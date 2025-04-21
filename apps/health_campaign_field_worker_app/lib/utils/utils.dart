@@ -1,5 +1,11 @@
 library app_utils;
 
+import 'package:registration_delivery/registration_delivery.init.dart'
+    as registration_delivery_mappers;
+import 'package:referral_reconciliation/referral_reconciliation.dart'
+    as referral_reconciliation_mappers;
+import 'package:inventory_management/inventory_management.init.dart'
+    as inventory_mappers;
 import 'dart:async';
 import 'dart:io';
 
@@ -461,6 +467,9 @@ initializeAllMappers() async {
     Future(() => attendance_mappers.initializeMappers()),
     Future(() => data_model_mappers.initializeMappers()),
     Future(() => dss_mappers.initializeMappers()),
+    Future(() => inventory_mappers.initializeMappers()),
+    Future(() => referral_reconciliation_mappers.initializeMappers()),
+    Future(() => registration_delivery_mappers.initializeMappers()),
   ];
   await Future.wait(initializations);
 }

@@ -9,7 +9,9 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:isar/isar.dart';
 import 'package:location/location.dart';
-
+import 'package:registration_delivery/data/repositories/local/household_global_search.dart';
+import 'package:registration_delivery/data/repositories/local/individual_global_search.dart';
+import 'package:registration_delivery/data/repositories/oplog/oplog.dart';
 import 'blocs/app_initialization/app_initialization.dart';
 import 'blocs/auth/auth.dart';
 import 'blocs/localization/localization.dart';
@@ -79,12 +81,17 @@ class MainApplicationState extends State<MainApplication>
           child: MultiBlocProvider(
             providers: [
               // INFO : Need to add bloc of package Here
-              BlocProvider(
-                create: (_) {
-                  return LocationBloc(location: Location())
-                    ..add(const LoadLocationEvent());
-                },
-                lazy: false,
+              RepositoryProvider<IndividualGlobalSearchRepository>(
+                create: (context) => IndividualGlobalSearchRepository(
+                  widget.sql,
+                  IndividualOpLogManager(widget.isar),
+                ),
+              ),
+              RepositoryProvider<HouseHoldGlobalSearchRepository>(
+                create: (context) => HouseHoldGlobalSearchRepository(
+                  widget.sql,
+                  HouseholdOpLogManager(widget.isar),
+                ),
               ),
               BlocProvider(
                 create: (_) {
@@ -94,6 +101,15 @@ class MainApplicationState extends State<MainApplication>
                 },
                 lazy: false,
               ),
+
+              BlocProvider(
+                create: (_) {
+                  return LocationBloc(location: Location())
+                    ..add(const LoadLocationEvent());
+                },
+                lazy: false,
+              ),
+
               BlocProvider(
                 create: (context) {
                   return UserBloc(
@@ -322,6 +338,7 @@ class MainApplicationState extends State<MainApplication>
                                 selectedLocale!.split("_").first,
                                 selectedLocale.split("_").last,
                               ),
+                              isar: widget.isar,
                             ),
                             locale: languages != null
                                 ? Locale(
