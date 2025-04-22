@@ -1,3 +1,12 @@
+import 'package:registration_delivery/router/registration_delivery_router.dart';
+import 'package:registration_delivery/router/registration_delivery_router.gm.dart';
+import 'package:referral_reconciliation/router/referral_reconciliation_router.gm.dart';
+import 'package:referral_reconciliation/router/referral_reconciliation_router.dart';
+
+import 'package:attendance_management/router/attendance_router.dart';
+import 'package:attendance_management/router/attendance_router.gm.dart';
+import 'package:inventory_management/router/inventory_router.dart';
+import 'package:inventory_management/router/inventory_router.gm.dart';
 import 'package:registration_delivery/registration_delivery.dart';
 import 'package:registration_delivery/router/registration_delivery_router.dart';
 import 'package:registration_delivery/router/registration_delivery_router.gm.dart';

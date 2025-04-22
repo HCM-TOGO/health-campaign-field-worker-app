@@ -17,6 +17,7 @@ import 'package:isar/isar.dart';
 import 'package:location/location.dart';
 import 'package:qr_flutter/qr_flutter.dart';
 import 'package:sync_service/sync_service_lib.dart';
+import 'package:survey_form/survey_form.dart';
 
 import '../blocs/app_initialization/app_initialization.dart';
 import '../blocs/auth/auth.dart';
@@ -125,6 +126,22 @@ class AuthenticatedPageWrapper extends StatelessWidget {
                   drawer: showDrawer ? drawerWidget(context) : null,
                   body: MultiBlocProvider(
                     providers: [
+                      BlocProvider(
+                        create: (_) => ServiceBloc(
+                          const ServiceEmptyState(),
+                          serviceDataRepository: context
+                              .repository<ServiceModel, ServiceSearchModel>(),
+                        ),
+                      ),
+
+                      BlocProvider(
+                        create: (_) => ServiceBloc(
+                          const ServiceEmptyState(),
+                          serviceDataRepository: context
+                              .repository<ServiceModel, ServiceSearchModel>(),
+                        ),
+                      ),
+
                       // INFO : Need to add bloc of package Here
                       BlocProvider(
                         create: (context) {
