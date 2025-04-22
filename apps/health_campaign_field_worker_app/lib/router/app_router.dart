@@ -29,6 +29,8 @@ import '../pages/unauthenticated.dart';
 import '../pages/beneficiary/beneficiary_search_page.dart';
 import '../pages/beneficiary/house_location_page.dart';
 export 'package:auto_route/auto_route.dart';
+import '../pages/beneficiary/custom_individual_details.dart';
+import '../pages/beneficiary/beneficiary_acknowledgement_page.dart';
 
 part 'app_router.gr.dart';
 
@@ -105,6 +107,13 @@ class AppRouter extends _$AppRouter {
                       page: IndividualDetailsRoute.page,
                       path: 'individual-details'),
                   AutoRoute(
+                      // initial: true,
+                      page: CustomIndividualDetailsRoute.page,
+                      path: 'custom-individual-details'),
+                  RedirectRoute(
+                      path: 'individual-details',
+                      redirectTo: 'custom-individual-details'),
+                  AutoRoute(
                       page: HouseHoldDetailsRoute.page,
                       path: 'household-details'),
                   AutoRoute(
@@ -124,6 +133,13 @@ class AppRouter extends _$AppRouter {
                     page: BeneficiaryAcknowledgementRoute.page,
                     path: 'beneficiary-acknowledgement',
                   ),
+                  AutoRoute(
+                    page: CustomBeneficiaryAcknowledgementRoute.page,
+                    path: 'custom-beneficiary-acknowledgement',
+                  ),
+                  RedirectRoute(
+                      path: 'beneficiary-acknowledgement',
+                      redirectTo: 'custom-beneficiary-acknowledgement'),
                 ],
               ),
               AutoRoute(

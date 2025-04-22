@@ -18,6 +18,7 @@ const householdLocation = HouseholdLocation();
 const searchBeneficiary = SearchBeneficiary();
 const individualDetails = IndividualDetails();
 const beneficiaryDetails = BeneficiaryDetails();
+const householdDetails = HouseholdDetails();
 
 const selectStockShowcase = SelectStockShowcase();
 const warehouseDetailsShowcase = WarehouseDetailsShowcase();
@@ -931,7 +932,7 @@ class IndividualDetails {
 
 class BeneficiaryDetails {
   const BeneficiaryDetails();
-
+  String get beneficiaryId => 'BENEFICIARY_ID';
   String get beneficiarysDetailsLabelText => 'BENEFICIARY_DETAILS_LABEL_TEXT';
   String get beneficiarysDetailsEditIconLabelText =>
       'BENEFICIARY_DETAILS_EDIT_ICON_LABEL_TEXT';
@@ -1007,6 +1008,28 @@ class BeneficiaryDetails {
   String get insufficientStorageContent =>
       'INSUFFICIENT_STORAGE_WARNING_CONTENT';
   String get recordCycle => 'BENEFICIARY_DETAILS_RECORD_CYCLE';
+}
+
+class HouseholdDetails {
+  const HouseholdDetails();
+
+  String get householdDetailsLabel => 'HOUSEHOLD_DETAILS_LABEL';
+
+  String get actionLabel => 'HOUSEHOLD_ACTION_LABEL';
+
+  String get dateOfRegistrationLabel =>
+      'HOUSEHOLD_DETAILS_DATE_OF_REGISTRATION_LABEL';
+
+  String get dateOfAdministrationLabel =>
+      'HOUSEHOLD_DETAILS_DATE_OF_ADMINISTRATION_LABEL';
+
+  String get noOfMembersCountLabel => 'NO_OF_MEMBERS_COUNT_LABEL';
+  String get viewHouseHoldDetailsActionSMC =>
+      'VIEW_HOUSEHOLD_DETAILS_ACTION_LABEL_SMC';
+
+  String get reasonLabelText => 'REASON_LABEL_TEXT';
+  String get householdDetailsDescriptionSMC =>
+      'HOUSEHOLD_DETAILS_DESCRIPTION_SMC';
 }
 
 class PrivacyPolicy {
