@@ -25,7 +25,6 @@ import 'package:inventory_management/inventory_management.dart';
 import 'package:attendance_management/attendance_management.dart';
 import 'package:referral_reconciliation/referral_reconciliation.dart';
 import 'package:registration_delivery/registration_delivery.dart';
-// import 'package:checklist/checklist.dart';
 import 'package:survey_form/survey_form.dart';
 import 'package:complaints/complaints.dart';
 
@@ -270,96 +269,11 @@ class NetworkManagerProviderWrapper extends StatelessWidget {
           StockOpLogManager(isar),
         ),
       ),
-      RepositoryProvider<
-          LocalRepository<StockReconciliationModel,
-              StockReconciliationSearchModel>>(
-        create: (_) => StockReconciliationLocalRepository(
-          sql,
-          StockReconciliationOpLogManager(isar),
-        ),
-      ),
-      RepositoryProvider<
-          LocalRepository<AttendanceRegisterModel,
-              AttendanceRegisterSearchModel>>(
-        create: (_) => AttendanceLocalRepository(
-          sql,
-          AttendanceOpLogManager(isar),
-        ),
-      ),
-      RepositoryProvider<
-          LocalRepository<AttendanceLogModel, AttendanceLogSearchModel>>(
-        create: (_) => AttendanceLogsLocalRepository(
-          sql,
-          AttendanceLogOpLogManager(isar),
-        ),
-      ),
-      RepositoryProvider<
-          LocalRepository<ServiceDefinitionModel,
-              ServiceDefinitionSearchModel>>(
-        create: (_) => ServiceDefinitionLocalRepository(
-          sql,
-          ServiceDefinitionOpLogManager(
-            isar,
-          ),
-        ),
-      ),
+
       RepositoryProvider<LocalRepository<ServiceModel, ServiceSearchModel>>(
         create: (_) => ServiceLocalRepository(
           sql,
           ServiceOpLogManager(isar),
-        ),
-      ),
-      RepositoryProvider<
-          LocalRepository<HFReferralModel, HFReferralSearchModel>>(
-        create: (_) => HFReferralLocalRepository(
-          sql,
-          HFReferralOpLogManager(isar),
-        ),
-      ),
-      RepositoryProvider<
-          LocalRepository<HouseholdMemberModel, HouseholdMemberSearchModel>>(
-        create: (_) => HouseholdMemberLocalRepository(
-          sql,
-          HouseholdMemberOpLogManager(isar),
-        ),
-      ),
-      RepositoryProvider<LocalRepository<HouseholdModel, HouseholdSearchModel>>(
-        create: (_) => HouseholdLocalRepository(
-          sql,
-          HouseholdOpLogManager(isar),
-        ),
-      ),
-      RepositoryProvider<
-          LocalRepository<ProjectBeneficiaryModel,
-              ProjectBeneficiarySearchModel>>(
-        create: (_) => ProjectBeneficiaryLocalRepository(
-          sql,
-          ProjectBeneficiaryOpLogManager(isar),
-        ),
-      ),
-      RepositoryProvider<LocalRepository<TaskModel, TaskSearchModel>>(
-        create: (_) => TaskLocalRepository(
-          sql,
-          TaskOpLogManager(isar),
-        ),
-      ),
-      RepositoryProvider<LocalRepository<ReferralModel, ReferralSearchModel>>(
-        create: (_) => ReferralLocalRepository(
-          sql,
-          ReferralOpLogManager(isar),
-        ),
-      ),
-      RepositoryProvider<
-          LocalRepository<SideEffectModel, SideEffectSearchModel>>(
-        create: (_) => SideEffectLocalRepository(
-          sql,
-          SideEffectOpLogManager(isar),
-        ),
-      ),
-      RepositoryProvider<RegistrationDeliveryAddressRepo>(
-        create: (_) => RegistrationDeliveryAddressRepo(
-          sql,
-          AddressOpLogManager(isar),
         ),
       ),
       RepositoryProvider<
@@ -370,13 +284,6 @@ class NetworkManagerProviderWrapper extends StatelessWidget {
           ServiceDefinitionOpLogManager(isar),
         ),
       ),
-      RepositoryProvider<
-          LocalRepository<PgrServiceModel, PgrServiceSearchModel>>(
-        create: (_) => PgrServiceLocalRepository(
-          sql,
-          PgrServiceOpLogManager(isar),
-        ),
-      )
     ];
   }
 

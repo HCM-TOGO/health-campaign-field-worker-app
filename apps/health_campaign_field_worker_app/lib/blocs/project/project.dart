@@ -1,5 +1,3 @@
-// import 'package:checklist/checklist.dart';
-
 // GENERATED using mason_cli
 import 'dart:async';
 import 'dart:core';
@@ -125,8 +123,6 @@ class ProjectBloc extends Bloc<ProjectEvent, ProjectState> {
   ProjectBloc({
     required this.serviceDefinitionRemoteRepository,
     required this.serviceDefinitionLocalRepository,
-
-
     LocalSecureStore? localSecureStore,
     required this.bandwidthCheckRepository,
     required this.projectStaffRemoteRepository,
@@ -259,26 +255,6 @@ class ProjectBloc extends Bloc<ProjectEvent, ProjectState> {
 
     if (projects.isNotEmpty) {
       // INFO : Need to add project load functionstry {
-      try {
-        await _loadServiceDefinition(projects);
-      } catch (_) {
-        emit(
-          state.copyWith(
-            loading: false,
-            syncError: ProjectSyncErrorType.serviceDefinitions,
-          ),
-        );
-      }
-      try {
-        await _loadServiceDefinition(projects);
-      } catch (_) {
-        emit(
-          state.copyWith(
-            loading: false,
-            syncError: ProjectSyncErrorType.serviceDefinitions,
-          ),
-        );
-      }
 
       try {
         await _loadServiceDefinition(projects);

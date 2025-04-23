@@ -251,30 +251,6 @@ class Constants {
           ReferralRemoteRepository(dio, actionMap: actions),
         if (value == DataModelType.stock)
           StockRemoteRepository(dio, actionMap: actions),
-        if (value == DataModelType.stockReconciliation)
-          StockReconciliationRemoteRepository(dio, actionMap: actions),
-        if (value == DataModelType.attendanceRegister)
-          AttendanceRemoteRepository(dio, actionMap: actions),
-        if (value == DataModelType.attendance)
-          AttendanceLogRemoteRepository(dio, actionMap: actions),
-        if (value == DataModelType.serviceDefinition)
-          ServiceDefinitionRemoteRepository(dio, actionMap: actions),
-        if (value == DataModelType.service)
-          ServiceRemoteRepository(dio, actionMap: actions),
-        if (value == DataModelType.hFReferral)
-          HFReferralRemoteRepository(dio, actionMap: actions),
-        if (value == DataModelType.household)
-          HouseholdRemoteRepository(dio, actionMap: actions),
-        if (value == DataModelType.projectBeneficiary)
-          ProjectBeneficiaryRemoteRepository(dio, actionMap: actions),
-        if (value == DataModelType.task)
-          TaskRemoteRepository(dio, actionMap: actions),
-        if (value == DataModelType.householdMember)
-          HouseholdMemberRemoteRepository(dio, actionMap: actions),
-        if (value == DataModelType.sideEffect)
-          SideEffectRemoteRepository(dio, actionMap: actions),
-        if (value == DataModelType.referral)
-          ReferralRemoteRepository(dio, actionMap: actions),
         if (value == DataModelType.serviceDefinition)
           ServiceDefinitionRemoteRepository(dio, actionMap: actions),
         if (value == DataModelType.service)
@@ -323,14 +299,11 @@ class Constants {
     SyncServiceSingleton().setRegistries(SyncServiceRegistry());
     SyncServiceSingleton().registries?.registerSyncRegistries({
       DataModelType.complaints: (remote) => CustomSyncRegistry(remote),
-
-      // AttendanceSingleton().setTenantId(envConfig.variables.tenantId);
-
-      //       InventorySingleton().setTenantId(tenantId: envConfig.variables.tenantId);
-
-      // ReferralReconSingleton().setTenantId(envConfig.variables.tenantId);
-      //   RegistrationDeliverySingleton().setTenantId(envConfig.variables.tenantId);
     });
+    AttendanceSingleton().setTenantId(envConfig.variables.tenantId);
+    InventorySingleton().setTenantId(tenantId: envConfig.variables.tenantId);
+    ReferralReconSingleton().setTenantId(envConfig.variables.tenantId);
+    RegistrationDeliverySingleton().setTenantId(envConfig.variables.tenantId);
   }
 }
 

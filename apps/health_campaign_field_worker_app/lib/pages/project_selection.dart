@@ -291,21 +291,7 @@ class _ProjectSelectionPageState extends LocalizedState<ProjectSelectionPage> {
   List<String> getHouseholdFiltersBasedOnProjectType(
       AppConfiguration appConfiguration, BuildContext context) {
     List<String> list = [];
-    // if (context.selectedProject.additionalDetails?.projectType?.code ==
-    //     ProjectTypes.smc.toValue()) {
-    //   if (appConfiguration.searchHouseHoldFiltersSMC != null) {
-    //     list.addAll(appConfiguration.searchHouseHoldFiltersSMC!
-    //         .map((e) => e.code)
-    //         .toList());
-    //   }
-    // } else {
-    //   if (appConfiguration.searchHouseHoldFilters != null) {
-    //     list.addAll(appConfiguration.searchHouseHoldFilters!
-    //         .map((e) => e.code)
-    //         .toList());
-    //   }
-    // }
-
+    // TODO add the household search logic if required
     return list;
   }
 
@@ -384,11 +370,6 @@ class _ProjectSelectionPageState extends LocalizedState<ProjectSelectionPage> {
               refusalReasons:
                   appConfiguration.refusalReasons?.map((e) => e.code).toList(),
               searchCLFFilters: []);
-          // ClosedHouseholdSingleton().setInitialData(
-          //   loggedInUserUuid: context.loggedInUserUuid,
-          //   projectId: context.projectId,
-          //   beneficiaryType: context.beneficiaryType,
-          // );
         });
   }
 }
