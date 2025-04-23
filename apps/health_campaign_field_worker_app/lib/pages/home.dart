@@ -16,6 +16,10 @@ import 'package:flutter/material.dart';
 import 'package:flutter_background_service/flutter_background_service.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
+import 'package:inventory_management/models/entities/inventory_transport_type.dart';
+import 'package:inventory_management/models/entities/stock.dart';
+import 'package:inventory_management/router/inventory_router.gm.dart';
+import 'package:inventory_management/utils/utils.dart';
 import 'package:sync_service/blocs/sync/sync.dart';
 
 import '../blocs/app_initialization/app_initialization.dart';
@@ -314,6 +318,47 @@ class _HomePageState extends LocalizedState<HomePage> {
         ),
       ),
 
+      i18.home.manageStockLabel:
+          homeShowcaseData.warehouseManagerManageStock.buildWith(
+        child: HomeItemCard(
+          icon: Icons.store_mall_directory,
+          label: i18.home.manageStockLabel,
+          onPressed: () {
+            context.read<AppInitializationBloc>().state.maybeWhen(
+                  orElse: () {},
+                  initialized: (
+                    AppConfiguration appConfiguration,
+                    _,
+                    __,
+                  ) {
+                    context.router.push(ManageStocksRoute());
+                  },
+                );
+          },
+        ),
+      ),
+
+      i18.home.stockReconciliationLabel:
+          homeShowcaseData.wareHouseManagerStockReconciliation.buildWith(
+        child: HomeItemCard(
+          icon: Icons.menu_book,
+          label: i18.home.stockReconciliationLabel,
+          onPressed: () {
+            context.router.push(StockReconciliationRoute());
+          },
+        ),
+      ),
+
+      i18.home.viewReportsLabel: homeShowcaseData.inventoryReport.buildWith(
+        child: HomeItemCard(
+          icon: Icons.announcement,
+          label: i18.home.viewReportsLabel,
+          onPressed: () {
+            context.router.push(InventoryReportSelectionRoute());
+          },
+        ),
+      ),
+
       i18.home.syncDataLabel: homeShowcaseData.distributorSyncData.buildWith(
         child: StreamBuilder<Map<String, dynamic>?>(
           stream: FlutterBackgroundService().on('serviceRunning'),
@@ -372,6 +417,11 @@ class _HomePageState extends LocalizedState<HomePage> {
 
     final Map<String, GlobalKey> homeItemsShowcaseMap = {
       // INFO : Need to add showcase keys of package Here
+      i18.home.manageStockLabel:
+          homeShowcaseData.warehouseManagerManageStock.showcaseKey,
+      i18.home.stockReconciliationLabel:
+          homeShowcaseData.wareHouseManagerStockReconciliation.showcaseKey,
+      i18.home.viewReportsLabel: homeShowcaseData.inventoryReport.showcaseKey,
       i18.home.syncDataLabel: homeShowcaseData.distributorSyncData.showcaseKey,
       i18.home.db: homeShowcaseData.db.showcaseKey,
       i18.home.dashboard: homeShowcaseData.dashBoard.showcaseKey,
@@ -380,6 +430,9 @@ class _HomePageState extends LocalizedState<HomePage> {
 
     final homeItemsLabel = <String>[
       // INFO: Need to add items label of package Here
+      i18.home.manageStockLabel,
+      i18.home.stockReconciliationLabel,
+      i18.home.viewReportsLabel,
       i18.home.syncDataLabel,
       i18.home.db,
       i18.home.dashboard,
@@ -424,7 +477,8 @@ class _HomePageState extends LocalizedState<HomePage> {
                 context.read<
                     LocalRepository<IndividualModel, IndividualSearchModel>>(),
                 context.read<
-                    LocalRepository<UserActionModel, UserActionSearchModel>>()
+                    LocalRepository<UserActionModel, UserActionSearchModel>>(),
+                context.read<LocalRepository<StockModel, StockSearchModel>>(),
               ],
               remoteRepositories: [
                 // INFO : Need to add repo repo of package Here
@@ -494,6 +548,28 @@ void setPackagesSingleton(BuildContext context) {
           projectId: context.projectId,
           loggedInUserUuid: context.loggedInUserUuid,
         );
+        InventorySingleton().setInitialData(
+          isWareHouseMgr: context.loggedInUserRoles
+              .where(
+                  (role) => role.code == RolesType.warehouseManager.toValue())
+              .toList()
+              .isNotEmpty,
+          isDistributor: context.loggedInUserRoles
+              .where(
+                (role) => role.code == RolesType.distributor.toValue(),
+              )
+              .toList()
+              .isNotEmpty,
+          loggedInUser: context.loggedInUserModel,
+          projectId: context.projectId,
+          loggedInUserUuid: context.loggedInUserUuid,
+          transportTypes: appConfiguration.transportTypes
+              ?.map((e) => InventoryTransportTypes()
+                ..name = e.code
+                ..code = e.code)
+              .toList(),
+        );
+        InventorySingleton().setBoundary(boundary: context.boundary);
       });
 }
 

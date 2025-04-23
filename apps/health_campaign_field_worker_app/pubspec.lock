@@ -427,9 +427,11 @@ packages:
   dart_mappable_builder:
     dependency: "direct dev"
     description:
-      path: "../../packages/dart_mappable_builder"
-      relative: true
-    source: path
+      path: "packages/dart_mappable_builder"
+      ref: master
+      resolved-ref: "9eb891657db6122039e462b4fb1920b93f819b80"
+      url: "https://github.com/egovernments/health-campaign-field-worker-app/"
+    source: git
     version: "4.2.3"
   dart_style:
     dependency: transitive
@@ -1282,6 +1284,14 @@ packages:
       url: "https://pub.dev"
     source: hosted
     version: "0.19.0"
+  inventory_management:
+    dependency: "direct main"
+    description:
+      name: inventory_management
+      sha256: "481b9ecb81900287632a79048e1ded36bb66415714f0ab5a30a38c94aa3d7cec"
+      url: "https://pub.dev"
+    source: hosted
+    version: "1.0.5"
   io:
     dependency: transitive
     description:

@@ -15,6 +15,9 @@ import '../blocs/localization/app_localization.dart';
 import '../data/local_store/no_sql/schema/app_configuration.dart';
 import '../data/repositories/local/localization.dart';
 
+import 'package:inventory_management/blocs/app_localization.dart'
+    as inventory_localization;
+
 getAppLocalizationDelegates({
   required LocalSqlDataStore sql,
   required AppConfiguration appConfig,
@@ -41,6 +44,10 @@ getAppLocalizationDelegates({
       appConfig.languages!,
     ),
     component_localization.ComponentLocalization.getDelegate(
+      LocalizationLocalRepository().returnLocalizationFromSQL(sql) as Future,
+      appConfig.languages!,
+    ),
+    inventory_localization.InventoryLocalization.getDelegate(
       LocalizationLocalRepository().returnLocalizationFromSQL(sql) as Future,
       appConfig.languages!,
     ),

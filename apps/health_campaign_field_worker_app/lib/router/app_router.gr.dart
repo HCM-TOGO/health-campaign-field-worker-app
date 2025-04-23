@@ -132,6 +132,7 @@ abstract class _$AppRouter extends RootStackRouter {
         ),
       );
     },
+    ...InventoryRoute().pagesMap,
   };
 }
 

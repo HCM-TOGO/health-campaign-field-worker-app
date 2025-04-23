@@ -1,6 +1,8 @@
 import 'package:auto_route/auto_route.dart';
 import 'package:digit_data_model/data_model.dart';
 import 'package:flutter/material.dart';
+import 'package:inventory_management/router/inventory_router.dart';
+import 'package:inventory_management/router/inventory_router.gm.dart';
 
 import '../blocs/localization/app_localization.dart';
 import '../pages/acknowledgement.dart';
@@ -22,7 +24,7 @@ part 'app_router.gr.dart';
 @AutoRouterConfig(
   // INFO : Need to add the router modules here
   modules: [
-
+    InventoryRoute,
   ],
 )
 class AppRouter extends _$AppRouter {
@@ -56,6 +58,54 @@ class AppRouter extends _$AppRouter {
         ),
 
         // INFO : Need to add Router of package Here
+
+        AutoRoute(
+          page: ManageStocksRoute.page,
+          path: 'manage-stocks',
+        ),
+        AutoRoute(
+          page: RecordStockWrapperRoute.page,
+          path: 'record-stock',
+          children: [
+            AutoRoute(
+              page: WarehouseDetailsRoute.page,
+              path: 'warehouse-details',
+              initial: true,
+            ),
+            // AutoRoute(
+            //   page: CustomWarehouseDetailsRoute.page,
+            //   path: 'custom-warehouse-details',
+            //   initial: true,
+            // ),
+            AutoRoute(
+              page: StockDetailsRoute.page,
+              path: 'details',
+            ),
+            // AutoRoute(
+            //   page: CustomStockDetailsRoute.page,
+            //   path: 'custom-details',
+            // ),
+            RedirectRoute(
+              path: 'details',
+              redirectTo: 'custom-details',
+            ),
+          ],
+        ),
+
+        AutoRoute(
+          page: StockReconciliationRoute.page,
+          path: 'stock-reconciliation',
+        ),
+
+        AutoRoute(
+          page: InventoryReportSelectionRoute.page,
+          path: 'inventory-report-selection',
+        ),
+
+        AutoRoute(
+          page: InventoryReportDetailsRoute.page,
+          path: 'inventory-report-details',
+        ),
 
         AutoRoute(page: AcknowledgementRoute.page, path: 'acknowledgement'),
 
