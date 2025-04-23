@@ -1,4 +1,4 @@
-      // import 'package:checklist/checklist.dart';
+// import 'package:checklist/checklist.dart';
 
 // GENERATED using mason_cli
 import 'dart:async';
@@ -32,7 +32,8 @@ part 'project.freezed.dart';
 
 typedef ProjectEmitter = Emitter<ProjectState>;
 
-class ProjectBloc extends Bloc<ProjectEvent, ProjectState> {FutureOr<void> _loadServiceDefinition(List<ProjectModel> projects) async {
+class ProjectBloc extends Bloc<ProjectEvent, ProjectState> {
+  FutureOr<void> _loadServiceDefinition(List<ProjectModel> projects) async {
     final configs = await isar.appConfigurations.where().findAll();
     final userObject = await localSecureStore.userRequestModel;
     List<String> codes = [];
@@ -40,8 +41,8 @@ class ProjectBloc extends Bloc<ProjectEvent, ProjectState> {FutureOr<void> _load
       configs.first.checklistTypes?.map((e) => e.code).forEach((element) {
         for (final project in projects) {
           codes.add(
-          '${project.name}.$element.${elements.code.snakeCase.toUpperCase()}',
-        );
+            '${project.name}.$element.${elements.code.snakeCase.toUpperCase()}',
+          );
         }
       });
     }
@@ -59,39 +60,8 @@ class ProjectBloc extends Bloc<ProjectEvent, ProjectState> {FutureOr<void> _load
       );
     }
   }
-/// Service Definition Repositories
-  final RemoteRepository<ServiceDefinitionModel, ServiceDefinitionSearchModel>
-      serviceDefinitionRemoteRepository;
-  final LocalRepository<ServiceDefinitionModel, ServiceDefinitionSearchModel>
-      serviceDefinitionLocalRepository;
-FutureOr<void> _loadServiceDefinition(List<ProjectModel> projects) async {
-    final configs = await isar.appConfigurations.where().findAll();
-    final userObject = await localSecureStore.userRequestModel;
-    List<String> codes = [];
-    for (UserRoleModel elements in userObject!.roles) {
-      configs.first.checklistTypes?.map((e) => e.code).forEach((element) {
-        for (final project in projects) {
-          codes.add(
-          '${project.name}.$element.${elements.code.snakeCase.toUpperCase()}',
-        );
-        }
-      });
-    }
 
-    final serviceDefinition = await serviceDefinitionRemoteRepository
-        .search(ServiceDefinitionSearchModel(
-      tenantId: envConfig.variables.tenantId,
-      code: codes,
-    ));
-
-    for (var element in serviceDefinition) {
-      await serviceDefinitionLocalRepository.create(
-        element,
-        createOpLog: false,
-      );
-    }
-  }
-/// Service Definition Repositories
+  /// Service Definition Repositories
   final RemoteRepository<ServiceDefinitionModel, ServiceDefinitionSearchModel>
       serviceDefinitionRemoteRepository;
   final LocalRepository<ServiceDefinitionModel, ServiceDefinitionSearchModel>
@@ -152,10 +122,10 @@ FutureOr<void> _loadServiceDefinition(List<ProjectModel> projects) async {
   final DashboardRemoteRepository dashboardRemoteRepository;
   BuildContext context;
 
-  ProjectBloc({// required this.serviceDefinitionRemoteRepository,
-  // required this.serviceDefinitionLocalRepository,
-// required this.serviceDefinitionRemoteRepository,
-  // required this.serviceDefinitionLocalRepository,
+  ProjectBloc({
+    required this.serviceDefinitionRemoteRepository,
+    required this.serviceDefinitionLocalRepository,
+
 
     LocalSecureStore? localSecureStore,
     required this.bandwidthCheckRepository,
@@ -289,6 +259,7 @@ FutureOr<void> _loadServiceDefinition(List<ProjectModel> projects) async {
 
     if (projects.isNotEmpty) {
       // INFO : Need to add project load functionstry {
+      try {
         await _loadServiceDefinition(projects);
       } catch (_) {
         emit(
@@ -308,7 +279,6 @@ FutureOr<void> _loadServiceDefinition(List<ProjectModel> projects) async {
           ),
         );
       }
-    }
 
       try {
         await _loadServiceDefinition(projects);
@@ -320,8 +290,6 @@ FutureOr<void> _loadServiceDefinition(List<ProjectModel> projects) async {
           ),
         );
       }
-    }
-
 
       try {
         await _loadProjectFacilities(projects, batchSize);

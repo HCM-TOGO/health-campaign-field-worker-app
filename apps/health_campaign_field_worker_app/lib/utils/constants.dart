@@ -124,19 +124,20 @@ class Constants {
       ),
       LocationTrackerLocalBaseRepository(
           sql, LocationTrackerOpLogManager(isar)),
-
-StockLocalRepository(sql, StockOpLogManager(isar)),
-StockReconciliationLocalRepository(sql,StockReconciliationOpLogManager(isar),),
-AttendanceLocalRepository(
-  sql,
-  AttendanceOpLogManager(isar),
-),
-AttendanceLogsLocalRepository(
-  sql,
-  AttendanceLogOpLogManager(isar),
-),
-
-ServiceDefinitionLocalRepository(
+      StockLocalRepository(sql, StockOpLogManager(isar)),
+      StockReconciliationLocalRepository(
+        sql,
+        StockReconciliationOpLogManager(isar),
+      ),
+      AttendanceLocalRepository(
+        sql,
+        AttendanceOpLogManager(isar),
+      ),
+      AttendanceLogsLocalRepository(
+        sql,
+        AttendanceLogOpLogManager(isar),
+      ),
+      ServiceDefinitionLocalRepository(
         sql,
         ServiceDefinitionOpLogManager(isar),
       ),
@@ -144,9 +145,7 @@ ServiceDefinitionLocalRepository(
         sql,
         ServiceOpLogManager(isar),
       ),
-
-    HFReferralLocalRepository(sql, HFReferralOpLogManager(isar)),
-
+      HFReferralLocalRepository(sql, HFReferralOpLogManager(isar)),
       HouseholdMemberLocalRepository(sql, HouseholdMemberOpLogManager(isar)),
       HouseholdLocalRepository(sql, HouseholdOpLogManager(isar)),
       ProjectBeneficiaryLocalRepository(
@@ -158,8 +157,7 @@ ServiceDefinitionLocalRepository(
       TaskLocalRepository(sql, TaskOpLogManager(isar)),
       SideEffectLocalRepository(sql, SideEffectOpLogManager(isar)),
       ReferralLocalRepository(sql, ReferralOpLogManager(isar)),
-
-ServiceDefinitionLocalRepository(
+      ServiceDefinitionLocalRepository(
         sql,
         ServiceDefinitionOpLogManager(isar),
       ),
@@ -167,7 +165,7 @@ ServiceDefinitionLocalRepository(
         sql,
         ServiceOpLogManager(isar),
       ),
-  ];
+    ];
   }
 
   Future<void> _initializeIsar(version) async {
@@ -251,38 +249,37 @@ ServiceDefinitionLocalRepository(
           SideEffectRemoteRepository(dio, actionMap: actions),
         if (value == DataModelType.referral)
           ReferralRemoteRepository(dio, actionMap: actions),
+        if (value == DataModelType.stock)
+          StockRemoteRepository(dio, actionMap: actions),
+        if (value == DataModelType.stockReconciliation)
+          StockReconciliationRemoteRepository(dio, actionMap: actions),
+        if (value == DataModelType.attendanceRegister)
+          AttendanceRemoteRepository(dio, actionMap: actions),
+        if (value == DataModelType.attendance)
+          AttendanceLogRemoteRepository(dio, actionMap: actions),
+        if (value == DataModelType.serviceDefinition)
+          ServiceDefinitionRemoteRepository(dio, actionMap: actions),
+        if (value == DataModelType.service)
+          ServiceRemoteRepository(dio, actionMap: actions),
+        if (value == DataModelType.hFReferral)
+          HFReferralRemoteRepository(dio, actionMap: actions),
+        if (value == DataModelType.household)
+          HouseholdRemoteRepository(dio, actionMap: actions),
+        if (value == DataModelType.projectBeneficiary)
+          ProjectBeneficiaryRemoteRepository(dio, actionMap: actions),
+        if (value == DataModelType.task)
+          TaskRemoteRepository(dio, actionMap: actions),
+        if (value == DataModelType.householdMember)
+          HouseholdMemberRemoteRepository(dio, actionMap: actions),
+        if (value == DataModelType.sideEffect)
+          SideEffectRemoteRepository(dio, actionMap: actions),
+        if (value == DataModelType.referral)
+          ReferralRemoteRepository(dio, actionMap: actions),
+        if (value == DataModelType.serviceDefinition)
+          ServiceDefinitionRemoteRepository(dio, actionMap: actions),
+        if (value == DataModelType.service)
+          ServiceRemoteRepository(dio, actionMap: actions),
       ]);
-          if (value == DataModelType.stock)
-       StockRemoteRepository(dio, actionMap: actions),
-    if (value == DataModelType.stockReconciliation)
-       StockReconciliationRemoteRepository(dio, actionMap: actions),
-    if (value == DataModelType.attendanceRegister)
-  AttendanceRemoteRepository(dio, actionMap: actions),
-if (value == DataModelType.attendance)
-  AttendanceLogRemoteRepository(dio, actionMap: actions),
-  if (value == DataModelType.serviceDefinition)
-          ServiceDefinitionRemoteRepository(dio, actionMap: actions),
-if (value == DataModelType.service)
-          ServiceRemoteRepository(dio, actionMap: actions),
-      if (value == DataModelType.hFReferral)
-    HFReferralRemoteRepository(dio, actionMap: actions),
-      if (value == DataModelType.household)
-      HouseholdRemoteRepository(dio, actionMap: actions),
-    if (value == DataModelType.projectBeneficiary)
-      ProjectBeneficiaryRemoteRepository(dio, actionMap: actions),
-    if (value == DataModelType.task)
-      TaskRemoteRepository(dio, actionMap: actions),
-    if (value == DataModelType.householdMember)
-      HouseholdMemberRemoteRepository(dio, actionMap: actions),
-    if (value == DataModelType.sideEffect)
-      SideEffectRemoteRepository(dio, actionMap: actions),
-    if (value == DataModelType.referral)
-      ReferralRemoteRepository(dio, actionMap: actions),
-    if (value == DataModelType.serviceDefinition)
-          ServiceDefinitionRemoteRepository(dio, actionMap: actions),
-if (value == DataModelType.service)
-          ServiceRemoteRepository(dio, actionMap: actions),
-  ]);
     }
 
     return remoteRepositories;
