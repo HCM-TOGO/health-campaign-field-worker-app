@@ -93,7 +93,7 @@ class CustomBeneficiaryAcknowledgementPageState
         },
         enableViewHousehold: widget.enableViewHousehold ?? false,
         secondaryLabel: localizations.translate(
-          i18_local.householdDetails.viewHouseHoldDetailsActionSMC,
+          i18_local.householdDetails.viewHouseHoldDetailsAction,
         ),
         subLabel: getSubText(wrapper),
         actionLabel:

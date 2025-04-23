@@ -38,6 +38,8 @@ const complaintsInboxShowcase = ComplaintsInboxShowcase();
 class Common {
   const Common();
 
+  String get min3CharsRequired => 'MIN_REQUIRED_3';
+
   String get coreCommonContinue => 'CORE_COMMON_CONTINUE';
 
   String get coreCommonAge => 'CORE_COMMON_AGE';
@@ -887,9 +889,35 @@ class SearchBeneficiary {
 class IndividualDetails {
   const IndividualDetails();
 
+  String get previousCycleBeneficiaryLabelText =>
+      'PREVIOUS_CYCLE_BENEFICIARY_LABEL';
+
+  String get mobileMinLengthValidationMessage =>
+      'MOBILE_MIN_LENGTH_VALIDATION';
+
+  String get individualsChildDetailsLabelText =>
+      'INDIVIDUAL_CHILD_LABEL_TEXT';
+
   String get individualsDetailsLabelText => 'INDIVIDUAL_LABEL_TEXT';
 
+  String get headHouseholdDetailsLabelText => 'HOUSEHOLD_HEAD_LABEL_TEXT';
+
+  String get childIndividualsDetailsLabelText => 'CHILD_INDIVIDUAL_LABEL_TEXT';
+
   String get nameLabelText => 'INDIVIDUAL_NAME_LABEL_TEXT';
+
+  String get firstNameLabelText => 'INDIVIDUAL_FIRST_NAME_LABEL_TEXT';
+
+  String get firstNameHeadLabelText => 'HEAD_HOUSEHOLD_FIRST_NAME_LABEL_TEXT';
+
+  String get lastNameLabelText => 'INDIVIDUAL_LAST_NAME_LABEL_TEXT';
+
+  String get lastNameHeadLabelText => 'HEAD_HOUSEHOLD_LAST_NAME_LABEL_TEXT';
+
+  String get childFirstNameLabelText =>
+      'CHILD_INDIVIDUAL_FIRST_NAME_LABEL_TEXT';
+
+  String get childLastNameLabelText => 'CHILD_INDIVIDUAL_LAST_NAME_LABEL_TEXT';
 
   String get checkboxLabelText => 'HEAD_OF_HOUSEHOLD_LABEL_TEXT';
 
@@ -927,8 +955,17 @@ class IndividualDetails {
 
   String get yearsAndMonthsErrorText => 'ERR_YEARS_AND_MONTHS';
 
-  String get linkVoucherToIndividual => 'LINK_VOUCHER_TO_INDIVIDUAL';
+  String get firstNameIsRequiredError => 'FIRST_NAME_REQUIRED_ERROR_MESSAGE';
+
+  String get firstNameLengthError => 'FIRST_NAME_LENGTH_ERROR_MESSAGE';
+
+  String get lastNameLengthError => 'LAST_NAME_LENGTH_ERROR_MESSAGE';
+
+  String get lastNameIsRequiredError => 'LAST_NAME_REQUIRED_ERROR_MESSAGE';
+
+  String get headAgeValidError => 'HEAD_VALID_AGE_ERROR_MESSAGE';
 }
+
 
 class BeneficiaryDetails {
   const BeneficiaryDetails();

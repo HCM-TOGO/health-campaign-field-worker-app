@@ -12,8 +12,10 @@ import 'package:location/location.dart';
 import 'package:registration_delivery/data/repositories/local/household_global_search.dart';
 import 'package:registration_delivery/data/repositories/local/individual_global_search.dart';
 import 'package:registration_delivery/data/repositories/oplog/oplog.dart';
+import 'package:registration_delivery/utils/typedefs.dart';
 import 'blocs/app_initialization/app_initialization.dart';
 import 'blocs/auth/auth.dart';
+import 'blocs/beneficiary_registration/beneficiary_registration.dart';
 import 'blocs/localization/localization.dart';
 import 'blocs/project/project.dart';
 import 'data/local_store/app_shared_preferences.dart';
@@ -26,6 +28,7 @@ import 'router/app_navigator_observer.dart';
 import 'router/app_router.dart';
 import 'utils/environment_config.dart';
 import 'utils/localization_delegates.dart';
+import 'utils/typedefs.dart';
 import 'utils/utils.dart';
 import 'widgets/network_manager_provider_wrapper.dart';
 
@@ -123,6 +126,7 @@ class MainApplicationState extends State<MainApplication>
                 create: (ctx) => AuthBloc(
                   authRepository: ctx.read(),
                   mdmsRepository: MdmsRepository(widget.client),
+                  
                   individualRemoteRepository: ctx.read<
                       RemoteRepository<IndividualModel,
                           IndividualSearchModel>>(),
@@ -132,6 +136,20 @@ class MainApplicationState extends State<MainApplication>
                     ),
                   ),
               ),
+              BlocProvider<BeneficiaryRegistrationBloc>(
+               create: (context) => BeneficiaryRegistrationBloc(
+                 const BeneficiaryRegistrationState.create(),
+                 individualRepository:
+                     context.read<IndividualDataRepository>(),
+                 householdRepository: context.read<HouseholdDataRepository>(),
+                 householdMemberRepository:
+                     context.read<HouseholdMemberDataRepository>(),
+                 projectBeneficiaryRepository:
+                     context.read<ProjectBeneficiaryDataRepository>(),
+                //  taskDataRepository: context.read<TaskDataRepository>(),
+                 beneficiaryType: BeneficiaryType.household, // or .household
+               ),
+             ),
               BlocProvider(
                 create: (ctx) => BoundaryBloc(
                   const BoundaryState(),

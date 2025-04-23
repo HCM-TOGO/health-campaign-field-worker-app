@@ -31,7 +31,9 @@ import '../pages/beneficiary/house_location_page.dart';
 export 'package:auto_route/auto_route.dart';
 import '../pages/beneficiary/custom_individual_details.dart';
 import '../pages/beneficiary/beneficiary_acknowledgement_page.dart';
-
+import '../pages/consent/household_consent.dart';
+import '../pages/beneficiary/widgets/consent_household_acknowledgement.dart';
+import '../pages/beneficiary/household_overview.dart';
 part 'app_router.gr.dart';
 
 @AutoRouterConfig(
@@ -159,6 +161,13 @@ class AppRouter extends _$AppRouter {
                     path: 'overview',
                     initial: true,
                   ),
+                  AutoRoute(
+                    page: CustomHouseholdOverviewRoute.page,
+                    path: 'custom-overview',
+                  ),
+                  RedirectRoute(
+                      path: 'overview',
+                      redirectTo: 'custom-overview'),
                   AutoRoute(
                     page: BeneficiaryDetailsRoute.page,
                     path: 'beneficiary-details',
