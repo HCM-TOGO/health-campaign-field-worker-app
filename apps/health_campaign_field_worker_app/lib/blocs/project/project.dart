@@ -10,6 +10,8 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:freezed_annotation/freezed_annotation.dart';
 import 'package:isar/isar.dart';
+import 'package:recase/recase.dart';
+import 'package:survey_form/survey_form.dart';
 
 import '../../../models/app_config/app_config_model.dart' as app_configuration;
 import '../../data/local_store/no_sql/schema/app_configuration.dart';
@@ -18,6 +20,7 @@ import '../../data/local_store/secure_store/secure_store.dart';
 import '../../data/repositories/remote/bandwidth_check.dart';
 import '../../data/repositories/remote/mdms.dart';
 import '../../models/app_config/app_config_model.dart';
+import '../../models/auth/auth_model.dart';
 import '../../utils/background_service.dart';
 import '../../utils/environment_config.dart';
 import '../../utils/least_level_boundary_singleton.dart';
@@ -28,6 +31,40 @@ part 'project.freezed.dart';
 typedef ProjectEmitter = Emitter<ProjectState>;
 
 class ProjectBloc extends Bloc<ProjectEvent, ProjectState> {
+  FutureOr<void> _loadServiceDefinition(List<ProjectModel> projects) async {
+    final configs = await isar.appConfigurations.where().findAll();
+    final userObject = await localSecureStore.userRequestModel;
+    List<String> codes = [];
+    for (UserRoleModel elements in userObject!.roles) {
+      configs.first.checklistTypes?.map((e) => e.code).forEach((element) {
+        for (final project in projects) {
+          codes.add(
+            '${project.name}.$element.${elements.code.snakeCase.toUpperCase()}',
+          );
+        }
+      });
+    }
+
+    final serviceDefinition = await serviceDefinitionRemoteRepository
+        .search(ServiceDefinitionSearchModel(
+      tenantId: envConfig.variables.tenantId,
+      code: codes,
+    ));
+
+    for (var element in serviceDefinition) {
+      await serviceDefinitionLocalRepository.create(
+        element,
+        createOpLog: false,
+      );
+    }
+  }
+
+  /// Service Definition Repositories
+  final RemoteRepository<ServiceDefinitionModel, ServiceDefinitionSearchModel>
+      serviceDefinitionRemoteRepository;
+  final LocalRepository<ServiceDefinitionModel, ServiceDefinitionSearchModel>
+      serviceDefinitionLocalRepository;
+
   final LocalSecureStore localSecureStore;
   final Isar isar;
   final MdmsRepository mdmsRepository;
@@ -84,6 +121,8 @@ class ProjectBloc extends Bloc<ProjectEvent, ProjectState> {
   BuildContext context;
 
   ProjectBloc({
+    required this.serviceDefinitionRemoteRepository,
+    required this.serviceDefinitionLocalRepository,
     LocalSecureStore? localSecureStore,
     required this.bandwidthCheckRepository,
     required this.projectStaffRemoteRepository,
@@ -215,7 +254,18 @@ class ProjectBloc extends Bloc<ProjectEvent, ProjectState> {
     }
 
     if (projects.isNotEmpty) {
-      // INFO : Need to add project load functions
+      // INFO : Need to add project load functionstry {
+
+      try {
+        await _loadServiceDefinition(projects);
+      } catch (_) {
+        emit(
+          state.copyWith(
+            loading: false,
+            syncError: ProjectSyncErrorType.serviceDefinitions,
+          ),
+        );
+      }
 
       try {
         await _loadProjectFacilities(projects, batchSize);

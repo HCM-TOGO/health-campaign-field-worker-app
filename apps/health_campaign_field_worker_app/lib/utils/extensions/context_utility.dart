@@ -113,6 +113,7 @@ extension ContextUtilityExtensions on BuildContext {
     RegistrationDeliverySingleton().setBoundary(boundary: selectedBoundary);
     ReferralReconSingleton().setBoundary(boundary: selectedBoundary);
     InventorySingleton().setBoundaryName(boundaryName: selectedBoundary.name!);
+    InventorySingleton().setBoundary(boundary: selectedBoundary);
     ComplaintsSingleton().setBoundary(boundary: selectedBoundary);
     AttendanceSingleton().setBoundary(boundary: selectedBoundary);
     LocationTrackerSingleton()
