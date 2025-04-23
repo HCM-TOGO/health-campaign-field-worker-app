@@ -1014,15 +1014,11 @@ class HouseholdDetails {
   const HouseholdDetails();
 
   String get householdDetailsLabel => 'HOUSEHOLD_DETAILS_LABEL';
-
   String get actionLabel => 'HOUSEHOLD_ACTION_LABEL';
-
   String get dateOfRegistrationLabel =>
       'HOUSEHOLD_DETAILS_DATE_OF_REGISTRATION_LABEL';
-
   String get dateOfAdministrationLabel =>
       'HOUSEHOLD_DETAILS_DATE_OF_ADMINISTRATION_LABEL';
-
   String get noOfMembersCountLabel => 'NO_OF_MEMBERS_COUNT_LABEL';
   String get viewHouseHoldDetailsActionSMC =>
       'VIEW_HOUSEHOLD_DETAILS_ACTION_LABEL_SMC';
@@ -1030,6 +1026,14 @@ class HouseholdDetails {
   String get reasonLabelText => 'REASON_LABEL_TEXT';
   String get householdDetailsDescriptionSMC =>
       'HOUSEHOLD_DETAILS_DESCRIPTION_SMC';
+  String get viewHouseHoldDetailsAction =>
+      'VIEW_HOUSEHOLD_DETAILS_ACTION_LABEL';
+  String get cardTitle => 'CONSENT_CARD_TITLE';
+  String get validationForSelection => 'CONSENT_SUBMIT_VALIDATION';
+  String get submitYes => 'SUBMIT_YES';
+  String get submitNo => 'SUBMIT_NO';
+  String get householdConsentLabel => 'HOUSEHOLD_CONSENT_LABEL';
+  String get cardAztTitle => 'HOUSEHOLD_CONSENT_LABELL';
 }
 
 class PrivacyPolicy {

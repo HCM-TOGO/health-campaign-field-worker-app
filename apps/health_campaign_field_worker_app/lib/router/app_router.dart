@@ -137,6 +137,14 @@ class AppRouter extends _$AppRouter {
                     page: CustomBeneficiaryAcknowledgementRoute.page,
                     path: 'custom-beneficiary-acknowledgement',
                   ),
+                  AutoRoute(
+                    page: HouseHoldConsentRoute.page,
+                    path: 'household-consent',
+                  ),
+                  AutoRoute(
+                    page: ConsentHouseholdAcknowledgementRoute.page,
+                    path: 'consent-household-acknowledgement',
+                  ),
                   RedirectRoute(
                       path: 'beneficiary-acknowledgement',
                       redirectTo: 'custom-beneficiary-acknowledgement'),
