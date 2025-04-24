@@ -79,6 +79,22 @@ class CustomValidator {
 
     return {'mobileNumber': true};
   }
+
+  static Map<String, dynamic>? mobileNumber(
+    AbstractControl<dynamic> control,
+  ) {
+    if (control.value == null || control.value.toString().isEmpty) {
+      return null;
+    }
+
+    const pattern = r'^\d{11}$';
+
+    if (RegExp(pattern).hasMatch(control.value.toString())) return null;
+
+    if (control.value.toString().length == 11) return {'mobileNumber': true};
+
+    return {'mobileNumber': false};
+  }
 }
 
 Future<void> requestDisableBatteryOptimization() async {

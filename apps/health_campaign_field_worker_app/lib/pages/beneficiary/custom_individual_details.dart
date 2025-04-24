@@ -41,7 +41,7 @@ class CustomIndividualDetailsPage extends LocalizedStatefulWidget {
   const CustomIndividualDetailsPage({
     super.key,
     super.appLocalizations,
-    this.isHeadOfHousehold = true,
+    this.isHeadOfHousehold = false,
   });
 
   @override
@@ -145,9 +145,20 @@ class CustomIndividualDetailsPageState
                       size: DigitButtonSize.large,
                       mainAxisSize: MainAxisSize.max,
                       onPressed: () async {
-                        final age = DigitDateUtils.calculateAge(
-                          form.control(_dobKey).value as DateTime,
-                        );
+                        if (form.control(_dobKey).value == null) {
+                          setState(() {
+                            form.control(_dobKey).setErrors({'': true});
+                          });
+                        }
+                        final age = (form.control(_dobKey).value != null)
+                            ? DigitDateUtils.calculateAge(
+                                form.control(_dobKey).value as DateTime,
+                              )
+                            : DigitDOBAgeConvertor(
+                                years: 0,
+                                months: 0,
+                                days: 0,
+                              );
                         if ((age.years == 0 && age.months == 0) ||
                             age.years >= 150 && age.months > 0) {
                           form.control(_dobKey).setErrors({'': true});
@@ -511,7 +522,7 @@ class CustomIndividualDetailsPageState
                                       .translate(i18.common.corecommonRequired)
                                   : null,
                               initialDate: before150Years,
-                              // initialValue: getInitialDateValue(form),
+                              initialValue: getInitialDateValue(form),
                               onChangeOfFormControl: (value) {
                                 // Handle changes to the control's value here
                                 setState(() {
@@ -610,6 +621,7 @@ class CustomIndividualDetailsPageState
                                   child: DigitTextFormInput(
                                     keyboardType: TextInputType.number,
                                     maxLength: 11,
+                                    isRequired: false,
                                     inputFormatters: [
                                       FilteringTextInputFormatter.digitsOnly,
                                     ],
@@ -815,12 +827,17 @@ class CustomIndividualDetailsPageState
       _genderKey: FormControl<String>(value: getGenderOptions(individual)),
       _mobileNumberKey:
           FormControl<String>(value: individual?.mobileNumber, validators: [
-        Validators.pattern(Constants.mobileNumberRegExp,
-            validationMessage:
-                localizations.translate(i18.common.coreCommonMobileNumber)),
-        Validators.minLength(11),
-        Validators.maxLength(11)
+        // Validators.pattern(Constants.mobileNumberRegExp,
+        //     validationMessage:
+        //         localizations.translate(i18.common.coreCommonMobileNumber)),
+        Validators.delegate(
+            (validator) => utils.CustomValidator.mobileNumber(validator)),
+        Validators.maxLength(11),
       ]),
+      _beneficiaryIdKey: FormControl<String>(
+        // validators: [Validators.required],
+        value: individual?.identifiers?.firstOrNull?.identifierId,
+      ),
     });
   }
 
