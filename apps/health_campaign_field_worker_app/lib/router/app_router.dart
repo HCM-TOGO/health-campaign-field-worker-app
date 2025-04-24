@@ -142,10 +142,12 @@ class AppRouter extends _$AppRouter {
                   AutoRoute(
                     page: HouseHoldConsentRoute.page,
                     path: 'household-consent',
+                    // initial: true,
                   ),
                   AutoRoute(
                     page: ConsentHouseholdAcknowledgementRoute.page,
                     path: 'consent-household-acknowledgement',
+                    // initial: true,
                   ),
                   RedirectRoute(
                       path: 'beneficiary-acknowledgement',
@@ -166,8 +168,7 @@ class AppRouter extends _$AppRouter {
                     path: 'custom-overview',
                   ),
                   RedirectRoute(
-                      path: 'overview',
-                      redirectTo: 'custom-overview'),
+                      path: 'overview', redirectTo: 'custom-overview'),
                   AutoRoute(
                     page: BeneficiaryDetailsRoute.page,
                     path: 'beneficiary-details',

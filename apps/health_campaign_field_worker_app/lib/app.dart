@@ -12,6 +12,9 @@ import 'package:location/location.dart';
 import 'package:registration_delivery/data/repositories/local/household_global_search.dart';
 import 'package:registration_delivery/data/repositories/local/individual_global_search.dart';
 import 'package:registration_delivery/data/repositories/oplog/oplog.dart';
+import 'package:registration_delivery/models/entities/household.dart';
+import 'package:registration_delivery/models/entities/household_member.dart';
+import 'package:registration_delivery/models/entities/project_beneficiary.dart';
 import 'package:registration_delivery/utils/typedefs.dart';
 import 'blocs/app_initialization/app_initialization.dart';
 import 'blocs/auth/auth.dart';
@@ -84,6 +87,7 @@ class MainApplicationState extends State<MainApplication>
           child: MultiBlocProvider(
             providers: [
               // INFO : Need to add bloc of package Here
+
               RepositoryProvider<IndividualGlobalSearchRepository>(
                 create: (context) => IndividualGlobalSearchRepository(
                   widget.sql,
@@ -114,6 +118,27 @@ class MainApplicationState extends State<MainApplication>
               ),
 
               BlocProvider(
+                create: (_) {
+                  return LocationBloc(location: Location());
+                },
+                lazy: false,
+              ),
+              BlocProvider<BeneficiaryRegistrationBloc>(
+                create: (context) => BeneficiaryRegistrationBloc(
+                  const BeneficiaryRegistrationState.create(),
+                  individualRepository: context
+                      .repository<IndividualModel, IndividualSearchModel>(),
+                  householdRepository: context
+                      .repository<HouseholdModel, HouseholdSearchModel>(),
+                  householdMemberRepository: context.repository<
+                      HouseholdMemberModel, HouseholdMemberSearchModel>(),
+                  projectBeneficiaryRepository: context.repository<
+                      ProjectBeneficiaryModel, ProjectBeneficiarySearchModel>(),
+                  //  taskDataRepository: context.read<TaskDataRepository>(),
+                  beneficiaryType: BeneficiaryType.household, // or .household
+                ),
+              ),
+              BlocProvider(
                 create: (context) {
                   return UserBloc(
                     const UserEmptyState(),
@@ -126,7 +151,6 @@ class MainApplicationState extends State<MainApplication>
                 create: (ctx) => AuthBloc(
                   authRepository: ctx.read(),
                   mdmsRepository: MdmsRepository(widget.client),
-                  
                   individualRemoteRepository: ctx.read<
                       RemoteRepository<IndividualModel,
                           IndividualSearchModel>>(),
@@ -136,20 +160,7 @@ class MainApplicationState extends State<MainApplication>
                     ),
                   ),
               ),
-              BlocProvider<BeneficiaryRegistrationBloc>(
-               create: (context) => BeneficiaryRegistrationBloc(
-                 const BeneficiaryRegistrationState.create(),
-                 individualRepository:
-                     context.read<IndividualDataRepository>(),
-                 householdRepository: context.read<HouseholdDataRepository>(),
-                 householdMemberRepository:
-                     context.read<HouseholdMemberDataRepository>(),
-                 projectBeneficiaryRepository:
-                     context.read<ProjectBeneficiaryDataRepository>(),
-                //  taskDataRepository: context.read<TaskDataRepository>(),
-                 beneficiaryType: BeneficiaryType.household, // or .household
-               ),
-             ),
+
               BlocProvider(
                 create: (ctx) => BoundaryBloc(
                   const BoundaryState(),

@@ -2,13 +2,8 @@
 import 'dart:async';
 
 import 'package:digit_data_model/data_model.dart';
-import 'package:digit_data_model/models/entities/beneficiary_type.dart';
-import 'package:digit_data_model/models/entities/identifier.dart';
-import 'package:digit_data_model/models/entities/locality.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:freezed_annotation/freezed_annotation.dart';
-import 'package:health_campaign_field_worker_app/models/entities/entities_beneficiary/identifier_types.dart';
-import 'package:health_campaign_field_worker_app/utils/uniqueid_generation.dart';
 import 'package:registration_delivery/models/entities/household.dart';
 import 'package:registration_delivery/models/entities/household_member.dart';
 import 'package:registration_delivery/models/entities/project_beneficiary.dart';
@@ -16,8 +11,10 @@ import 'package:registration_delivery/utils/typedefs.dart';
 
 import '../../models/data_model.dart';
 
+import '../../models/entities/entities_beneficiary/identifier_types.dart';
 import '../../utils/environment_config.dart';
 import '../../utils/typedefs.dart';
+import '../../utils/uniqueid_generation.dart';
 import '../../utils/utils.dart';
 
 part 'beneficiary_registration.freezed.dart';

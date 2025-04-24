@@ -1,12 +1,17 @@
-import 'package:digit_components/digit_components.dart';
 import 'package:digit_components/widgets/atoms/digit_radio_button_list.dart';
+import 'package:digit_components/widgets/digit_card.dart';
+import 'package:digit_components/widgets/digit_elevated_button.dart';
 import 'package:digit_data_model/data_model.dart';
+import 'package:digit_ui_components/services/location_bloc.dart';
+import 'package:digit_ui_components/theme/digit_theme.dart';
+import 'package:digit_ui_components/widgets/scrollable_content.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:reactive_forms/reactive_forms.dart';
 import 'package:registration_delivery/blocs/search_households/search_households.dart';
 import 'package:registration_delivery/models/entities/household.dart';
 import 'package:registration_delivery/router/registration_delivery_router.gm.dart';
+import 'package:registration_delivery/widgets/showcase/showcase_wrappers.dart';
 import '../../blocs/beneficiary_registration/beneficiary_registration.dart';
 import '../../models/data_model.dart';
 import '../../router/app_router.dart';
@@ -28,12 +33,22 @@ class HouseHoldConsentPage extends LocalizedStatefulWidget {
 }
 
 class _HouseHoldConsentPageState extends LocalizedState<HouseHoldConsentPage> {
+  @override
+  void initState() {
+    final regState = context.read<BeneficiaryRegistrationBloc>().state;
+    context.read<LocationBloc>().add(const LoadLocationEvent());
+
+    super.initState();
+  }
+
   static const _consent = 'consent';
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
     final bloc = context.read<BeneficiaryRegistrationBloc>();
     final router = context.router;
+
+    initState() {}
 
     return Scaffold(
       body: ReactiveFormBuilder(
@@ -174,14 +189,15 @@ class _HouseHoldConsentPageState extends LocalizedState<HouseHoldConsentPage> {
                           },
                         );
                       },
-                      child: Center(
+                      child: const Center(
                         child: Text(
-                          registrationState.mapOrNull(
-                                editHousehold: (value) => localizations
-                                    .translate(i18.common.coreCommonSave),
-                              ) ??
-                              localizations
-                                  .translate(i18.householdDetails.actionLabel),
+                          "Submit", style: TextStyle(color: Colors.white),
+                          // registrationState.mapOrNull(
+                          //       editHousehold: (value) => localizations
+                          //           .translate(i18.common.coreCommonSave),
+                          //     ) ??
+                          //     localizations
+                          //         .translate(i18.householdDetails.actionLabel),
                         ),
                       ),
                     );

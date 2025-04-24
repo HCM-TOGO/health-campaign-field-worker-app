@@ -11,6 +11,7 @@ import 'package:digit_ui_components/widgets/molecules/digit_card.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:health_campaign_field_worker_app/router/app_router.dart';
 import 'package:reactive_forms/reactive_forms.dart';
 import 'package:registration_delivery/utils/extensions/extensions.dart';
 
@@ -231,7 +232,7 @@ class CustomHouseholdLocationPageState
                                     addressModel,
                                   ),
                                 );
-                                router.push(HouseHoldDetailsRoute());
+                                router.push(HouseHoldConsentRoute());
                               },
                               editHousehold: (
                                 address,
