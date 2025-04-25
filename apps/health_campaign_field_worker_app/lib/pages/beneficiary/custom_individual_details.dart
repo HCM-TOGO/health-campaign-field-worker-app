@@ -85,32 +85,102 @@ class CustomIndividualDetailsPageState
             BeneficiaryRegistrationBloc, BeneficiaryRegistrationState>(
           listener: (context, state) {
             state.mapOrNull(
-              persisted: (value) async {
+              // persisted: (value) async {
+              //   print("🎉 We are in the persisted state!: ${value.navigateToRoot}");
+              //   if (value.navigateToRoot) {
+              //     final overviewBloc = context.read<HouseholdOverviewBloc>();
+
+              //     overviewBloc.add(
+              //       HouseholdOverviewReloadEvent(
+              //         projectId:
+              //             RegistrationDeliverySingleton().projectId.toString(),
+              //         projectBeneficiaryType:
+              //             RegistrationDeliverySingleton().beneficiaryType ??
+              //                 BeneficiaryType.household,
+              //       ),
+              //     );
+
+              //     await overviewBloc.stream.firstWhere((element) =>
+              //         element.loading == false &&
+              //         element.householdMemberWrapper.household != null);
+              //     HouseholdMemberWrapper memberWrapper =
+              //         overviewBloc.state.householdMemberWrapper;
+              //     final route = router.parent() as StackRouter;
+              //     route.popUntilRouteWithName(SearchBeneficiaryRoute.name);
+              //     route.push(BeneficiaryWrapperRoute(wrapper: memberWrapper));
+              //   }
+              //   else {
+              //     Future.delayed(
+              //       const Duration(
+              //         milliseconds: 200,
+              //       ),
+              //       () {
+              //         // ignore: deprecated_member_use
+              //         (router.parent() as StackRouter).pop();
+              //         context.read<SearchHouseholdsBloc>().add(
+              //               SearchHouseholdsByHouseholdsEvent(
+              //                 householdModel: value.householdModel,
+              //                 projectId: context.projectId,
+              //                 isProximityEnabled: false,
+              //               ),
+              //             );
+              //       },
+              //     ).then((value) => {
+              //          // ignore: avoid_print
+              //          print("➡️ THEN block executed, pushing acknowledgement page $router"), 
+              //           router.push(CustomBeneficiaryAcknowledgementRoute(
+              //             enableViewHousehold: true,
+              //           )),
+              //         });
+              //   }
+              // },
+              persisted: (value) {
                 if (value.navigateToRoot) {
-                  final overviewBloc = context.read<HouseholdOverviewBloc>();
-
-                  overviewBloc.add(
-                    HouseholdOverviewReloadEvent(
-                      projectId:
-                          RegistrationDeliverySingleton().projectId.toString(),
-                      projectBeneficiaryType:
-                          RegistrationDeliverySingleton().beneficiaryType ??
-                              BeneficiaryType.household,
+                  Future.delayed(
+                    const Duration(
+                      milliseconds: 500,
                     ),
-                  );
-
-                  await overviewBloc.stream.firstWhere((element) =>
-                      element.loading == false &&
-                      element.householdMemberWrapper.household != null);
-                  HouseholdMemberWrapper memberWrapper =
-                      overviewBloc.state.householdMemberWrapper;
-                  final route = router.parent() as StackRouter;
-                  route.popUntilRouteWithName(SearchBeneficiaryRoute.name);
-                  route.push(BeneficiaryWrapperRoute(wrapper: memberWrapper));
+                    () {
+                      context.read<SearchHouseholdsBloc>().add(
+                            SearchHouseholdsByHouseholdsEvent(
+                              householdModel: value.householdModel,
+                              projectId: context.projectId,
+                              isProximityEnabled: false,
+                            ),
+                          );
+                    },
+                  ).then((value) => {
+                        context.router
+                            .push(CustomBeneficiaryAcknowledgementRoute(
+                          enableViewHousehold: true,
+                        ))
+                      });
+                } else {
+                  Future.delayed(
+                    const Duration(
+                      milliseconds: 500,
+                    ),
+                    () {
+                      print("This is working :)");
+                      context.read<SearchHouseholdsBloc>().add(
+                            SearchHouseholdsByHouseholdsEvent(
+                              householdModel: value.householdModel,
+                              projectId: context.projectId,
+                              isProximityEnabled: false,
+                            ),
+                          );
+                    },
+                  ).then((value) => {
+                        context.router
+                            .push(CustomBeneficiaryAcknowledgementRoute(
+                          enableViewHousehold: widget.isHeadOfHousehold,
+                        )),
+                      });
                 }
               },
             );
           },
+
           builder: (context, state) {
             return ScrollableContent(
               enableFixedButton: true,
@@ -174,8 +244,9 @@ class CustomIndividualDetailsPageState
                             RegistrationDeliverySingleton().loggedInUserUuid;
                         final projectId =
                             RegistrationDeliverySingleton().projectId;
-                        form.markAllAsTouched();
-                        if (!form.valid) return;
+                        // form.markAllAsTouched();
+                        // print("Form is valid: ${form.valid}, Errors: ${form.errors}");
+                        // if (!form.valid) return;
                         FocusManager.instance.primaryFocus?.unfocus();
 
                         if (age.years < 18 && widget.isHeadOfHousehold) {
@@ -210,7 +281,12 @@ class CustomIndividualDetailsPageState
                             loggedInUserId: context.loggedInUserUuid,
                             returnCombinedIds: false,
                           );
+
+                          form.control('beneficiaryId').value = beneficiaryId!.first;
                         }
+
+                        form.markAllAsTouched();
+                        if (!form.valid) return;
 
                         final submit = await DigitDialog.show<bool>(
                           context,
@@ -827,15 +903,15 @@ class CustomIndividualDetailsPageState
       _genderKey: FormControl<String>(value: getGenderOptions(individual)),
       _mobileNumberKey:
           FormControl<String>(value: individual?.mobileNumber, validators: [
-        // Validators.pattern(Constants.mobileNumberRegExp,
-        //     validationMessage:
-        //         localizations.translate(i18.common.coreCommonMobileNumber)),
+        Validators.pattern(Constants.mobileNumberRegExp,
+            validationMessage:
+                localizations.translate(i18.common.coreCommonMobileNumber)),
         Validators.delegate(
             (validator) => utils.CustomValidator.mobileNumber(validator)),
         Validators.maxLength(11),
       ]),
       _beneficiaryIdKey: FormControl<String>(
-        // validators: [Validators.required],
+        validators: [Validators.required],
         value: individual?.identifiers?.firstOrNull?.identifierId,
       ),
     });

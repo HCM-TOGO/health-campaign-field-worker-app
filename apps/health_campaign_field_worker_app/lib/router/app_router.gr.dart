@@ -533,7 +533,7 @@ class CustomIndividualDetailsRoute
   CustomIndividualDetailsRoute({
     Key? key,
     AppLocalizations? appLocalizations,
-    bool isHeadOfHousehold = true,
+    bool isHeadOfHousehold = false,
     List<PageRouteInfo>? children,
   }) : super(
           CustomIndividualDetailsRoute.name,
@@ -555,7 +555,7 @@ class CustomIndividualDetailsRouteArgs {
   const CustomIndividualDetailsRouteArgs({
     this.key,
     this.appLocalizations,
-    this.isHeadOfHousehold = true,
+    this.isHeadOfHousehold = false,
   });
 
   final Key? key;
