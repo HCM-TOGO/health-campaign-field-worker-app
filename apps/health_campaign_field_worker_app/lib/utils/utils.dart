@@ -1,5 +1,8 @@
 library app_utils;
 
+import 'package:inventory_management/inventory_management.init.dart'
+    as inventory_mappers;
+
 import 'dart:async';
 import 'dart:io';
 
@@ -461,6 +464,7 @@ initializeAllMappers() async {
     Future(() => attendance_mappers.initializeMappers()),
     Future(() => data_model_mappers.initializeMappers()),
     Future(() => dss_mappers.initializeMappers()),
+    Future(() => inventory_mappers.initializeMappers()),
   ];
   await Future.wait(initializations);
 }

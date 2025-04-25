@@ -1,3 +1,4 @@
+import 'package:inventory_management/inventory_management.dart';
 import 'package:digit_data_model/data/local_store/no_sql/schema/entity_mapper_listener.dart';
 import 'package:digit_data_model/data_model.dart';
 
@@ -20,6 +21,14 @@ class EntityMapper extends EntityMapperListener {
     switch (entityType) {
       case "individual":
         final entity = IndividualModelMapper.fromJson(entityString);
+        return entity;
+
+      case "stock":
+        final entity = StockModelMapper.fromJson(entityString);
+        return entity;
+
+      case "stockReconciliation":
+        final entity = StockReconciliationModelMapper.fromJson(entityString);
         return entity;
 
       default:

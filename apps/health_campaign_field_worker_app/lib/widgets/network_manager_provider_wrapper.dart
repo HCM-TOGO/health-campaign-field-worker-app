@@ -19,6 +19,7 @@ import '../data/repositories/oplog.dart';
 import '../data/repositories/remote/auth.dart';
 import '../data/repositories/remote/downsync.dart';
 import '../models/downsync/downsync.dart';
+import 'package:inventory_management/inventory_management.dart';
 
 class NetworkManagerProviderWrapper extends StatelessWidget {
   final LocalSqlDataStore sql;
@@ -169,6 +170,14 @@ class NetworkManagerProviderWrapper extends StatelessWidget {
           StockOpLogManager(isar),
         ),
       ),
+      RepositoryProvider<
+          LocalRepository<StockReconciliationModel,
+              StockReconciliationSearchModel>>(
+        create: (_) => StockReconciliationLocalRepository(
+          sql,
+          StockReconciliationOpLogManager(isar),
+        ),
+      ),
     ];
   }
 
@@ -290,6 +299,17 @@ class NetworkManagerProviderWrapper extends StatelessWidget {
             ),
           ),
 // INFO Need to add the packages here
+        if (value == DataModelType.stock)
+          RepositoryProvider<RemoteRepository<StockModel, StockSearchModel>>(
+            create: (_) => StockRemoteRepository(dio, actionMap: actions),
+          ),
+        if (value == DataModelType.stockReconciliation)
+          RepositoryProvider<
+              RemoteRepository<StockReconciliationModel,
+                  StockReconciliationSearchModel>>(
+            create: (_) =>
+                StockReconciliationRemoteRepository(dio, actionMap: actions),
+          ),
       ]);
     }
 

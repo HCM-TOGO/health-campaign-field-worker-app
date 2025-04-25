@@ -1,5 +1,6 @@
 import 'package:auto_route/auto_route.dart';
 import 'package:collection/collection.dart';
+import 'package:digit_components/widgets/atoms/digit_reactive_dropdown.dart';
 import 'package:digit_data_model/data_model.dart';
 import 'package:digit_scanner/blocs/scanner.dart';
 import 'package:digit_scanner/pages/qr_scanner.dart';
@@ -25,6 +26,8 @@ import 'package:inventory_management/blocs/product_variant.dart';
 import 'package:inventory_management/blocs/record_stock.dart';
 import 'package:inventory_management/widgets/back_navigation_help_header.dart';
 
+import '../../utils/i18_key_constants.dart' as i18_local;
+
 @RoutePage()
 class CustomStockDetailsPage extends LocalizedStatefulWidget {
   const CustomStockDetailsPage({
@@ -44,6 +47,7 @@ class CustomStockDetailsPageState
   static const _transactionReasonKey = 'transactionReason';
   static const _waybillNumberKey = 'waybillNumber';
   static const _waybillQuantityKey = 'waybillQuantity';
+  static const _batchNumberKey = 'batchNumberKey';
   static const _vehicleNumberKey = 'vehicleNumber';
   static const _typeOfTransportKey = 'typeOfTransport';
   static const _commentsKey = 'comments';
@@ -72,6 +76,13 @@ class CustomStockDetailsPageState
         validators: [Validators.minLength(2), Validators.maxLength(200)],
       ),
       _waybillQuantityKey: FormControl<String>(),
+      _batchNumberKey: FormControl<String>(
+        validators: [
+          Validators.required,
+          Validators.minLength(2),
+          Validators.maxLength(200)
+        ],
+      ),
       _vehicleNumberKey: FormControl<String>(),
       _typeOfTransportKey: FormControl<String>(),
       _commentsKey: FormControl<String>(),
@@ -345,6 +356,10 @@ class CustomStockDetailsPageState
                                                 .control(_waybillQuantityKey)
                                                 .value as String?;
 
+                                            final batchNumber = form
+                                                .control(_batchNumberKey)
+                                                .value as String?;
+
                                             final vehicleNumber = form
                                                 .control(_vehicleNumberKey)
                                                 .value as String?;
@@ -470,6 +485,15 @@ class CustomStockDetailsPageState
                                                           AdditionalField(
                                                             'waybill_quantity',
                                                             waybillQuantity,
+                                                          ),
+                                                        if (batchNumber !=
+                                                                null &&
+                                                            batchNumber
+                                                                .trim()
+                                                                .isNotEmpty)
+                                                          AdditionalField(
+                                                            'batch_number',
+                                                            batchNumber,
                                                           ),
                                                         if (vehicleNumber !=
                                                                 null &&
@@ -615,54 +639,74 @@ class CustomStockDetailsPageState
                                       )),
                                     ),
                                     fetched: (productVariants) {
-                                      return ReactiveWrapperField(
+                                      // return ReactiveWrapperField(
+                                      //   formControlName: _productVariantKey,
+                                      //   validationMessages: {
+                                      //     'required': (object) =>
+                                      //         '${module.selectProductLabel}_IS_REQUIRED',
+                                      //   },
+                                      //   showErrors: (control) =>
+                                      //       control.invalid && control.touched,
+                                      //   builder: (field) {
+                                      //     return LabeledField(
+                                      //       label: localizations.translate(
+                                      //         module.selectProductLabel,
+                                      //       ),
+                                      //       isRequired: true,
+                                      //       child: DigitDropdown(
+                                      //         errorMessage: field.errorText,
+                                      //         emptyItemText:
+                                      //             localizations.translate(
+                                      //           i18.common.noMatchFound,
+                                      //         ),
+                                      //         items: productVariants
+                                      //             .map((variant) {
+                                      //           return DropdownItem(
+                                      //             name: localizations.translate(
+                                      //               variant.sku ?? variant.id,
+                                      //             ),
+                                      //             code: variant.id,
+                                      //           );
+                                      //         }).toList(),
+                                      //         onSelect: (value) {
+                                      //           /// Find the selected product variant model by matching the id
+                                      //           ProductVariantModel?
+                                      //               selectedVariant =
+                                      //               productVariants
+                                      //                   .firstWhereOrNull(
+                                      //             (variant) =>
+                                      //                 variant.id == value.code,
+                                      //           );
+
+                                      //           /// Update the form control with the selected product variant model
+                                      //           form
+                                      //               .control(_productVariantKey)
+                                      //               .value = selectedVariant;
+
+                                      //           setState(() {});
+                                      //         },
+                                      //       ),
+                                      //     );
+                                      //   },
+                                      // );
+                                      return DigitReactiveDropdown<
+                                          ProductVariantModel>(
+                                        key: const Key(_productVariantKey),
                                         formControlName: _productVariantKey,
+                                        label: localizations.translate(
+                                          module.selectProductLabel,
+                                        ),
+                                        isRequired: true,
+                                        valueMapper: (value) {
+                                          return localizations.translate(
+                                            value.sku ?? value.id,
+                                          );
+                                        },
+                                        menuItems: productVariants,
                                         validationMessages: {
                                           'required': (object) =>
-                                              '${module.selectProductLabel}_IS_REQUIRED',
-                                        },
-                                        showErrors: (control) =>
-                                            control.invalid && control.touched,
-                                        builder: (field) {
-                                          return LabeledField(
-                                            label: localizations.translate(
-                                              module.selectProductLabel,
-                                            ),
-                                            isRequired: true,
-                                            child: DigitDropdown(
-                                              errorMessage: field.errorText,
-                                              emptyItemText:
-                                                  localizations.translate(
-                                                i18.common.noMatchFound,
-                                              ),
-                                              items: productVariants
-                                                  .map((variant) {
-                                                return DropdownItem(
-                                                  name: localizations.translate(
-                                                    variant.sku ?? variant.id,
-                                                  ),
-                                                  code: variant.id,
-                                                );
-                                              }).toList(),
-                                              onSelect: (value) {
-                                                /// Find the selected product variant model by matching the id
-                                                ProductVariantModel?
-                                                    selectedVariant =
-                                                    productVariants
-                                                        .firstWhereOrNull(
-                                                  (variant) =>
-                                                      variant.id == value.code,
-                                                );
-
-                                                /// Update the form control with the selected product variant model
-                                                form
-                                                    .control(_productVariantKey)
-                                                    .value = selectedVariant;
-
-                                                setState(() {});
-                                              },
-                                            ),
-                                          );
+                                              localizations.translate(
+                                                  '${module.selectProductLabel}_IS_REQUIRED'),
                                         },
                                       );
                                     },
@@ -968,35 +1012,83 @@ class CustomStockDetailsPageState
                                       );
                                     }),
                               if (isWareHouseMgr)
-                                transportTypes.isNotEmpty
-                                    ? ReactiveWrapperField(
-                                        formControlName: _typeOfTransportKey,
-                                        builder: (field) {
-                                          return LabeledField(
-                                            label: localizations.translate(
-                                              i18.stockDetails
-                                                  .transportTypeLabel,
-                                            ),
-                                            child: DigitDropdown(
-                                              emptyItemText:
-                                                  localizations.translate(
-                                                i18.common.noMatchFound,
-                                              ),
-                                              items: transportTypes.map((type) {
-                                                return DropdownItem(
-                                                  name: localizations
-                                                      .translate(type.name),
-                                                  code: type.code,
-                                                );
-                                              }).toList(),
-                                              onSelect: (value) {
-                                                field.control.value =
-                                                    value.name;
-                                                setState(() {});
-                                              },
-                                            ),
-                                          );
+                                ReactiveWrapperField(
+                                    formControlName: _batchNumberKey,
+                                    builder: (field) {
+                                      return InputField(
+                                        type: InputType.text,
+                                        isRequired: true,
+                                        label: localizations.translate(
+                                          i18_local
+                                              .stockDetails.batchNumberLabel,
+                                        ),
+                                        onChange: (val) {
+                                          if (val == '') {
+                                            field.control.value = '0';
+                                          } else {
+                                            field.control.value = val;
+                                          }
                                         },
+                                      );
+                                    }),
+
+                              // if (isWareHouseMgr)
+                              //   transportTypes.isNotEmpty
+                              //       ? ReactiveWrapperField(
+                              //           formControlName: _typeOfTransportKey,
+                              //           builder: (field) {
+                              //             return LabeledField(
+                              //               label: localizations.translate(
+                              //                 i18.stockDetails
+                              //                     .transportTypeLabel,
+                              //               ),
+                              //               child: DigitDropdown(
+                              //                 emptyItemText:
+                              //                     localizations.translate(
+                              //                   i18.common.noMatchFound,
+                              //                 ),
+                              //                 items: transportTypes.map((type) {
+                              //                   return DropdownItem(
+                              //                     name: localizations
+                              //                         .translate(type.name),
+                              //                     code: type.code,
+                              //                   );
+                              //                 }).toList(),
+                              //                 onSelect: (value) {
+                              //                   field.control.value =
+                              //                       value.name;
+                              //                   form
+                              //                       .control(
+                              //                           _typeOfTransportKey)
+                              //                       .value = value.code;
+                              //                   form
+                              //                       .control(
+                              //                           _typeOfTransportKey)
+                              //                       .updateValue(value.code);
+                              //                   setState(() {});
+                              //                 },
+                              //               ),
+                              //             );
+                              //           },
+                              //         )
+                              //       : const Offstage(),
+                              if (isWareHouseMgr)
+                                transportTypes.isNotEmpty
+                                    ? DigitReactiveDropdown<String>(
+                                        key: const Key(_typeOfTransportKey),
+                                        label: localizations.translate(
+                                          i18.stockDetails.transportTypeLabel,
+                                        ),
+                                        valueMapper: (e) => e,
+                                        initialValue:
+                                            transportTypes.firstOrNull?.name,
+                                        menuItems: transportTypes.map(
+                                          (e) {
+                                            return localizations
+                                                .translate(e.name);
+                                          },
+                                        ).toList(),
+                                        formControlName: _typeOfTransportKey,
                                       )
                                     : const Offstage(),
                               if (isWareHouseMgr)
@@ -1026,86 +1118,86 @@ class CustomStockDetailsPageState
                                       },
                                     );
                                   }),
-                              scannerState.barCodes.isEmpty
-                                  ? DigitButton(
-                                      mainAxisSize: MainAxisSize.max,
-                                      size: DigitButtonSize.large,
-                                      type: DigitButtonType.secondary,
-                                      onPressed: () {
-                                        //[TODO: Add route to auto_route]
-                                        Navigator.of(context).push(
-                                          MaterialPageRoute(
-                                            builder: (context) =>
-                                                const DigitScannerPage(
-                                              quantity: 5,
-                                              isGS1code: true,
-                                              singleValue: false,
-                                            ),
-                                            settings: const RouteSettings(
-                                                name: '/qr-scanner'),
-                                          ),
-                                        );
-                                      },
-                                      prefixIcon: Icons.qr_code,
-                                      label: localizations.translate(
-                                        i18.common.scanBales,
-                                      ),
-                                    )
-                                  : Column(children: [
-                                      Row(
-                                        mainAxisAlignment:
-                                            MainAxisAlignment.spaceBetween,
-                                        children: [
-                                          Align(
-                                            alignment: Alignment.centerLeft,
-                                            child: Text(
-                                              localizations.translate(i18
-                                                  .stockDetails
-                                                  .scannedResources),
-                                              style: DigitTheme
-                                                  .instance
-                                                  .mobileTheme
-                                                  .textTheme
-                                                  .labelSmall,
-                                            ),
-                                          ),
-                                          Padding(
-                                            padding: const EdgeInsets.only(
-                                              bottom: spacer4,
-                                            ),
-                                            child: IconButton(
-                                              alignment: Alignment.centerRight,
-                                              color: theme
-                                                  .colorTheme.primary.primary1,
-                                              icon: const Icon(Icons.edit),
-                                              onPressed: () {
-                                                //[TODO: Add route to auto_route]
-                                                Navigator.of(context).push(
-                                                  MaterialPageRoute(
-                                                    builder: (context) =>
-                                                        const DigitScannerPage(
-                                                      quantity: 5,
-                                                      isGS1code: true,
-                                                      singleValue: false,
-                                                    ),
-                                                    settings:
-                                                        const RouteSettings(
-                                                            name:
-                                                                '/qr-scanner'),
-                                                  ),
-                                                );
-                                              },
-                                            ),
-                                          ),
-                                        ],
-                                      ),
-                                      ...scannedResources.map((e) => Align(
-                                            alignment: Alignment.centerLeft,
-                                            child: Text(e
-                                                .elements.values.first.data
-                                                .toString()),
-                                          ))
-                                    ])
+                              // scannerState.barCodes.isEmpty
+                              //     ? DigitButton(
+                              //         mainAxisSize: MainAxisSize.max,
+                              //         size: DigitButtonSize.large,
+                              //         type: DigitButtonType.secondary,
+                              //         onPressed: () {
+                              //           //[TODO: Add route to auto_route]
+                              //           Navigator.of(context).push(
+                              //             MaterialPageRoute(
+                              //               builder: (context) =>
+                              //                   const DigitScannerPage(
+                              //                 quantity: 5,
+                              //                 isGS1code: true,
+                              //                 singleValue: false,
+                              //               ),
+                              //               settings: const RouteSettings(
+                              //                   name: '/qr-scanner'),
+                              //             ),
+                              //           );
+                              //         },
+                              //         prefixIcon: Icons.qr_code,
+                              //         label: localizations.translate(
+                              //           i18.common.scanBales,
+                              //         ),
+                              //       )
+                              //     : Column(children: [
+                              //         Row(
+                              //           mainAxisAlignment:
+                              //               MainAxisAlignment.spaceBetween,
+                              //           children: [
+                              //             Align(
+                              //               alignment: Alignment.centerLeft,
+                              //               child: Text(
+                              //                 localizations.translate(i18
+                              //                     .stockDetails
+                              //                     .scannedResources),
+                              //                 style: DigitTheme
+                              //                     .instance
+                              //                     .mobileTheme
+                              //                     .textTheme
+                              //                     .labelSmall,
+                              //               ),
+                              //             ),
+                              //             Padding(
+                              //               padding: const EdgeInsets.only(
+                              //                 bottom: spacer4,
+                              //               ),
+                              //               child: IconButton(
+                              //                 alignment: Alignment.centerRight,
+                              //                 color: theme
+                              //                     .colorTheme.primary.primary1,
+                              //                 icon: const Icon(Icons.edit),
+                              //                 onPressed: () {
+                              //                   //[TODO: Add route to auto_route]
+                              //                   Navigator.of(context).push(
+                              //                     MaterialPageRoute(
+                              //                       builder: (context) =>
+                              //                           const DigitScannerPage(
+                              //                         quantity: 5,
+                              //                         isGS1code: true,
+                              //                         singleValue: false,
+                              //                       ),
+                              //                       settings:
+                              //                           const RouteSettings(
+                              //                               name:
+                              //                                   '/qr-scanner'),
+                              //                     ),
+                              //                   );
+                              //                 },
+                              //               ),
+                              //             ),
+                              //           ],
+                              //         ),
+                              //         ...scannedResources.map((e) => Align(
+                              //               alignment: Alignment.centerLeft,
+                              //               child: Text(e
+                              //                   .elements.values.first.data
+                              //                   .toString()),
+                              //             ))
+                              //       ])
                             ],
                           ),
                         ],
