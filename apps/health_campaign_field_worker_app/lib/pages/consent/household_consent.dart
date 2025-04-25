@@ -1,5 +1,6 @@
 import 'package:digit_components/widgets/atoms/digit_radio_button_list.dart';
 import 'package:digit_components/widgets/digit_card.dart';
+import 'package:digit_components/widgets/digit_dialog.dart';
 import 'package:digit_components/widgets/digit_elevated_button.dart';
 import 'package:digit_data_model/data_model.dart';
 import 'package:digit_ui_components/services/location_bloc.dart';
@@ -7,6 +8,7 @@ import 'package:digit_ui_components/theme/digit_theme.dart';
 import 'package:digit_ui_components/widgets/scrollable_content.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:logger/web.dart';
 import 'package:reactive_forms/reactive_forms.dart';
 import 'package:registration_delivery/blocs/search_households/search_households.dart';
 import 'package:registration_delivery/models/entities/household.dart';
@@ -36,6 +38,8 @@ class _HouseHoldConsentPageState extends LocalizedState<HouseHoldConsentPage> {
   @override
   void initState() {
     final regState = context.read<BeneficiaryRegistrationBloc>().state;
+
+    Logger().d(regState);
     context.read<LocationBloc>().add(const LoadLocationEvent());
 
     super.initState();
@@ -48,7 +52,7 @@ class _HouseHoldConsentPageState extends LocalizedState<HouseHoldConsentPage> {
     final bloc = context.read<BeneficiaryRegistrationBloc>();
     final router = context.router;
 
-    initState() {}
+    Logger().d("This is the state ${bloc.state}");
 
     return Scaffold(
       body: ReactiveFormBuilder(
@@ -65,128 +69,172 @@ class _HouseHoldConsentPageState extends LocalizedState<HouseHoldConsentPage> {
                 child: BlocBuilder<LocationBloc, LocationState>(
                   builder: (context, locationState) {
                     return DigitElevatedButton(
-                      onPressed: () {
-                        form.markAllAsTouched();
-                        if (!form.valid) return;
+                      onPressed: () async {
+                        await DigitDialog.show<bool>(
+                          context,
+                          options: DigitDialogOptions(
+                            titleText: "Ready to submit",
+                            contentText:
+                                "Make sure you review all details before clicking on the Submit button. Click on the Cancel button to go back to the previous page.",
+                            primaryAction: DigitDialogActions(
+                              label: "Submit",
+                              action: (context) {
+                                // clickedStatus.value = true;
+                                Navigator.of(
+                                  context,
+                                  rootNavigator: true,
+                                ).pop(true);
+                                form.markAllAsTouched();
+                                if (!form.valid) return;
 
-                        registrationState.maybeWhen(
-                          orElse: () {
-                            return;
-                          },
-                          create: (
-                            addressModel,
-                            householdModel,
-                            individualModel,
-                            registrationDate,
-                            searchQuery,
-                            loading,
-                            isHeadOfHousehold,
-                          ) {
-                            if (form.control(_consent).value == null) {
-                              form.control(_consent).setErrors({'': true});
+                                registrationState.maybeWhen(
+                                  orElse: () {
+                                    return;
+                                  },
+                                  create: (
+                                    addressModel,
+                                    householdModel,
+                                    individualModel,
+                                    registrationDate,
+                                    searchQuery,
+                                    loading,
+                                    isHeadOfHousehold,
+                                  ) {
+                                    if (form.control(_consent).value == null) {
+                                      form
+                                          .control(_consent)
+                                          .setErrors({'': true});
 
-                              return;
-                            }
+                                      return;
+                                    }
 
-                            final isConsent =
-                                (form.control(_consent).value as KeyValue)
-                                            .key ==
-                                        0
-                                    ? false
-                                    : true;
-                            if (!isConsent && addressModel != null) {
-                              var address = addressModel.copyWith(
-                                latitude: locationState.latitude ??
-                                    addressModel.latitude,
-                                longitude: locationState.longitude ??
-                                    addressModel.longitude,
-                                locationAccuracy: locationState.accuracy ??
-                                    addressModel.locationAccuracy,
-                              );
-                              final projectTypeId =
-                                  context.selectedProjectType == null
-                                      ? ""
-                                      : context.selectedProjectType!.id;
-                              final cycleIndex = context.selectedCycle?.id == 0
-                                  ? ""
-                                  : "0${context.selectedCycle?.id}";
+                                    final isConsent = (form
+                                                    .control(_consent)
+                                                    .value as KeyValue)
+                                                .key ==
+                                            0
+                                        ? false
+                                        : true;
+                                    if (!isConsent && addressModel != null) {
+                                      var address = addressModel.copyWith(
+                                        latitude: locationState.latitude ??
+                                            addressModel.latitude,
+                                        longitude: locationState.longitude ??
+                                            addressModel.longitude,
+                                        locationAccuracy:
+                                            locationState.accuracy ??
+                                                addressModel.locationAccuracy,
+                                      );
+                                      final projectTypeId =
+                                          context.selectedProjectType == null
+                                              ? ""
+                                              : context.selectedProjectType!.id;
+                                      final cycleIndex =
+                                          context.selectedCycle?.id == 0
+                                              ? ""
+                                              : "0${context.selectedCycle?.id}";
 
-                              var household = householdModel;
-                              household ??= HouseholdModel(
-                                tenantId: envConfig.variables.tenantId,
-                                clientReferenceId: IdGen.i.identifier,
-                                rowVersion: 1,
-                                clientAuditDetails: ClientAuditDetails(
-                                  createdBy: context.loggedInUserUuid,
-                                  createdTime: context.millisecondsSinceEpoch(),
-                                  lastModifiedBy: context.loggedInUserUuid,
-                                  lastModifiedTime:
-                                      context.millisecondsSinceEpoch(),
-                                ),
-                                auditDetails: AuditDetails(
-                                  createdBy: context.loggedInUserUuid,
-                                  createdTime: context.millisecondsSinceEpoch(),
-                                  lastModifiedBy: context.loggedInUserUuid,
-                                  lastModifiedTime:
-                                      context.millisecondsSinceEpoch(),
-                                ),
-                                address: address,
-                                latitude: locationState.latitude,
-                                longitude: locationState.longitude,
-                                additionalFields: HouseholdAdditionalFields(
-                                  version: 1,
-                                  fields: [
-                                    // AdditionalField(
-                                    //     Constants.isConsentKey, isConsent),
-                                    if (cycleIndex.isNotEmpty)
-                                      AdditionalField(
-                                        'cycleIndex',
-                                        cycleIndex,
-                                      ),
-                                    if (projectTypeId!.isNotEmpty)
-                                      AdditionalField(
-                                        'projectTypeId',
-                                        projectTypeId,
-                                      ),
-                                    AdditionalField(
-                                      'projectId',
-                                      context.projectId,
-                                    ),
-                                  ],
-                                ),
-                              );
+                                      var household = householdModel;
+                                      household ??= HouseholdModel(
+                                        tenantId: envConfig.variables.tenantId,
+                                        clientReferenceId: IdGen.i.identifier,
+                                        rowVersion: 1,
+                                        clientAuditDetails: ClientAuditDetails(
+                                          createdBy: context.loggedInUserUuid,
+                                          createdTime:
+                                              context.millisecondsSinceEpoch(),
+                                          lastModifiedBy:
+                                              context.loggedInUserUuid,
+                                          lastModifiedTime:
+                                              context.millisecondsSinceEpoch(),
+                                        ),
+                                        auditDetails: AuditDetails(
+                                          createdBy: context.loggedInUserUuid,
+                                          createdTime:
+                                              context.millisecondsSinceEpoch(),
+                                          lastModifiedBy:
+                                              context.loggedInUserUuid,
+                                          lastModifiedTime:
+                                              context.millisecondsSinceEpoch(),
+                                        ),
+                                        address: address,
+                                        latitude: locationState.latitude,
+                                        longitude: locationState.longitude,
+                                        additionalFields:
+                                            HouseholdAdditionalFields(
+                                          version: 1,
+                                          fields: [
+                                            // AdditionalField(
+                                            //     Constants.isConsentKey, isConsent),
+                                            if (cycleIndex.isNotEmpty)
+                                              AdditionalField(
+                                                'cycleIndex',
+                                                cycleIndex,
+                                              ),
+                                            if (projectTypeId!.isNotEmpty)
+                                              AdditionalField(
+                                                'projectTypeId',
+                                                projectTypeId,
+                                              ),
+                                            AdditionalField(
+                                              'projectId',
+                                              context.projectId,
+                                            ),
+                                          ],
+                                        ),
+                                      );
 
-                              household = household.copyWith(
-                                memberCount: 0,
-                              );
+                                      household = household.copyWith(
+                                        memberCount: 0,
+                                      );
 
-                              bloc.add(
-                                BeneficiaryRegistrationSaveHouseholdConsentEvent(
-                                  household: household,
-                                  isConsent: isConsent,
-                                ),
-                              );
-                              // clear search on consent being no
-                              final searchBloc =
-                                  context.read<SearchHouseholdsBloc>();
-                              searchBloc.add(
-                                const SearchHouseholdsClearEvent(),
-                              );
-                              context.router
-                                  .push(ConsentHouseholdAcknowledgementRoute());
-                            } else {
-                              context.router.push(HouseHoldDetailsRoute());
-                            }
-                          },
-                          editHousehold: (
-                            addressModel,
-                            householdModel,
-                            individuals,
-                            registrationDate,
-                            loading,
-                          ) {
-                            (router.parent() as StackRouter).pop();
-                          },
+                                      Logger().d(
+                                          "Household in this content $household");
+                                      Logger().d(
+                                          "Address in this content $addressModel");
+                                      bloc.add(
+                                        BeneficiaryRegistrationSaveHouseholdConsentEvent(
+                                          household: household,
+                                          isConsent: isConsent,
+                                        ),
+                                      );
+                                      context.router.push(
+                                          ConsentHouseholdAcknowledgementRoute());
+                                      // clear search on consent being no
+                                      final searchBloc =
+                                          context.read<SearchHouseholdsBloc>();
+                                      searchBloc.add(
+                                        const SearchHouseholdsClearEvent(),
+                                      );
+                                    } else {
+                                      // Logger().d(
+                                      //     "Address in this content $household");
+                                      Logger().d(
+                                          "Address in this content $addressModel");
+                                      context.router
+                                          .push(HouseHoldDetailsRoute());
+                                    }
+                                  },
+                                  editHousehold: (
+                                    addressModel,
+                                    householdModel,
+                                    individuals,
+                                    registrationDate,
+                                    loading,
+                                  ) {
+                                    (router.parent() as StackRouter).pop();
+                                  },
+                                );
+                              },
+                            ),
+                            secondaryAction: DigitDialogActions(
+                              label: "Cancel",
+                              action: (context) => Navigator.of(
+                                context,
+                                rootNavigator: true,
+                              ).pop(false),
+                            ),
+                          ),
                         );
                       },
                       child: const Center(

@@ -20,7 +20,6 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:intl/intl.dart';
 import 'package:reactive_forms/reactive_forms.dart';
 import 'package:registration_delivery/registration_delivery.dart';
-import 'package:registration_delivery/router/registration_delivery_router.gm.dart';
 import 'package:registration_delivery/utils/constants.dart';
 import 'package:registration_delivery/utils/i18_key_constants.dart' as i18;
 import 'package:registration_delivery/utils/utils.dart';
@@ -127,7 +126,7 @@ class CustomIndividualDetailsPageState
               //       },
               //     ).then((value) => {
               //          // ignore: avoid_print
-              //          print("➡️ THEN block executed, pushing acknowledgement page $router"), 
+              //          print("➡️ THEN block executed, pushing acknowledgement page $router"),
               //           router.push(CustomBeneficiaryAcknowledgementRoute(
               //             enableViewHousehold: true,
               //           )),
@@ -180,7 +179,6 @@ class CustomIndividualDetailsPageState
               },
             );
           },
-
           builder: (context, state) {
             return ScrollableContent(
               enableFixedButton: true,
@@ -282,7 +280,8 @@ class CustomIndividualDetailsPageState
                             returnCombinedIds: false,
                           );
 
-                          form.control('beneficiaryId').value = beneficiaryId!.first;
+                          form.control('beneficiaryId').value =
+                              beneficiaryId!.first;
                         }
 
                         form.markAllAsTouched();

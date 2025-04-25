@@ -36,21 +36,28 @@ class _ConsentHouseholdAcknowledgementPageState
             parent
               ..pop()
               ..pop();
+            // context.router.push(
+            //   HouseHoldDetailsRoute(),
+            // );
           },
           secondaryAction: () {
-            final wrapper = context
-                .read<HouseholdOverviewBloc>()
-                .state
-                .householdMemberWrapper;
+            // final wrapper = context
+            //     .read<HouseholdOverviewBloc>()
+            //     .state
+            //     .householdMemberWrapper;
 
-            context.router.popAndPush(
-              BeneficiaryWrapperRoute(wrapper: wrapper),
-            );
+            // context.router.popAndPush(
+            //   BeneficiaryWrapperRoute(wrapper: wrapper),
+            // );
+            // context.router.push(
+            //   HouseHoldDetailsRoute(),
+            // );
           },
-          enableViewHousehold: widget.enableViewHousehold ?? false,
-          secondaryLabel: localizations.translate(
-            i18.householdDetails.viewHouseHoldDetailsAction,
-          ),
+          enableViewHousehold: true,
+          // secondaryLabel: localizations.translate(
+          //   i18.householdDetails.viewHouseHoldDetailsAction,
+          // ),
+          secondaryLabel: "View Houshold details",
           actionLabel: localizations
               .translate(i18.acknowledgementSuccess.actionLabelText),
           description: localizations.translate(

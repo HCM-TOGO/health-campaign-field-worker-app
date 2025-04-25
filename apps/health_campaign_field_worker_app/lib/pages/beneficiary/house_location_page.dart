@@ -12,10 +12,11 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:health_campaign_field_worker_app/router/app_router.dart';
+import 'package:logger/logger.dart';
 import 'package:reactive_forms/reactive_forms.dart';
 import 'package:registration_delivery/utils/extensions/extensions.dart';
 
-import 'package:registration_delivery/blocs/beneficiary_registration/beneficiary_registration.dart';
+import '../../blocs/beneficiary_registration/beneficiary_registration.dart';
 import 'package:registration_delivery/router/registration_delivery_router.gm.dart';
 import 'package:registration_delivery/utils/i18_key_constants.dart' as i18;
 import 'package:registration_delivery/utils/utils.dart';
@@ -165,7 +166,6 @@ class CustomHouseholdLocationPageState
                                 registrationDate,
                                 searchQuery,
                                 loading,
-                                isHeadOfHousehold,
                               ) {
                                 var addressModel = AddressModel(
                                   addressLine1: addressLine1 != null &&
@@ -227,59 +227,15 @@ class CustomHouseholdLocationPageState
                                   ),
                                 );
 
-                                bloc.add(
-                                  BeneficiaryRegistrationSaveAddressEvent(
-                                    addressModel,
-                                  ),
-                                );
-                                router.push(HouseHoldConsentRoute());
-                              },
-                              editHousehold: (
-                                address,
-                                householdModel,
-                                individuals,
-                                registrationDate,
-                                projectBeneficiaryModel,
-                                loading,
-                                headOfHousehold,
-                              ) {
-                                var addressModel = address.copyWith(
-                                  addressLine1: addressLine1 != null &&
-                                          addressLine1.trim().isNotEmpty
-                                      ? addressLine1
-                                      : null,
-                                  addressLine2: addressLine2 != null &&
-                                          addressLine2.trim().isNotEmpty
-                                      ? addressLine2
-                                      : null,
-                                  landmark: landmark != null &&
-                                          landmark.trim().isNotEmpty
-                                      ? landmark
-                                      : null,
-                                  locality: address.locality,
-                                  pincode: postalCode != null &&
-                                          postalCode.trim().isNotEmpty
-                                      ? postalCode
-                                      : null,
-                                  type: AddressType.correspondence,
-                                  latitude: form.control(_latKey).value,
-                                  longitude: form.control(_lngKey).value,
-                                  buildingName: (RegistrationDeliverySingleton()
-                                              .householdType ==
-                                          HouseholdType.community)
-                                      ? form.control(_buildingNameKey).value
-                                      : null,
-                                  locationAccuracy:
-                                      form.control(_accuracyKey).value,
-                                );
-                                // TODO [Linking of Voucher for Household based project  need to be handled]
+                                Logger().d(
+                                    "This is the addressModel ${addressModel.toJson()}");
 
                                 bloc.add(
                                   BeneficiaryRegistrationSaveAddressEvent(
                                     addressModel,
                                   ),
                                 );
-                                router.push(HouseDetailsRoute());
+                                router.push(HouseHoldConsentRoute());
                               },
                             );
                           },
