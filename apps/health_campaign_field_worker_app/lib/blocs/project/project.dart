@@ -288,12 +288,15 @@ class ProjectBloc extends Bloc<ProjectEvent, ProjectState> {
 
     await projectFacilityLocalRepository.bulkCreate(projectFacilities);
 
-    final facilities = await facilityRemoteRepository.search(
-      FacilitySearchModel(tenantId: envConfig.variables.tenantId),
-      limit: batchSize,
-    );
-
-    await facilityLocalRepository.bulkCreate(facilities);
+    try {
+      final facilities = await facilityRemoteRepository.search(
+        FacilitySearchModel(tenantId: envConfig.variables.tenantId),
+        limit: 1000,
+      );
+      await facilityLocalRepository.bulkCreate(facilities);
+    } catch (e) {
+      print(e);
+    }
   }
 
   FutureOr<void> _loadProductVariants(List<ProjectModel> projects) async {

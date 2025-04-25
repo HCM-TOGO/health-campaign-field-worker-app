@@ -7,6 +7,7 @@ import 'package:digit_location_tracker/location_tracker.dart';
 import 'package:digit_ui_components/utils/app_logger.dart';
 import 'package:dio/dio.dart';
 import 'package:flutter/material.dart';
+import 'package:inventory_management/utils/utils.dart';
 import 'package:isar/isar.dart';
 import 'package:path_provider/path_provider.dart';
 import 'package:sync_service/sync_service_lib.dart';
@@ -219,6 +220,7 @@ class Constants {
     SyncServiceSingleton().registries?.registerSyncRegistries({
       DataModelType.complaints: (remote) => CustomSyncRegistry(remote),
     });
+    InventorySingleton().setTenantId(tenantId: envConfig.variables.tenantId);
   }
 }
 
