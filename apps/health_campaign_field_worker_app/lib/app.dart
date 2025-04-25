@@ -1,3 +1,4 @@
+// import 'package:checklist/checklist.dart';
 import 'package:attendance_management/models/entities/attendance_register.dart';
 import 'package:digit_data_model/data_model.dart';
 import 'package:digit_dss/digit_dss.dart';
@@ -9,9 +10,6 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:isar/isar.dart';
 import 'package:location/location.dart';
-import 'package:registration_delivery/data/repositories/local/household_global_search.dart';
-import 'package:registration_delivery/data/repositories/local/individual_global_search.dart';
-import 'package:registration_delivery/data/repositories/oplog/oplog.dart';
 import 'package:survey_form/survey_form.dart';
 
 import 'blocs/app_initialization/app_initialization.dart';
@@ -83,18 +81,24 @@ class MainApplicationState extends State<MainApplication>
           child: MultiBlocProvider(
             providers: [
               // INFO : Need to add bloc of package Here
-              RepositoryProvider<IndividualGlobalSearchRepository>(
-                create: (context) => IndividualGlobalSearchRepository(
-                  widget.sql,
-                  IndividualOpLogManager(widget.isar),
-                ),
+              BlocProvider(
+                create: (_) {
+                  return DigitScannerBloc(
+                    const DigitScannerState(),
+                  );
+                },
+                lazy: false,
               ),
-              RepositoryProvider<HouseHoldGlobalSearchRepository>(
-                create: (context) => HouseHoldGlobalSearchRepository(
-                  widget.sql,
-                  HouseholdOpLogManager(widget.isar),
-                ),
+
+              BlocProvider(
+                create: (_) {
+                  return DigitScannerBloc(
+                    const DigitScannerState(),
+                  );
+                },
+                lazy: false,
               ),
+
               BlocProvider(
                 create: (_) {
                   return DigitScannerBloc(
@@ -111,7 +115,14 @@ class MainApplicationState extends State<MainApplication>
                 },
                 lazy: false,
               ),
-
+              BlocProvider(
+                create: (_) {
+                  return DigitScannerBloc(
+                    const DigitScannerState(),
+                  );
+                },
+                lazy: false,
+              ),
               BlocProvider(
                 create: (context) {
                   return UserBloc(
@@ -161,10 +172,12 @@ class MainApplicationState extends State<MainApplication>
 
                     final localizationModulesList = appConfig.backendInterface;
                     var firstLanguage;
-                    firstLanguage = appConfig.languages?.lastOrNull?.value;
-                    final selectedLocale =
-                        AppSharedPreferences().getSelectedLocale ??
-                            firstLanguage;
+                    firstLanguage = 'en_NG';
+                    final selectedLocale = 'en_NG';
+                    AppSharedPreferences().setSelectedLocale(selectedLocale);
+                    // AppSharedPreferences().getSelectedLocale ??
+                    //     firstLanguage;
+
                     LocalizationParams().setLocale(Locale(selectedLocale));
                     final languages = appConfig.languages;
 
@@ -340,14 +353,13 @@ class MainApplicationState extends State<MainApplication>
                                   })
                                 : [firstLanguage],
                             localizationsDelegates: getAppLocalizationDelegates(
-                              sql: widget.sql,
-                              appConfig: appConfig,
-                              selectedLocale: Locale(
-                                selectedLocale!.split("_").first,
-                                selectedLocale.split("_").last,
-                              ),
-                              isar: widget.isar,
-                            ),
+                                sql: widget.sql,
+                                appConfig: appConfig,
+                                selectedLocale: Locale(
+                                  selectedLocale!.split("_").first,
+                                  selectedLocale.split("_").last,
+                                ),
+                                isar: widget.isar),
                             locale: languages != null
                                 ? Locale(
                                     selectedLocale!.split("_").first,

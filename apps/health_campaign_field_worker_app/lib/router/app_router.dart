@@ -36,6 +36,7 @@ import '../pages/inventory/custom_manage_stocks.dart';
 import '../pages/inventory/custom_record_stock_wrapper.dart';
 import '../pages/inventory/custom_stock_details.dart';
 import '../pages/inventory/custom_warehouse_details.dart';
+import '../pages/inventory/custom_stock_details_in_tabs.dart';
 export 'package:auto_route/auto_route.dart';
 
 part 'app_router.gr.dart';
@@ -233,6 +234,8 @@ class AppRouter extends _$AppRouter {
             ),
             AutoRoute(
                 page: CustomStockDetailsRoute.page, path: 'custom-details'),
+            // AutoRoute(
+            //     page: DynamicTabsPageRoute.page, path: 'custom-details-in-tab'),
           ],
         ),
         AutoRoute(

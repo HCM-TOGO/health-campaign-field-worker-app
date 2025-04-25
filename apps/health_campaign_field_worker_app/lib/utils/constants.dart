@@ -175,16 +175,16 @@ class Constants {
     final appConfigs = await isar.appConfigurations.where().findAll();
     final config = appConfigs.firstOrNull;
 
-    final enableCrashlytics =
-        config?.firebaseConfig?.enableCrashlytics ?? false;
-    if (enableCrashlytics) {
-      firebase_services.initialize(
-        options: DefaultFirebaseOptions.currentPlatform,
-        onErrorMessage: (value) {
-          AppLogger.instance.error(title: 'CRASHLYTICS', message: value);
-        },
-      );
-    }
+    final enableCrashlytics = false;
+    // config?.firebaseConfig?.enableCrashlytics ?? false;
+    // if (enableCrashlytics) {
+    //   firebase_services.initialize(
+    //     options: DefaultFirebaseOptions.currentPlatform,
+    //     onErrorMessage: (value) {
+    //       AppLogger.instance.error(title: 'CRASHLYTICS', message: value);
+    //     },
+    //   );
+    // }
 
     _version = version;
   }

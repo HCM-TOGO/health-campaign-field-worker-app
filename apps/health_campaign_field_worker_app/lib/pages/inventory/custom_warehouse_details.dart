@@ -8,6 +8,7 @@ import 'package:digit_ui_components/widgets/atoms/input_wrapper.dart';
 import 'package:digit_ui_components/widgets/molecules/digit_card.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:health_campaign_field_worker_app/router/app_router.dart';
 import 'package:intl/intl.dart';
 import 'package:inventory_management/router/inventory_router.gm.dart';
 import 'package:reactive_forms/reactive_forms.dart';
@@ -234,7 +235,7 @@ class CustomWarehouseDetailsPageState
                                                       ),
                                                     );
                                                     context.router.push(
-                                                      StockDetailsRoute(),
+                                                      CustomStockDetailsRoute(),
                                                     );
                                                   }
                                                 },
