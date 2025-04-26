@@ -44,6 +44,7 @@ class CustomStockDetailsPageState
   static const _productVariantKey = 'productVariant';
   static const _secondaryPartyKey = 'secondaryParty';
   static const _transactionQuantityKey = 'quantity';
+  static const _transactionPartialQuantityKey = 'partialQuantity';
   static const _transactionReasonKey = 'transactionReason';
   static const _waybillNumberKey = 'waybillNumber';
   static const _waybillQuantityKey = 'waybillQuantity';
@@ -71,17 +72,14 @@ class CustomStockDetailsPageState
         Validators.min(0),
         Validators.max(10000),
       ]),
+      _transactionPartialQuantityKey: FormControl<int>(validators: []),
       _transactionReasonKey: FormControl<String>(),
       _waybillNumberKey: FormControl<String>(
         validators: [Validators.minLength(2), Validators.maxLength(200)],
       ),
       _waybillQuantityKey: FormControl<String>(),
       _batchNumberKey: FormControl<String>(
-        validators: [
-          Validators.required,
-          Validators.minLength(2),
-          Validators.maxLength(200)
-        ],
+        validators: [],
       ),
       _vehicleNumberKey: FormControl<String>(),
       _typeOfTransportKey: FormControl<String>(),
@@ -140,6 +138,7 @@ class CustomStockDetailsPageState
 
                 String pageTitle;
                 String quantityCountLabel;
+                String? quantityPartialCountLabel;
                 String? transactionReasonLabel;
                 String? transactionReason;
                 String transactionType;
@@ -149,20 +148,26 @@ class CustomStockDetailsPageState
                 switch (entryType) {
                   case StockRecordEntryType.receipt:
                     pageTitle = module.receivedPageTitle;
-                    quantityCountLabel = module.quantityReceivedLabel;
+                    quantityCountLabel =
+                        i18.inventoryReportDetails.receiptQuantityLabel;
                     transactionType = TransactionType.received.toValue();
 
                     break;
                   case StockRecordEntryType.dispatch:
                     pageTitle = module.issuedPageTitle;
-                    quantityCountLabel = module.quantitySentLabel;
+                    quantityCountLabel =
+                        i18.inventoryReportDetails.dispatchQuantityLabel;
                     transactionType = TransactionType.dispatched.toValue();
 
                     break;
                   case StockRecordEntryType.returned:
                     pageTitle = module.returnedPageTitle;
-                    quantityCountLabel = module.quantityReturnedLabel;
+                    quantityCountLabel =
+                        i18.inventoryReportDetails.returnedQuantityLabel;
+                    quantityPartialCountLabel = i18_local
+                        .inventoryReportDetails.partialReturnedQuantityLabel;
                     transactionType = TransactionType.received.toValue();
+
                     break;
                   case StockRecordEntryType.loss:
                     pageTitle = module.lostPageTitle;
@@ -198,6 +203,23 @@ class CustomStockDetailsPageState
                       if (scannerState.barCodes.isNotEmpty) {
                         scannedResources.clear();
                         scannedResources.addAll(scannerState.barCodes);
+                      }
+
+                      if (entryType == StockRecordEntryType.returned) {
+                        form
+                            .control(_transactionPartialQuantityKey)
+                            .setValidators([
+                          Validators.required,
+                          Validators.number(),
+                          Validators.min(0),
+                          Validators.max(10000),
+                        ], autoValidate: true);
+                      } else {
+                        form.control(_batchNumberKey).setValidators([
+                          Validators.required,
+                          Validators.minLength(2),
+                          Validators.maxLength(200)
+                        ], autoValidate: true);
                       }
 
                       return ScrollableContent(
@@ -344,9 +366,16 @@ class CustomStockDetailsPageState
                                             }
 
                                             final quantity = form
-                                                .control(
-                                                    _transactionQuantityKey)
-                                                .value;
+                                                    .control(
+                                                        _transactionQuantityKey)
+                                                    .value ??
+                                                0;
+
+                                            final partialQuantity = form
+                                                    .control(
+                                                        _transactionPartialQuantityKey)
+                                                    .value ??
+                                                0;
 
                                             final waybillNumber = form
                                                 .control(_waybillNumberKey)
@@ -537,6 +566,19 @@ class CustomStockDetailsPageState
                                                           addBarCodesToFields(
                                                               scannerState
                                                                   .barCodes),
+                                                        if (entryType ==
+                                                            StockRecordEntryType
+                                                                .returned) ...[
+                                                          AdditionalField(
+                                                            'unused_quantity',
+                                                            quantity.toString(),
+                                                          ),
+                                                          AdditionalField(
+                                                            'partial_quantity',
+                                                            partialQuantity
+                                                                .toString(),
+                                                          ),
+                                                        ]
                                                       ],
                                                     )
                                                   : null,
@@ -639,74 +681,54 @@ class CustomStockDetailsPageState
                                       )),
                                     ),
                                     fetched: (productVariants) {
-                                      // return ReactiveWrapperField(
-                                      //   formControlName: _productVariantKey,
-                                      //   validationMessages: {
-                                      //     'required': (object) =>
-                                      //         '${module.selectProductLabel}_IS_REQUIRED',
-                                      //   },
-                                      //   showErrors: (control) =>
-                                      //       control.invalid && control.touched,
-                                      //   builder: (field) {
-                                      //     return LabeledField(
-                                      //       label: localizations.translate(
-                                      //         module.selectProductLabel,
-                                      //       ),
-                                      //       isRequired: true,
-                                      //       child: DigitDropdown(
-                                      //         errorMessage: field.errorText,
-                                      //         emptyItemText:
-                                      //             localizations.translate(
-                                      //           i18.common.noMatchFound,
-                                      //         ),
-                                      //         items: productVariants
-                                      //             .map((variant) {
-                                      //           return DropdownItem(
-                                      //             name: localizations.translate(
-                                      //               variant.sku ?? variant.id,
-                                      //             ),
-                                      //             code: variant.id,
-                                      //           );
-                                      //         }).toList(),
-                                      //         onSelect: (value) {
-                                      //           /// Find the selected product variant model by matching the id
-                                      //           ProductVariantModel?
-                                      //               selectedVariant =
-                                      //               productVariants
-                                      //                   .firstWhereOrNull(
-                                      //             (variant) =>
-                                      //                 variant.id == value.code,
-                                      //           );
-
-                                      //           /// Update the form control with the selected product variant model
-                                      //           form
-                                      //               .control(_productVariantKey)
-                                      //               .value = selectedVariant;
-
-                                      //           setState(() {});
-                                      //         },
-                                      //       ),
-                                      //     );
-                                      //   },
-                                      // );
-                                      return DigitReactiveDropdown<
-                                          ProductVariantModel>(
-                                        key: const Key(_productVariantKey),
+                                      return ReactiveWrapperField(
                                         formControlName: _productVariantKey,
-                                        label: localizations.translate(
-                                          module.selectProductLabel,
-                                        ),
-                                        isRequired: true,
-                                        valueMapper: (value) {
-                                          return localizations.translate(
-                                            value.sku ?? value.id,
-                                          );
-                                        },
-                                        menuItems: productVariants,
                                         validationMessages: {
                                           'required': (object) =>
-                                              localizations.translate(
-                                                  '${module.selectProductLabel}_IS_REQUIRED'),
+                                              '${module.selectProductLabel}_IS_REQUIRED',
+                                        },
+                                        showErrors: (control) =>
+                                            control.invalid && control.touched,
+                                        builder: (field) {
+                                          return LabeledField(
+                                            label: localizations.translate(
+                                              module.selectProductLabel,
+                                            ),
+                                            isRequired: true,
+                                            child: DigitDropdown(
+                                              errorMessage: field.errorText,
+                                              emptyItemText:
+                                                  localizations.translate(
+                                                i18.common.noMatchFound,
+                                              ),
+                                              items: productVariants
+                                                  .map((variant) {
+                                                return DropdownItem(
+                                                  name: localizations.translate(
+                                                    variant.sku ?? variant.id,
+                                                  ),
+                                                  code: variant.id,
+                                                );
+                                              }).toList(),
+                                              onSelect: (value) {
+                                                /// Find the selected product variant model by matching the id
+                                                ProductVariantModel?
+                                                    selectedVariant =
+                                                    productVariants
+                                                        .firstWhereOrNull(
+                                                  (variant) =>
+                                                      variant.id == value.code,
+                                                );
+
+                                                /// Update the form control with the selected product variant model
+                                                form
+                                                    .control(_productVariantKey)
+                                                    .value = selectedVariant;
+
+                                                setState(() {});
+                                              },
+                                            ),
+                                          );
                                         },
                                       );
                                     },
@@ -934,6 +956,7 @@ class CustomStockDetailsPageState
                                 //   formControlName: _deliveryTeamKey,
                                 // ),
                               ),
+
                               ReactiveWrapperField(
                                   formControlName: _transactionQuantityKey,
                                   validationMessages: {
@@ -978,6 +1001,58 @@ class CustomStockDetailsPageState
                                       ),
                                     );
                                   }),
+
+                              Visibility(
+                                visible:
+                                    entryType == StockRecordEntryType.returned,
+                                child: ReactiveWrapperField(
+                                    formControlName:
+                                        _transactionPartialQuantityKey,
+                                    validationMessages: {
+                                      "number": (object) =>
+                                          localizations.translate(
+                                            '${quantityCountLabel}_ERROR',
+                                          ),
+                                      "max": (object) =>
+                                          localizations.translate(
+                                            '${quantityCountLabel}_MAX_ERROR',
+                                          ),
+                                      "min": (object) =>
+                                          localizations.translate(
+                                            '${quantityCountLabel}_MIN_ERROR',
+                                          ),
+                                    },
+                                    showErrors: (control) =>
+                                        control.invalid && control.touched,
+                                    builder: (field) {
+                                      return LabeledField(
+                                        label: localizations.translate(
+                                          quantityPartialCountLabel ?? "",
+                                        ),
+                                        isRequired: true,
+                                        child: BaseDigitFormInput(
+                                          errorMessage: field.errorText,
+                                          keyboardType: const TextInputType
+                                              .numberWithOptions(
+                                            decimal: true,
+                                          ),
+                                          onChange: (val) {
+                                            field.control.markAsTouched();
+                                            if (int.parse(val) > 10000000000) {
+                                              field.control.value = 10000;
+                                            } else {
+                                              if (val != '') {
+                                                field.control.value =
+                                                    int.parse(val);
+                                              } else {
+                                                field.control.value = null;
+                                              }
+                                            }
+                                          },
+                                        ),
+                                      );
+                                    }),
+                              ),
                               if (isWareHouseMgr)
                                 ReactiveWrapperField(
                                     formControlName: _waybillNumberKey,
@@ -1011,7 +1086,8 @@ class CustomStockDetailsPageState
                                         },
                                       );
                                     }),
-                              if (isWareHouseMgr)
+                              if (isWareHouseMgr &&
+                                  entryType != StockRecordEntryType.returned)
                                 ReactiveWrapperField(
                                     formControlName: _batchNumberKey,
                                     builder: (field) {
@@ -1032,63 +1108,44 @@ class CustomStockDetailsPageState
                                       );
                                     }),
 
-                              // if (isWareHouseMgr)
-                              //   transportTypes.isNotEmpty
-                              //       ? ReactiveWrapperField(
-                              //           formControlName: _typeOfTransportKey,
-                              //           builder: (field) {
-                              //             return LabeledField(
-                              //               label: localizations.translate(
-                              //                 i18.stockDetails
-                              //                     .transportTypeLabel,
-                              //               ),
-                              //               child: DigitDropdown(
-                              //                 emptyItemText:
-                              //                     localizations.translate(
-                              //                   i18.common.noMatchFound,
-                              //                 ),
-                              //                 items: transportTypes.map((type) {
-                              //                   return DropdownItem(
-                              //                     name: localizations
-                              //                         .translate(type.name),
-                              //                     code: type.code,
-                              //                   );
-                              //                 }).toList(),
-                              //                 onSelect: (value) {
-                              //                   field.control.value =
-                              //                       value.name;
-                              //                   form
-                              //                       .control(
-                              //                           _typeOfTransportKey)
-                              //                       .value = value.code;
-                              //                   form
-                              //                       .control(
-                              //                           _typeOfTransportKey)
-                              //                       .updateValue(value.code);
-                              //                   setState(() {});
-                              //                 },
-                              //               ),
-                              //             );
-                              //           },
-                              //         )
-                              //       : const Offstage(),
                               if (isWareHouseMgr)
                                 transportTypes.isNotEmpty
-                                    ? DigitReactiveDropdown<String>(
-                                        key: const Key(_typeOfTransportKey),
-                                        label: localizations.translate(
-                                          i18.stockDetails.transportTypeLabel,
-                                        ),
-                                        valueMapper: (e) => e,
-                                        initialValue:
-                                            transportTypes.firstOrNull?.name,
-                                        menuItems: transportTypes.map(
-                                          (e) {
-                                            return localizations
-                                                .translate(e.name);
-                                          },
-                                        ).toList(),
+                                    ? ReactiveWrapperField(
                                         formControlName: _typeOfTransportKey,
+                                        builder: (field) {
+                                          return LabeledField(
+                                            label: localizations.translate(
+                                              i18.stockDetails
+                                                  .transportTypeLabel,
+                                            ),
+                                            child: DigitDropdown(
+                                              emptyItemText:
+                                                  localizations.translate(
+                                                i18.common.noMatchFound,
+                                              ),
+                                              items: transportTypes.map((type) {
+                                                return DropdownItem(
+                                                  name: localizations
+                                                      .translate(type.name),
+                                                  code: type.code,
+                                                );
+                                              }).toList(),
+                                              onSelect: (value) {
+                                                field.control.value =
+                                                    value.name;
+                                                form
+                                                    .control(
+                                                        _typeOfTransportKey)
+                                                    .value = value.code;
+                                                form
+                                                    .control(
+                                                        _typeOfTransportKey)
+                                                    .updateValue(value.code);
+                                                setState(() {});
+                                              },
+                                            ),
+                                          );
+                                        },
                                       )
                                     : const Offstage(),
                               if (isWareHouseMgr)

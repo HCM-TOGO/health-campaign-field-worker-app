@@ -15,6 +15,7 @@ import 'package:provider/provider.dart';
 import '../blocs/app_initialization/app_initialization.dart';
 import '../data/local_store/downsync/downsync.dart';
 import '../data/network_manager.dart';
+import '../data/repositories/local/inventory_management/custom_stock.dart';
 import '../data/repositories/oplog.dart';
 import '../data/repositories/remote/auth.dart';
 import '../data/repositories/remote/downsync.dart';
@@ -164,8 +165,14 @@ class NetworkManagerProviderWrapper extends StatelessWidget {
 
       // INFO Need to add packages here
 
+      // RepositoryProvider<LocalRepository<StockModel, StockSearchModel>>(
+      //   create: (_) => StockLocalRepository(
+      //     sql,
+      //     StockOpLogManager(isar),
+      //   ),
+      // ),
       RepositoryProvider<LocalRepository<StockModel, StockSearchModel>>(
-        create: (_) => StockLocalRepository(
+        create: (_) => CustomStockLocalRepository(
           sql,
           StockOpLogManager(isar),
         ),

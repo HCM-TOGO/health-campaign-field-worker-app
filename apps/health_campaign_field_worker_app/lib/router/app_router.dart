@@ -2,10 +2,11 @@ import 'package:auto_route/auto_route.dart';
 import 'package:digit_data_model/data_model.dart';
 import 'package:flutter/material.dart';
 import 'package:inventory_management/blocs/app_localization.dart';
-import 'package:inventory_management/blocs/inventory_report.dart';
+// import 'package:inventory_management/blocs/inventory_report.dart';
 import 'package:inventory_management/router/inventory_router.dart';
 import 'package:inventory_management/router/inventory_router.gm.dart';
 
+import '../blocs/inventory_management/custom_inventory_report.dart';
 import '../blocs/localization/app_localization.dart';
 import '../pages/acknowledgement.dart';
 import '../pages/authenticated.dart';

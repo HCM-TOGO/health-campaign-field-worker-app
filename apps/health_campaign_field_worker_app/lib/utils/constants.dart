@@ -19,6 +19,7 @@ import '../data/local_store/no_sql/schema/localization.dart';
 import '../data/local_store/no_sql/schema/project_types.dart';
 import '../data/local_store/no_sql/schema/row_versions.dart';
 import '../data/local_store/no_sql/schema/service_registry.dart';
+import '../data/repositories/local/inventory_management/custom_stock.dart';
 import '../data/repositories/remote/downsync.dart';
 import '../data/sync_registry.dart';
 import '../data/sync_service_mapper.dart';
@@ -116,7 +117,8 @@ class Constants {
       ),
       LocationTrackerLocalBaseRepository(
           sql, LocationTrackerOpLogManager(isar)),
-      StockLocalRepository(sql, StockOpLogManager(isar)),
+      // StockLocalRepository(sql, StockOpLogManager(isar)),
+      CustomStockLocalRepository(sql, StockOpLogManager(isar)),
       StockReconciliationLocalRepository(
         sql,
         StockReconciliationOpLogManager(isar),

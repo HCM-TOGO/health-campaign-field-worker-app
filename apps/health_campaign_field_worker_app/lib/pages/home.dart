@@ -364,8 +364,9 @@ class _HomePageState extends LocalizedState<HomePage> {
               icon: Icons.sync_alt,
               label: i18.home.syncDataLabel,
               onPressed: () async {
-                if (snapshot.data?['enablesManualSync'] == true) {
-                  if (context.mounted) _attemptSyncUp(context);
+                if (snapshot.data == null ||
+                    snapshot.data?['enablesManualSync'] == true) {
+                  _attemptSyncUp(context);
                 } else {
                   if (context.mounted) {
                     Toast.showToast(
@@ -480,8 +481,8 @@ class _HomePageState extends LocalizedState<HomePage> {
 
                 context.read<
                     LocalRepository<IndividualModel, IndividualSearchModel>>(),
-                context.read<
-                    LocalRepository<UserActionModel, UserActionSearchModel>>(),
+                // context.read<
+                //     LocalRepository<UserActionModel, UserActionSearchModel>>(),
                 context.read<LocalRepository<StockModel, StockSearchModel>>(),
               ],
               remoteRepositories: [
@@ -493,8 +494,8 @@ class _HomePageState extends LocalizedState<HomePage> {
 
                 context.read<
                     RemoteRepository<IndividualModel, IndividualSearchModel>>(),
-                context.read<
-                    RemoteRepository<UserActionModel, UserActionSearchModel>>(),
+                // context.read<
+                //     RemoteRepository<UserActionModel, UserActionSearchModel>>(),
               ],
             ),
           );
