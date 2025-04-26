@@ -3,7 +3,6 @@ import 'package:registration_delivery/registration_delivery.dart';
 import 'package:registration_delivery/router/registration_delivery_router.gm.dart';
 
 import 'package:inventory_management/inventory_management.dart';
-import 'package:inventory_management/router/inventory_router.gm.dart';
 
 import 'dart:async';
 
@@ -23,10 +22,6 @@ import 'package:flutter/material.dart';
 import 'package:flutter_background_service/flutter_background_service.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
-import 'package:inventory_management/models/entities/inventory_transport_type.dart';
-import 'package:inventory_management/models/entities/stock.dart';
-import 'package:inventory_management/router/inventory_router.gm.dart';
-import 'package:inventory_management/utils/utils.dart';
 import 'package:survey_form/models/entities/service.dart';
 import 'package:sync_service/blocs/sync/sync.dart';
 
