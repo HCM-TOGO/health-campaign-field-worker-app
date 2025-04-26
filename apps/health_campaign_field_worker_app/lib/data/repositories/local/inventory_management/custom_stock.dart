@@ -74,10 +74,6 @@ class CustomStockLocalRepository
         final createdBy = data.auditCreatedBy;
         final createdTime = data.auditCreatedTime;
 
-        final additionalField = StockAdditionalFieldsMapper.fromJson(
-          data.additionalFields!,
-        );
-
         return StockModel(
           id: data.id,
           tenantId: data.tenantId,
