@@ -55,6 +55,39 @@ abstract class _$AppRouter extends RootStackRouter {
         ),
       );
     },
+    CaregiverConsentRoute.name: (routeData) {
+      final args = routeData.argsAs<CaregiverConsentRouteArgs>(
+          orElse: () => const CaregiverConsentRouteArgs());
+      return AutoRoutePage<dynamic>(
+        routeData: routeData,
+        child: CaregiverConsentPage(
+          key: args.key,
+          appLocalizations: args.appLocalizations,
+        ),
+      );
+    },
+    CustomHouseHoldDetailsRoute.name: (routeData) {
+      final args = routeData.argsAs<CustomHouseHoldDetailsRouteArgs>(
+          orElse: () => const CustomHouseHoldDetailsRouteArgs());
+      return AutoRoutePage<dynamic>(
+        routeData: routeData,
+        child: CustomHouseHoldDetailsPage(
+          key: args.key,
+          appLocalizations: args.appLocalizations,
+        ),
+      );
+    },
+    CustomHouseholdLocationRoute.name: (routeData) {
+      final args = routeData.argsAs<CustomHouseholdLocationRouteArgs>(
+          orElse: () => const CustomHouseholdLocationRouteArgs());
+      return AutoRoutePage<dynamic>(
+        routeData: routeData,
+        child: CustomHouseholdLocationPage(
+          key: args.key,
+          appLocalizations: args.appLocalizations,
+        ),
+      );
+    },
     CustomInventoryReportDetailsRoute.name: (routeData) {
       final args = routeData.argsAs<CustomInventoryReportDetailsRouteArgs>();
       return AutoRoutePage<dynamic>(
@@ -199,6 +232,7 @@ abstract class _$AppRouter extends RootStackRouter {
       );
     },
     ...InventoryRoute().pagesMap,
+    ...RegistrationDeliveryRoute().pagesMap,
   };
 }
 
@@ -339,6 +373,122 @@ class BoundarySelectionRouteArgs {
   @override
   String toString() {
     return 'BoundarySelectionRouteArgs{key: $key, appLocalizations: $appLocalizations}';
+  }
+}
+
+/// generated route for
+/// [CaregiverConsentPage]
+class CaregiverConsentRoute extends PageRouteInfo<CaregiverConsentRouteArgs> {
+  CaregiverConsentRoute({
+    Key? key,
+    RegistrationDeliveryLocalization? appLocalizations,
+    List<PageRouteInfo>? children,
+  }) : super(
+          CaregiverConsentRoute.name,
+          args: CaregiverConsentRouteArgs(
+            key: key,
+            appLocalizations: appLocalizations,
+          ),
+          initialChildren: children,
+        );
+
+  static const String name = 'CaregiverConsentRoute';
+
+  static const PageInfo<CaregiverConsentRouteArgs> page =
+      PageInfo<CaregiverConsentRouteArgs>(name);
+}
+
+class CaregiverConsentRouteArgs {
+  const CaregiverConsentRouteArgs({
+    this.key,
+    this.appLocalizations,
+  });
+
+  final Key? key;
+
+  final RegistrationDeliveryLocalization? appLocalizations;
+
+  @override
+  String toString() {
+    return 'CaregiverConsentRouteArgs{key: $key, appLocalizations: $appLocalizations}';
+  }
+}
+
+/// generated route for
+/// [CustomHouseHoldDetailsPage]
+class CustomHouseHoldDetailsRoute
+    extends PageRouteInfo<CustomHouseHoldDetailsRouteArgs> {
+  CustomHouseHoldDetailsRoute({
+    Key? key,
+    RegistrationDeliveryLocalization? appLocalizations,
+    List<PageRouteInfo>? children,
+  }) : super(
+          CustomHouseHoldDetailsRoute.name,
+          args: CustomHouseHoldDetailsRouteArgs(
+            key: key,
+            appLocalizations: appLocalizations,
+          ),
+          initialChildren: children,
+        );
+
+  static const String name = 'CustomHouseHoldDetailsRoute';
+
+  static const PageInfo<CustomHouseHoldDetailsRouteArgs> page =
+      PageInfo<CustomHouseHoldDetailsRouteArgs>(name);
+}
+
+class CustomHouseHoldDetailsRouteArgs {
+  const CustomHouseHoldDetailsRouteArgs({
+    this.key,
+    this.appLocalizations,
+  });
+
+  final Key? key;
+
+  final RegistrationDeliveryLocalization? appLocalizations;
+
+  @override
+  String toString() {
+    return 'CustomHouseHoldDetailsRouteArgs{key: $key, appLocalizations: $appLocalizations}';
+  }
+}
+
+/// generated route for
+/// [CustomHouseholdLocationPage]
+class CustomHouseholdLocationRoute
+    extends PageRouteInfo<CustomHouseholdLocationRouteArgs> {
+  CustomHouseholdLocationRoute({
+    Key? key,
+    RegistrationDeliveryLocalization? appLocalizations,
+    List<PageRouteInfo>? children,
+  }) : super(
+          CustomHouseholdLocationRoute.name,
+          args: CustomHouseholdLocationRouteArgs(
+            key: key,
+            appLocalizations: appLocalizations,
+          ),
+          initialChildren: children,
+        );
+
+  static const String name = 'CustomHouseholdLocationRoute';
+
+  static const PageInfo<CustomHouseholdLocationRouteArgs> page =
+      PageInfo<CustomHouseholdLocationRouteArgs>(name);
+}
+
+class CustomHouseholdLocationRouteArgs {
+  const CustomHouseholdLocationRouteArgs({
+    this.key,
+    this.appLocalizations,
+  });
+
+  final Key? key;
+
+  final RegistrationDeliveryLocalization? appLocalizations;
+
+  @override
+  String toString() {
+    return 'CustomHouseholdLocationRouteArgs{key: $key, appLocalizations: $appLocalizations}';
   }
 }
 

@@ -11,6 +11,12 @@ import 'package:inventory_management/data/repositories/oplog/oplog.dart';
 import 'package:inventory_management/models/entities/stock.dart';
 import 'package:isar/isar.dart';
 import 'package:provider/provider.dart';
+import 'package:survey_form/data/repositories/local/service.dart';
+import 'package:survey_form/data/repositories/local/service_definition.dart';
+import 'package:survey_form/data/repositories/oplog/oplog.dart';
+import 'package:survey_form/data/repositories/remote/service_definition.dart';
+import 'package:survey_form/models/entities/service.dart';
+import 'package:survey_form/models/entities/service_definition.dart';
 
 import '../blocs/app_initialization/app_initialization.dart';
 import '../data/local_store/downsync/downsync.dart';
@@ -20,6 +26,7 @@ import '../data/repositories/remote/auth.dart';
 import '../data/repositories/remote/downsync.dart';
 import '../models/downsync/downsync.dart';
 import 'package:inventory_management/inventory_management.dart';
+import 'package:registration_delivery/registration_delivery.dart';
 
 class NetworkManagerProviderWrapper extends StatelessWidget {
   final LocalSqlDataStore sql;
@@ -178,6 +185,66 @@ class NetworkManagerProviderWrapper extends StatelessWidget {
           StockReconciliationOpLogManager(isar),
         ),
       ),
+      RepositoryProvider<
+          LocalRepository<HouseholdMemberModel, HouseholdMemberSearchModel>>(
+        create: (_) => HouseholdMemberLocalRepository(
+          sql,
+          HouseholdMemberOpLogManager(isar),
+        ),
+      ),
+      RepositoryProvider<LocalRepository<HouseholdModel, HouseholdSearchModel>>(
+        create: (_) => HouseholdLocalRepository(
+          sql,
+          HouseholdOpLogManager(isar),
+        ),
+      ),
+      RepositoryProvider<
+          LocalRepository<ProjectBeneficiaryModel,
+              ProjectBeneficiarySearchModel>>(
+        create: (_) => ProjectBeneficiaryLocalRepository(
+          sql,
+          ProjectBeneficiaryOpLogManager(isar),
+        ),
+      ),
+      RepositoryProvider<LocalRepository<TaskModel, TaskSearchModel>>(
+        create: (_) => TaskLocalRepository(
+          sql,
+          TaskOpLogManager(isar),
+        ),
+      ),
+      RepositoryProvider<LocalRepository<ReferralModel, ReferralSearchModel>>(
+        create: (_) => ReferralLocalRepository(
+          sql,
+          ReferralOpLogManager(isar),
+        ),
+      ),
+      RepositoryProvider<
+          LocalRepository<SideEffectModel, SideEffectSearchModel>>(
+        create: (_) => SideEffectLocalRepository(
+          sql,
+          SideEffectOpLogManager(isar),
+        ),
+      ),
+      RepositoryProvider<RegistrationDeliveryAddressRepo>(
+        create: (_) => RegistrationDeliveryAddressRepo(
+          sql,
+          AddressOpLogManager(isar),
+        ),
+      ),
+      RepositoryProvider<
+          LocalRepository<ServiceDefinitionModel,
+              ServiceDefinitionSearchModel>>(
+        create: (_) => ServiceDefinitionLocalRepository(
+          sql,
+          ServiceDefinitionOpLogManager(isar),
+        ),
+      ),
+      RepositoryProvider<LocalRepository<ServiceModel, ServiceSearchModel>>(
+        create: (_) => ServiceLocalRepository(
+          sql,
+          ServiceOpLogManager(isar),
+        ),
+      ),
     ];
   }
 
@@ -309,6 +376,64 @@ class NetworkManagerProviderWrapper extends StatelessWidget {
                   StockReconciliationSearchModel>>(
             create: (_) =>
                 StockReconciliationRemoteRepository(dio, actionMap: actions),
+          ),
+        if (value == DataModelType.household)
+          RepositoryProvider<
+              RemoteRepository<HouseholdModel, HouseholdSearchModel>>(
+            create: (_) => HouseholdRemoteRepository(
+              dio,
+              actionMap: actions,
+            ),
+          ),
+        if (value == DataModelType.householdMember)
+          RepositoryProvider<
+              RemoteRepository<HouseholdMemberModel,
+                  HouseholdMemberSearchModel>>(
+            create: (_) => HouseholdMemberRemoteRepository(
+              dio,
+              actionMap: actions,
+            ),
+          ),
+        if (value == DataModelType.projectBeneficiary)
+          RepositoryProvider<
+              RemoteRepository<ProjectBeneficiaryModel,
+                  ProjectBeneficiarySearchModel>>(
+            create: (_) => ProjectBeneficiaryRemoteRepository(
+              dio,
+              actionMap: actions,
+            ),
+          ),
+        if (value == DataModelType.task)
+          RepositoryProvider<RemoteRepository<TaskModel, TaskSearchModel>>(
+            create: (_) => TaskRemoteRepository(
+              dio,
+              actionMap: actions,
+            ),
+          ),
+        if (value == DataModelType.referral)
+          RepositoryProvider<
+              RemoteRepository<ReferralModel, ReferralSearchModel>>(
+            create: (_) => ReferralRemoteRepository(
+              dio,
+              actionMap: actions,
+            ),
+          ),
+        if (value == DataModelType.sideEffect)
+          RepositoryProvider<
+              RemoteRepository<SideEffectModel, SideEffectSearchModel>>(
+            create: (_) => SideEffectRemoteRepository(
+              dio,
+              actionMap: actions,
+            ),
+          ),
+        if (value == DataModelType.serviceDefinition)
+          RepositoryProvider<
+              RemoteRepository<ServiceDefinitionModel,
+                  ServiceDefinitionSearchModel>>(
+            create: (_) => ServiceDefinitionRemoteRepository(
+              dio,
+              actionMap: actions,
+            ),
           ),
       ]);
     }

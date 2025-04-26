@@ -13,6 +13,8 @@ const homeShowcase = HomeShowcase();
 const privacyPolicy = PrivacyPolicy();
 const dashBoard = Dashboard();
 
+const caregiverConsent = CaregiverConsent();
+
 const householdLocationShowcase = HouseholdLocationShowcase();
 const householdLocation = HouseholdLocation();
 const searchBeneficiary = SearchBeneficiary();
@@ -393,6 +395,18 @@ class ComplaintTypeShowcase {
   }
 }
 
+class CaregiverConsent {
+  const CaregiverConsent();
+
+  String get caregiverConsentLabelText => 'CARE_GIVER_CONSENT_LABEL_TEXT';
+
+  String get caregiverConsentDescriptionText =>
+      'CARE_GIVER_CONSENT_DESCRIPTION_TEXT';
+
+  String get caregiverConsentActionLabelText =>
+      'CARE_GIVER_CONSENT_ACTION_LABEL_TEXT';
+}
+
 class ComplaintsDetailsShowcase {
   const ComplaintsDetailsShowcase();
 
@@ -533,6 +547,9 @@ class Home {
   const Home();
 
   String get beneficiaryLabel => 'HOME_BENEFICIARY_LABEL';
+
+  String get beneficiaryDistributionLabel =>
+      'HOME_BENEFICIARY_DISTRIBUTION_LABEL';
 
   String get manageStockLabel => 'HOME_MANAGE_STOCK_LABEL';
 

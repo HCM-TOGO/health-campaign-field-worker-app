@@ -10,6 +10,8 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:freezed_annotation/freezed_annotation.dart';
 import 'package:isar/isar.dart';
+import 'package:recase/recase.dart';
+import 'package:survey_form/models/entities/service_definition.dart';
 
 import '../../../models/app_config/app_config_model.dart' as app_configuration;
 import '../../data/local_store/no_sql/schema/app_configuration.dart';
@@ -18,6 +20,7 @@ import '../../data/local_store/secure_store/secure_store.dart';
 import '../../data/repositories/remote/bandwidth_check.dart';
 import '../../data/repositories/remote/mdms.dart';
 import '../../models/app_config/app_config_model.dart';
+import '../../models/auth/auth_model.dart';
 import '../../utils/background_service.dart';
 import '../../utils/environment_config.dart';
 import '../../utils/least_level_boundary_singleton.dart';
@@ -33,6 +36,12 @@ class ProjectBloc extends Bloc<ProjectEvent, ProjectState> {
   final MdmsRepository mdmsRepository;
 
   final BandwidthCheckRepository bandwidthCheckRepository;
+
+  /// Service Definition Repositories
+  final RemoteRepository<ServiceDefinitionModel, ServiceDefinitionSearchModel>
+      serviceDefinitionRemoteRepository;
+  final LocalRepository<ServiceDefinitionModel, ServiceDefinitionSearchModel>
+      serviceDefinitionLocalRepository;
 
   /// Project Staff Repositories
   final RemoteRepository<ProjectStaffModel, ProjectStaffSearchModel>
@@ -85,6 +94,8 @@ class ProjectBloc extends Bloc<ProjectEvent, ProjectState> {
 
   ProjectBloc({
     LocalSecureStore? localSecureStore,
+    required this.serviceDefinitionRemoteRepository,
+    required this.serviceDefinitionLocalRepository,
     required this.bandwidthCheckRepository,
     required this.projectStaffRemoteRepository,
     required this.projectRemoteRepository,
@@ -217,6 +228,40 @@ class ProjectBloc extends Bloc<ProjectEvent, ProjectState> {
     if (projects.isNotEmpty) {
       // INFO : Need to add project load functions
 
+      try {
+        await _loadProjectFacilities(projects, batchSize);
+      } catch (_) {
+        emit(
+          state.copyWith(
+            loading: false,
+            syncError: ProjectSyncErrorType.projectFacilities,
+          ),
+        );
+      }
+      try {
+        await _loadProductVariants(projects);
+      } catch (_) {
+        emit(
+          state.copyWith(
+            loading: false,
+            syncError: ProjectSyncErrorType.productVariants,
+          ),
+        );
+      }
+    }
+
+    if (projects.isNotEmpty) {
+      // INFO : Need to add project load functions
+      try {
+        await _loadServiceDefinition(projects);
+      } catch (_) {
+        emit(
+          state.copyWith(
+            loading: false,
+            syncError: ProjectSyncErrorType.serviceDefinitions,
+          ),
+        );
+      }
       try {
         await _loadProjectFacilities(projects, batchSize);
       } catch (_) {
@@ -443,6 +488,34 @@ class ProjectBloc extends Bloc<ProjectEvent, ProjectState> {
       return configuredBatchSize;
     } catch (e) {
       rethrow;
+    }
+  }
+
+  FutureOr<void> _loadServiceDefinition(List<ProjectModel> projects) async {
+    final configs = await isar.appConfigurations.where().findAll();
+    final userObject = await localSecureStore.userRequestModel;
+    List<String> codes = [];
+    for (UserRoleModel elements in userObject!.roles) {
+      configs.first.checklistTypes?.map((e) => e.code).forEach((element) {
+        for (final project in projects) {
+          codes.add(
+            '${project.name}.$element.${elements.code.snakeCase.toUpperCase()}',
+          );
+        }
+      });
+    }
+
+    final serviceDefinition = await serviceDefinitionRemoteRepository
+        .search(ServiceDefinitionSearchModel(
+      tenantId: envConfig.variables.tenantId,
+      code: codes,
+    ));
+
+    for (var element in serviceDefinition) {
+      await serviceDefinitionLocalRepository.create(
+        element,
+        createOpLog: false,
+      );
     }
   }
 }

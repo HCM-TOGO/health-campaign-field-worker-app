@@ -1,3 +1,7 @@
+import 'package:digit_data_model/models/entities/household_type.dart';
+import 'package:registration_delivery/registration_delivery.dart';
+import 'package:registration_delivery/router/registration_delivery_router.gm.dart';
+
 import 'package:inventory_management/inventory_management.dart';
 import 'package:inventory_management/router/inventory_router.gm.dart';
 
@@ -23,6 +27,7 @@ import 'package:inventory_management/models/entities/inventory_transport_type.da
 import 'package:inventory_management/models/entities/stock.dart';
 import 'package:inventory_management/router/inventory_router.gm.dart';
 import 'package:inventory_management/utils/utils.dart';
+import 'package:survey_form/models/entities/service.dart';
 import 'package:sync_service/blocs/sync/sync.dart';
 
 import '../blocs/app_initialization/app_initialization.dart';
@@ -42,6 +47,7 @@ import '../utils/utils.dart';
 import '../widgets/header/back_navigation_help_header.dart';
 import '../widgets/home/home_item_card.dart';
 import '../widgets/localized.dart';
+import '../widgets/registration_delivery/custom_beneficiary_progress.dart';
 import '../widgets/showcase/config/showcase_constants.dart';
 import '../widgets/showcase/showcase_button.dart';
 
@@ -139,6 +145,18 @@ class _HomePageState extends LocalizedState<HomePage> {
                   showcaseFor: showcaseKeys.toSet().toList(),
                 ),
               ),
+              skipProgressBar
+                  ? const SizedBox.shrink()
+                  : homeShowcaseData.distributorProgressBar.buildWith(
+                      child: CustomBeneficiaryProgressBar(
+                        label: localizations.translate(
+                          i18.home.progressIndicatorTitle,
+                        ),
+                        prefixLabel: localizations.translate(
+                          i18.home.progressIndicatorPrefixLabel,
+                        ),
+                      ),
+                    ),
             ],
           ),
           footer: Padding(
@@ -246,7 +264,7 @@ class _HomePageState extends LocalizedState<HomePage> {
                     return count == 0
                         ? const Offstage()
                         : Padding(
-                            padding: EdgeInsets.symmetric(
+                            padding: const EdgeInsets.symmetric(
                               horizontal: spacer2,
                             ),
                             child: InfoCard(
@@ -318,6 +336,18 @@ class _HomePageState extends LocalizedState<HomePage> {
           },
         ),
       ),
+      i18.home.beneficiaryLabel:
+          homeShowcaseData.distributorBeneficiaries.buildWith(
+        child: HomeItemCard(
+          icon: Icons.family_restroom_rounded,
+          label: i18.home.beneficiaryLabel,
+          onPressed: () async {
+            RegistrationDeliverySingleton()
+                .setHouseholdType(HouseholdType.family);
+            context.router.push(const RegistrationDeliveryWrapperRoute());
+          },
+        ),
+      ),
       i18.home.manageStockLabel:
           homeShowcaseData.warehouseManagerManageStock.buildWith(
         child: HomeItemCard(
@@ -364,7 +394,8 @@ class _HomePageState extends LocalizedState<HomePage> {
               icon: Icons.sync_alt,
               label: i18.home.syncDataLabel,
               onPressed: () async {
-                if (snapshot.data?['enablesManualSync'] == true) {
+                if (snapshot.data == null ||
+                    snapshot.data?['enablesManualSync'] == true) {
                   if (context.mounted) _attemptSyncUp(context);
                 } else {
                   if (context.mounted) {
@@ -414,6 +445,8 @@ class _HomePageState extends LocalizedState<HomePage> {
 
     final Map<String, GlobalKey> homeItemsShowcaseMap = {
       // INFO : Need to add showcase keys of package Here
+      i18.home.beneficiaryLabel:
+          homeShowcaseData.distributorBeneficiaries.showcaseKey,
 
       i18.home.manageStockLabel:
           homeShowcaseData.warehouseManagerManageStock.showcaseKey,
@@ -428,6 +461,7 @@ class _HomePageState extends LocalizedState<HomePage> {
 
     final homeItemsLabel = <String>[
       // INFO: Need to add items label of package Here
+      i18.home.beneficiaryLabel,
 
       i18.home.manageStockLabel,
       i18.home.stockReconciliationLabel,
@@ -473,6 +507,22 @@ class _HomePageState extends LocalizedState<HomePage> {
               userId: context.loggedInUserUuid,
               localRepositories: [
                 // INFO : Need to add local repo of package Here
+                context
+                    .read<LocalRepository<ServiceModel, ServiceSearchModel>>(),
+                context.read<
+                    LocalRepository<HouseholdModel, HouseholdSearchModel>>(),
+                context.read<
+                    LocalRepository<ProjectBeneficiaryModel,
+                        ProjectBeneficiarySearchModel>>(),
+                context.read<
+                    LocalRepository<HouseholdMemberModel,
+                        HouseholdMemberSearchModel>>(),
+                context.read<LocalRepository<TaskModel, TaskSearchModel>>(),
+                context.read<
+                    LocalRepository<SideEffectModel, SideEffectSearchModel>>(),
+                context.read<
+                    LocalRepository<ReferralModel, ReferralSearchModel>>(),
+
                 context.read<LocalRepository<StockModel, StockSearchModel>>(),
                 context.read<
                     LocalRepository<StockReconciliationModel,
@@ -486,6 +536,20 @@ class _HomePageState extends LocalizedState<HomePage> {
               ],
               remoteRepositories: [
                 // INFO : Need to add repo repo of package Here
+                context.read<
+                    RemoteRepository<HouseholdModel, HouseholdSearchModel>>(),
+                context.read<
+                    RemoteRepository<ProjectBeneficiaryModel,
+                        ProjectBeneficiarySearchModel>>(),
+                context.read<
+                    RemoteRepository<HouseholdMemberModel,
+                        HouseholdMemberSearchModel>>(),
+                context.read<RemoteRepository<TaskModel, TaskSearchModel>>(),
+                context.read<
+                    RemoteRepository<SideEffectModel, SideEffectSearchModel>>(),
+                context.read<
+                    RemoteRepository<ReferralModel, ReferralSearchModel>>(),
+
                 context.read<RemoteRepository<StockModel, StockSearchModel>>(),
                 context.read<
                     RemoteRepository<StockReconciliationModel,
@@ -541,6 +605,39 @@ void setPackagesSingleton(BuildContext context) {
             dashboardConfigSchema ?? [], context.projectTypeCode ?? "");
         loadLocalization(context, appConfiguration);
         // INFO : Need to add singleton of package Here
+        RegistrationDeliverySingleton().setInitialData(
+          loggedInUserUuid: context.loggedInUserUuid,
+          maxRadius: appConfiguration.maxRadius!,
+          projectId: context.projectId,
+          selectedBeneficiaryType: context.beneficiaryType,
+          projectType: context.selectedProjectType,
+          selectedProject: context.selectedProject,
+          genderOptions:
+              appConfiguration.genderOptions!.map((e) => e.code).toList(),
+          idTypeOptions:
+              appConfiguration.idTypeOptions!.map((e) => e.code).toList(),
+          householdDeletionReasonOptions: appConfiguration
+              .householdDeletionReasonOptions!
+              .map((e) => e.code)
+              .toList(),
+          householdMemberDeletionReasonOptions: appConfiguration
+              .householdMemberDeletionReasonOptions!
+              .map((e) => e.code)
+              .toList(),
+          deliveryCommentOptions: appConfiguration.deliveryCommentOptions!
+              .map((e) => e.code)
+              .toList(),
+          symptomsTypes:
+              appConfiguration.symptomsTypes!.map((e) => e.code).toList(),
+          referralReasons:
+              appConfiguration.referralReasons!.map((e) => e.code).toList(),
+          searchHouseHoldFilter: [],
+          searchCLFFilters: [],
+          houseStructureTypes: [],
+          refusalReasons: [],
+          loggedInUser: null,
+        );
+
         InventorySingleton().setInitialData(
           isWareHouseMgr: context.loggedInUserRoles
               .where(

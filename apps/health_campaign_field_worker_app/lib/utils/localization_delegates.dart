@@ -1,3 +1,5 @@
+import 'package:registration_delivery/blocs/app_localization.dart'
+    as registration_delivery_localization;
 import 'dart:ui';
 
 import 'package:attendance_management/blocs/app_localization.dart'
@@ -53,12 +55,10 @@ getAppLocalizationDelegates({
       LocalizationLocalRepository().returnLocalizationFromSQL(sql) as Future,
       appConfig.languages!,
     ),
-    // inventory_localization.InventoryLocalization.getDelegate(
-    //   getLocalizationString(
-    //     isar,
-    //     selectedLocale,
-    //   ),
-    //   appConfig.languages!,
-    // ),
+    registration_delivery_localization.RegistrationDeliveryLocalization
+        .getDelegate(
+      LocalizationLocalRepository().returnLocalizationFromSQL(sql) as Future,
+      appConfig.languages!,
+    ),
   ];
 }

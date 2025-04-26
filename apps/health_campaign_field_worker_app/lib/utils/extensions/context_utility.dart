@@ -110,6 +110,7 @@ extension ContextUtilityExtensions on BuildContext {
       throw AppException('No boundary is selected');
     }
     // INFO: Set Boundary for packages
+    RegistrationDeliverySingleton().setBoundary(boundary: selectedBoundary);
     InventorySingleton().setBoundaryName(boundaryName: selectedBoundary.name!);
     AttendanceSingleton().setBoundary(boundary: selectedBoundary);
     LocationTrackerSingleton()
@@ -124,6 +125,27 @@ extension ContextUtilityExtensions on BuildContext {
     } catch (_) {
       return null;
     }
+  }
+
+  bool get isRegistrar {
+    UserRequestModel loggedInUser;
+
+    try {
+      loggedInUser = this.loggedInUser;
+    } catch (_) {
+      return false;
+    }
+
+    for (final role in loggedInUser.roles) {
+      switch (role.code) {
+        case "REGISTRAR":
+          return true;
+        default:
+          break;
+      }
+    }
+
+    return false;
   }
 
   List<UserRoleModel> get loggedInUserRoles {
