@@ -525,8 +525,8 @@ class _HomePageState extends LocalizedState<HomePage> {
 
                 context.read<
                     LocalRepository<IndividualModel, IndividualSearchModel>>(),
-                context.read<
-                    LocalRepository<UserActionModel, UserActionSearchModel>>(),
+                // context.read<
+                //     LocalRepository<UserActionModel, UserActionSearchModel>>(),
                 context.read<LocalRepository<StockModel, StockSearchModel>>(),
               ],
               remoteRepositories: [
@@ -552,8 +552,8 @@ class _HomePageState extends LocalizedState<HomePage> {
 
                 context.read<
                     RemoteRepository<IndividualModel, IndividualSearchModel>>(),
-                context.read<
-                    RemoteRepository<UserActionModel, UserActionSearchModel>>(),
+                // context.read<
+                //     RemoteRepository<UserActionModel, UserActionSearchModel>>(),
               ],
             ),
           );

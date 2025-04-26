@@ -21,6 +21,7 @@ const searchBeneficiary = SearchBeneficiary();
 const individualDetails = IndividualDetails();
 const beneficiaryDetails = BeneficiaryDetails();
 const stockDetails = StockDetails();
+const inventoryReportDetails = InventoryReportDetails();
 
 const selectStockShowcase = SelectStockShowcase();
 const warehouseDetailsShowcase = WarehouseDetailsShowcase();
@@ -210,6 +211,26 @@ class HomeShowcase {
   String get clf {
     return "COMMUNAL_LIVING_FACILITY_SHOWCASE";
   }
+}
+
+class StockDetails {
+  const StockDetails();
+
+  String get batchNumberLabel {
+    return 'STOCK_DETAILS_BATCH_NUMBER';
+  }
+
+  String get quantityUnusedReturnedLabel =>
+      'STOCK_DETAILS_UNUSED_QUANTITY_RETURNED';
+
+  String get quantityPartialReturnedLabel =>
+      'STOCK_DETAILS_PARTIAL_QUANTITY_RETURNED';
+}
+
+class InventoryReportDetails {
+  const InventoryReportDetails();
+  String get partialReturnedQuantityLabel =>
+      "INVENTORY_REPORT_DETAILS_PARTIAL_RETURNED_QUANTITY_LABEL";
 }
 
 class SelectStockShowcase {
@@ -1047,12 +1068,4 @@ class Dashboard {
   const Dashboard();
 
   String get dashboardHeaderLabel => 'DASHBOARD_HEADER';
-}
-
-class StockDetails {
-  const StockDetails();
-
-  String get batchNumberLabel {
-    return 'STOCK_DETAILS_BATCH_NUMBER';
-  }
 }
