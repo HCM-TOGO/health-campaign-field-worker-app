@@ -15,7 +15,7 @@ import '../pages/acknowledgement.dart';
 import '../pages/authenticated.dart';
 import '../pages/boundary_selection.dart';
 import '../pages/home.dart';
-import '../pages/inventory_management/custom_manage_staock.dart';
+import '../pages/inventory_management/custom_manage_stock.dart';
 import '../pages/inventory_management/custom_inventory_report_selection.dart';
 import '../pages/inventory_management/custom_stock_details.dart';
 import '../pages/inventory_management/custom_stock_reconciliation.dart';
@@ -28,8 +28,11 @@ import '../pages/project_facility_selection.dart';
 import '../pages/project_selection.dart';
 import '../pages/qr_details_page.dart';
 import '../pages/registration_delivery/caregiver_consent.dart';
+import '../pages/registration_delivery/custom_beneficiary_acknowledgement.dart';
 import '../pages/registration_delivery/custom_household_details.dart';
 import '../pages/registration_delivery/custom_household_location.dart';
+import '../pages/registration_delivery/custom_individual_details.dart';
+import '../pages/registration_delivery/custom_summary.dart';
 import '../pages/reports/beneficiary/beneficaries_report.dart';
 import '../pages/unauthenticated.dart';
 export 'package:auto_route/auto_route.dart';
@@ -111,25 +114,32 @@ class AppRouter extends _$AppRouter {
                     page: HouseDetailsRoute.page,
                     path: 'house-details',
                   ),
-                  // AutoRoute(
-                  //   page: CustomHouseDetailsRoute.page,
-                  //   path: 'house-details',
-                  // ),
                   AutoRoute(
                       page: IndividualDetailsRoute.page,
                       path: 'individual-details'),
+                  AutoRoute(
+                      page: CustomIndividualDetailsRoute.page,
+                      path: 'custom-individual-details'),
                   // AutoRoute(
                   //     page: HouseHoldDetailsRoute.page,
                   //     path: 'household-details'),
+                  AutoRoute(
+                      page: CustomHouseHoldDetailsRoute.page,
+                      path: 'household-details'),
                   AutoRoute(
                     page: SummaryRoute.page,
                     path: 'beneficiary-summary',
                   ),
                   AutoRoute(
-                      page: CustomHouseHoldDetailsRoute.page,
-                      path: 'household-details'),
+                    page: CustomSummaryRoute.page,
+                    path: 'custom-beneficiary-summary',
+                  ),
+                  // AutoRoute(
+                  //   page: BeneficiaryAcknowledgementRoute.page,
+                  //   path: 'beneficiary-acknowledgement',
+                  // ),
                   AutoRoute(
-                    page: BeneficiaryAcknowledgementRoute.page,
+                    page: CustomBeneficiaryAcknowledgementRoute.page,
                     path: 'beneficiary-acknowledgement',
                   ),
                 ],
