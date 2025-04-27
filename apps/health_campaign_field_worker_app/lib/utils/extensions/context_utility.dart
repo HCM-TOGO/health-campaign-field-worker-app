@@ -148,6 +148,29 @@ extension ContextUtilityExtensions on BuildContext {
     return false;
   }
 
+  bool get isCDD {
+    UserRequestModel loggedInUser;
+
+    try {
+      loggedInUser = this.loggedInUser;
+    } catch (_) {
+      return false;
+    }
+
+    List<String> targetedRoles = [
+      "WAREHOUSE_MANAGER",
+      "DISTRIBUTOR",
+    ];
+
+    for (final role in loggedInUser.roles) {
+      if (targetedRoles.contains(role.code)) {
+        targetedRoles.remove(role.code);
+      }
+    }
+
+    return targetedRoles.isEmpty;
+  }
+
   List<UserRoleModel> get loggedInUserRoles {
     final authBloc = _get<AuthBloc>();
     final userRequestObject = authBloc.state.whenOrNull(
