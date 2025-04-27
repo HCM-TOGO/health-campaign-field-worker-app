@@ -26,6 +26,8 @@ import 'package:registration_delivery/widgets/localized.dart';
 import 'package:registration_delivery/widgets/showcase/config/showcase_constants.dart';
 import 'package:registration_delivery/widgets/showcase/showcase_button.dart';
 
+import '../../router/app_router.dart';
+
 @RoutePage()
 class CustomHouseHoldDetailsPage extends LocalizedStatefulWidget {
   const CustomHouseHoldDetailsPage({
@@ -226,7 +228,8 @@ class CustomHouseHoldDetailsPageState
                                 ),
                               );
                               context.router.push(
-                                IndividualDetailsRoute(isHeadOfHousehold: true),
+                                CustomIndividualDetailsRoute(
+                                    isHeadOfHousehold: true),
                               );
                             },
                             editHousehold: (
