@@ -12,6 +12,7 @@ import 'package:inventory_management/widgets/back_navigation_help_header.dart';
 
 import '../../blocs/inventory_management/custom_inventory_report.dart';
 import '../../router/app_router.dart';
+import '../../utils/utils.dart';
 
 @RoutePage()
 class CustomInventoryReportSelectionPage extends LocalizedStatefulWidget {
@@ -77,24 +78,25 @@ class CustomInventoryReportSelectionPageState
                     ),
                   ),
                 ),
-                const SizedBox(height: spacer4),
-                Padding(
-                  padding: const EdgeInsets.symmetric(horizontal: spacer2),
-                  child: MenuCard(
-                    heading: localizations.translate(
-                      i18.inventoryReportSelection.inventoryReportIssuedLabel,
-                    ),
-                    description: localizations.translate(i18
-                        .inventoryReportSelection
-                        .inventoryReportIssuedDescription),
-                    icon: Icons.logout,
-                    onTap: () => context.router.push(
-                      CustomInventoryReportDetailsRoute(
-                        reportType: InventoryReportType.dispatch,
+                if (!context.isCDD) const SizedBox(height: spacer4),
+                if (!context.isCDD)
+                  Padding(
+                    padding: const EdgeInsets.symmetric(horizontal: spacer2),
+                    child: MenuCard(
+                      heading: localizations.translate(
+                        i18.inventoryReportSelection.inventoryReportIssuedLabel,
+                      ),
+                      description: localizations.translate(i18
+                          .inventoryReportSelection
+                          .inventoryReportIssuedDescription),
+                      icon: Icons.logout,
+                      onTap: () => context.router.push(
+                        CustomInventoryReportDetailsRoute(
+                          reportType: InventoryReportType.dispatch,
+                        ),
                       ),
                     ),
                   ),
-                ),
                 const SizedBox(height: spacer4),
                 Padding(
                   padding: const EdgeInsets.symmetric(horizontal: spacer2),
