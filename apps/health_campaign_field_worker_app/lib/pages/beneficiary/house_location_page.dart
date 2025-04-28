@@ -16,7 +16,8 @@ import 'package:logger/logger.dart';
 import 'package:reactive_forms/reactive_forms.dart';
 import 'package:registration_delivery/utils/extensions/extensions.dart';
 
-import '../../blocs/beneficiary_registration/beneficiary_registration.dart';
+// import '../../blocs/beneficiary_registration/beneficiary_registration.dart';
+import 'package:registration_delivery/blocs/beneficiary_registration/beneficiary_registration.dart';
 import 'package:registration_delivery/router/registration_delivery_router.gm.dart';
 import 'package:registration_delivery/utils/i18_key_constants.dart' as i18;
 import 'package:registration_delivery/utils/utils.dart';
@@ -166,6 +167,7 @@ class CustomHouseholdLocationPageState
                                 registrationDate,
                                 searchQuery,
                                 loading,
+                                headOfHousehold
                               ) {
                                 var addressModel = AddressModel(
                                   addressLine1: addressLine1 != null &&

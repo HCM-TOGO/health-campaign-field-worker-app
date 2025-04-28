@@ -2,6 +2,7 @@ import 'package:digit_components/widgets/atoms/digit_radio_button_list.dart';
 import 'package:digit_components/widgets/digit_card.dart';
 import 'package:digit_components/widgets/digit_dialog.dart';
 import 'package:digit_components/widgets/digit_elevated_button.dart';
+import 'package:digit_data_model/data/local_store/sql_store/tables/project_beneficiary.dart';
 import 'package:digit_data_model/data_model.dart';
 import 'package:digit_ui_components/services/location_bloc.dart';
 import 'package:digit_ui_components/theme/digit_theme.dart';
@@ -12,9 +13,11 @@ import 'package:logger/web.dart';
 import 'package:reactive_forms/reactive_forms.dart';
 import 'package:registration_delivery/blocs/search_households/search_households.dart';
 import 'package:registration_delivery/models/entities/household.dart';
+import 'package:registration_delivery/models/entities/project_beneficiary.dart';
 import 'package:registration_delivery/router/registration_delivery_router.gm.dart';
 import 'package:registration_delivery/widgets/showcase/showcase_wrappers.dart';
-import '../../blocs/beneficiary_registration/beneficiary_registration.dart';
+// import '../../blocs/beneficiary_registration/beneficiary_registration.dart';
+import 'package:registration_delivery/blocs/beneficiary_registration/beneficiary_registration.dart';
 import '../../models/data_model.dart';
 import '../../router/app_router.dart';
 import '../../utils/environment_config.dart';
@@ -95,10 +98,12 @@ class _HouseHoldConsentPageState extends LocalizedState<HouseHoldConsentPage> {
                                     addressModel,
                                     householdModel,
                                     individualModel,
+                                    projectBeneficiaryModel,
                                     registrationDate,
                                     searchQuery,
                                     loading,
                                     isHeadOfHousehold,
+
                                   ) {
                                     if (form.control(_consent).value == null) {
                                       form
@@ -193,9 +198,10 @@ class _HouseHoldConsentPageState extends LocalizedState<HouseHoldConsentPage> {
                                       Logger().d(
                                           "Address in this content $addressModel");
                                       bloc.add(
-                                        BeneficiaryRegistrationSaveHouseholdConsentEvent(
+                                        BeneficiaryRegistrationSaveHouseholdDetailsEvent(
+                                          registrationDate: DateTime.now(),
                                           household: household,
-                                          isConsent: isConsent,
+                                          // isConsent: isConsent,
                                         ),
                                       );
                                       context.router.push(
@@ -220,7 +226,9 @@ class _HouseHoldConsentPageState extends LocalizedState<HouseHoldConsentPage> {
                                     householdModel,
                                     individuals,
                                     registrationDate,
+                                    projectBeneficiaryModel,
                                     loading,
+                                    headOfHousehold,
                                   ) {
                                     (router.parent() as StackRouter).pop();
                                   },

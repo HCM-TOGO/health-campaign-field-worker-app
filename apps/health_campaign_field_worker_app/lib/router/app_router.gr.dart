@@ -410,7 +410,7 @@ class CustomBeneficiaryAcknowledgementRoute
     extends PageRouteInfo<CustomBeneficiaryAcknowledgementRouteArgs> {
   CustomBeneficiaryAcknowledgementRoute({
     Key? key,
-    RegistrationDeliveryLocalization? appLocalizations,
+    AppLocalizations? appLocalizations,
     bool? enableViewHousehold,
     List<PageRouteInfo>? children,
   }) : super(
@@ -438,7 +438,7 @@ class CustomBeneficiaryAcknowledgementRouteArgs {
 
   final Key? key;
 
-  final RegistrationDeliveryLocalization? appLocalizations;
+  final AppLocalizations? appLocalizations;
 
   final bool? enableViewHousehold;
 
@@ -532,7 +532,7 @@ class CustomIndividualDetailsRoute
     extends PageRouteInfo<CustomIndividualDetailsRouteArgs> {
   CustomIndividualDetailsRoute({
     Key? key,
-    AppLocalizations? appLocalizations,
+    RegistrationDeliveryLocalization? appLocalizations,
     bool isHeadOfHousehold = false,
     List<PageRouteInfo>? children,
   }) : super(
@@ -560,7 +560,7 @@ class CustomIndividualDetailsRouteArgs {
 
   final Key? key;
 
-  final AppLocalizations? appLocalizations;
+  final RegistrationDeliveryLocalization? appLocalizations;
 
   final bool isHeadOfHousehold;
 

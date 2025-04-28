@@ -130,6 +130,7 @@ class BeneficiaryRegistrationBloc
         throw const InvalidRegistrationStateException();
       },
       create: (value) async {
+        print("Yes, we are in the create in event, and the value of model is ${event.model}");
         emit(value.copyWith(
           isHeadOfHousehold: event.isHeadOfHousehold,
           individualModel: event.model,

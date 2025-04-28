@@ -152,6 +152,10 @@ class AppRouter extends _$AppRouter {
                   RedirectRoute(
                       path: 'beneficiary-acknowledgement',
                       redirectTo: 'custom-beneficiary-acknowledgement'),
+                      AutoRoute(
+                          page: SummaryRoute.page,
+                          path: 'beneficiary-summary',
+                        ),
                 ],
               ),
               AutoRoute(
