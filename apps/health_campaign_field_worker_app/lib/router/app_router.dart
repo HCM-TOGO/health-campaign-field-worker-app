@@ -1,3 +1,5 @@
+import 'package:attendance_management/router/attendance_router.dart';
+import 'package:attendance_management/router/attendance_router.gm.dart';
 import 'package:auto_route/auto_route.dart';
 import 'package:digit_data_model/data_model.dart';
 import 'package:flutter/material.dart';
@@ -34,6 +36,7 @@ part 'app_router.gr.dart';
   // INFO : Need to add the router modules here
   modules: [
     InventoryRoute,
+    AttendanceRoute,
   ],
 )
 class AppRouter extends _$AppRouter {
@@ -67,6 +70,24 @@ class AppRouter extends _$AppRouter {
         ),
 
         // INFO : Need to add Router of package Here
+        // Attendance Route
+        AutoRoute(
+          page: ManageAttendanceRoute.page,
+          path: 'manage-attendance',
+        ),
+        AutoRoute(
+          page: AttendanceDateSessionSelectionRoute.page,
+          path: 'attendance-date-session-selection',
+        ),
+        AutoRoute(
+          page: MarkAttendanceRoute.page,
+          path: 'mark-attendance',
+        ),
+        AutoRoute(
+          page: AttendanceAcknowledgementRoute.page,
+          path: 'attendance-acknowledgement',
+        ),
+
         // Inventory Route
         AutoRoute(
           page: ManageStocksRoute.page,

@@ -60,5 +60,9 @@ getAppLocalizationDelegates({
     //   ),
     //   appConfig.languages!,
     // ),
+    attendance_localization.AttendanceLocalization.getDelegate(
+      LocalizationLocalRepository().returnLocalizationFromSQL(sql) as Future,
+      appConfig.languages!,
+    ),
   ];
 }

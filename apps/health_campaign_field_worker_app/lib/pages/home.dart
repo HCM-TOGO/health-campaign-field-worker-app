@@ -1,3 +1,6 @@
+import 'package:attendance_management/attendance_management.dart';
+import 'package:attendance_management/router/attendance_router.gm.dart';
+
 import 'package:inventory_management/inventory_management.dart';
 import 'package:inventory_management/router/inventory_router.gm.dart';
 
@@ -415,6 +418,8 @@ class _HomePageState extends LocalizedState<HomePage> {
 
     final Map<String, GlobalKey> homeItemsShowcaseMap = {
       // INFO : Need to add showcase keys of package Here
+      i18.home.manageAttendanceLabel:
+          homeShowcaseData.manageAttendance.showcaseKey,
 
       i18.home.manageStockLabel:
           homeShowcaseData.warehouseManagerManageStock.showcaseKey,
@@ -429,6 +434,7 @@ class _HomePageState extends LocalizedState<HomePage> {
 
     final homeItemsLabel = <String>[
       // INFO: Need to add items label of package Here
+      i18.home.manageAttendanceLabel,
 
       i18.home.manageStockLabel,
       i18.home.stockReconciliationLabel,
@@ -474,6 +480,10 @@ class _HomePageState extends LocalizedState<HomePage> {
               userId: context.loggedInUserUuid,
               localRepositories: [
                 // INFO : Need to add local repo of package Here
+                context.read<
+                    LocalRepository<AttendanceLogModel,
+                        AttendanceLogSearchModel>>(),
+
                 context.read<LocalRepository<StockModel, StockSearchModel>>(),
                 context.read<
                     LocalRepository<StockReconciliationModel,
@@ -487,6 +497,10 @@ class _HomePageState extends LocalizedState<HomePage> {
               ],
               remoteRepositories: [
                 // INFO : Need to add repo repo of package Here
+                context.read<
+                    RemoteRepository<AttendanceLogModel,
+                        AttendanceLogSearchModel>>(),
+
                 context.read<RemoteRepository<StockModel, StockSearchModel>>(),
                 context.read<
                     RemoteRepository<StockReconciliationModel,
@@ -542,6 +556,12 @@ void setPackagesSingleton(BuildContext context) {
             dashboardConfigSchema ?? [], context.projectTypeCode ?? "");
         loadLocalization(context, appConfiguration);
         // INFO : Need to add singleton of package Here
+        AttendanceSingleton().setInitialData(
+            projectId: context.projectId,
+            loggedInIndividualId: context.loggedInIndividualId!,
+            loggedInUserUuid: context.loggedInUserUuid,
+            appVersion: Constants().version);
+
         InventorySingleton().setInitialData(
           isWareHouseMgr: context.loggedInUserRoles
               .where(
