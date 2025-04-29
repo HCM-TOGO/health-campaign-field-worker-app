@@ -28,6 +28,7 @@ import '../data/repositories/remote/downsync.dart';
 import '../models/downsync/downsync.dart';
 import 'package:inventory_management/inventory_management.dart';
 import 'package:registration_delivery/registration_delivery.dart';
+import 'package:referral_reconciliation/referral_reconciliation.dart';
 
 class NetworkManagerProviderWrapper extends StatelessWidget {
   final LocalSqlDataStore sql;
@@ -252,6 +253,13 @@ class NetworkManagerProviderWrapper extends StatelessWidget {
           ServiceOpLogManager(isar),
         ),
       ),
+      RepositoryProvider<
+          LocalRepository<HFReferralModel, HFReferralSearchModel>>(
+        create: (_) => HFReferralLocalRepository(
+          sql,
+          HFReferralOpLogManager(isar),
+        ),
+      ),
     ];
   }
 
@@ -441,6 +449,11 @@ class NetworkManagerProviderWrapper extends StatelessWidget {
               dio,
               actionMap: actions,
             ),
+          ),
+        if (value == DataModelType.hFReferral)
+          RepositoryProvider<
+              RemoteRepository<HFReferralModel, HFReferralSearchModel>>(
+            create: (_) => HFReferralRemoteRepository(dio, actionMap: actions),
           ),
       ]);
     }

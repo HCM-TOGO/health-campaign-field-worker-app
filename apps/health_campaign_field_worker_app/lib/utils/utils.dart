@@ -1,5 +1,8 @@
 library app_utils;
 
+import 'package:referral_reconciliation/referral_reconciliation.dart'
+    as referral_reconciliation_mappers;
+
 import 'dart:convert';
 
 import 'package:crypto/crypto.dart';
@@ -474,6 +477,7 @@ initializeAllMappers() async {
     Future(() => dss_mappers.initializeMappers()),
     Future(() => inventory_mappers.initializeMappers()),
     Future(() => registration_delivery_mappers.initializeMappers()),
+    Future(() => referral_reconciliation_mappers.initializeMappers()),
   ];
   await Future.wait(initializations);
 }

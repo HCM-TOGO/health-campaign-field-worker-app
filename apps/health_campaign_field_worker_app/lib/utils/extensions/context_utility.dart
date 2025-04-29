@@ -110,6 +110,7 @@ extension ContextUtilityExtensions on BuildContext {
       throw AppException('No boundary is selected');
     }
     // INFO: Set Boundary for packages
+    ReferralReconSingleton().setBoundary(boundary: selectedBoundary);
     RegistrationDeliverySingleton().setBoundary(boundary: selectedBoundary);
     InventorySingleton().setBoundaryName(boundaryName: selectedBoundary.name!);
     AttendanceSingleton().setBoundary(boundary: selectedBoundary);

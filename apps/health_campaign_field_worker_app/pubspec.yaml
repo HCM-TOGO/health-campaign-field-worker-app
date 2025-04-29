@@ -69,6 +69,7 @@ dependencies:
   registration_delivery: 1.0.6
   survey_form: 1.0.1
   crypto: 3.0.3
+  referral_reconciliation: 1.0.4
 
 dev_dependencies:
   flutter_test:

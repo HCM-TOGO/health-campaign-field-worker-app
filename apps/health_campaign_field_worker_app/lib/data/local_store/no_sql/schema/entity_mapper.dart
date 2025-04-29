@@ -1,3 +1,4 @@
+import 'package:referral_reconciliation/models/entities/hf_referral.dart';
 import 'package:registration_delivery/registration_delivery.dart';
 import 'package:inventory_management/inventory_management.dart';
 import 'package:digit_data_model/data/local_store/no_sql/schema/entity_mapper_listener.dart';
@@ -54,6 +55,10 @@ class EntityMapper extends EntityMapperListener {
 
       case "referral":
         final entity = ReferralModelMapper.fromJson(entityString);
+        return entity;
+
+      case "hFReferral":
+        final entity = HFReferralModelMapper.fromJson(entityString);
         return entity;
 
       default:

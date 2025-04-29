@@ -95,6 +95,14 @@ class MainApplicationState extends State<MainApplication>
           child: MultiBlocProvider(
             providers: [
               // INFO : Need to add bloc of package Here
+              BlocProvider(
+                create: (_) {
+                  return DigitScannerBloc(
+                    const DigitScannerState(),
+                  );
+                },
+                lazy: false,
+              ),
 
               BlocProvider(
                 create: (_) {

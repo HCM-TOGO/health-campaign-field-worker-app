@@ -1,3 +1,5 @@
+import 'package:referral_reconciliation/router/referral_reconciliation_router.gm.dart';
+import 'package:referral_reconciliation/router/referral_reconciliation_router.dart';
 import 'package:registration_delivery/blocs/app_localization.dart';
 import 'package:registration_delivery/router/registration_delivery_router.dart';
 import 'package:registration_delivery/router/registration_delivery_router.gm.dart';
@@ -44,6 +46,7 @@ part 'app_router.gr.dart';
   modules: [
     InventoryRoute,
     RegistrationDeliveryRoute,
+    ReferralReconciliationRoute,
   ],
 )
 class AppRouter extends _$AppRouter {
@@ -77,6 +80,40 @@ class AppRouter extends _$AppRouter {
         ),
 
         // INFO : Need to add Router of package Here
+        // Referral Reconciliation Route
+        AutoRoute(
+            page: HFCreateReferralWrapperRoute.page,
+            path: 'hf-referral',
+            children: [
+              AutoRoute(
+                  page: ReferralFacilityRoute.page,
+                  path: 'facility-details',
+                  initial: true),
+              AutoRoute(
+                  page: RecordReferralDetailsRoute.page,
+                  path: 'referral-details'),
+              AutoRoute(
+                page: ReferralReasonChecklistRoute.page,
+                path: 'referral-checklist-create',
+              ),
+              AutoRoute(
+                page: ReferralReasonChecklistPreviewRoute.page,
+                path: 'referral-checklist-view',
+              ),
+            ]),
+        AutoRoute(
+          page: ReferralReconAcknowledgementRoute.page,
+          path: 'referral-acknowledgement',
+        ),
+        AutoRoute(
+          page: ReferralReconProjectFacilitySelectionRoute.page,
+          path: 'referral-project-facility',
+        ),
+        AutoRoute(
+          page: SearchReferralReconciliationsRoute.page,
+          path: 'search-referrals',
+        ),
+
         AutoRoute(
             page: RegistrationDeliveryWrapperRoute.page,
             path: 'registration-delivery-wrapper',
