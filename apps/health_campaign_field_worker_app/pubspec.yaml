@@ -70,7 +70,7 @@ dependencies:
   registration_delivery: ^1.0.6
   crypto: ^3.0.3
   digit_components: ^1.0.2
-  logger:
+  logger: ^2.5.0
 
 dev_dependencies:
   flutter_test:

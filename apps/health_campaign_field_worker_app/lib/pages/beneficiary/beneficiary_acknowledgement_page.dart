@@ -5,18 +5,12 @@ import 'package:digit_ui_components/digit_components.dart';
 import 'package:digit_ui_components/widgets/molecules/panel_cards.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:health_campaign_field_worker_app/router/app_router.dart';
-import 'package:logger/logger.dart';
 import 'package:registration_delivery/blocs/beneficiary_registration/beneficiary_registration.dart';
-import 'package:registration_delivery/blocs/household_overview/household_overview.dart';
-// import 'package:health_campaign_field_worker_app/blocs/beneficiary_registration/beneficiary_registration.dart';
 // import 'package:registration_delivery/blocs/household_overview/household_overview.dart';
 import 'package:registration_delivery/blocs/search_households/search_households.dart';
 
 import '../../../utils/i18_key_constants.dart' as i18;
 import '../../../widgets/localized.dart';
-import 'package:registration_delivery/blocs/search_households/search_bloc_common_wrapper.dart';
-import 'package:registration_delivery/router/registration_delivery_router.gm.dart';
 import '../../../utils/i18_key_constants.dart' as i18_local;
 import '../../models/entities/entities_beneficiary/identifier_types.dart';
 
@@ -42,15 +36,13 @@ class CustomBeneficiaryAcknowledgementPageState
   @override
   void initState() {
     super.initState();
+    // Todo: Need to use household overview bloc to show users
+
     // final bloc = context.read<SearchBlocWrapper>();
-    final overviewBloc = context.read<HouseholdOverviewBloc>();
-    final individualbloc = context.read<BeneficiaryRegistrationBloc>();
-    // print("The individual repo is: ${individualbloc.individualRepository.}");
-    // print("This init state is working and the value of the wrapper is: ${bloc.state.householdMembers.isEmpty}");
+    // final overviewBloc = context.read<HouseholdOverviewBloc>();
     // wrapper = bloc.state.householdMembers.isEmpty
     //     ? overviewBloc.state.householdMemberWrapper
     //     : bloc.state.householdMembers.lastOrNull;
-    // Logger().d("this is the individual in ack: ${individualbloc.individualRepository.create}");
   }
 
   @override
@@ -85,10 +77,10 @@ class CustomBeneficiaryAcknowledgementPageState
                             i18.householdDetails.viewHouseHoldDetailsAction,
                           ),
                           onPressed: () {
-                            final parent =
-                                context.router.parent() as StackRouter;
-                            final searchBlocState =
-                                context.read<SearchHouseholdsBloc>().state;
+                            // final parent =
+                            //     context.router.parent() as StackRouter;
+                            // final searchBlocState =
+                            //     context.read<SearchHouseholdsBloc>().state;
 
                             // parent.popUntilRouteWithName(
                             //     CustomSearchBeneficiaryRoute.name);
@@ -118,6 +110,10 @@ class CustomBeneficiaryAcknowledgementPageState
                     ],
                     additionalDetails: [
                       Text(
+                        "${individualModel.name!.givenName}",
+                         style: const TextStyle(color: Colors.white),
+                      ),
+                      Text(
                         "${individualModel.additionalFields!.fields.first.value}",
                         style: const TextStyle(color: Colors.white),
                       )
@@ -138,17 +134,6 @@ class CustomBeneficiaryAcknowledgementPageState
     );
   }
 
-  // getSubText(HouseholdMemberWrapper? wrapper) {
-  //   return wrapper != null
-  //       ? '${localizations.translate(i18_local.beneficiaryDetails.beneficiaryId)}\n'
-  //           '${wrapper.members?.lastOrNull!.name!.givenName} - '
-  //           '${wrapper.members?.lastOrNull!.identifiers!.lastWhereOrNull(
-  //                 (e) =>
-  //                     e.identifierType ==
-  //                     IdentifierTypes.uniqueBeneficiaryID.toValue(),
-  //               )!.identifierId ?? localizations.translate(i18.common.noResultsFound)}'
-  //       : '';
-  // }
   List<Text>? getSubText(HouseholdMemberWrapper? wrapper) {
     if (wrapper == null) return null;
 
