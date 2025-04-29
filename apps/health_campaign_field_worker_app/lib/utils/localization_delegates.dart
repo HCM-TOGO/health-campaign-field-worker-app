@@ -8,6 +8,14 @@ import 'package:inventory_management/blocs/app_localization.dart'
     as inventory_localization;
 import 'package:complaints/blocs/localization/app_localization.dart'
     as complaints_localization;
+import 'package:registration_delivery/blocs/app_localization.dart'
+    as registration_delivery_localization;
+import 'package:referral_reconciliation/blocs/app_localization.dart'
+    as referral_reconciliation_localization;
+import 'package:survey_form/blocs/app_localization.dart'
+    as checklist_localization;
+import 'package:inventory_management/blocs/app_localization.dart'
+    as inventory_localization;
 import 'dart:ui';
 
 import 'package:attendance_management/blocs/app_localization.dart'
@@ -20,6 +28,8 @@ import 'package:digit_scanner/blocs/app_localization.dart'
 import 'package:digit_ui_components/services/AppLocalization.dart'
     as component_localization;
 import 'package:flutter_localizations/flutter_localizations.dart';
+
+import 'package:isar/isar.dart';
 
 import '../blocs/localization/app_localization.dart';
 import '../data/local_store/no_sql/schema/app_configuration.dart';

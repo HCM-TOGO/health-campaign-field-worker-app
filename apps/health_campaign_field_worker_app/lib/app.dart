@@ -17,6 +17,7 @@ import 'package:registration_delivery/models/entities/household.dart';
 import 'package:registration_delivery/models/entities/household_member.dart';
 import 'package:registration_delivery/models/entities/project_beneficiary.dart';
 import 'package:registration_delivery/utils/typedefs.dart';
+import 'package:survey_form/survey_form.dart';
 import 'blocs/app_initialization/app_initialization.dart';
 import 'blocs/auth/auth.dart';
 import 'blocs/beneficiary_registration/beneficiary_registration.dart';
@@ -223,6 +224,12 @@ class MainApplicationState extends State<MainApplication>
                         ),
                         BlocProvider(
                           create: (ctx) => ProjectBloc(
+                            serviceDefinitionRemoteRepository: ctx.read<
+                                RemoteRepository<ServiceDefinitionModel,
+                                    ServiceDefinitionSearchModel>>(),
+                            serviceDefinitionLocalRepository: ctx.read<
+                                LocalRepository<ServiceDefinitionModel,
+                                    ServiceDefinitionSearchModel>>(),
                             bandwidthCheckRepository: BandwidthCheckRepository(
                               DioClient().dio,
                               bandwidthPath:
@@ -387,7 +394,16 @@ class MainApplicationState extends State<MainApplication>
                                 orElse: () => [
                                   const UnauthenticatedRouteWrapper(),
                                 ],
-                                authenticated: (_, __, ___, ____, _____) => [
+                                authenticated: (
+                                  _,
+                                  __,
+                                  ___,
+                                  ____,
+                                  _____,
+                                  ______,
+                                  ________,
+                                ) =>
+                                    [
                                   AuthenticatedRouteWrapper(),
                                 ],
                               ),

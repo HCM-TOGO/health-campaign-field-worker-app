@@ -1,18 +1,21 @@
-import 'package:registration_delivery/registration_delivery.dart';
 import 'package:registration_delivery/router/registration_delivery_router.dart';
 import 'package:registration_delivery/router/registration_delivery_router.gm.dart';
 import 'package:referral_reconciliation/router/referral_reconciliation_router.gm.dart';
 import 'package:referral_reconciliation/router/referral_reconciliation_router.dart';
+
+import 'package:attendance_management/router/attendance_router.dart';
+import 'package:attendance_management/router/attendance_router.gm.dart';
+import 'package:registration_delivery/registration_delivery.dart';
 import 'package:inventory_management/router/inventory_router.dart';
 import 'package:inventory_management/router/inventory_router.gm.dart';
 import 'package:complaints/router/complaints_router.dart';
 import 'package:complaints/router/complaints_router.gm.dart';
-import 'package:attendance_management/router/attendance_router.dart';
-import 'package:attendance_management/router/attendance_router.gm.dart';
+import 'package:inventory_management/blocs/record_stock.dart';
 import 'package:auto_route/auto_route.dart';
 import 'package:digit_data_model/data_model.dart';
 import 'package:flutter/material.dart';
 import 'package:registration_delivery/blocs/app_localization.dart';
+import 'package:inventory_management/blocs/app_localization.dart';
 import '../blocs/localization/app_localization.dart';
 import '../pages/acknowledgement.dart';
 import '../pages/authenticated.dart';
@@ -28,6 +31,11 @@ import '../pages/reports/beneficiary/beneficaries_report.dart';
 import '../pages/unauthenticated.dart';
 import '../pages/beneficiary/beneficiary_search_page.dart';
 import '../pages/beneficiary/house_location_page.dart';
+import '../pages/inventory/custom_facility_selection.dart';
+import '../pages/inventory/custom_manage_stocks.dart';
+import '../pages/inventory/custom_record_stock_wrapper.dart';
+import '../pages/inventory/custom_stock_details.dart';
+import '../pages/inventory/custom_warehouse_details.dart';
 export 'package:auto_route/auto_route.dart';
 import '../pages/beneficiary/custom_individual_details.dart';
 import '../pages/beneficiary/beneficiary_acknowledgement_page.dart';
@@ -249,19 +257,20 @@ class AppRouter extends _$AppRouter {
 
         // Inventory Route
         AutoRoute(
-          page: ManageStocksRoute.page,
-          path: 'manage-stocks',
+          page: CustomManageStocksRoute.page,
+          path: 'custom-manage-stocks',
         ),
         AutoRoute(
-          page: RecordStockWrapperRoute.page,
-          path: 'record-stock',
+          page: CustomRecordStockWrapperRoute.page,
+          path: 'custom-record-stock',
           children: [
             AutoRoute(
-              page: WarehouseDetailsRoute.page,
-              path: 'warehouse-details',
+              page: CustomWarehouseDetailsRoute.page,
+              path: 'custom-warehouse-details',
               initial: true,
             ),
-            AutoRoute(page: StockDetailsRoute.page, path: 'details'),
+            AutoRoute(
+                page: CustomStockDetailsRoute.page, path: 'custom-details'),
           ],
         ),
         AutoRoute(
