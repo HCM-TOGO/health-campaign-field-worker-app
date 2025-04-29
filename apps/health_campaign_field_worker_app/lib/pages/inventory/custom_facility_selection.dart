@@ -10,6 +10,7 @@ import 'package:inventory_management/utils/constants.dart';
 import 'package:inventory_management/widgets/localized.dart';
 import 'package:reactive_forms/reactive_forms.dart';
 
+import '../../blocs/localization/app_localization.dart';
 import '../../utils/i18_key_constants.dart' as i18;
 // import '../widgets/back_navigation_help_header.dart';
 
@@ -184,16 +185,23 @@ class CustomInventoryFacilitySelectionPageState
 class FacilityValueAccessor
     extends ControlValueAccessor<FacilityModel, String> {
   final List<FacilityModel> models;
+  BuildContext context;
 
-  FacilityValueAccessor(this.models);
+  FacilityValueAccessor(this.models, this.context);
 
   @override
   String? modelToViewValue(FacilityModel? modelValue) {
-    return modelValue?.id;
+    AppLocalizations localizations = AppLocalizations.of(context);
+
+    return modelValue == null
+        ? ""
+        : modelValue?.name ??
+            localizations.translate('$facilityPrefix${modelValue?.id}');
   }
 
   @override
   FacilityModel? viewToModelValue(String? viewValue) {
-    return models.firstWhereOrNull((element) => element.id == viewValue);
+    return models.firstWhereOrNull(
+        (element) => element.id == viewValue || element.name == viewValue);
   }
 }

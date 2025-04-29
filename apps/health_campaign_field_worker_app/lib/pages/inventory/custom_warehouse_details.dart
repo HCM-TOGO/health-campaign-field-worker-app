@@ -18,6 +18,7 @@ import 'package:inventory_management/blocs/record_stock.dart';
 import 'package:inventory_management/utils/utils.dart';
 import 'package:inventory_management/widgets/back_navigation_help_header.dart';
 import 'package:inventory_management/widgets/inventory/no_facilities_assigned_dialog.dart';
+import '../../router/app_router.dart';
 import 'custom_facility_selection.dart';
 
 @RoutePage()
@@ -234,7 +235,7 @@ class CustomWarehouseDetailsPageState
                                                       ),
                                                     );
                                                     context.router.push(
-                                                      StockDetailsRoute(),
+                                                      CustomStockDetailsRoute(),
                                                     );
                                                   }
                                                 },
