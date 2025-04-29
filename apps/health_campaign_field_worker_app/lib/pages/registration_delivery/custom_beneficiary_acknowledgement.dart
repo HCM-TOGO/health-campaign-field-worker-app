@@ -3,8 +3,11 @@ import 'package:digit_ui_components/digit_components.dart';
 import 'package:digit_ui_components/widgets/molecules/panel_cards.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:registration_delivery/blocs/beneficiary_registration/beneficiary_registration.dart';
+import 'package:registration_delivery/blocs/search_households/search_households.dart';
 
 import 'package:registration_delivery/utils/i18_key_constants.dart' as i18;
+import 'package:registration_delivery/utils/utils.dart';
 import 'package:registration_delivery/widgets/localized.dart';
 import 'package:registration_delivery/blocs/search_households/search_bloc_common_wrapper.dart';
 import 'package:registration_delivery/router/registration_delivery_router.gm.dart';
@@ -32,43 +35,53 @@ class CustomBeneficiaryAcknowledgementPageState
     extends LocalizedState<CustomBeneficiaryAcknowledgementPage> {
   @override
   Widget build(BuildContext context) {
+    final bloc = context.read<SearchBlocWrapper>();
+    HouseholdMemberWrapper? householdMember =
+        bloc.state.householdMembers.firstOrNull;
     return Scaffold(
       body: Padding(
         padding: const EdgeInsets.all(spacer2),
-        child: CustomPanelCard(
-          type: PanelType.success,
-          title: localizations
-              .translate(i18.acknowledgementSuccess.acknowledgementLabelText),
-          subTitle: {
-            'id': 'Beneficiary Id',
-            'value': widget.beneficiaryId,
+        child: BlocConsumer<BeneficiaryRegistrationBloc,
+            BeneficiaryRegistrationState>(
+          listener: (context, householdState) {},
+          builder: (context, state) {
+            return CustomPanelCard(
+              type: PanelType.success,
+              title: localizations.translate(
+                  i18.acknowledgementSuccess.acknowledgementLabelText),
+              subTitle: {
+                'id': 'Beneficiary Id',
+                'value': widget.beneficiaryId,
+              },
+              actions: [
+                if (householdMember != null)
+                  DigitButton(
+                      label: localizations.translate(
+                        i18.householdDetails.viewHouseHoldDetailsAction,
+                      ),
+                      onPressed: () {
+                        context.router.popAndPush(
+                          BeneficiaryWrapperRoute(
+                            wrapper: householdMember,
+                          ),
+                        );
+                      },
+                      type: DigitButtonType.primary,
+                      size: DigitButtonSize.large),
+                DigitButton(
+                    label: localizations
+                        .translate(i18.acknowledgementSuccess.actionLabelText),
+                    onPressed: () {
+                      context.router.maybePop();
+                    },
+                    type: DigitButtonType.secondary,
+                    size: DigitButtonSize.large),
+              ],
+              description: localizations.translate(
+                i18.acknowledgementSuccess.acknowledgementDescriptionText,
+              ),
+            );
           },
-          actions: [
-            DigitButton(
-                label: localizations.translate(
-                  i18.householdDetails.viewHouseHoldDetailsAction,
-                ),
-                onPressed: () {
-                  final bloc = context.read<SearchBlocWrapper>();
-
-                  context.router.popAndPush(
-                    BeneficiaryWrapperRoute(
-                      wrapper: bloc.state.householdMembers.first,
-                    ),
-                  );
-                },
-                type: DigitButtonType.primary,
-                size: DigitButtonSize.large),
-            DigitButton(
-                label: localizations
-                    .translate(i18.acknowledgementSuccess.actionLabelText),
-                onPressed: () => context.router.maybePop(),
-                type: DigitButtonType.secondary,
-                size: DigitButtonSize.large),
-          ],
-          description: localizations.translate(
-            i18.acknowledgementSuccess.acknowledgementDescriptionText,
-          ),
         ),
       ),
     );
