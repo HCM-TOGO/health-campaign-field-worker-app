@@ -556,20 +556,6 @@ class CustomHouseholdOverviewRoute
           args: CustomHouseholdOverviewRouteArgs(
             key: key,
             appLocalizations: appLocalizations,
-/// [CustomInventoryFacilitySelectionPage]
-class CustomInventoryFacilitySelectionRoute
-    extends PageRouteInfo<CustomInventoryFacilitySelectionRouteArgs> {
-  CustomInventoryFacilitySelectionRoute({
-    Key? key,
-    InventoryLocalization? appLocalizations,
-    required List<FacilityModel> facilities,
-    List<PageRouteInfo>? children,
-  }) : super(
-          CustomInventoryFacilitySelectionRoute.name,
-          args: CustomInventoryFacilitySelectionRouteArgs(
-            key: key,
-            appLocalizations: appLocalizations,
-            facilities: facilities,
           ),
           initialChildren: children,
         );
@@ -584,33 +570,15 @@ class CustomHouseholdOverviewRouteArgs {
   const CustomHouseholdOverviewRouteArgs({
     this.key,
     this.appLocalizations,
-  static const String name = 'CustomInventoryFacilitySelectionRoute';
-
-  static const PageInfo<CustomInventoryFacilitySelectionRouteArgs> page =
-      PageInfo<CustomInventoryFacilitySelectionRouteArgs>(name);
-}
-
-class CustomInventoryFacilitySelectionRouteArgs {
-  const CustomInventoryFacilitySelectionRouteArgs({
-    this.key,
-    this.appLocalizations,
-    required this.facilities,
   });
 
   final Key? key;
+
   final RegistrationDeliveryLocalization? appLocalizations;
 
   @override
   String toString() {
     return 'CustomHouseholdOverviewRouteArgs{key: $key, appLocalizations: $appLocalizations}';
-    
-  final InventoryLocalization? appLocalizations;
-
-  final List<FacilityModel> facilities;
-
-  @override
-  String toString() {
-    return 'CustomInventoryFacilitySelectionRouteArgs{key: $key, appLocalizations: $appLocalizations, facilities: $facilities}';
   }
 }
 
@@ -629,6 +597,80 @@ class CustomIndividualDetailsRoute
             key: key,
             appLocalizations: appLocalizations,
             isHeadOfHousehold: isHeadOfHousehold,
+          ),
+          initialChildren: children,
+        );
+
+  static const String name = 'CustomIndividualDetailsRoute';
+
+  static const PageInfo<CustomIndividualDetailsRouteArgs> page =
+      PageInfo<CustomIndividualDetailsRouteArgs>(name);
+}
+
+class CustomIndividualDetailsRouteArgs {
+  const CustomIndividualDetailsRouteArgs({
+    this.key,
+    this.appLocalizations,
+    this.isHeadOfHousehold = false,
+  });
+
+  final Key? key;
+
+  final RegistrationDeliveryLocalization? appLocalizations;
+
+  final bool isHeadOfHousehold;
+
+  @override
+  String toString() {
+    return 'CustomIndividualDetailsRouteArgs{key: $key, appLocalizations: $appLocalizations, isHeadOfHousehold: $isHeadOfHousehold}';
+  }
+}
+
+/// generated route for
+/// [CustomInventoryFacilitySelectionPage]
+class CustomInventoryFacilitySelectionRoute
+    extends PageRouteInfo<CustomInventoryFacilitySelectionRouteArgs> {
+  CustomInventoryFacilitySelectionRoute({
+    Key? key,
+    InventoryLocalization? appLocalizations,
+    required List<FacilityModel> facilities,
+    List<PageRouteInfo>? children,
+  }) : super(
+          CustomInventoryFacilitySelectionRoute.name,
+          args: CustomInventoryFacilitySelectionRouteArgs(
+            key: key,
+            appLocalizations: appLocalizations,
+            facilities: facilities,
+          ),
+          initialChildren: children,
+        );
+
+  static const String name = 'CustomInventoryFacilitySelectionRoute';
+
+  static const PageInfo<CustomInventoryFacilitySelectionRouteArgs> page =
+      PageInfo<CustomInventoryFacilitySelectionRouteArgs>(name);
+}
+
+class CustomInventoryFacilitySelectionRouteArgs {
+  const CustomInventoryFacilitySelectionRouteArgs({
+    this.key,
+    this.appLocalizations,
+    required this.facilities,
+  });
+
+  final Key? key;
+
+  final InventoryLocalization? appLocalizations;
+
+  final List<FacilityModel> facilities;
+
+  @override
+  String toString() {
+    return 'CustomInventoryFacilitySelectionRouteArgs{key: $key, appLocalizations: $appLocalizations, facilities: $facilities}';
+  }
+}
+
+/// generated route for
 /// [CustomManageStocksPage]
 class CustomManageStocksRoute
     extends PageRouteInfo<CustomManageStocksRouteArgs> {
@@ -645,16 +687,6 @@ class CustomManageStocksRoute
           initialChildren: children,
         );
 
-  static const String name = 'CustomIndividualDetailsRoute';
-  static const PageInfo<CustomIndividualDetailsRouteArgs> page =
-      PageInfo<CustomIndividualDetailsRouteArgs>(name);
-}
-
-class CustomIndividualDetailsRouteArgs {
-  const CustomIndividualDetailsRouteArgs({
-    this.key,
-    this.appLocalizations,
-    this.isHeadOfHousehold = false,
   static const String name = 'CustomManageStocksRoute';
 
   static const PageInfo<CustomManageStocksRouteArgs> page =
@@ -669,13 +701,6 @@ class CustomManageStocksRouteArgs {
 
   final Key? key;
 
-  final RegistrationDeliveryLocalization? appLocalizations;
-
-  final bool isHeadOfHousehold;
-
-  @override
-  String toString() {
-    return 'CustomIndividualDetailsRouteArgs{key: $key, appLocalizations: $appLocalizations, isHeadOfHousehold: $isHeadOfHousehold}';
   final InventoryLocalization? appLocalizations;
 
   @override
