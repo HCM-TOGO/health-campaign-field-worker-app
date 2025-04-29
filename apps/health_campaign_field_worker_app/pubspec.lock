@@ -353,7 +353,7 @@ packages:
     source: hosted
     version: "1.18.0"
   complaints:
-    dependency: "direct dev"
+    dependency: "direct main"
     description:
       name: complaints
       sha256: cba8a9d32754fa28a0987d844b9b050aacb5c62a7345dfd41254f26b0bb4f0ea
@@ -557,10 +557,6 @@ packages:
     dependency: "direct main"
     description:
       name: digit_ui_components
-      sha256: "764292c02746fa372ce93ea4d67f3941cdfa5197a552a33d586ce01aa44650f1"
-      url: "https://pub.dev"
-    source: hosted
-    version: "0.2.1+1"
       sha256: f371af457d5be79c25d05b3e05c230c12be347c664c577619087f5575df8530f
       url: "https://pub.dev"
     source: hosted
@@ -1345,7 +1341,7 @@ packages:
     source: hosted
     version: "0.19.0"
   inventory_management:
-    dependency: "direct dev"
+    dependency: "direct main"
     description:
       name: inventory_management
       sha256: "68271fd2f99fae4b3f826403b16b6b3568bb74ba96dc92c45c1eff457fdbcd49"
@@ -1841,7 +1837,7 @@ packages:
     source: hosted
     version: "4.1.0"
   referral_reconciliation:
-    dependency: "direct dev"
+    dependency: "direct main"
     description:
       name: referral_reconciliation
       sha256: "5d3ea365246978776c0d247d9dbe35ebc04b7df1b85d7f38db20ec7e4021b977"
@@ -1849,20 +1845,10 @@ packages:
     source: hosted
     version: "1.0.4+2"
   registration_delivery:
-    dependency: "direct dev"
+    dependency: "direct main"
     description:
       name: registration_delivery
       sha256: "01bdb6ad7d0e5c9e4a18d4749d1390edb04b5348da402961f718edecf9e5fd40"
-      url: "https://pub.dev"
-    source: hosted
-    version: "1.0.6+2"
-  remove_emoji_input_formatter:
-    dependency: transitive
-    description:
-      name: remove_emoji_input_formatter
-      sha256: "82d195984f890de7a8fea936c698848e78c1a67ccefe18db3baf9f7a3bc0177f"
-      url: "https://pub.dev"
-    source: hosted
       url: "https://pub.dev"
     source: hosted
     version: "1.0.6+2"
