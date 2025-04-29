@@ -79,6 +79,30 @@ abstract class _$AppRouter extends RootStackRouter {
         ),
       );
     },
+    CustomFacilitySelectionSMCRoute.name: (routeData) {
+      final args = routeData.argsAs<CustomFacilitySelectionSMCRouteArgs>();
+      return AutoRoutePage<dynamic>(
+        routeData: routeData,
+        child: CustomFacilitySelectionSMCPage(
+          key: args.key,
+          appLocalizations: args.appLocalizations,
+          facilities: args.facilities,
+        ),
+      );
+    },
+    CustomHouseholdAcknowledgementSMCRoute.name: (routeData) {
+      final args = routeData.argsAs<CustomHouseholdAcknowledgementSMCRouteArgs>(
+          orElse: () => const CustomHouseholdAcknowledgementSMCRouteArgs());
+      return AutoRoutePage<dynamic>(
+        routeData: routeData,
+        child: CustomHouseholdAcknowledgementSMCPage(
+          key: args.key,
+          appLocalizations: args.appLocalizations,
+          enableViewHousehold: args.enableViewHousehold,
+          isReferral: args.isReferral,
+        ),
+      );
+    },
     CustomHouseholdLocationRoute.name: (routeData) {
       final args = routeData.argsAs<CustomHouseholdLocationRouteArgs>(
           orElse: () => const CustomHouseholdLocationRouteArgs());
@@ -125,6 +149,18 @@ abstract class _$AppRouter extends RootStackRouter {
         ),
       );
     },
+    CustomInventoryFacilitySelectionSMCRoute.name: (routeData) {
+      final args =
+          routeData.argsAs<CustomInventoryFacilitySelectionSMCRouteArgs>();
+      return AutoRoutePage<dynamic>(
+        routeData: routeData,
+        child: CustomInventoryFacilitySelectionSMCPage(
+          key: args.key,
+          appLocalizations: args.appLocalizations,
+          facilities: args.facilities,
+        ),
+      );
+    },
     CustomManageStocksRoute.name: (routeData) {
       final args = routeData.argsAs<CustomManageStocksRouteArgs>(
           orElse: () => const CustomManageStocksRouteArgs());
@@ -145,6 +181,23 @@ abstract class _$AppRouter extends RootStackRouter {
           key: args.key,
           type: args.type,
         )),
+      );
+    },
+    CustomReferBeneficiarySMCRoute.name: (routeData) {
+      final args = routeData.argsAs<CustomReferBeneficiarySMCRouteArgs>();
+      return AutoRoutePage<dynamic>(
+        routeData: routeData,
+        child: CustomReferBeneficiarySMCPage(
+          key: args.key,
+          appLocalizations: args.appLocalizations,
+          isEditing: args.isEditing,
+          projectBeneficiaryClientRefId: args.projectBeneficiaryClientRefId,
+          individual: args.individual,
+          isReadministrationUnSuccessful: args.isReadministrationUnSuccessful,
+          quantityWasted: args.quantityWasted,
+          productVariantId: args.productVariantId,
+          referralReasons: args.referralReasons,
+        ),
       );
     },
     CustomSearchBeneficiaryRoute.name: (routeData) {
@@ -176,6 +229,21 @@ abstract class _$AppRouter extends RootStackRouter {
         routeData: routeData,
         child: CustomWarehouseDetailsPage(
           key: args.key,
+          appLocalizations: args.appLocalizations,
+        ),
+      );
+    },
+    EligibilityChecklistViewRoute.name: (routeData) {
+      final args = routeData.argsAs<EligibilityChecklistViewRouteArgs>(
+          orElse: () => const EligibilityChecklistViewRouteArgs());
+      return AutoRoutePage<dynamic>(
+        routeData: routeData,
+        child: EligibilityChecklistViewPage(
+          key: args.key,
+          referralClientRefId: args.referralClientRefId,
+          individual: args.individual,
+          projectBeneficiaryClientReferenceId:
+              args.projectBeneficiaryClientReferenceId,
           appLocalizations: args.appLocalizations,
         ),
       );
@@ -505,6 +573,99 @@ class CustomBeneficiaryAcknowledgementRouteArgs {
 }
 
 /// generated route for
+/// [CustomFacilitySelectionSMCPage]
+class CustomFacilitySelectionSMCRoute
+    extends PageRouteInfo<CustomFacilitySelectionSMCRouteArgs> {
+  CustomFacilitySelectionSMCRoute({
+    Key? key,
+    InventoryLocalization? appLocalizations,
+    required List<FacilityModel> facilities,
+    List<PageRouteInfo>? children,
+  }) : super(
+          CustomFacilitySelectionSMCRoute.name,
+          args: CustomFacilitySelectionSMCRouteArgs(
+            key: key,
+            appLocalizations: appLocalizations,
+            facilities: facilities,
+          ),
+          initialChildren: children,
+        );
+
+  static const String name = 'CustomFacilitySelectionSMCRoute';
+
+  static const PageInfo<CustomFacilitySelectionSMCRouteArgs> page =
+      PageInfo<CustomFacilitySelectionSMCRouteArgs>(name);
+}
+
+class CustomFacilitySelectionSMCRouteArgs {
+  const CustomFacilitySelectionSMCRouteArgs({
+    this.key,
+    this.appLocalizations,
+    required this.facilities,
+  });
+
+  final Key? key;
+
+  final InventoryLocalization? appLocalizations;
+
+  final List<FacilityModel> facilities;
+
+  @override
+  String toString() {
+    return 'CustomFacilitySelectionSMCRouteArgs{key: $key, appLocalizations: $appLocalizations, facilities: $facilities}';
+  }
+}
+
+/// generated route for
+/// [CustomHouseholdAcknowledgementSMCPage]
+class CustomHouseholdAcknowledgementSMCRoute
+    extends PageRouteInfo<CustomHouseholdAcknowledgementSMCRouteArgs> {
+  CustomHouseholdAcknowledgementSMCRoute({
+    Key? key,
+    AppLocalizations? appLocalizations,
+    bool? enableViewHousehold,
+    bool? isReferral,
+    List<PageRouteInfo>? children,
+  }) : super(
+          CustomHouseholdAcknowledgementSMCRoute.name,
+          args: CustomHouseholdAcknowledgementSMCRouteArgs(
+            key: key,
+            appLocalizations: appLocalizations,
+            enableViewHousehold: enableViewHousehold,
+            isReferral: isReferral,
+          ),
+          initialChildren: children,
+        );
+
+  static const String name = 'CustomHouseholdAcknowledgementSMCRoute';
+
+  static const PageInfo<CustomHouseholdAcknowledgementSMCRouteArgs> page =
+      PageInfo<CustomHouseholdAcknowledgementSMCRouteArgs>(name);
+}
+
+class CustomHouseholdAcknowledgementSMCRouteArgs {
+  const CustomHouseholdAcknowledgementSMCRouteArgs({
+    this.key,
+    this.appLocalizations,
+    this.enableViewHousehold,
+    this.isReferral,
+  });
+
+  final Key? key;
+
+  final AppLocalizations? appLocalizations;
+
+  final bool? enableViewHousehold;
+
+  final bool? isReferral;
+
+  @override
+  String toString() {
+    return 'CustomHouseholdAcknowledgementSMCRouteArgs{key: $key, appLocalizations: $appLocalizations, enableViewHousehold: $enableViewHousehold, isReferral: $isReferral}';
+  }
+}
+
+/// generated route for
 /// [CustomHouseholdLocationPage]
 class CustomHouseholdLocationRoute
     extends PageRouteInfo<CustomHouseholdLocationRouteArgs> {
@@ -671,6 +832,50 @@ class CustomInventoryFacilitySelectionRouteArgs {
 }
 
 /// generated route for
+/// [CustomInventoryFacilitySelectionSMCPage]
+class CustomInventoryFacilitySelectionSMCRoute
+    extends PageRouteInfo<CustomInventoryFacilitySelectionSMCRouteArgs> {
+  CustomInventoryFacilitySelectionSMCRoute({
+    Key? key,
+    InventoryLocalization? appLocalizations,
+    required List<FacilityModel> facilities,
+    List<PageRouteInfo>? children,
+  }) : super(
+          CustomInventoryFacilitySelectionSMCRoute.name,
+          args: CustomInventoryFacilitySelectionSMCRouteArgs(
+            key: key,
+            appLocalizations: appLocalizations,
+            facilities: facilities,
+          ),
+          initialChildren: children,
+        );
+
+  static const String name = 'CustomInventoryFacilitySelectionSMCRoute';
+
+  static const PageInfo<CustomInventoryFacilitySelectionSMCRouteArgs> page =
+      PageInfo<CustomInventoryFacilitySelectionSMCRouteArgs>(name);
+}
+
+class CustomInventoryFacilitySelectionSMCRouteArgs {
+  const CustomInventoryFacilitySelectionSMCRouteArgs({
+    this.key,
+    this.appLocalizations,
+    required this.facilities,
+  });
+
+  final Key? key;
+
+  final InventoryLocalization? appLocalizations;
+
+  final List<FacilityModel> facilities;
+
+  @override
+  String toString() {
+    return 'CustomInventoryFacilitySelectionSMCRouteArgs{key: $key, appLocalizations: $appLocalizations, facilities: $facilities}';
+  }
+}
+
+/// generated route for
 /// [CustomManageStocksPage]
 class CustomManageStocksRoute
     extends PageRouteInfo<CustomManageStocksRouteArgs> {
@@ -745,6 +950,80 @@ class CustomRecordStockWrapperRouteArgs {
   @override
   String toString() {
     return 'CustomRecordStockWrapperRouteArgs{key: $key, type: $type}';
+  }
+}
+
+/// generated route for
+/// [CustomReferBeneficiarySMCPage]
+class CustomReferBeneficiarySMCRoute
+    extends PageRouteInfo<CustomReferBeneficiarySMCRouteArgs> {
+  CustomReferBeneficiarySMCRoute({
+    Key? key,
+    AppLocalizations? appLocalizations,
+    bool isEditing = false,
+    required String projectBeneficiaryClientRefId,
+    required IndividualModel individual,
+    bool isReadministrationUnSuccessful = false,
+    String quantityWasted = "00",
+    String? productVariantId,
+    List<String>? referralReasons,
+    List<PageRouteInfo>? children,
+  }) : super(
+          CustomReferBeneficiarySMCRoute.name,
+          args: CustomReferBeneficiarySMCRouteArgs(
+            key: key,
+            appLocalizations: appLocalizations,
+            isEditing: isEditing,
+            projectBeneficiaryClientRefId: projectBeneficiaryClientRefId,
+            individual: individual,
+            isReadministrationUnSuccessful: isReadministrationUnSuccessful,
+            quantityWasted: quantityWasted,
+            productVariantId: productVariantId,
+            referralReasons: referralReasons,
+          ),
+          initialChildren: children,
+        );
+
+  static const String name = 'CustomReferBeneficiarySMCRoute';
+
+  static const PageInfo<CustomReferBeneficiarySMCRouteArgs> page =
+      PageInfo<CustomReferBeneficiarySMCRouteArgs>(name);
+}
+
+class CustomReferBeneficiarySMCRouteArgs {
+  const CustomReferBeneficiarySMCRouteArgs({
+    this.key,
+    this.appLocalizations,
+    this.isEditing = false,
+    required this.projectBeneficiaryClientRefId,
+    required this.individual,
+    this.isReadministrationUnSuccessful = false,
+    this.quantityWasted = "00",
+    this.productVariantId,
+    this.referralReasons,
+  });
+
+  final Key? key;
+
+  final AppLocalizations? appLocalizations;
+
+  final bool isEditing;
+
+  final String projectBeneficiaryClientRefId;
+
+  final IndividualModel individual;
+
+  final bool isReadministrationUnSuccessful;
+
+  final String quantityWasted;
+
+  final String? productVariantId;
+
+  final List<String>? referralReasons;
+
+  @override
+  String toString() {
+    return 'CustomReferBeneficiarySMCRouteArgs{key: $key, appLocalizations: $appLocalizations, isEditing: $isEditing, projectBeneficiaryClientRefId: $projectBeneficiaryClientRefId, individual: $individual, isReadministrationUnSuccessful: $isReadministrationUnSuccessful, quantityWasted: $quantityWasted, productVariantId: $productVariantId, referralReasons: $referralReasons}';
   }
 }
 
@@ -862,6 +1141,61 @@ class CustomWarehouseDetailsRouteArgs {
   @override
   String toString() {
     return 'CustomWarehouseDetailsRouteArgs{key: $key, appLocalizations: $appLocalizations}';
+  }
+}
+
+/// generated route for
+/// [EligibilityChecklistViewPage]
+class EligibilityChecklistViewRoute
+    extends PageRouteInfo<EligibilityChecklistViewRouteArgs> {
+  EligibilityChecklistViewRoute({
+    Key? key,
+    String? referralClientRefId,
+    IndividualModel? individual,
+    String? projectBeneficiaryClientReferenceId,
+    AppLocalizations? appLocalizations,
+    List<PageRouteInfo>? children,
+  }) : super(
+          EligibilityChecklistViewRoute.name,
+          args: EligibilityChecklistViewRouteArgs(
+            key: key,
+            referralClientRefId: referralClientRefId,
+            individual: individual,
+            projectBeneficiaryClientReferenceId:
+                projectBeneficiaryClientReferenceId,
+            appLocalizations: appLocalizations,
+          ),
+          initialChildren: children,
+        );
+
+  static const String name = 'EligibilityChecklistViewRoute';
+
+  static const PageInfo<EligibilityChecklistViewRouteArgs> page =
+      PageInfo<EligibilityChecklistViewRouteArgs>(name);
+}
+
+class EligibilityChecklistViewRouteArgs {
+  const EligibilityChecklistViewRouteArgs({
+    this.key,
+    this.referralClientRefId,
+    this.individual,
+    this.projectBeneficiaryClientReferenceId,
+    this.appLocalizations,
+  });
+
+  final Key? key;
+
+  final String? referralClientRefId;
+
+  final IndividualModel? individual;
+
+  final String? projectBeneficiaryClientReferenceId;
+
+  final AppLocalizations? appLocalizations;
+
+  @override
+  String toString() {
+    return 'EligibilityChecklistViewRouteArgs{key: $key, referralClientRefId: $referralClientRefId, individual: $individual, projectBeneficiaryClientReferenceId: $projectBeneficiaryClientReferenceId, appLocalizations: $appLocalizations}';
   }
 }
 

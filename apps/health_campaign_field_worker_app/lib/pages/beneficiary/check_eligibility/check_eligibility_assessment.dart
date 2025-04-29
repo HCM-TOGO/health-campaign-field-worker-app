@@ -7,17 +7,23 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:group_radio_button/group_radio_button.dart';
+import 'package:health_campaign_field_worker_app/blocs/service_definition/service_definition.dart';
+import 'package:health_campaign_field_worker_app/models/entities/assessment_checklist/status.dart';
 import 'package:registration_delivery/blocs/delivery_intervention/deliver_intervention.dart';
 import 'package:registration_delivery/blocs/household_overview/household_overview.dart';
 import 'package:registration_delivery/blocs/search_households/search_households.dart';
 import 'package:digit_data_model/data_model.dart';
-import 'package:registration_delivery/models/entities/status.dart';
+// import 'package:registration_delivery/models/entities/status.dart';
 import 'package:registration_delivery/models/entities/task.dart';
 import 'package:registration_delivery/router/registration_delivery_router.gm.dart';
+import '../../../blocs/service/service.dart';
+import '../../../models/entities/assessment_checklist/service.dart';
+import '../../../models/entities/assessment_checklist/service_attributes.dart';
+import '../../../models/entities/assessment_checklist/service_definition.dart';
 import '../../../models/entities/roles_type.dart';
 import '../../../router/app_router.dart';
 import '../../../utils/environment_config.dart';
-import '../../../utils/utils_smc/i18_key_constants.dart' as i18;
+import '../../../utils/i18_key_constants.dart' as i18;
 import '../../../utils/utils.dart';
 import '../../../widgets/header/back_navigation_help_header.dart';
 import '../../../widgets/localized.dart';
@@ -101,7 +107,7 @@ class _EligibilityChecklistViewPage
                               '${context.selectedProject.name}.ELIGIBLITY_ASSESSMENT.${context.isCommunityDistributor ? RolesType.communityDistributor.toValue() : RolesType.healthFacilitySupervisor.toValue()}',
                             ))
                         .toList()
-                        .first;
+                        .first as ServiceDefinitionModel?;
                     initialAttributes = selectedServiceDefinition?.attributes;
                     if (!isControllersInitialized) {
                       initialAttributes?.forEach((e) {
@@ -391,7 +397,7 @@ class _EligibilityChecklistViewPage
                                   );
 
                                   router.push(
-                                    CustomHouseholdAcknowledgementSMCRoute(
+                                    HouseholdAcknowledgementRoute(
                                         enableViewHousehold: true),
                                   );
                                 } else if (ifReferral) {

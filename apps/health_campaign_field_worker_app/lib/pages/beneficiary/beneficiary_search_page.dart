@@ -439,7 +439,7 @@ class _CustomSearchBeneficiaryPageState
                     final spaq1 = context.spaq1;
                     final spaq2 = context.spaq2;
 
-                    if (spaq1 >= 2 && spaq2 >= 2) {
+                    if (spaq1 >= 0 && spaq2 >= 0) {
                       FocusManager.instance.primaryFocus?.unfocus();
                       context.read<DigitScannerBloc>().add(
                             const DigitScannerEvent.handleScanner(),

@@ -42,6 +42,11 @@ import '../pages/beneficiary/beneficiary_acknowledgement_page.dart';
 import '../pages/consent/household_consent.dart';
 import '../pages/beneficiary/widgets/consent_household_acknowledgement.dart';
 import '../pages/beneficiary/household_overview.dart';
+import '../pages/beneficiary/check_eligibility/facility_selection_smc.dart';
+import '../pages/beneficiary/check_eligibility/household_acknowledgement_smc.dart';
+import '../pages/beneficiary/check_eligibility/inventory_facility_selection_smc.dart';
+import '../pages/beneficiary/check_eligibility/refer_beneficiary_smc.dart';
+import '../pages/beneficiary/check_eligibility/check_eligibility_assessment.dart';
 part 'app_router.gr.dart';
 
 @AutoRouterConfig(
@@ -147,6 +152,10 @@ class AppRouter extends _$AppRouter {
                     page: CustomBeneficiaryAcknowledgementRoute.page,
                     path: 'custom-beneficiary-acknowledgement',
                   ),
+                    AutoRoute(
+                      page: EligibilityChecklistViewRoute.page,
+                      path: 'eligibility-checklist',
+                    ),
                   AutoRoute(
                     page: HouseHoldConsentRoute.page,
                     path: 'household-consent',
@@ -189,6 +198,7 @@ class AppRouter extends _$AppRouter {
                     page: DeliverInterventionRoute.page,
                     path: 'deliver-intervention',
                   ),
+                 
                   AutoRoute(
                     page: SideEffectsRoute.page,
                     path: 'side-effects',
@@ -197,6 +207,14 @@ class AppRouter extends _$AppRouter {
                     page: ReferBeneficiaryRoute.page,
                     path: 'refer-beneficiary',
                   ),
+                  AutoRoute(
+                      page: CustomReferBeneficiarySMCRoute.page,
+                      path: 'refer-beneficiary-smc',
+                    ),
+                  AutoRoute(
+                      page: CustomInventoryFacilitySelectionSMCRoute.page,
+                      path: 'custom-inventory-select-facilities-smc',
+                    ),
                   AutoRoute(
                     page: DoseAdministeredRoute.page,
                     path: 'dose-administered',
@@ -217,6 +235,14 @@ class AppRouter extends _$AppRouter {
                     page: HouseholdAcknowledgementRoute.page,
                     path: 'household-acknowledgement',
                   ),
+                   AutoRoute(
+                      page: CustomHouseholdAcknowledgementSMCRoute.page,
+                      path: 'custom-household-acknowledgement-smc',
+                    ),
+                    RedirectRoute(
+                      path: 'household-acknowledgement',
+                      redirectTo: 'custom-household-acknowledgement-smc',
+                    ),
                 ],
               ),
             ]),

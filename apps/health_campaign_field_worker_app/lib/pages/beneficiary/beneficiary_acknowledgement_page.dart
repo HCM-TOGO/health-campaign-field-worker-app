@@ -13,6 +13,7 @@ import '../../../utils/i18_key_constants.dart' as i18;
 import '../../../widgets/localized.dart';
 import '../../../utils/i18_key_constants.dart' as i18_local;
 import '../../models/entities/entities_beneficiary/identifier_types.dart';
+import '../../router/app_router.dart';
 
 @RoutePage()
 class CustomBeneficiaryAcknowledgementPage extends LocalizedStatefulWidget {
@@ -90,6 +91,7 @@ class CustomBeneficiaryAcknowledgementPageState
                             //     wrapper: searchBlocState.householdMembers.first,
                             //   ),
                             // );
+                            context.router.push(EligibilityChecklistViewRoute());
                           },
                           type: DigitButtonType.primary,
                           size: DigitButtonSize.large),
