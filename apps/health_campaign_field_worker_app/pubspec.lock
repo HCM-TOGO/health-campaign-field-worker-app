@@ -401,7 +401,7 @@ packages:
     source: hosted
     version: "0.3.4+2"
   crypto:
-    dependency: transitive
+    dependency: "direct main"
     description:
       name: crypto
       sha256: ff625774173754681d66daaf4a448684fb04b78f902da9cb3d308c19cc5e8bab
@@ -557,6 +557,10 @@ packages:
     dependency: "direct main"
     description:
       name: digit_ui_components
+      sha256: "764292c02746fa372ce93ea4d67f3941cdfa5197a552a33d586ce01aa44650f1"
+      url: "https://pub.dev"
+    source: hosted
+    version: "0.2.1+1"
       sha256: f371af457d5be79c25d05b3e05c230c12be347c664c577619087f5575df8530f
       url: "https://pub.dev"
     source: hosted
@@ -1460,6 +1464,14 @@ packages:
       url: "https://pub.dev"
     source: hosted
     version: "5.0.2"
+  logger:
+    dependency: "direct main"
+    description:
+      name: logger
+      sha256: be4b23575aac7ebf01f225a241eb7f6b5641eeaf43c6a8613510fc2f8cf187d1
+      url: "https://pub.dev"
+    source: hosted
+    version: "2.5.0"
   logging:
     dependency: transitive
     description:
@@ -1841,6 +1853,16 @@ packages:
     description:
       name: registration_delivery
       sha256: "01bdb6ad7d0e5c9e4a18d4749d1390edb04b5348da402961f718edecf9e5fd40"
+      url: "https://pub.dev"
+    source: hosted
+    version: "1.0.6+2"
+  remove_emoji_input_formatter:
+    dependency: transitive
+    description:
+      name: remove_emoji_input_formatter
+      sha256: "82d195984f890de7a8fea936c698848e78c1a67ccefe18db3baf9f7a3bc0177f"
+      url: "https://pub.dev"
+    source: hosted
       url: "https://pub.dev"
     source: hosted
     version: "1.0.6+2"

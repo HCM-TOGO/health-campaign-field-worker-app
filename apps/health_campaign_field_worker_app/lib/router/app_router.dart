@@ -37,7 +37,11 @@ import '../pages/inventory/custom_record_stock_wrapper.dart';
 import '../pages/inventory/custom_stock_details.dart';
 import '../pages/inventory/custom_warehouse_details.dart';
 export 'package:auto_route/auto_route.dart';
-
+import '../pages/beneficiary/custom_individual_details.dart';
+import '../pages/beneficiary/beneficiary_acknowledgement_page.dart';
+import '../pages/consent/household_consent.dart';
+import '../pages/beneficiary/widgets/consent_household_acknowledgement.dart';
+import '../pages/beneficiary/household_overview.dart';
 part 'app_router.gr.dart';
 
 @AutoRouterConfig(
@@ -113,6 +117,13 @@ class AppRouter extends _$AppRouter {
                       page: IndividualDetailsRoute.page,
                       path: 'individual-details'),
                   AutoRoute(
+                      // initial: true,
+                      page: CustomIndividualDetailsRoute.page,
+                      path: 'custom-individual-details'),
+                  RedirectRoute(
+                      path: 'individual-details',
+                      redirectTo: 'custom-individual-details'),
+                  AutoRoute(
                       page: HouseHoldDetailsRoute.page,
                       path: 'household-details'),
                   AutoRoute(
@@ -132,6 +143,27 @@ class AppRouter extends _$AppRouter {
                     page: BeneficiaryAcknowledgementRoute.page,
                     path: 'beneficiary-acknowledgement',
                   ),
+                  AutoRoute(
+                    page: CustomBeneficiaryAcknowledgementRoute.page,
+                    path: 'custom-beneficiary-acknowledgement',
+                  ),
+                  AutoRoute(
+                    page: HouseHoldConsentRoute.page,
+                    path: 'household-consent',
+                    // initial: true,
+                  ),
+                  AutoRoute(
+                    page: ConsentHouseholdAcknowledgementRoute.page,
+                    path: 'consent-household-acknowledgement',
+                    // initial: true,
+                  ),
+                  RedirectRoute(
+                      path: 'beneficiary-acknowledgement',
+                      redirectTo: 'custom-beneficiary-acknowledgement'),
+                      AutoRoute(
+                          page: SummaryRoute.page,
+                          path: 'beneficiary-summary',
+                        ),
                 ],
               ),
               AutoRoute(
@@ -143,6 +175,12 @@ class AppRouter extends _$AppRouter {
                     path: 'overview',
                     initial: true,
                   ),
+                  AutoRoute(
+                    page: CustomHouseholdOverviewRoute.page,
+                    path: 'custom-overview',
+                  ),
+                  RedirectRoute(
+                      path: 'overview', redirectTo: 'custom-overview'),
                   AutoRoute(
                     page: BeneficiaryDetailsRoute.page,
                     path: 'beneficiary-details',
