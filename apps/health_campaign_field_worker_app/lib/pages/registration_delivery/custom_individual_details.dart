@@ -338,6 +338,7 @@ class CustomIndividualDetailsPageState
                                   context,
                                   form: form,
                                   oldIndividual: individualModel,
+                                  beneficiaryId: beneficiaryId?.first,
                                 );
                                 final tag = scannerBloc.state.qrCodes.isNotEmpty
                                     ? scannerBloc.state.qrCodes.first
@@ -395,6 +396,7 @@ class CustomIndividualDetailsPageState
                                 final individual = _getIndividualModel(
                                   context,
                                   form: form,
+                                  beneficiaryId: beneficiaryId?.first,
                                 );
 
                                 if (context.mounted) {
@@ -878,7 +880,7 @@ class CustomIndividualDetailsPageState
               .byName(form.control(_genderKey).value.toString().toLowerCase()),
       mobileNumber: form.control(_mobileNumberKey).value,
       dateOfBirth: dobString,
-      identifiers: isEditIndividual
+      identifiers: isEditIndividual && identifier.identifierId != null
           ? identifiers
           : [
               identifier.copyWith(

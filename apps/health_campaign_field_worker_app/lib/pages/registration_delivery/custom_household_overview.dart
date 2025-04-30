@@ -831,7 +831,7 @@ class _CustomHouseholdOverviewPageState
                                                     ),
                                                   ),
                                                   children: [
-                                                    IndividualDetailsRoute(
+                                                    CustomIndividualDetailsRoute(
                                                       isHeadOfHousehold: isHead,
                                                     ),
                                                   ],
@@ -1037,12 +1037,11 @@ class _CustomHouseholdOverviewPageState
           addressModel: address,
           householdModel: household,
         ),
-        // children: [
-        //   CustomIndividualDetailsRoute(),
-        // ],
+        children: [
+          CustomIndividualDetailsRoute(),
+        ],
       ),
     );
-    context.router.push(CustomIndividualDetailsRoute());
   }
 
   bool isOutsideProjectDateRange() {
