@@ -41,6 +41,7 @@ import '../pages/registration_delivery/custom_household_details.dart';
 import '../pages/registration_delivery/custom_household_location.dart';
 import '../pages/registration_delivery/custom_household_overview.dart';
 import '../pages/registration_delivery/custom_individual_details.dart';
+import '../pages/registration_delivery/custom_registration_delivery_wrapper.dart';
 import '../pages/registration_delivery/custom_search_beneficiary.dart';
 import '../pages/registration_delivery/custom_summary.dart';
 import '../pages/registration_delivery/record_redose.dart';
@@ -122,10 +123,9 @@ class AppRouter extends _$AppRouter {
           page: SearchReferralReconciliationsRoute.page,
           path: 'search-referrals',
         ),
-
         AutoRoute(
-            page: RegistrationDeliveryWrapperRoute.page,
-            path: 'registration-delivery-wrapper',
+            page: CustomRegistrationDeliveryWrapperRoute.page,
+            path: 'custom-registration-delivery-wrapper',
             children: [
               // AutoRoute(
               //     initial: true,
@@ -195,7 +195,7 @@ class AppRouter extends _$AppRouter {
               ),
               AutoRoute(
                 page: BeneficiaryWrapperRoute.page,
-                path: 'beneficiary',
+                path: 'custom-beneficiary',
                 children: [
                   // AutoRoute(
                   //   page: HouseholdOverviewRoute.page,

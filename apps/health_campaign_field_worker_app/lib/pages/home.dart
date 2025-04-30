@@ -342,7 +342,7 @@ class _HomePageState extends LocalizedState<HomePage> {
           onPressed: () async {
             RegistrationDeliverySingleton()
                 .setHouseholdType(HouseholdType.family);
-            context.router.push(const RegistrationDeliveryWrapperRoute());
+            context.router.push(const CustomRegistrationDeliveryWrapperRoute());
           },
         ),
       ),

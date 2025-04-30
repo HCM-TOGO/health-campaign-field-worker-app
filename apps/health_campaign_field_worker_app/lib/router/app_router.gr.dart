@@ -210,6 +210,12 @@ abstract class _$AppRouter extends RootStackRouter {
         ),
       );
     },
+    CustomRegistrationDeliveryWrapperRoute.name: (routeData) {
+      return AutoRoutePage<dynamic>(
+        routeData: routeData,
+        child: const CustomRegistrationDeliveryWrapperPage(),
+      );
+    },
     CustomSearchBeneficiaryRoute.name: (routeData) {
       final args = routeData.argsAs<CustomSearchBeneficiaryRouteArgs>(
           orElse: () => const CustomSearchBeneficiaryRouteArgs());
@@ -1094,6 +1100,20 @@ class CustomReferBeneficiarySMCRouteArgs {
   String toString() {
     return 'CustomReferBeneficiarySMCRouteArgs{key: $key, appLocalizations: $appLocalizations, isEditing: $isEditing, projectBeneficiaryClientRefId: $projectBeneficiaryClientRefId, individual: $individual, isReadministrationUnSuccessful: $isReadministrationUnSuccessful, quantityWasted: $quantityWasted, productVariantId: $productVariantId, referralReasons: $referralReasons}';
   }
+}
+
+/// generated route for
+/// [CustomRegistrationDeliveryWrapperPage]
+class CustomRegistrationDeliveryWrapperRoute extends PageRouteInfo<void> {
+  const CustomRegistrationDeliveryWrapperRoute({List<PageRouteInfo>? children})
+      : super(
+          CustomRegistrationDeliveryWrapperRoute.name,
+          initialChildren: children,
+        );
+
+  static const String name = 'CustomRegistrationDeliveryWrapperRoute';
+
+  static const PageInfo<void> page = PageInfo<void>(name);
 }
 
 /// generated route for

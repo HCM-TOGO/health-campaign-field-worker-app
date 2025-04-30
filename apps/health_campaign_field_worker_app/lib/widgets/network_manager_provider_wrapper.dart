@@ -22,6 +22,7 @@ import '../blocs/app_initialization/app_initialization.dart';
 import '../data/local_store/downsync/downsync.dart';
 import '../data/network_manager.dart';
 import '../data/repositories/local/inventory_management/custom_stock.dart';
+import '../data/repositories/local/registration_delivery/custom_registration_delivery.dart';
 import '../data/repositories/oplog.dart';
 import '../data/repositories/remote/auth.dart';
 import '../data/repositories/remote/downsync.dart';
@@ -235,6 +236,12 @@ class NetworkManagerProviderWrapper extends StatelessWidget {
       ),
       RepositoryProvider<RegistrationDeliveryAddressRepo>(
         create: (_) => RegistrationDeliveryAddressRepo(
+          sql,
+          AddressOpLogManager(isar),
+        ),
+      ),
+      RepositoryProvider<CustomRegistrationDeliveryAddressRepo>(
+        create: (_) => CustomRegistrationDeliveryAddressRepo(
           sql,
           AddressOpLogManager(isar),
         ),
