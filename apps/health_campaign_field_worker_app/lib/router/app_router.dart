@@ -1,6 +1,7 @@
 import 'package:referral_reconciliation/router/referral_reconciliation_router.gm.dart';
 import 'package:referral_reconciliation/router/referral_reconciliation_router.dart';
 import 'package:registration_delivery/blocs/app_localization.dart';
+import 'package:registration_delivery/models/entities/task.dart';
 import 'package:registration_delivery/router/registration_delivery_router.dart';
 import 'package:registration_delivery/router/registration_delivery_router.gm.dart';
 import 'package:auto_route/auto_route.dart';
@@ -33,8 +34,11 @@ import '../pages/registration_delivery/caregiver_consent.dart';
 import '../pages/registration_delivery/custom_beneficiary_acknowledgement.dart';
 import '../pages/registration_delivery/custom_household_details.dart';
 import '../pages/registration_delivery/custom_household_location.dart';
+import '../pages/registration_delivery/custom_household_overview.dart';
 import '../pages/registration_delivery/custom_individual_details.dart';
+import '../pages/registration_delivery/custom_search_beneficiary.dart';
 import '../pages/registration_delivery/custom_summary.dart';
+import '../pages/registration_delivery/record_redose.dart';
 import '../pages/reports/beneficiary/beneficaries_report.dart';
 import '../pages/unauthenticated.dart';
 export 'package:auto_route/auto_route.dart';
@@ -123,6 +127,10 @@ class AppRouter extends _$AppRouter {
                   page: SearchBeneficiaryRoute.page,
                   path: 'search-beneficiary'),
 
+              // AutoRoute(
+              //     initial: true,
+              //     page: CustomSearchBeneficiaryRoute.page,
+              //     path: 'custom-search-beneficiary'),
               AutoRoute(
                 page: FacilitySelectionRoute.page,
                 path: 'select-facilities',
@@ -185,9 +193,14 @@ class AppRouter extends _$AppRouter {
                 page: BeneficiaryWrapperRoute.page,
                 path: 'beneficiary',
                 children: [
+                  // AutoRoute(
+                  //   page: HouseholdOverviewRoute.page,
+                  //   path: 'overview',
+                  //   initial: true,
+                  // ),
                   AutoRoute(
-                    page: HouseholdOverviewRoute.page,
-                    path: 'overview',
+                    page: CustomHouseholdOverviewRoute.page,
+                    path: 'custom-overview',
                     initial: true,
                   ),
                   AutoRoute(
@@ -209,6 +222,10 @@ class AppRouter extends _$AppRouter {
                   AutoRoute(
                     page: DoseAdministeredRoute.page,
                     path: 'dose-administered',
+                  ),
+                  AutoRoute(
+                    page: RecordRedoseRoute.page,
+                    path: 'record-redose',
                   ),
                   AutoRoute(
                     page: SplashAcknowledgementRoute.page,

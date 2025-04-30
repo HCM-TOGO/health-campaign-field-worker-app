@@ -89,6 +89,9 @@ class Constants {
 
   static const String boundaryLocalizationPath = 'rainmaker-boundary-admin';
 
+  static const String reAdministeredKey = "reAdministered";
+  static const String reDoseQuantityKey = 'reDoseQuantity';
+
   static const String dashboardAnalyticsPath =
       '/dashboard-analytics/dashboard/getChartV2';
 

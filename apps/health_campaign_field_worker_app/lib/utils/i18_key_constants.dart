@@ -38,6 +38,9 @@ const complaintsDetailsShowcase = ComplaintsDetailsShowcase();
 const complaintsDetailsViewShowcase = ComplaintsDetailsViewShowcase();
 const complaintsInboxShowcase = ComplaintsInboxShowcase();
 
+const householdOverView = HouseholdOverView();
+const deliverIntervention = DeliverIntervention();
+
 class Common {
   const Common();
 
@@ -135,6 +138,34 @@ class Common {
   String get ageInMonths => 'AGE_IN_MONTHS_LABEL';
   String get locationCapturing => 'CAPTURING_LOCATION';
   String get profileUpdateSuccess => 'PROFILE_UPDATE_SUCCESS';
+}
+
+class HouseholdOverView {
+  const HouseholdOverView();
+
+  String get householdOverViewHouseholderHeadLabel =>
+      'HOUSEHOLD_OVER_VIEW_HOUSEHOLDER_HEAD_LABEL';
+
+  String get householdOverViewBeneficiaryRefusedLabel =>
+      'HOUSEHOLD_OVER_VIEW_BENEFICIARY_REFUSED_LABEL';
+
+  String get householdOverViewAssessmentActionText =>
+      'HOUSEHOLD_OVER_VIEW_ASSESSMENT_ACTION_TEXT';
+
+  String get householdOverViewRedoseActionText =>
+      'HOUSEHOLD_OVER_VIEW_REDOSE_ACTION_TEXT';
+}
+
+class DeliverIntervention {
+  const DeliverIntervention();
+
+  String get recordRedoseLabel => 'DELIVER_INTERVENTION_RECORD_REDOSE_LABEL';
+  String get reasonForRedoseLabel =>
+      'DELIVER_INTERVENTION_REASON_FOR_REDOSE_LABEL';
+  String get selectReasonForRedoseLabel =>
+      'DELIVER_INTERVENTION_SELECT_REASON_FOR_REDOSE_LABEL';
+  String get redoseQuantityLabel =>
+      'DELIVER_INTERVENTION_REDOSE_QUANTITY_LABEL';
 }
 
 class HomeShowcase {
@@ -970,6 +1001,8 @@ class IndividualDetails {
 
 class BeneficiaryDetails {
   const BeneficiaryDetails();
+
+  String get backToHouseholdDetails => 'BACK_TO_HOUSEHOLD_DETAILS';
 
   String get beneficiarysDetailsLabelText => 'BENEFICIARY_DETAILS_LABEL_TEXT';
   String get beneficiarysDetailsEditIconLabelText =>

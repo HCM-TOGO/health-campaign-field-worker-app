@@ -23,7 +23,9 @@ import 'package:registration_delivery/widgets/localized.dart';
 import 'package:registration_delivery/widgets/showcase/config/showcase_constants.dart';
 import 'package:registration_delivery/widgets/showcase/showcase_button.dart';
 
+import '../../models/entities/identifier_types.dart';
 import '../../router/app_router.dart';
+import '../../utils/constants.dart';
 import 'caregiver_consent.dart';
 
 @RoutePage()
@@ -244,6 +246,49 @@ class CustomHouseholdLocationPageState
                                 projectBeneficiaryModel,
                                 loading,
                                 headOfHousehold,
+                              ) {
+                                var addressModel = address.copyWith(
+                                  addressLine1: addressLine1 != null &&
+                                          addressLine1.trim().isNotEmpty
+                                      ? addressLine1
+                                      : null,
+                                  addressLine2: addressLine2 != null &&
+                                          addressLine2.trim().isNotEmpty
+                                      ? addressLine2
+                                      : null,
+                                  landmark: landmark != null &&
+                                          landmark.trim().isNotEmpty
+                                      ? landmark
+                                      : null,
+                                  locality: address.locality,
+                                  pincode: postalCode != null &&
+                                          postalCode.trim().isNotEmpty
+                                      ? postalCode
+                                      : null,
+                                  type: AddressType.correspondence,
+                                  latitude: form.control(_latKey).value,
+                                  longitude: form.control(_lngKey).value,
+                                  buildingName: (RegistrationDeliverySingleton()
+                                              .householdType ==
+                                          HouseholdType.community)
+                                      ? form.control(_buildingNameKey).value
+                                      : null,
+                                  locationAccuracy:
+                                      form.control(_accuracyKey).value,
+                                );
+                                // TODO [Linking of Voucher for Household based project  need to be handled]
+
+                                bloc.add(
+                                  BeneficiaryRegistrationSaveAddressEvent(
+                                    addressModel,
+                                  ),
+                                );
+                                router.push(CaregiverConsentRoute());
+                              },
+                              addMember: (
+                                address,
+                                householdModel,
+                                loading,
                               ) {
                                 var addressModel = address.copyWith(
                                   addressLine1: addressLine1 != null &&
