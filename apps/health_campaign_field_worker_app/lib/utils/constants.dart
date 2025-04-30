@@ -86,11 +86,12 @@ class Constants {
   static const String defaultDateTimeFormat = 'dd/MM/yyyy hh:mm a';
   static const String surveyFormViewDateFormat = 'dd/MM/yyyy hh:mm a';
   static const String healthFacilitySurveyFormPrefix = 'HF_RF';
-
+  static const String checklistViewDateFormat = 'dd/MM/yyyy hh:mm a';
   static const String boundaryLocalizationPath = 'rainmaker-boundary-admin';
 
   static const String reAdministeredKey = "reAdministered";
   static const String reDoseQuantityKey = 'reDoseQuantity';
+  static const String healthFacility = 'Health Facility';
 
   static const String dashboardAnalyticsPath =
       '/dashboard-analytics/dashboard/getChartV2';

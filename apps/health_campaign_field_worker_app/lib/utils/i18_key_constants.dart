@@ -40,6 +40,9 @@ const complaintsInboxShowcase = ComplaintsInboxShowcase();
 
 const householdOverView = HouseholdOverView();
 const deliverIntervention = DeliverIntervention();
+const checklist = Checklist();
+const referBeneficiary = ReferBeneficiary();
+const householdDetails = HouseholdDetails();
 
 class Common {
   const Common();
@@ -166,6 +169,135 @@ class DeliverIntervention {
       'DELIVER_INTERVENTION_SELECT_REASON_FOR_REDOSE_LABEL';
   String get redoseQuantityLabel =>
       'DELIVER_INTERVENTION_REDOSE_QUANTITY_LABEL';
+
+  String get beneficiaryIneligibleDescription => 'BENEFICIARY_INELIGIBLE_DESC';
+  String get beneficiaryReferralDescription => 'BENEFICIARY_REFERRAL_DESC';
+  String get spaqRedirectionScreenDescription => 'SPAQ_REDIRECTED_SCREEN_DESC';
+}
+
+class Checklist {
+  const Checklist();
+
+  String get checklist => 'CHECKLIST';
+
+  String get checklistlabel => 'CHECKLIST_LABEL';
+
+  String get checklistCreateActionLabel => 'CHECKLIST_CREATE_ACTION_LABEL';
+
+  String get checklistViewActionLabel => 'CHECKLIST_VIEW_ACTION_LABEL';
+
+  String get checklistDetailLabel => 'CHECKLIST_DETAILS_LABEL';
+
+  String get checklistDialogLabel => 'CHECKLIST_DIALOG_LABEL';
+
+  String get checklistDialogDescription => 'CHECKLIST_DIALOG_DESCRITPTION';
+
+  String get checklistDialogPrimaryAction => 'CHECKLIST_DIALOG_PRIMARY_ACTION';
+
+  String get submitButtonDialogLabelText => 'CHECKLIST_DETAILS_SUBMIT';
+
+  String get checklistDialogDynamicDescription =>
+      'CHECKLIST_DIALOG_DYNAMIC_DESCRIPTION';
+
+  String get checklistDialogSecondaryAction =>
+      'CHECKLIST_DIALOG_SECONDARY_ACTION';
+
+  String get checklistdate => 'CHECKLIST_DATE';
+
+  String get checklistReasonRequiredError => 'CHECKLIST_REASON_REQUIRED_ERROR';
+
+  String get notSelectedKey => 'NOT_SELECTED';
+
+  String get checklistBackDialogLabel => 'CHECKLIST_BACK_DIALOG_LABEL';
+
+  String get checklistBackDialogDescription =>
+      'CHECKLIST_BACK_DIALOG_DESCRITPTION';
+
+  String get checklistBackDialogPrimaryAction =>
+      'CHECKLIST_BACK_DIALOG_PRIMARY_ACTION';
+
+  String get checklistBackDialogSecondaryAction =>
+      'CHECKLIST_BACK_DIALOG_SECONDARY_ACTION';
+
+  String get noChecklistFound => 'NO_CHECKLISTS_FOUND';
+}
+
+class ReferBeneficiary {
+  const ReferBeneficiary();
+
+  String get dateOfReferralLabel => 'REFER_BENEFICIARY_DATE_OF_REFERRAL_LABEL';
+  String get dateOfEvaluationLabel =>
+      'REFER_BENEFICIARY_DATE_OF_EVALUATION_LABEL';
+  String get administrationUnitFormLabel => 'ADMINISTRATION_UNIT_FORM_LABEL';
+  String get organizationUnitFormLabel => 'ORGANIZATION_UNIT_FORM_LABEL';
+  String get referredByLabel => 'REFERRED_BY_FORM_LABEL';
+  String get referredToLabel => 'REFERRED_TO_FORM_LABEL';
+  String get reasonForReferral => 'REASON_FOR_REFERRAL';
+  String get referralComments => 'REFERRAL_COMMENTS';
+  String get referralDetails => 'REFERRAL_DETAILS_HEADER';
+  String get facilityValidationMessage => 'PLEASE_ENTER_VALID_FACILITY';
+  String get facilityDetails => 'FACILITY_DETAILS_HEADER';
+  String get evaluationFacilityLabel => 'EVALUATION_FACILITY_LABEL';
+  String get nameOfHealthFacilityCoordinatorLabel =>
+      'NAME_OF_HEALTH_FACILITY_COORDINATOR';
+  String get healthFacilityCoordinatorLabel => 'NAME_OF_HF_COORDINATOR_LABEL';
+  String get nameOfTheChildLabel => 'REFERRAL_NAME_OF_CHILD_LABEL';
+  String get beneficiaryIdLabel => 'REFERRAL_BENEFICIARY_ID_LABEL';
+  String get referralCodeLabel => 'REFERRAL_CODE_LABEL';
+  String get reasonForReferralHeader => 'REASON_FOR_REFERRAL_HEADER';
+  String get searchReferralsHeader => 'SEARCH_REFERRALS_HEADER';
+  String get referredByTeamCodeLabel => 'REFERRED_BY_TEAM_CODE_LABEL';
+  String get selectCycle => 'REFERRAL_SELECT_CYCLE';
+  String get createReferralLabel => 'CREATE_REFERRAL_LABEL';
+  String get noChecklistFound => 'NO_CHECKLISTS_FOUND';
+  String get dialogTitle => 'REFERRAL_CONFIRMATION_DIALOG_TITLE';
+  String get dialogContent => 'REFERRAL_CONFIRMATION_DIALOG_CONTENT';
+  String get dialogSuccess => 'REFERRAL_CONFIRMATION_SUCCESS_LABEL';
+  String get dialogCancel => 'REFERRAL_CONFIRMATION_CANCEL_LABEL';
+  String get referredDialogTitle => 'REFERRAL_CONFIRMATION_DIALOG_BOX_TITLE';
+  String get referredDialogContent =>
+      'REFERRAL_CONFIRMATION_DIALOG_BOX_CONTENT';
+  String get referAlertDialogTitle => 'REFERRAL_ALERT_DIALOG_TITLE';
+  String get referAlertDialogContent => 'REFERRAL_ALERT_DIALOG_CONTENT';
+  String get validationForReferralAge => 'REFERRAL_AGE_VALIDATION';
+}
+
+class HouseholdDetails {
+  const HouseholdDetails();
+
+  String get householdDetailsLabel => 'HOUSEHOLD_DETAILS_LABEL';
+  String get actionLabel => 'HOUSEHOLD_ACTION_LABEL';
+  String get dateOfRegistrationLabel =>
+      'HOUSEHOLD_DETAILS_DATE_OF_REGISTRATION_LABEL';
+  String get dateOfAdministrationLabel =>
+      'HOUSEHOLD_DETAILS_DATE_OF_ADMINISTRATION_LABEL';
+  String get noOfMembersCountLabel => 'NO_OF_MEMBERS_COUNT_LABEL';
+  String get viewHouseHoldDetailsActionSMC =>
+      'VIEW_HOUSEHOLD_DETAILS_ACTION_LABEL_SMC';
+
+  String get reasonLabelText => 'REASON_LABEL_TEXT';
+  String get householdDetailsDescriptionSMC =>
+      'HOUSEHOLD_DETAILS_DESCRIPTION_SMC';
+  String get viewHouseHoldDetailsAction =>
+      'VIEW_HOUSEHOLD_DETAILS_ACTION_LABEL';
+  String get cardTitle => 'CONSENT_CARD_TITLE';
+  String get validationForSelection => 'CONSENT_SUBMIT_VALIDATION';
+  String get submitYes => 'SUBMIT_YES';
+  String get submitNo => 'SUBMIT_NO';
+  String get householdConsentLabel => 'HOUSEHOLD_CONSENT_LABEL';
+  String get cardAztTitle => 'HOUSEHOLD_CONSENT_LABELL';
+}
+
+class ForgotPassword {
+  const ForgotPassword();
+
+  String get labelText => 'FORGOT_PASSWORD_LABEL_TEXT';
+
+  String get contentText => 'FORGOT_PASSWORD_CONTENT_TEXT';
+
+  String get primaryActionLabel => 'PRIMARY_ACTION_LABEL';
+
+  String get actionLabel => 'FORGOT_PASSWORD_ACTION_LABEL';
 }
 
 class HomeShowcase {
@@ -583,17 +715,17 @@ class ComplaintsInboxShowcase {
   }
 }
 
-class ForgotPassword {
-  const ForgotPassword();
+// class ForgotPassword {
+//   const ForgotPassword();
 
-  String get labelText => 'FORGOT_PASSWORD_LABEL_TEXT';
+//   String get labelText => 'FORGOT_PASSWORD_LABEL_TEXT';
 
-  String get contentText => 'FORGOT_PASSWORD_CONTENT_TEXT';
+//   String get contentText => 'FORGOT_PASSWORD_CONTENT_TEXT';
 
-  String get primaryActionLabel => 'PRIMARY_ACTION_LABEL';
+//   String get primaryActionLabel => 'PRIMARY_ACTION_LABEL';
 
-  String get actionLabel => 'FORGOT_PASSWORD_ACTION_LABEL';
-}
+//   String get actionLabel => 'FORGOT_PASSWORD_ACTION_LABEL';
+// }
 
 class Home {
   const Home();
@@ -653,6 +785,8 @@ class AcknowledgementSuccess {
   String get goToHome => 'GO_TO_HOME_SCREEN';
   String get downloadmoredata => 'DOWNLOAD_MORE_DATA';
   String get dataDownloadedSuccessLabel => 'DATA_DOWNLOADED_SUCCESS_LABEL';
+  String get referAcknowledgementLabelText =>
+      'REFER_ACKNOWLEDGEMENT_SUCCESS_LABEL_TEXT';
 }
 
 class ProjectSelection {

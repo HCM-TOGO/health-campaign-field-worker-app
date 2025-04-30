@@ -16,6 +16,11 @@ import '../blocs/inventory_management/custom_inventory_report.dart';
 import '../blocs/localization/app_localization.dart';
 import '../pages/acknowledgement.dart';
 import '../pages/authenticated.dart';
+import '../pages/beneficiary/check_eligibility/check_eligibility_assessment.dart';
+import '../pages/beneficiary/check_eligibility/facility_selection_smc.dart';
+import '../pages/beneficiary/check_eligibility/household_acknowledgement_smc.dart';
+import '../pages/beneficiary/check_eligibility/inventory_facility_selection_smc.dart';
+import '../pages/beneficiary/check_eligibility/refer_beneficiary_smc.dart';
 import '../pages/boundary_selection.dart';
 import '../pages/home.dart';
 import '../pages/inventory_management/custom_manage_stock.dart';
@@ -122,15 +127,14 @@ class AppRouter extends _$AppRouter {
             page: RegistrationDeliveryWrapperRoute.page,
             path: 'registration-delivery-wrapper',
             children: [
-              AutoRoute(
-                  initial: true,
-                  page: SearchBeneficiaryRoute.page,
-                  path: 'search-beneficiary'),
-
               // AutoRoute(
               //     initial: true,
-              //     page: CustomSearchBeneficiaryRoute.page,
-              //     path: 'custom-search-beneficiary'),
+              //     page: SearchBeneficiaryRoute.page,
+              //     path: 'search-beneficiary'),
+              AutoRoute(
+                  initial: true,
+                  page: CustomSearchBeneficiaryRoute.page,
+                  path: 'custom-search-beneficiary'),
               AutoRoute(
                 page: FacilitySelectionRoute.page,
                 path: 'select-facilities',
@@ -218,6 +222,18 @@ class AppRouter extends _$AppRouter {
                   AutoRoute(
                     page: ReferBeneficiaryRoute.page,
                     path: 'refer-beneficiary',
+                  ),
+                  AutoRoute(
+                    page: EligibilityChecklistViewRoute.page,
+                    path: 'eligibility-checklist',
+                  ),
+                  AutoRoute(
+                    page: CustomReferBeneficiarySMCRoute.page,
+                    path: 'refer-beneficiary-smc',
+                  ),
+                  AutoRoute(
+                    page: CustomInventoryFacilitySelectionSMCRoute.page,
+                    path: 'custom-inventory-select-facilities-smc',
                   ),
                   AutoRoute(
                     page: DoseAdministeredRoute.page,

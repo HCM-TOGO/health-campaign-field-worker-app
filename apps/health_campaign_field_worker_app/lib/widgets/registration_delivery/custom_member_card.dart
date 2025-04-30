@@ -311,13 +311,13 @@ class CustomMemberCard extends StatelessWidget {
 
                                       if ((tasks ?? []).isEmpty) {
                                         // TODO: Add eligibility page
-                                        // context.router.push(
-                                        //   EligibilityChecklistViewRoute(
-                                        //     projectBeneficiaryClientReferenceId:
-                                        //         projectBeneficiaryClientReferenceId,
-                                        //     individual: individual,
-                                        //   ),
-                                        // );
+                                        context.router.push(
+                                          EligibilityChecklistViewRoute(
+                                            projectBeneficiaryClientReferenceId:
+                                                projectBeneficiaryClientReferenceId,
+                                            individual: individual,
+                                          ),
+                                        );
                                       } else {
                                         var successfulTask = tasks!
                                             .where(
