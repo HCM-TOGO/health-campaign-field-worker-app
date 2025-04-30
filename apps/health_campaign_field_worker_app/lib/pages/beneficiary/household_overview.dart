@@ -5,6 +5,7 @@ import 'package:digit_components/digit_components.dart';
 import 'package:digit_data_model/data_model.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:logger/logger.dart';
 import 'package:registration_delivery/blocs/beneficiary_registration/beneficiary_registration.dart';
 import 'package:registration_delivery/blocs/delivery_intervention/deliver_intervention.dart';
 import 'package:registration_delivery/blocs/household_overview/household_overview.dart';
@@ -336,64 +337,67 @@ class _CustomHouseholdOverviewPageState
                                           .isEmpty)
                                         DigitElevatedButton(
                                             onPressed: () async {
-                                              HouseholdMemberWrapper wrapper =
-                                                  state.householdMemberWrapper;
+                                              Logger().d("This is the button");
 
-                                              final timestamp = wrapper
-                                                  .headOfHousehold
-                                                  ?.clientAuditDetails
-                                                  ?.createdTime;
-                                              final date = DateTime
-                                                  .fromMillisecondsSinceEpoch(
-                                                timestamp ??
-                                                    DateTime.now()
-                                                        .millisecondsSinceEpoch,
-                                              );
+                                              context.router.root.push(
+                                                  EligibilityChecklistViewRoute());
+                                              // HouseholdMemberWrapper wrapper =
+                                              //     state.householdMemberWrapper;
 
-                                              final address =
-                                                  wrapper.household?.address;
+                                              // final timestamp = wrapper
+                                              //     .headOfHousehold
+                                              //     ?.clientAuditDetails
+                                              //     ?.createdTime;
+                                              // final date = DateTime
+                                              //     .fromMillisecondsSinceEpoch(
+                                              //   timestamp ??
+                                              //       DateTime.now()
+                                              //           .millisecondsSinceEpoch,
+                                              // );
 
-                                              if (address == null) return;
+                                              // final address =
+                                              //     wrapper.household?.address;
 
-                                              final projectBeneficiary = state
-                                                  .householdMemberWrapper
-                                                  .projectBeneficiaries
-                                                  ?.firstWhereOrNull(
-                                                (element) =>
-                                                    element
-                                                        .beneficiaryClientReferenceId ==
-                                                    wrapper.household
-                                                        ?.clientReferenceId,
-                                              );
+                                              // if (address == null) return;
 
-                                              await context.router.root.push(
-                                                BeneficiaryRegistrationWrapperRoute(
-                                                  initialState:
-                                                      BeneficiaryRegistrationEditHouseholdState(
-                                                    addressModel: address,
-                                                    individualModel: state
-                                                            .householdMemberWrapper
-                                                            .members ??
-                                                        [],
-                                                    householdModel: state
-                                                        .householdMemberWrapper
-                                                        .household!,
-                                                    registrationDate: date,
-                                                    projectBeneficiaryModel:
-                                                        projectBeneficiary,
-                                                  ),
-                                                  children: [
-                                                    HouseholdLocationRoute(),
-                                                  ],
-                                                ),
-                                              );
+                                              // final projectBeneficiary = state
+                                              //     .householdMemberWrapper
+                                              //     .projectBeneficiaries
+                                              //     ?.firstWhereOrNull(
+                                              //   (element) =>
+                                              //       element
+                                              //           .beneficiaryClientReferenceId ==
+                                              //       wrapper.household
+                                              //           ?.clientReferenceId,
+                                              // );
+
+                                              // await context.router.root.push(
+                                              //   BeneficiaryRegistrationWrapperRoute(
+                                              //     initialState:
+                                              //         BeneficiaryRegistrationEditHouseholdState(
+                                              //       addressModel: address,
+                                              //       individualModel: state
+                                              //               .householdMemberWrapper
+                                              //               .members ??
+                                              //           [],
+                                              //       householdModel: state
+                                              //           .householdMemberWrapper
+                                              //           .household!,
+                                              //       registrationDate: date,
+                                              //       projectBeneficiaryModel:
+                                              //           projectBeneficiary,
+                                              //     ),
+                                              //     children: [
+                                              //       HouseholdLocationRoute(),
+                                              //     ],
+                                              //   ),
+                                              // );
                                             },
                                             child: Center(
                                               child: Text(
-                                                localizations.translate(
-                                                  i18.householdOverView
-                                                      .householdOverViewEditIconText,
-                                                ),
+                                                "SMC Eligibility",
+                                                style: TextStyle(
+                                                    color: Colors.white),
                                               ),
                                             ))
                                     ],
@@ -642,22 +646,22 @@ class _CustomHouseholdOverviewPageState
                               const SizedBox(
                                 height: kPadding,
                               ),
-                              // Center(
-                              //   child: DigitIconButton(
-                              //     onPressed: () => addIndividual(
-                              //       context,
-                              //       state.householdMemberWrapper.household!,
-                              //     ),
-                              //     iconText: localizations.translate(
-                              //       i18.householdOverView
-                              //           .householdOverViewAddActionText,
-                              //     ),
-                              //     icon: Icons.add_circle,
-                              //   ),
-                              // ),
-                              // const SizedBox(
-                              //   height: kPadding,
-                              // ),
+                              Center(
+                                child: DigitIconButton(
+                                  onPressed: () => addIndividual(
+                                    context,
+                                    state.householdMemberWrapper.household!,
+                                  ),
+                                  iconText: localizations.translate(
+                                    i18.householdOverView
+                                        .householdOverViewAddActionText,
+                                  ),
+                                  icon: Icons.add_circle,
+                                ),
+                              ),
+                              const SizedBox(
+                                height: kPadding,
+                              ),
                             ],
                           ),
                         ),

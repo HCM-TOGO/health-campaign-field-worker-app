@@ -9,6 +9,9 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:isar/isar.dart';
 import 'package:location/location.dart';
+import 'package:registration_delivery/blocs/delivery_intervention/deliver_intervention.dart';
+import 'package:registration_delivery/blocs/household_overview/household_overview.dart';
+import 'package:registration_delivery/models/entities/task.dart';
 import 'package:survey_form/survey_form.dart';
 import 'package:registration_delivery/data/repositories/local/household_global_search.dart';
 import 'package:registration_delivery/data/repositories/local/individual_global_search.dart';
@@ -16,8 +19,9 @@ import 'package:registration_delivery/data/repositories/oplog/oplog.dart';
 import 'package:registration_delivery/models/entities/household.dart';
 import 'package:registration_delivery/models/entities/household_member.dart';
 import 'package:registration_delivery/models/entities/project_beneficiary.dart';
+import 'package:registration_delivery/blocs/search_households/search_households.dart'
+    as customIndividualGlobalSearchBloc;
 import 'package:registration_delivery/utils/typedefs.dart';
-import 'package:survey_form/survey_form.dart';
 import 'blocs/app_initialization/app_initialization.dart';
 import 'blocs/auth/auth.dart';
 import 'blocs/beneficiary_registration/beneficiary_registration.dart';
@@ -125,6 +129,40 @@ class MainApplicationState extends State<MainApplication>
                 },
                 lazy: false,
               ),
+              BlocProvider(
+                create: (context) {
+                  return DeliverInterventionBloc(
+                      const DeliverInterventionState(),
+                      taskRepository:
+                          context.repository<TaskModel, TaskSearchModel>());
+                },
+              ),
+
+              BlocProvider(
+                create: (context) => HouseholdOverviewBloc(
+                  const HouseholdOverviewState(
+                    householdMemberWrapper: customIndividualGlobalSearchBloc
+                        .HouseholdMemberWrapper(),
+                  ),
+                  individualRepository: context
+                      .repository<IndividualModel, IndividualSearchModel>(),
+                  householdRepository: context
+                      .repository<HouseholdModel, HouseholdSearchModel>(),
+                  householdMemberRepository: context.repository<
+                      HouseholdMemberModel, HouseholdMemberSearchModel>(),
+                  projectBeneficiaryRepository: context.repository<
+                      ProjectBeneficiaryModel, ProjectBeneficiarySearchModel>(),
+                  taskDataRepository: context.read<TaskDataRepository>(),
+                  beneficiaryType: BeneficiaryType.household,
+                  sideEffectDataRepository:
+                      context.read<SideEffectDataRepository>(),
+                  referralDataRepository:
+                      context.read<ReferralDataRepository>(),
+                  individualGlobalSearchRepository:
+                      context.read<IndividualGlobalSearchRepository>(),
+                ),
+              ),
+
               BlocProvider<BeneficiaryRegistrationBloc>(
                 create: (context) => BeneficiaryRegistrationBloc(
                   const BeneficiaryRegistrationState.create(),
@@ -140,6 +178,7 @@ class MainApplicationState extends State<MainApplication>
                   beneficiaryType: BeneficiaryType.household, // or .household
                 ),
               ),
+
               BlocProvider(
                 create: (context) {
                   return UserBloc(
@@ -310,6 +349,21 @@ class MainApplicationState extends State<MainApplication>
                                 ProjectFacilityModel,
                                 ProjectFacilitySearchModel>(),
                           ),
+                        ),
+                        BlocProvider(
+                          create: (_) => ServiceBloc(
+                            const ServiceEmptyState(),
+                            serviceDataRepository: context
+                                .repository<ServiceModel, ServiceSearchModel>(),
+                          ),
+                        ),
+                        BlocProvider(
+                          create: (_) => ServiceDefinitionBloc(
+                            const ServiceDefinitionEmptyState(),
+                            serviceDefinitionDataRepository: context.repository<
+                                ServiceDefinitionModel,
+                                ServiceDefinitionSearchModel>(),
+                          )..add(const ServiceDefinitionFetchEvent()),
                         ),
                         BlocProvider(
                           create: (context) => ProductVariantBloc(

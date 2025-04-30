@@ -103,7 +103,6 @@ class _HouseHoldConsentPageState extends LocalizedState<HouseHoldConsentPage> {
                                     searchQuery,
                                     loading,
                                     isHeadOfHousehold,
-
                                   ) {
                                     if (form.control(_consent).value == null) {
                                       form
@@ -213,8 +212,6 @@ class _HouseHoldConsentPageState extends LocalizedState<HouseHoldConsentPage> {
                                         const SearchHouseholdsClearEvent(),
                                       );
                                     } else {
-                                      // Logger().d(
-                                      //     "Address in this content $household");
                                       Logger().d(
                                           "Address in this content $addressModel");
                                       context.router

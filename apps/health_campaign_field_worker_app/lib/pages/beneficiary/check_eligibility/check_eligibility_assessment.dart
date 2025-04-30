@@ -7,8 +7,9 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:group_radio_button/group_radio_button.dart';
-import 'package:health_campaign_field_worker_app/blocs/service_definition/service_definition.dart';
-import 'package:health_campaign_field_worker_app/models/entities/assessment_checklist/status.dart';
+import 'package:registration_delivery/models/entities/status.dart';
+import 'package:survey_form/survey_form.dart';
+
 import 'package:registration_delivery/blocs/delivery_intervention/deliver_intervention.dart';
 import 'package:registration_delivery/blocs/household_overview/household_overview.dart';
 import 'package:registration_delivery/blocs/search_households/search_households.dart';
@@ -16,10 +17,8 @@ import 'package:digit_data_model/data_model.dart';
 // import 'package:registration_delivery/models/entities/status.dart';
 import 'package:registration_delivery/models/entities/task.dart';
 import 'package:registration_delivery/router/registration_delivery_router.gm.dart';
-import '../../../blocs/service/service.dart';
-import '../../../models/entities/assessment_checklist/service.dart';
-import '../../../models/entities/assessment_checklist/service_attributes.dart';
-import '../../../models/entities/assessment_checklist/service_definition.dart';
+
+import '../../../blocs/service/service.dart' as service;
 import '../../../models/entities/roles_type.dart';
 import '../../../router/app_router.dart';
 import '../../../utils/environment_config.dart';
@@ -64,12 +63,12 @@ class _EligibilityChecklistViewPage
 
   @override
   void initState() {
-    context.read<ServiceBloc>().add(
-          ServiceChecklistEvent(
-            value: Random().nextInt(100).toString(),
-            submitTriggered: true,
-          ),
-        );
+    // context.read<ServiceBloc>().add(
+    //       service.ServiceChecklistEvent(
+    //         value: Random().nextInt(100).toString(),
+    //         submitTriggered: true,
+    //       ) as ServiceEvent,
+    //     );
     super.initState();
   }
 
@@ -345,9 +344,9 @@ class _EligibilityChecklistViewPage
                                                     .millisecondsSinceEpoch(),
                                               ),
                                               projectId: context.projectId,
-                                              status: Status
-                                                  .beneficiaryInEligible
-                                                  .toValue(),
+                                              // status: Status
+                                              //     .beneficiaryInEligible
+                                              //     .toValue(),
                                               clientAuditDetails:
                                                   ClientAuditDetails(
                                                 createdBy:
@@ -363,11 +362,11 @@ class _EligibilityChecklistViewPage
                                                   TaskAdditionalFields(
                                                 version: 1,
                                                 fields: [
-                                                  AdditionalField(
-                                                    'taskStatus',
-                                                    Status.beneficiaryInEligible
-                                                        .toValue(),
-                                                  ),
+                                                  // AdditionalField(
+                                                  //   'taskStatus',
+                                                  //   Status.beneficiaryInEligible
+                                                  //       .toValue(),
+                                                  // ),
                                                   AdditionalField(
                                                     'ineligibleReasons',
                                                     ineligibilityReasons
@@ -426,12 +425,12 @@ class _EligibilityChecklistViewPage
                               final router = context.router;
                               submitTriggered = true;
 
-                              context.read<ServiceBloc>().add(
-                                    const ServiceChecklistEvent(
-                                      value: '',
-                                      submitTriggered: true,
-                                    ),
-                                  );
+                              // context.read<ServiceBloc>().add(
+                              //       const ServiceChecklistEvent(
+                              //         value: '',
+                              //         submitTriggered: true,
+                              //       ),
+                              //     );
                               final isValid =
                                   checklistFormKey.currentState?.validate();
                               if (!isValid!) {
@@ -506,9 +505,7 @@ class _EligibilityChecklistViewPage
                               Padding(
                                 padding: const EdgeInsets.only(bottom: 8),
                                 child: Text(
-                                  localizations.translate(
-                                    selectedServiceDefinition!.code.toString(),
-                                  ),
+                                  "",
                                   style: theme.textTheme.displayMedium,
                                   textAlign: TextAlign.left,
                                 ),
@@ -619,16 +616,16 @@ class _EligibilityChecklistViewPage
                                                         .split('.')
                                                         .contains(e),
                                                     onChanged: (value) {
-                                                      context
-                                                          .read<ServiceBloc>()
-                                                          .add(
-                                                            ServiceChecklistEvent(
-                                                              value:
-                                                                  e.toString(),
-                                                              submitTriggered:
-                                                                  submitTriggered,
-                                                            ),
-                                                          );
+                                                      // context
+                                                      //     .read<ServiceBloc>()
+                                                      //     .add(
+                                                      //       ServiceChecklistEvent(
+                                                      //         value:
+                                                      //             e.toString(),
+                                                      //         submitTriggered:
+                                                      //             submitTriggered,
+                                                      //       ),
+                                                      //     );
                                                       final String ele;
                                                       var val =
                                                           controller[index]
@@ -735,12 +732,12 @@ class _EligibilityChecklistViewPage
                   return RadioGroup<String>.builder(
                     groupValue: controller[index].text.trim(),
                     onChanged: (value) {
-                      context.read<ServiceBloc>().add(
-                            ServiceChecklistEvent(
-                              value: Random().nextInt(100).toString(),
-                              submitTriggered: submitTriggered,
-                            ),
-                          );
+                      // context.read<ServiceBloc>().add(
+                      //       ServiceChecklistEvent(
+                      //         value: Random().nextInt(100).toString(),
+                      //         submitTriggered: submitTriggered,
+                      //       ),
+                      //     );
                       setState(() {
                         // Clear child controllers and update visibility
                         for (final matchingChildItem in childItems) {
@@ -893,12 +890,12 @@ class _EligibilityChecklistViewPage
                           label: e,
                           value: controller[index].text.split('.').contains(e),
                           onChanged: (value) {
-                            context.read<ServiceBloc>().add(
-                                  ServiceChecklistEvent(
-                                    value: e.toString(),
-                                    submitTriggered: submitTriggered,
-                                  ),
-                                );
+                            // context.read<ServiceBloc>().add(
+                            //       ServiceChecklistEvent(
+                            //         value: e.toString(),
+                            //         submitTriggered: submitTriggered,
+                            //       ),
+                            //     );
                             final String ele;
                             var val = controller[index].text.split('.');
                             if (val.contains(e)) {

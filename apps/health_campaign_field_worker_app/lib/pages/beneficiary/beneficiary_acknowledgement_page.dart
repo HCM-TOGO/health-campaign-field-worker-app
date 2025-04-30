@@ -8,6 +8,7 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:registration_delivery/blocs/beneficiary_registration/beneficiary_registration.dart';
 // import 'package:registration_delivery/blocs/household_overview/household_overview.dart';
 import 'package:registration_delivery/blocs/search_households/search_households.dart';
+import 'package:registration_delivery/router/registration_delivery_router.gm.dart';
 
 import '../../../utils/i18_key_constants.dart' as i18;
 import '../../../widgets/localized.dart';
@@ -91,7 +92,9 @@ class CustomBeneficiaryAcknowledgementPageState
                             //     wrapper: searchBlocState.householdMembers.first,
                             //   ),
                             // );
-                            context.router.push(EligibilityChecklistViewRoute());
+                            context.router.push(
+                              CustomHouseholdOverviewRoute(),
+                            );
                           },
                           type: DigitButtonType.primary,
                           size: DigitButtonSize.large),
@@ -106,18 +109,25 @@ class CustomBeneficiaryAcknowledgementPageState
                             //     wrapper: bloc.state.householdMembers.first,
                             //   ),
                             // );
+                            // context.router.push(
+                            //   HouseHoldDetailsRoute(),
+                            // );
                           },
                           type: DigitButtonType.secondary,
                           size: DigitButtonSize.large),
                     ],
                     additionalDetails: [
-                      Text(
-                        "${individualModel.name!.givenName}",
-                         style: const TextStyle(color: Colors.white),
+                      const Text(
+                        "Beneficiary ID",
+                        style: TextStyle(
+                            color: Colors.white,
+                            fontSize: 20,
+                            fontWeight: FontWeight.bold),
                       ),
                       Text(
                         "${individualModel.additionalFields!.fields.first.value}",
-                        style: const TextStyle(color: Colors.white),
+                        style: const TextStyle(
+                            color: Colors.white, fontWeight: FontWeight.w500),
                       )
                     ],
                     description: localizations.translate(
