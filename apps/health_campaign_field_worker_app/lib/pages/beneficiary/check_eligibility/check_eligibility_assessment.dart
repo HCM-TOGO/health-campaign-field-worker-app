@@ -8,16 +8,15 @@ import 'package:flutter/services.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:group_radio_button/group_radio_button.dart';
 import 'package:registration_delivery/blocs/household_overview/household_overview.dart';
+import 'package:intl/intl.dart';
 import 'package:registration_delivery/models/entities/status.dart';
 import 'package:survey_form/survey_form.dart';
-
 import 'package:registration_delivery/blocs/delivery_intervention/deliver_intervention.dart';
 import 'package:registration_delivery/blocs/search_households/search_households.dart';
 import 'package:digit_data_model/data_model.dart';
 // import 'package:registration_delivery/models/entities/status.dart';
 import 'package:registration_delivery/models/entities/task.dart';
 import 'package:registration_delivery/router/registration_delivery_router.gm.dart';
-
 // import '../../../blocs/service/service.dart' as service;
 import '../../../models/entities/roles_type.dart';
 import '../../../router/app_router.dart';
@@ -26,6 +25,8 @@ import '../../../utils/i18_key_constants.dart' as i18_local;
 import '../../../utils/utils.dart';
 import '../../../widgets/header/back_navigation_help_header.dart';
 import '../../../widgets/localized.dart';
+import '../../../models/entities/assessment_checklist/status.dart' as status_local;
+import 'package:digit_ui_components/services/location_bloc.dart' as location;
 
 @RoutePage()
 class EligibilityChecklistViewPage extends LocalizedStatefulWidget {
@@ -63,12 +64,15 @@ class _EligibilityChecklistViewPage
 
   @override
   void initState() {
-    // context.read<ServiceBloc>().add(
-    //       service.ServiceChecklistEvent(
-    //         value: Random().nextInt(100).toString(),
-    //         submitTriggered: true,
-    //       ) as ServiceEvent,
-    //     );
+     context
+        .read<location.LocationBloc>()
+        .add(const location.LocationEvent.load());
+    context.read<ServiceBloc>().add(
+            ServiceSurveyFormEvent(
+            value: Random().nextInt(100).toString(),
+            submitTriggered: true,
+          )
+        );
     super.initState();
   }
 
@@ -94,8 +98,12 @@ class _EligibilityChecklistViewPage
           ? () async => false
           : () async => _onBackPressed(context, ifIneligible),
       child: Scaffold(
-        body: BlocBuilder<HouseholdOverviewBloc, HouseholdOverviewState>(
+        body: BlocBuilder<location.LocationBloc, location.LocationState> (
+         builder: (context, locationState) {
+        return   BlocBuilder <HouseholdOverviewBloc, HouseholdOverviewState>(
           builder: (context, householdOverviewState) {
+                            double? latitude = locationState.latitude;
+                double? longitude = locationState.longitude;
             return BlocBuilder<ServiceDefinitionBloc, ServiceDefinitionState>(
               builder: (context, state) {
                 state.mapOrNull(
@@ -106,7 +114,7 @@ class _EligibilityChecklistViewPage
                               '${context.selectedProject.name}.ELIGIBLITY_ASSESSMENT.${context.isCommunityDistributor ? RolesType.communityDistributor.toValue() : RolesType.healthFacilitySupervisor.toValue()}',
                             ))
                         .toList()
-                        .firstOrNull as ServiceDefinitionModel?;
+                        .firstOrNull;
                     initialAttributes = selectedServiceDefinition?.attributes;
                     if (!isControllersInitialized) {
                       initialAttributes?.forEach((e) {
@@ -130,21 +138,62 @@ class _EligibilityChecklistViewPage
                             showHelp: false,
                             showcaseButton: null,
                           ),
+
                       ]),
                       enableFixedButton: true,
-                      footer: BlocListener<LocationBloc, LocationState>(
-                        listener: (context, state) async {
-                          if (state.accuracy != null && triggerLocalization) {
-                            triggerLocalization = false;
-                            final router = context.router;
-                            // close the location capturing `dialog`
-                            DigitComponentsUtils().hideDialog(context);
+                      footer:  DigitCard(
+                          margin: const EdgeInsets.fromLTRB(0, kPadding, 0, 0),
+                          padding: const EdgeInsets.fromLTRB(
+                              kPadding, 0, kPadding, 0),
+                          child: DigitElevatedButton(
+                            onPressed: () async {
+                              final isValid =
+                                  checklistFormKey.currentState?.validate();
+                              if (!isValid!) {
+                                return;
+                              }
+                              final itemsAttributes = initialAttributes;
 
-                            // Wait for the location to be obtained
-                            final locationState =
-                                context.read<LocationBloc>().state;
-                            double? latitude = locationState.latitude;
-                            double? longitude = locationState.longitude;
+                              for (int i = 0; i < controller.length; i++) {
+                                if (itemsAttributes?[i].required == true &&
+                                    ((itemsAttributes?[i].dataType ==
+                                                'SingleValueList' &&
+                                            visibleChecklistIndexes
+                                                .any((e) => e == i) &&
+                                            (controller[i].text == '')) ||
+                                        (itemsAttributes?[i].dataType !=
+                                                'SingleValueList' &&
+                                            (controller[i].text == '' &&
+                                                !(context
+                                                        .isHealthFacilitySupervisor &&
+                                                    widget.referralClientRefId !=
+                                                        null))))) {
+                                  return;
+                                }
+                              }
+                              for (int i = 0; i < controller.length; i++) {
+                                initialAttributes;
+                                var attributeCode =
+                                    '${initialAttributes?[i].code}';
+                                var value = initialAttributes?[i].dataType !=
+                                        'SingleValueList'
+                                    ? controller[i]
+                                            .text
+                                            .toString()
+                                            .trim()
+                                            .isNotEmpty
+                                        ? controller[i].text.toString()
+                                        : (initialAttributes?[i].dataType !=
+                                                'Number'
+                                            ? ''
+                                            : '0')
+                                    : visibleChecklistIndexes.contains(i)
+                                        ? controller[i].text.toString()
+                                        : i18_local.checklist.notSelectedKey;
+                                responses[attributeCode] = value;
+                              }
+                              triggerLocalization = true;
+                            // final router = context.router;
 
                             List<String>? referralReasons = [];
                             List<String?> ineligibilityReasons = [];
@@ -238,6 +287,7 @@ class _EligibilityChecklistViewPage
                                         additionalFields:
                                             ServiceAttributesAdditionalFields(
                                           version: 1,
+                                          // TODO: This needs to be done after adding locationbloc
                                           fields: [
                                             AdditionalField(
                                               'latitude',
@@ -327,6 +377,7 @@ class _EligibilityChecklistViewPage
                                   ((ifDeliver || ifAdministration) ||
                                       ifIneligible ||
                                       ifReferral)) {
+                                        final router = context.router;
                                 if (ifIneligible) {
                                   // added the deliversubmitevent here
                                   final clientReferenceId = IdGen.i.identifier;
@@ -347,9 +398,9 @@ class _EligibilityChecklistViewPage
                                                     .millisecondsSinceEpoch(),
                                               ),
                                               projectId: context.projectId,
-                                              // status: Status
-                                              //     .beneficiaryInEligible
-                                              //     .toValue(),
+                                              status: status_local.Status
+                                                  .beneficiaryInEligible
+                                                  .toValue(),
                                               clientAuditDetails:
                                                   ClientAuditDetails(
                                                 createdBy:
@@ -403,95 +454,43 @@ class _EligibilityChecklistViewPage
                                         enableViewHousehold: true),
                                   );
                                 } else if (ifReferral) {
-                                  // router.push(
-                                  //   CustomReferBeneficiarySMCRoute(
-                                  //     projectBeneficiaryClientRefId:
-                                  //         projectBeneficiaryClientReferenceId ??
-                                  //             "",
-                                  //     individual: widget.individual!,
-                                  //     referralReasons: referralReasons,
-                                  //   ),
-                                  // );
+                                  router.push(
+                                    CustomReferBeneficiarySMCRoute(
+                                      projectBeneficiaryClientRefId:
+                                          projectBeneficiaryClientReferenceId ??
+                                              "",
+                                      individual: widget.individual!,
+                                      referralReasons: referralReasons,
+                                    ),
+                                  );
                                 } else {
                                   router.push(BeneficiaryDetailsRoute());
                                 }
                               }
-                            }
-                          }
-                        },
-                        child: DigitCard(
-                          margin: const EdgeInsets.fromLTRB(0, kPadding, 0, 0),
-                          padding: const EdgeInsets.fromLTRB(
-                              kPadding, 0, kPadding, 0),
-                          child: DigitElevatedButton(
-                            onPressed: () async {
+
                               final router = context.router;
                               submitTriggered = true;
 
-                              // context.read<ServiceBloc>().add(
-                              //       const ServiceChecklistEvent(
-                              //         value: '',
-                              //         submitTriggered: true,
-                              //       ),
-                              //     );
-                              final isValid =
-                                  checklistFormKey.currentState?.validate();
-                              if (!isValid!) {
-                                return;
-                              }
-                              final itemsAttributes = initialAttributes;
+                              context.read<ServiceBloc>().add(
+                                    const ServiceSurveyFormEvent(
+                                      value: '',
+                                      submitTriggered: true,
+                                    ),
+                                  );
 
-                              for (int i = 0; i < controller.length; i++) {
-                                if (itemsAttributes?[i].required == true &&
-                                    ((itemsAttributes?[i].dataType ==
-                                                'SingleValueList' &&
-                                            visibleChecklistIndexes
-                                                .any((e) => e == i) &&
-                                            (controller[i].text == '')) ||
-                                        (itemsAttributes?[i].dataType !=
-                                                'SingleValueList' &&
-                                            (controller[i].text == '' &&
-                                                !(context
-                                                        .isHealthFacilitySupervisor &&
-                                                    widget.referralClientRefId !=
-                                                        null))))) {
-                                  return;
-                                }
-                              }
-                              for (int i = 0; i < controller.length; i++) {
-                                initialAttributes;
-                                var attributeCode =
-                                    '${initialAttributes?[i].code}';
-                                var value = initialAttributes?[i].dataType !=
-                                        'SingleValueList'
-                                    ? controller[i]
-                                            .text
-                                            .toString()
-                                            .trim()
-                                            .isNotEmpty
-                                        ? controller[i].text.toString()
-                                        : (initialAttributes?[i].dataType !=
-                                                'Number'
-                                            ? ''
-                                            : '0')
-                                    : visibleChecklistIndexes.contains(i)
-                                        ? controller[i].text.toString()
-                                        : i18_local.checklist.notSelectedKey;
-                                responses[attributeCode] = value;
-                              }
-                              triggerLocalization = true;
 
                               // Request location from LocationBloc
-                              context
-                                  .read<LocationBloc>()
-                                  .add(const LocationEvent.load());
-                              DigitComponentsUtils()
-                                  .showLocationCapturingDialog(
-                                context,
-                                localizations.translate(
-                                    i18_local.common.locationCapturing),
-                                DigitSyncDialogType.inProgress,
-                              );
+                              // context
+                              //     .read<location.LocationBloc>()
+                              //     .add(const location.LocationEvent.load());
+                              // DigitComponentsUtils()
+                              //     .showLocationCapturingDialog(
+                              //   context,
+                              //   localizations.translate(
+                              //       i18_local.common.locationCapturing),
+                              //   DigitSyncDialogType.inProgress,
+                              // );
+                            }
                             },
                             child: Text(
                               localizations
@@ -499,7 +498,6 @@ class _EligibilityChecklistViewPage
                             ),
                           ),
                         ),
-                      ),
                       children: [
                         Form(
                           key: checklistFormKey, //assigning key to form
@@ -681,8 +679,9 @@ class _EligibilityChecklistViewPage
               },
             );
           },
-        ),
-      ),
+        );
+         }
+   ))
     );
   }
 
@@ -719,7 +718,7 @@ class _EligibilityChecklistViewPage
           Align(
             alignment: Alignment.topLeft,
             child: Padding(
-              padding: const EdgeInsets.all(16.0), // Add padding here
+              padding: const EdgeInsets.all(4.0), // Add padding here
               child: Text(
                 '${localizations.translate(
                   '${selectedServiceDefinition?.code}.${item.code}',
@@ -933,20 +932,43 @@ class _EligibilityChecklistViewPage
     bool ifAdministration,
   ) {
     var isIneligible = false;
-    var q4Key = "SEA3";
+    var q3Key = "KBEA3";
+    var q5Key = "KBEA4";
     Map<String, String> keyVsReason = {
-      q4Key: "CHILD_ON_MEDICATION_1",
+      q3Key: "NOT_ADMINISTERED_IN_PREVIOUS_CYCLE",
+      q5Key: "CHILD_ON_MEDICATION_1",
     };
+    final individualModel = widget.individual;
 
     if (responses.isNotEmpty) {
+      if (responses.containsKey(q3Key) && responses[q3Key]!.isNotEmpty) {
+        isIneligible = responses[q3Key] == yes ? true : false;
+        if (individualModel != null && isIneligible) {
+          // added a try catch as a fallback
+          try {
+            final dateOfBirth = DateFormat("dd/MM/yyyy")
+                .parse(individualModel.dateOfBirth ?? '');
+            final age = DigitDateUtils.calculateAge(dateOfBirth);
+            final ageInMonths = getAgeMonths(age);
+            isIneligible = !(ageInMonths < 60);
+            if (!isIneligible) {
+              ifAdministration = true;
+            }
+          } catch (error) {
+            // if any error in parsing , will use fallback case
+            isIneligible = false;
+            ifAdministration = true;
+          }
+        }
+      }
       if (!isIneligible &&
-          (responses.containsKey(q4Key) && responses[q4Key]!.isNotEmpty)) {
-        isIneligible = responses[q4Key] == yes ? true : false;
+          (responses.containsKey(q5Key) && responses[q5Key]!.isNotEmpty)) {
+        isIneligible = responses[q5Key] == yes ? true : false;
       }
       // passing all the reasons which have response as true
       if (isIneligible) {
         for (var entry in responses.entries) {
-          if (entry.key == q4Key) {
+          if (entry.key == q3Key || entry.key == q5Key) {
             entry.value == yes
                 ? ineligibilityReasons.add(keyVsReason[entry.key])
                 : null;
@@ -958,18 +980,21 @@ class _EligibilityChecklistViewPage
     return [isIneligible, ifAdministration];
   }
 
+
   bool isReferral(
     Map<String?, String> responses,
     List<String?> referralReasons,
   ) {
     var isReferral = false;
-    var q1Key = "SEA1";
-    var q2Key = "SEA1.YES.ADT1";
-    var q3Key = "SEA2";
+    var q1Key = "KBEA1";
+    var q2Key = "KBEA2";
+    var q4Key = "KBEA3.NO.ADT1";
+    // var q3Key = "KBEA3";
     Map<String, String> referralKeysVsCode = {
       q1Key: "SICK",
       q2Key: "FEVER",
-      q3Key: "DRUG_SE_PC",
+      q4Key: "DRUG_SE_PC",
+      // q3Key: "DRUG_SE_PC",
     };
     // TODO Configure the reasons ,verify hardcoded strings
 
@@ -982,8 +1007,8 @@ class _EligibilityChecklistViewPage
         isReferral = responses[q2Key] == yes ? true : false;
       }
       if (!isReferral &&
-          (responses.containsKey(q3Key) && responses[q3Key]!.isNotEmpty)) {
-        isReferral = responses[q3Key] == yes ? true : false;
+          (responses.containsKey(q4Key) && responses[q4Key]!.isNotEmpty)) {
+        isReferral = responses[q4Key] == yes ? true : false;
       }
     }
     if (isReferral) {

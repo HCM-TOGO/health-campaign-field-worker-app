@@ -1,24 +1,31 @@
 library app_utils;
 
-import 'package:referral_reconciliation/referral_reconciliation.dart'
-    as referral_reconciliation_mappers;
+import 'package:collection/collection.dart';
+import 'package:digit_components/utils/date_utils.dart';
+import 'package:digit_data_model/models/entities/individual.dart';
+import 'package:registration_delivery/models/entities/additional_fields_type.dart';
+import 'package:registration_delivery/models/entities/household.dart';
+import 'package:survey_form/survey_form.init.dart' as surveyForm_mappers;
+// import 'package:complaints/complaints.init.dart' as complaints_mappers;
 
 import 'dart:convert';
 
 import 'package:crypto/crypto.dart';
 import 'package:device_info_plus/device_info_plus.dart';
 import 'package:flutter/foundation.dart';
-import 'package:registration_delivery/registration_delivery.init.dart'
-    as registration_delivery_mappers;
-
 import 'package:inventory_management/inventory_management.init.dart'
     as inventory_mappers;
+
+import 'package:registration_delivery/registration_delivery.init.dart'
+    as registration_delivery_mappers;
 
 import 'dart:async';
 import 'dart:io';
 
 import 'package:attendance_management/attendance_management.dart'
     as attendance_mappers;
+import 'package:survey_form/survey_form.dart' as surveyForm_mappers;
+// import 'package:complaints/complaints.dart' as complaints_mappers;
 import 'package:connectivity_plus/connectivity_plus.dart';
 import 'package:digit_data_model/data_model.dart' as data_model;
 import 'package:digit_data_model/data_model.init.dart' as data_model_mappers;
@@ -93,6 +100,11 @@ setBgRunning(bool isBgRunning) async {
   await localSecureStore.setBackgroundService(isBgRunning);
 }
 
+int getAgeMonths(DigitDOBAge age) {
+  return (age.years * 12) + age.months;
+}
+
+
 performBackgroundService({
   BuildContext? context,
   required bool stopService,
@@ -131,6 +143,89 @@ performBackgroundService({
     }
   }
 }
+
+
+int getUnderFiveChildCount(HouseholdModel? householdCaptured) {
+  final additionalFields = householdCaptured?.additionalFields?.fields;
+  if (additionalFields == null || additionalFields.isEmpty) {
+    return 0;
+  }
+
+  final underFiveChildEntry = additionalFields
+      .where(
+        (e) => e.key == AdditionalFieldsType.children.toValue(),
+      )
+      .firstOrNull;
+
+  if (underFiveChildEntry == null) {
+    return 0;
+  }
+
+  final value = underFiveChildEntry.value;
+
+  if (value == null) {
+    return 0;
+  } else if (value is int) {
+    return value;
+  } else if (value is String) {
+    return int.tryParse(value) ?? 0;
+  } else if (value is double) {
+    return value.toInt();
+  } else {
+    // Any other unexpected type
+    return 0;
+  }
+}
+
+int getPregnantWomenCount(HouseholdModel? householdCaptured) {
+  final additionalFields = householdCaptured?.additionalFields?.fields;
+
+  if (additionalFields == null || additionalFields.isEmpty) {
+    return 0;
+  }
+
+  final pregnantWomenEntry = additionalFields
+      .where(
+        (e) => e.key == AdditionalFieldsType.pregnantWomen.toValue(),
+      )
+      .firstOrNull;
+
+  if (pregnantWomenEntry == null) {
+    return 0;
+  }
+
+  final value = pregnantWomenEntry.value;
+
+  if (value == null) {
+    return 0;
+  } else if (value is int) {
+    return value;
+  } else if (value is String) {
+    return int.tryParse(value) ?? 0;
+  } else if (value is double) {
+    return value.toInt();
+  } else {
+    return 0;
+  }
+}
+
+Map<String, dynamic>? customValidMobileNumber(
+  AbstractControl<dynamic> control,
+) {
+  if (control.value == null || control.value.toString().isEmpty) {
+    return null; // Optional field
+  }
+
+  const pattern = r'^\d{11}$'; // Exactly 11 digits
+
+  if (RegExp(pattern).hasMatch(control.value.toString())) {
+    return null; // Valid
+  }
+
+  return {'mobileNumber': true}; // Invalid
+}
+
+
 
 String maskString(String input) {
   // Define the character to use for masking (e.g., "*")
@@ -475,9 +570,10 @@ initializeAllMappers() async {
     Future(() => attendance_mappers.initializeMappers()),
     Future(() => data_model_mappers.initializeMappers()),
     Future(() => dss_mappers.initializeMappers()),
-    Future(() => inventory_mappers.initializeMappers()),
     Future(() => registration_delivery_mappers.initializeMappers()),
-    Future(() => referral_reconciliation_mappers.initializeMappers()),
+    Future(() => inventory_mappers.initializeMappers()),
+    Future(() => surveyForm_mappers.initializeMappers()),
+    // Future(() => complaints_mappers.initializeMappers()),
   ];
   await Future.wait(initializations);
 }

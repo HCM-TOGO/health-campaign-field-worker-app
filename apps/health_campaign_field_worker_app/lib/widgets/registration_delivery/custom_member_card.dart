@@ -385,7 +385,7 @@ class CustomMemberCard extends StatelessWidget {
                                               options: DigitDialogOptions(
                                                 titleText:
                                                     localizations.translate(
-                                                  i18.beneficiaryDetails
+                                                  i18_local.beneficiaryDetails
                                                       .insufficientStockHeading,
                                                 ),
                                                 titleIcon: Icon(
@@ -395,10 +395,10 @@ class CustomMemberCard extends StatelessWidget {
                                                 ),
                                                 contentText:
                                                     "${localizations.translate(
-                                                  i18.beneficiaryDetails
+                                                  i18_local.beneficiaryDetails
                                                       .insufficientAZTStockMessageDelivery,
                                                 )}=$spaq1${localizations.translate(
-                                                  i18.beneficiaryDetails
+                                                  i18_local.beneficiaryDetails
                                                       .beneficiaryDoseUnit,
                                                 )}",
                                                 primaryAction:

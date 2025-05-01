@@ -749,7 +749,7 @@ class _RecordRedosePageState extends LocalizedState<RecordRedosePage> {
               Validators.required,
             ],
             value:
-                "${productVariants[0].quantity ?? 0} ${localizations.translate(i18.beneficiaryDetails.beneficiaryDoseUnit)}",
+                "${productVariants[0].quantity ?? 0} ${localizations.translate(i18_local.beneficiaryDetails.beneficiaryDoseUnit)}",
             // value: productVariants[0].quantity ?? 0,
           ),
         ),
