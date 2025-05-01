@@ -14,7 +14,7 @@ import 'package:digit_ui_components/widgets/molecules/digit_card.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_keyboard_visibility/flutter_keyboard_visibility.dart';
-import 'package:registration_delivery/blocs/beneficiary_registration/beneficiary_registration.dart';
+import 'package:health_campaign_field_worker_app/blocs/registration_delivery/custom_beneficairy_registration.dart';
 import 'package:registration_delivery/blocs/search_households/search_bloc_common_wrapper.dart';
 import 'package:registration_delivery/blocs/search_households/search_households.dart'
     as registration_delivery;
@@ -389,7 +389,7 @@ class _CustomSearchBeneficiaryPageState
                                         const SearchHouseholdsClearEvent(),
                                       );
                                       await context.router.push(
-                                        BeneficiaryRegistrationWrapperRoute(
+                                        CustomBeneficiaryRegistrationWrapperRoute(
                                           initialState: BeneficiaryRegistrationState.editHousehold(
                                               householdModel: householdMemberWrapper
                                                   .household!,
@@ -476,7 +476,8 @@ class _CustomSearchBeneficiaryPageState
                         context.read<DigitScannerBloc>().add(
                               const DigitScannerEvent.handleScanner(),
                             );
-                        context.router.push(BeneficiaryRegistrationWrapperRoute(
+                        context.router
+                            .push(CustomBeneficiaryRegistrationWrapperRoute(
                           initialState: BeneficiaryRegistrationCreateState(
                             searchQuery: searchHouseholdsState.searchQuery,
                           ),

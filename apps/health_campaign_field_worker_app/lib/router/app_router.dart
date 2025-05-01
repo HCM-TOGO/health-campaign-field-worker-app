@@ -1,3 +1,4 @@
+import 'package:health_campaign_field_worker_app/blocs/registration_delivery/custom_beneficairy_registration.dart';
 import 'package:referral_reconciliation/router/referral_reconciliation_router.gm.dart';
 import 'package:referral_reconciliation/router/referral_reconciliation_router.dart';
 import 'package:registration_delivery/blocs/app_localization.dart';
@@ -37,6 +38,7 @@ import '../pages/project_selection.dart';
 import '../pages/qr_details_page.dart';
 import '../pages/registration_delivery/caregiver_consent.dart';
 import '../pages/registration_delivery/custom_beneficiary_acknowledgement.dart';
+import '../pages/registration_delivery/custom_beneficiary_registration_wrapper.dart';
 import '../pages/registration_delivery/custom_household_details.dart';
 import '../pages/registration_delivery/custom_household_location.dart';
 import '../pages/registration_delivery/custom_household_overview.dart';
@@ -143,8 +145,8 @@ class AppRouter extends _$AppRouter {
 
               /// Beneficiary Registration
               AutoRoute(
-                page: BeneficiaryRegistrationWrapperRoute.page,
-                path: 'beneficiary-registration',
+                page: CustomBeneficiaryRegistrationWrapperRoute.page,
+                path: 'custom-beneficiary-registration',
                 children: [
                   // AutoRoute(
                   //   page: HouseholdLocationRoute.page,

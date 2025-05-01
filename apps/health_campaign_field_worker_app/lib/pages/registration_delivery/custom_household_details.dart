@@ -15,7 +15,6 @@ import 'package:registration_delivery/blocs/search_households/search_households.
 import 'package:registration_delivery/models/entities/additional_fields_type.dart';
 import 'package:registration_delivery/utils/extensions/extensions.dart';
 
-import 'package:registration_delivery/blocs/beneficiary_registration/beneficiary_registration.dart';
 import 'package:registration_delivery/models/entities/household.dart';
 import 'package:registration_delivery/router/registration_delivery_router.gm.dart';
 import 'package:registration_delivery/utils/constants.dart';
@@ -26,6 +25,7 @@ import 'package:registration_delivery/widgets/localized.dart';
 import 'package:registration_delivery/widgets/showcase/config/showcase_constants.dart';
 import 'package:registration_delivery/widgets/showcase/showcase_button.dart';
 
+import '../../blocs/registration_delivery/custom_beneficairy_registration.dart';
 import '../../router/app_router.dart';
 
 @RoutePage()
@@ -64,7 +64,7 @@ class CustomHouseHoldDetailsPageState
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
-    final bloc = context.read<BeneficiaryRegistrationBloc>();
+    final bloc = context.read<CustomBeneficiaryRegistrationBloc>();
     final router = context.router;
     final textTheme = theme.digitTextTheme(context);
     final bool isCommunity = RegistrationDeliverySingleton().householdType ==
@@ -78,7 +78,7 @@ class CustomHouseHoldDetailsPageState
             _memberController.text =
                 form.control(_memberCountKey).value.toString();
           }
-          return BlocConsumer<BeneficiaryRegistrationBloc,
+          return BlocConsumer<CustomBeneficiaryRegistrationBloc,
               BeneficiaryRegistrationState>(
             listener: (context, state) {
               if (state is BeneficiaryRegistrationPersistedState &&

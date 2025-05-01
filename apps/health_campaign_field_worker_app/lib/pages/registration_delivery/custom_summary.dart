@@ -15,12 +15,12 @@ import 'package:registration_delivery/widgets/showcase/showcase_button.dart';
 
 import 'package:registration_delivery/widgets/localized.dart';
 import 'package:registration_delivery/utils/i18_key_constants.dart' as i18;
-import 'package:registration_delivery/blocs/beneficiary_registration/beneficiary_registration.dart';
 import 'package:registration_delivery/blocs/search_households/search_bloc_common_wrapper.dart';
 import 'package:registration_delivery/blocs/search_households/search_households.dart';
 import 'package:registration_delivery/utils/constants.dart';
 import 'package:registration_delivery/utils/utils.dart';
 
+import '../../blocs/registration_delivery/custom_beneficairy_registration.dart';
 import '../../router/app_router.dart';
 import 'custom_beneficiary_acknowledgement.dart';
 
@@ -49,7 +49,7 @@ class CustomSummaryPageState extends LocalizedState<CustomSummaryPage> {
 
     return PopScope(
       onPopInvoked: (val) {
-        context.read<BeneficiaryRegistrationBloc>().add(
+        context.read<CustomBeneficiaryRegistrationBloc>().add(
               BeneficiaryRegistrationCreateEvent(
                 projectId: RegistrationDeliverySingleton().projectId!,
                 userUuid: RegistrationDeliverySingleton().loggedInUserUuid!,
@@ -58,7 +58,7 @@ class CustomSummaryPageState extends LocalizedState<CustomSummaryPage> {
             );
       },
       child: Scaffold(
-          body: BlocConsumer<BeneficiaryRegistrationBloc,
+          body: BlocConsumer<CustomBeneficiaryRegistrationBloc,
               BeneficiaryRegistrationState>(
         listener: (context, householdState) {
           final router = context.router;
@@ -127,8 +127,8 @@ class CustomSummaryPageState extends LocalizedState<CustomSummaryPage> {
                           mainAxisSize: MainAxisSize.max,
                           isDisabled: isClicked ? true : false,
                           onPressed: () async {
-                            final bloc =
-                                context.read<BeneficiaryRegistrationBloc>();
+                            final bloc = context
+                                .read<CustomBeneficiaryRegistrationBloc>();
                             final userId = RegistrationDeliverySingleton()
                                 .loggedInUserUuid;
                             final projectId =

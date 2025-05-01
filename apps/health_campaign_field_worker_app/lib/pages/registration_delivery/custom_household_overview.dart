@@ -17,10 +17,10 @@ import 'package:digit_ui_components/widgets/molecules/show_pop_up.dart';
 import 'package:digit_ui_components/widgets/scrollable_content.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:health_campaign_field_worker_app/blocs/registration_delivery/custom_beneficairy_registration.dart';
 import 'package:survey_form/survey_form.dart';
 
 import 'package:registration_delivery/widgets/status_filter/status_filter.dart';
-import 'package:registration_delivery/blocs/beneficiary_registration/beneficiary_registration.dart';
 import 'package:registration_delivery/blocs/delivery_intervention/deliver_intervention.dart';
 import 'package:registration_delivery/blocs/household_overview/household_overview.dart';
 import 'package:registration_delivery/blocs/search_households/search_bloc_common_wrapper.dart';
@@ -419,7 +419,7 @@ class _CustomHouseholdOverviewPageState
                                                           await context
                                                               .router.root
                                                               .push(
-                                                            BeneficiaryRegistrationWrapperRoute(
+                                                            CustomBeneficiaryRegistrationWrapperRoute(
                                                               initialState:
                                                                   BeneficiaryRegistrationEditHouseholdState(
                                                                 addressModel:
@@ -817,7 +817,7 @@ class _CustomHouseholdOverviewPageState
                                               );
 
                                               await context.router.root.push(
-                                                BeneficiaryRegistrationWrapperRoute(
+                                                CustomBeneficiaryRegistrationWrapperRoute(
                                                   initialState:
                                                       BeneficiaryRegistrationEditIndividualState(
                                                     individualModel: e,
@@ -1012,7 +1012,7 @@ class _CustomHouseholdOverviewPageState
                                   mainAxisSize: MainAxisSize.max,
                                   onPressed: () => addIndividual(
                                     context,
-                                    state.householdMemberWrapper.household!,
+                                    state.householdMemberWrapper.household,
                                   ),
                                   label: localizations.translate(
                                     i18.householdOverView
@@ -1033,10 +1033,10 @@ class _CustomHouseholdOverviewPageState
     );
   }
 
-  addIndividual(BuildContext context, HouseholdModel household) async {
+  addIndividual(BuildContext context, HouseholdModel? household) async {
     final bloc = context.read<HouseholdOverviewBloc>();
 
-    final address = household.address;
+    final address = household?.address;
 
     if (address == null) return;
     bloc.add(
@@ -1046,11 +1046,11 @@ class _CustomHouseholdOverviewPageState
             RegistrationDeliverySingleton().beneficiaryType!,
       ),
     );
-    await context.router.push(
-      BeneficiaryRegistrationWrapperRoute(
+    await context.router.popAndPush(
+      CustomBeneficiaryRegistrationWrapperRoute(
         initialState: BeneficiaryRegistrationAddMemberState(
           addressModel: address,
-          householdModel: household,
+          householdModel: household!,
         ),
         children: [
           CustomIndividualDetailsRoute(),

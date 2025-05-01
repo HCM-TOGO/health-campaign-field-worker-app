@@ -79,6 +79,18 @@ abstract class _$AppRouter extends RootStackRouter {
         ),
       );
     },
+    CustomBeneficiaryRegistrationWrapperRoute.name: (routeData) {
+      final args =
+          routeData.argsAs<CustomBeneficiaryRegistrationWrapperRouteArgs>();
+      return AutoRoutePage<dynamic>(
+        routeData: routeData,
+        child: WrappedRoute(
+            child: CustomBeneficiaryRegistrationWrapperPage(
+          key: args.key,
+          initialState: args.initialState,
+        )),
+      );
+    },
     CustomFacilitySelectionSMCRoute.name: (routeData) {
       final args = routeData.argsAs<CustomFacilitySelectionSMCRouteArgs>();
       return AutoRoutePage<dynamic>(
@@ -605,6 +617,45 @@ class CustomBeneficiaryAcknowledgementRouteArgs {
   @override
   String toString() {
     return 'CustomBeneficiaryAcknowledgementRouteArgs{key: $key, appLocalizations: $appLocalizations, acknowledgementType: $acknowledgementType, enableViewHousehold: $enableViewHousehold}';
+  }
+}
+
+/// generated route for
+/// [CustomBeneficiaryRegistrationWrapperPage]
+class CustomBeneficiaryRegistrationWrapperRoute
+    extends PageRouteInfo<CustomBeneficiaryRegistrationWrapperRouteArgs> {
+  CustomBeneficiaryRegistrationWrapperRoute({
+    Key? key,
+    required BeneficiaryRegistrationState initialState,
+    List<PageRouteInfo>? children,
+  }) : super(
+          CustomBeneficiaryRegistrationWrapperRoute.name,
+          args: CustomBeneficiaryRegistrationWrapperRouteArgs(
+            key: key,
+            initialState: initialState,
+          ),
+          initialChildren: children,
+        );
+
+  static const String name = 'CustomBeneficiaryRegistrationWrapperRoute';
+
+  static const PageInfo<CustomBeneficiaryRegistrationWrapperRouteArgs> page =
+      PageInfo<CustomBeneficiaryRegistrationWrapperRouteArgs>(name);
+}
+
+class CustomBeneficiaryRegistrationWrapperRouteArgs {
+  const CustomBeneficiaryRegistrationWrapperRouteArgs({
+    this.key,
+    required this.initialState,
+  });
+
+  final Key? key;
+
+  final BeneficiaryRegistrationState initialState;
+
+  @override
+  String toString() {
+    return 'CustomBeneficiaryRegistrationWrapperRouteArgs{key: $key, initialState: $initialState}';
   }
 }
 
