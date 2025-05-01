@@ -72,7 +72,7 @@ class CustomMemberCard extends StatelessWidget {
 
   Widget statusWidget(context) {
     final theme = Theme.of(context);
-    if (isSMCDelivered && isVASDelivered) {
+    if (isSMCDelivered || isVASDelivered) {
       return Column(
         children: [
           if (isSMCDelivered)
@@ -373,7 +373,7 @@ class CustomMemberCard extends StatelessWidget {
                                                 .resources!.first.quantity!,
                                           ).round();
 
-                                          if (spaq1 >= doseCount) {
+                                          if (true || spaq1 >= doseCount) {
                                             context.router.push(
                                               RecordRedoseRoute(
                                                 tasks: [successfulTask!],
