@@ -1,6 +1,7 @@
 library app_utils;
 
 import 'package:collection/collection.dart';
+import 'package:digit_components/utils/date_utils.dart';
 import 'package:digit_data_model/models/entities/individual.dart';
 import 'package:registration_delivery/models/entities/additional_fields_type.dart';
 import 'package:registration_delivery/models/entities/household.dart';
@@ -98,6 +99,11 @@ setBgRunning(bool isBgRunning) async {
   final localSecureStore = LocalSecureStore.instance;
   await localSecureStore.setBackgroundService(isBgRunning);
 }
+
+int getAgeMonths(DigitDOBAge age) {
+  return (age.years * 12) + age.months;
+}
+
 
 performBackgroundService({
   BuildContext? context,
