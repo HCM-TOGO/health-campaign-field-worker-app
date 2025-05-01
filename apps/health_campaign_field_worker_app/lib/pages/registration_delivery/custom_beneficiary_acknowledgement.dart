@@ -1,20 +1,16 @@
 import 'package:auto_route/auto_route.dart';
 import 'package:collection/collection.dart';
 import 'package:digit_ui_components/digit_components.dart';
-import 'package:digit_ui_components/widgets/molecules/panel_cards.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:registration_delivery/blocs/beneficiary_registration/beneficiary_registration.dart';
-import 'package:registration_delivery/blocs/household_overview/household_overview.dart';
 import 'package:registration_delivery/blocs/search_households/search_households.dart'
     as registration_delivery;
 
 import 'package:registration_delivery/utils/i18_key_constants.dart' as i18;
-import 'package:registration_delivery/utils/utils.dart';
 import 'package:registration_delivery/widgets/localized.dart';
-import 'package:registration_delivery/blocs/search_households/search_bloc_common_wrapper.dart';
 import 'package:registration_delivery/router/registration_delivery_router.gm.dart';
 
+import '../../blocs/registration_delivery/custom_beneficairy_registration.dart';
 import '../../blocs/registration_delivery/custom_search_household.dart';
 import '../../models/entities/identifier_types.dart';
 import '../../widgets/digit_ui_component/custom_panel_card.dart';
@@ -47,11 +43,20 @@ class CustomBeneficiaryAcknowledgementPageState
   }
 
   Map<String, String>? subtitleMap(
-      registration_delivery.HouseholdMemberWrapper? householdMember) {
+      registration_delivery.HouseholdMemberWrapper? householdMember,
+      String? householdId) {
     String? beneficiaryId = householdMember?.members?.lastOrNull?.identifiers
         ?.lastWhereOrNull((e) =>
             e.identifierType == IdentifierTypes.uniqueBeneficiaryID.toValue())
         ?.identifierId;
+    if (widget.acknowledgementType == AcknowledgementType.addHousehold) {
+      return householdId == null
+          ? null
+          : {
+              'id': i18_local.beneficiaryDetails.householdId,
+              'value': householdId,
+            };
+    }
     return beneficiaryId == null
         ? null
         : {
@@ -89,38 +94,44 @@ class CustomBeneficiaryAcknowledgementPageState
               );
             }
 
-            return CustomPanelCard(
-              type: PanelType.success,
-              title: localizations.translate(
-                  i18.acknowledgementSuccess.acknowledgementLabelText),
-              subTitle: subtitleMap(householdMemberWrapper),
-              actions: [
-                if (householdMemberWrapper != null)
-                  DigitButton(
-                      label: localizations.translate(
-                        i18.householdDetails.viewHouseHoldDetailsAction,
-                      ),
-                      onPressed: () {
-                        context.router.popAndPush(
-                          BeneficiaryWrapperRoute(
-                            wrapper: householdMemberWrapper!,
+            return BlocBuilder<CustomBeneficiaryRegistrationBloc,
+                BeneficiaryRegistrationState>(
+              builder: (context, state) {
+                return CustomPanelCard(
+                  type: PanelType.success,
+                  title: localizations.translate(
+                      i18.acknowledgementSuccess.acknowledgementLabelText),
+                  subTitle: subtitleMap(householdMemberWrapper,
+                      state.householdModel?.clientReferenceId),
+                  actions: [
+                    if (householdMemberWrapper != null)
+                      DigitButton(
+                          label: localizations.translate(
+                            i18.householdDetails.viewHouseHoldDetailsAction,
                           ),
-                        );
-                      },
-                      type: DigitButtonType.primary,
-                      size: DigitButtonSize.large),
-                DigitButton(
-                    label: localizations
-                        .translate(i18.acknowledgementSuccess.actionLabelText),
-                    onPressed: () {
-                      context.router.maybePop();
-                    },
-                    type: DigitButtonType.secondary,
-                    size: DigitButtonSize.large),
-              ],
-              description: localizations.translate(
-                i18.acknowledgementSuccess.acknowledgementDescriptionText,
-              ),
+                          onPressed: () {
+                            context.router.popAndPush(
+                              BeneficiaryWrapperRoute(
+                                wrapper: householdMemberWrapper!,
+                              ),
+                            );
+                          },
+                          type: DigitButtonType.primary,
+                          size: DigitButtonSize.large),
+                    DigitButton(
+                        label: localizations.translate(
+                            i18.acknowledgementSuccess.actionLabelText),
+                        onPressed: () {
+                          context.router.maybePop();
+                        },
+                        type: DigitButtonType.secondary,
+                        size: DigitButtonSize.large),
+                  ],
+                  description: localizations.translate(
+                    i18.acknowledgementSuccess.acknowledgementDescriptionText,
+                  ),
+                );
+              },
             );
           },
         ),
