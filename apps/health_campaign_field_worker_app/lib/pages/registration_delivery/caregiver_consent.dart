@@ -1,4 +1,5 @@
 import 'package:auto_route/auto_route.dart';
+import 'package:digit_data_model/data_model.dart';
 import 'package:digit_data_model/models/entities/household_type.dart';
 import 'package:digit_ui_components/digit_components.dart';
 import 'package:digit_ui_components/models/RadioButtonModel.dart';
@@ -12,6 +13,7 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:reactive_forms/reactive_forms.dart';
 
 import 'package:registration_delivery/blocs/beneficiary_registration/beneficiary_registration.dart';
+import 'package:registration_delivery/models/entities/household.dart';
 import 'package:registration_delivery/router/registration_delivery_router.gm.dart';
 import 'package:registration_delivery/utils/i18_key_constants.dart' as i18;
 import 'package:registration_delivery/utils/utils.dart';
@@ -21,7 +23,10 @@ import 'package:registration_delivery/widgets/showcase/config/showcase_constants
 import 'package:registration_delivery/widgets/showcase/showcase_button.dart';
 
 import '../../router/app_router.dart';
+import '../../utils/environment_config.dart';
+import '../../utils/extensions/extensions.dart';
 import '../../utils/i18_key_constants.dart' as i18_local;
+import 'custom_beneficiary_acknowledgement.dart';
 
 enum CaregiverConsentEnum {
   yes,
@@ -46,6 +51,7 @@ class CaregiverConsentPageState extends LocalizedState<CaregiverConsentPage> {
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
     final textTheme = theme.digitTextTheme(context);
+    final bloc = context.read<BeneficiaryRegistrationBloc>();
     final router = context.router;
     final bool isCommunity = RegistrationDeliverySingleton().householdType ==
         HouseholdType.community;
@@ -72,9 +78,8 @@ class CaregiverConsentPageState extends LocalizedState<CaregiverConsentPage> {
             BlocBuilder<LocationBloc, LocationState>(
               builder: (context, locationState) {
                 return DigitButton(
-                  label: localizations.translate(
-                    i18.householdLocation.actionLabel,
-                  ),
+                  label:
+                      localizations.translate(i18.householdDetails.actionLabel),
                   type: DigitButtonType.primary,
                   size: DigitButtonSize.large,
                   mainAxisSize: MainAxisSize.max,
@@ -82,7 +87,96 @@ class CaregiverConsentPageState extends LocalizedState<CaregiverConsentPage> {
                     if (selectedConsent == CaregiverConsentEnum.yes) {
                       router.push(CustomHouseHoldDetailsRoute());
                     } else {
-                      router.push(CustomHouseHoldDetailsRoute());
+                      registrationState.maybeWhen(orElse: () {
+                        return;
+                      }, create: (
+                        addressModel,
+                        householdModel,
+                        individualModel,
+                        projectBeneficiaryModel,
+                        registrationDate,
+                        searchQuery,
+                        loading,
+                        isHeadOfHousehold,
+                      ) {
+                        var household = householdModel;
+                        household ??= HouseholdModel(
+                          tenantId: RegistrationDeliverySingleton().tenantId,
+                          clientReferenceId:
+                              householdModel?.clientReferenceId ??
+                                  IdGen.i.identifier,
+                          rowVersion: 1,
+                          clientAuditDetails: ClientAuditDetails(
+                            createdBy: RegistrationDeliverySingleton()
+                                .loggedInUserUuid!,
+                            createdTime: context.millisecondsSinceEpoch(),
+                            lastModifiedBy: RegistrationDeliverySingleton()
+                                .loggedInUserUuid,
+                            lastModifiedTime: context.millisecondsSinceEpoch(),
+                          ),
+                          auditDetails: AuditDetails(
+                            createdBy: RegistrationDeliverySingleton()
+                                .loggedInUserUuid!,
+                            createdTime: context.millisecondsSinceEpoch(),
+                            lastModifiedBy: RegistrationDeliverySingleton()
+                                .loggedInUserUuid,
+                            lastModifiedTime: context.millisecondsSinceEpoch(),
+                          ),
+                        );
+
+                        household = household.copyWith(
+                            rowVersion: 1,
+                            tenantId: RegistrationDeliverySingleton().tenantId,
+                            clientReferenceId:
+                                householdModel?.clientReferenceId ??
+                                    IdGen.i.identifier,
+                            memberCount: 0,
+                            clientAuditDetails: ClientAuditDetails(
+                              createdBy: RegistrationDeliverySingleton()
+                                  .loggedInUserUuid
+                                  .toString(),
+                              createdTime: context.millisecondsSinceEpoch(),
+                              lastModifiedBy: RegistrationDeliverySingleton()
+                                  .loggedInUserUuid
+                                  .toString(),
+                              lastModifiedTime:
+                                  context.millisecondsSinceEpoch(),
+                            ),
+                            auditDetails: AuditDetails(
+                              createdBy: RegistrationDeliverySingleton()
+                                  .loggedInUserUuid
+                                  .toString(),
+                              createdTime: context.millisecondsSinceEpoch(),
+                              lastModifiedBy: RegistrationDeliverySingleton()
+                                  .loggedInUserUuid
+                                  .toString(),
+                              lastModifiedTime:
+                                  context.millisecondsSinceEpoch(),
+                            ),
+                            address: addressModel,
+                            additionalFields: HouseholdAdditionalFields(
+                                version: 1, fields: []));
+
+                        bloc.add(
+                          BeneficiaryRegistrationSaveHouseholdDetailsEvent(
+                            household: household,
+                            registrationDate: DateTime.now(),
+                          ),
+                        );
+                        context.router.push(
+                          CustomIndividualDetailsRoute(isHeadOfHousehold: true),
+                        );
+                        context.router.push(
+                            CustomBeneficiaryAcknowledgementRoute(
+                                acknowledgementType:
+                                    AcknowledgementType.addHousehold));
+                        // clear search on consent being no
+                        // final searchBloc =
+                        //     context.read<SearchHouseholdsBloc>();
+                        // searchBloc.add(
+                        //   const SearchHouseholdsClearEvent(),
+                        // );
+                      });
                     }
                   },
                 );
@@ -126,7 +220,7 @@ class CaregiverConsentPageState extends LocalizedState<CaregiverConsentPage> {
                           if (value.code == CaregiverConsentEnum.yes.name) {
                             selectedConsent = CaregiverConsentEnum.yes;
                           } else {
-                            selectedConsent = CaregiverConsentEnum.yes;
+                            selectedConsent = CaregiverConsentEnum.no;
                           }
                         },
                       );
