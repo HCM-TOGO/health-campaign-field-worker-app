@@ -136,53 +136,6 @@ class _CustomSearchBeneficiaryPageState
                                 mainAxisAlignment: MainAxisAlignment.start,
                                 crossAxisAlignment: CrossAxisAlignment.start,
                                 children: [
-                                  locationState.latitude != null
-                                      ? Padding(
-                                          padding:
-                                              const EdgeInsets.all(spacer2),
-                                          child: DigitSwitch(
-                                            mainAxisAlignment:
-                                                MainAxisAlignment.start,
-                                            label:
-                                                (RegistrationDeliverySingleton()
-                                                            .householdType ==
-                                                        HouseholdType.community)
-                                                    ? localizations.translate(
-                                                        i18.searchBeneficiary
-                                                            .communityProximityLabel,
-                                                      )
-                                                    : localizations.translate(
-                                                        i18.searchBeneficiary
-                                                            .proximityLabel,
-                                                      ),
-                                            value: isProximityEnabled,
-                                            onChanged: (value) {
-                                              searchController.clear();
-                                              setState(() {
-                                                isProximityEnabled = value;
-                                                lat = locationState.latitude!;
-                                                long = locationState.longitude!;
-                                              });
-
-                                              if (locationState
-                                                      .hasPermissions &&
-                                                  value &&
-                                                  locationState.latitude !=
-                                                      null &&
-                                                  locationState.longitude !=
-                                                      null &&
-                                                  RegistrationDeliverySingleton()
-                                                          .maxRadius !=
-                                                      null &&
-                                                  isProximityEnabled) {
-                                                triggerGlobalSearchEvent();
-                                              } else {
-                                                triggerGlobalSearchEvent();
-                                              }
-                                            },
-                                          ),
-                                        )
-                                      : const Offstage(),
                                   Padding(
                                     padding: const EdgeInsets.all(spacer2),
                                     child: DigitSearchBar(
@@ -231,6 +184,53 @@ class _CustomSearchBeneficiaryPageState
                                               onPressed: () =>
                                                   showFilterDialog(),
                                             ),
+                                          ),
+                                        )
+                                      : const Offstage(),
+                                  locationState.latitude != null
+                                      ? Padding(
+                                          padding:
+                                              const EdgeInsets.all(spacer2),
+                                          child: DigitSwitch(
+                                            mainAxisAlignment:
+                                                MainAxisAlignment.start,
+                                            label:
+                                                (RegistrationDeliverySingleton()
+                                                            .householdType ==
+                                                        HouseholdType.community)
+                                                    ? localizations.translate(
+                                                        i18.searchBeneficiary
+                                                            .communityProximityLabel,
+                                                      )
+                                                    : localizations.translate(
+                                                        i18.searchBeneficiary
+                                                            .proximityLabel,
+                                                      ),
+                                            value: isProximityEnabled,
+                                            onChanged: (value) {
+                                              searchController.clear();
+                                              setState(() {
+                                                isProximityEnabled = value;
+                                                lat = locationState.latitude!;
+                                                long = locationState.longitude!;
+                                              });
+
+                                              if (locationState
+                                                      .hasPermissions &&
+                                                  value &&
+                                                  locationState.latitude !=
+                                                      null &&
+                                                  locationState.longitude !=
+                                                      null &&
+                                                  RegistrationDeliverySingleton()
+                                                          .maxRadius !=
+                                                      null &&
+                                                  isProximityEnabled) {
+                                                triggerGlobalSearchEvent();
+                                              } else {
+                                                triggerGlobalSearchEvent();
+                                              }
+                                            },
                                           ),
                                         )
                                       : const Offstage(),
