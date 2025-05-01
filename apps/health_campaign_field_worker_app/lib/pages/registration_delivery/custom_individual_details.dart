@@ -167,28 +167,28 @@ class CustomIndividualDetailsPageState
           listener: (context, state) {
             state.mapOrNull(
               persisted: (value) async {
-                if (value.navigateToRoot) {
-                  // final overviewBloc = context.read<HouseholdOverviewBloc>();
+                // if (value.navigateToRoot) {
+                //   final overviewBloc = context.read<HouseholdOverviewBloc>();
 
-                  // overviewBloc.add(
-                  //   HouseholdOverviewReloadEvent(
-                  //     projectId:
-                  //         RegistrationDeliverySingleton().projectId.toString(),
-                  //     projectBeneficiaryType:
-                  //         RegistrationDeliverySingleton().beneficiaryType ??
-                  //             BeneficiaryType.household,
-                  //   ),
-                  // );
+                //   overviewBloc.add(
+                //     HouseholdOverviewReloadEvent(
+                //       projectId:
+                //           RegistrationDeliverySingleton().projectId.toString(),
+                //       projectBeneficiaryType:
+                //           RegistrationDeliverySingleton().beneficiaryType ??
+                //               BeneficiaryType.household,
+                //     ),
+                //   );
 
-                  // await overviewBloc.stream.firstWhere((element) =>
-                  //     element.loading == false &&
-                  //     element.householdMemberWrapper.household != null);
-                  // HouseholdMemberWrapper memberWrapper =
-                  //     overviewBloc.state.householdMemberWrapper;
-                  // final route = router.parent() as StackRouter;
-                  // route.popUntilRouteWithName(SearchBeneficiaryRoute.name);
-                  // route.push(BeneficiaryWrapperRoute(wrapper: memberWrapper));
-                }
+                //   await overviewBloc.stream.firstWhere((element) =>
+                //       element.loading == false &&
+                //       element.householdMemberWrapper.household != null);
+                //   HouseholdMemberWrapper memberWrapper =
+                //       overviewBloc.state.householdMemberWrapper;
+                //   final route = router.parent() as StackRouter;
+                //   route.popUntilRouteWithName(SearchBeneficiaryRoute.name);
+                //   route.push(BeneficiaryWrapperRoute(wrapper: memberWrapper));
+                // }
               },
             );
           },
@@ -518,6 +518,9 @@ class CustomIndividualDetailsPageState
                                             ? scannerBloc.state.qrCodes.first
                                             : null,
                                       ),
+                                    );
+                                    onSubmit(
+                                      individual.name?.givenName ?? "",
                                     );
                                   }
                                 }
