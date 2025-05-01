@@ -152,8 +152,11 @@ class HouseholdOverView {
   String get householdOverViewBeneficiaryRefusedLabel =>
       'HOUSEHOLD_OVER_VIEW_BENEFICIARY_REFUSED_LABEL';
 
-  String get householdOverViewAssessmentActionText =>
-      'HOUSEHOLD_OVER_VIEW_ASSESSMENT_ACTION_TEXT';
+  String get householdOverViewSMCAssessmentActionText =>
+      'HOUSEHOLD_OVER_VIEW_SMC_ASSESSMENT_ACTION_TEXT';
+
+  String get householdOverViewVASAssessmentActionText =>
+      'HOUSEHOLD_OVER_VIEW_VAS_ASSESSMENT_ACTION_TEXT';
 
   String get householdOverViewRedoseActionText =>
       'HOUSEHOLD_OVER_VIEW_REDOSE_ACTION_TEXT';
