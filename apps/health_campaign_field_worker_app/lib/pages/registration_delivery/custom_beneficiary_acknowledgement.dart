@@ -1,9 +1,11 @@
 import 'package:auto_route/auto_route.dart';
+import 'package:collection/collection.dart';
 import 'package:digit_ui_components/digit_components.dart';
 import 'package:digit_ui_components/widgets/molecules/panel_cards.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:registration_delivery/blocs/beneficiary_registration/beneficiary_registration.dart';
+import 'package:registration_delivery/blocs/household_overview/household_overview.dart';
 import 'package:registration_delivery/blocs/search_households/search_households.dart';
 
 import 'package:registration_delivery/utils/i18_key_constants.dart' as i18;
@@ -12,17 +14,21 @@ import 'package:registration_delivery/widgets/localized.dart';
 import 'package:registration_delivery/blocs/search_households/search_bloc_common_wrapper.dart';
 import 'package:registration_delivery/router/registration_delivery_router.gm.dart';
 
+import '../../models/entities/identifier_types.dart';
 import '../../widgets/digit_ui_component/custom_panel_card.dart';
+import '../../utils/i18_key_constants.dart' as i18_local;
+
+enum AcknowledgementType { addHousehold, addMember }
 
 @RoutePage()
 class CustomBeneficiaryAcknowledgementPage extends LocalizedStatefulWidget {
   final bool? enableViewHousehold;
-  final String beneficiaryId;
+  final AcknowledgementType acknowledgementType;
 
   const CustomBeneficiaryAcknowledgementPage({
     super.key,
     super.appLocalizations,
-    required this.beneficiaryId,
+    required this.acknowledgementType,
     this.enableViewHousehold,
   });
 
@@ -33,26 +39,46 @@ class CustomBeneficiaryAcknowledgementPage extends LocalizedStatefulWidget {
 
 class CustomBeneficiaryAcknowledgementPageState
     extends LocalizedState<CustomBeneficiaryAcknowledgementPage> {
+  late final HouseholdMemberWrapper? householdMember;
+
+  @override
+  void initState() {
+    super.initState();
+    final bloc = context.read<SearchBlocWrapper>();
+    final overviewBloc = context.read<HouseholdOverviewBloc>();
+    householdMember = bloc.state.householdMembers.isEmpty
+        ? overviewBloc.state.householdMemberWrapper
+        : bloc.state.householdMembers.lastOrNull;
+  }
+
+  Map<String, String>? subtitleMap(HouseholdMemberWrapper? householdMember) {
+    String? beneficiaryId = householdMember?.members?.lastOrNull?.identifiers
+        ?.lastWhereOrNull((e) =>
+            e.identifierType == IdentifierTypes.uniqueBeneficiaryID.toValue())
+        ?.identifierId;
+    return beneficiaryId == null
+        ? null
+        : {
+            'id': i18_local.beneficiaryDetails.beneficiaryId,
+            'value': beneficiaryId,
+          };
+  }
+
   @override
   Widget build(BuildContext context) {
     final bloc = context.read<SearchBlocWrapper>();
-    HouseholdMemberWrapper? householdMember =
-        bloc.state.householdMembers.firstOrNull;
     return Scaffold(
       body: Padding(
         padding: const EdgeInsets.all(spacer2),
         child: BlocConsumer<BeneficiaryRegistrationBloc,
             BeneficiaryRegistrationState>(
           listener: (context, householdState) {},
-          builder: (context, state) {
+          builder: (context, householdState) {
             return CustomPanelCard(
               type: PanelType.success,
               title: localizations.translate(
                   i18.acknowledgementSuccess.acknowledgementLabelText),
-              subTitle: {
-                'id': 'Beneficiary Id',
-                'value': widget.beneficiaryId,
-              },
+              subTitle: subtitleMap(householdMember),
               actions: [
                 if (householdMember != null)
                   DigitButton(
@@ -62,7 +88,7 @@ class CustomBeneficiaryAcknowledgementPageState
                       onPressed: () {
                         context.router.popAndPush(
                           BeneficiaryWrapperRoute(
-                            wrapper: householdMember,
+                            wrapper: householdMember!,
                           ),
                         );
                       },

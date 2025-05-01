@@ -22,6 +22,7 @@ import 'package:registration_delivery/utils/constants.dart';
 import 'package:registration_delivery/utils/utils.dart';
 
 import '../../router/app_router.dart';
+import 'custom_beneficiary_acknowledgement.dart';
 
 @RoutePage()
 class CustomSummaryPage extends LocalizedStatefulWidget {
@@ -77,9 +78,7 @@ class CustomSummaryPageState extends LocalizedState<CustomSummaryPage> {
                     );
                 router.push(CustomBeneficiaryAcknowledgementRoute(
                   enableViewHousehold: true,
-                  beneficiaryId: value.individualModel?.identifiers?.lastOrNull
-                          ?.identifierId ??
-                      "",
+                  acknowledgementType: AcknowledgementType.addHousehold,
                 ));
               }
             },

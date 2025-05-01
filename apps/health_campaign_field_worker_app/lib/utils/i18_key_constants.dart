@@ -1145,6 +1145,7 @@ class IndividualDetails {
 class BeneficiaryDetails {
   const BeneficiaryDetails();
 
+  String get beneficiaryId => 'BENEFICIARY_ID';
   String get backToHouseholdDetails => 'BACK_TO_HOUSEHOLD_DETAILS';
 
   String get beneficiarysDetailsLabelText => 'BENEFICIARY_DETAILS_LABEL_TEXT';

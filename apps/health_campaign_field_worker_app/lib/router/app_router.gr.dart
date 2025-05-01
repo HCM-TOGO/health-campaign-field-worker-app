@@ -74,7 +74,7 @@ abstract class _$AppRouter extends RootStackRouter {
         child: CustomBeneficiaryAcknowledgementPage(
           key: args.key,
           appLocalizations: args.appLocalizations,
-          beneficiaryId: args.beneficiaryId,
+          acknowledgementType: args.acknowledgementType,
           enableViewHousehold: args.enableViewHousehold,
         ),
       );
@@ -566,7 +566,7 @@ class CustomBeneficiaryAcknowledgementRoute
   CustomBeneficiaryAcknowledgementRoute({
     Key? key,
     RegistrationDeliveryLocalization? appLocalizations,
-    required String beneficiaryId,
+    required AcknowledgementType acknowledgementType,
     bool? enableViewHousehold,
     List<PageRouteInfo>? children,
   }) : super(
@@ -574,7 +574,7 @@ class CustomBeneficiaryAcknowledgementRoute
           args: CustomBeneficiaryAcknowledgementRouteArgs(
             key: key,
             appLocalizations: appLocalizations,
-            beneficiaryId: beneficiaryId,
+            acknowledgementType: acknowledgementType,
             enableViewHousehold: enableViewHousehold,
           ),
           initialChildren: children,
@@ -590,7 +590,7 @@ class CustomBeneficiaryAcknowledgementRouteArgs {
   const CustomBeneficiaryAcknowledgementRouteArgs({
     this.key,
     this.appLocalizations,
-    required this.beneficiaryId,
+    required this.acknowledgementType,
     this.enableViewHousehold,
   });
 
@@ -598,13 +598,13 @@ class CustomBeneficiaryAcknowledgementRouteArgs {
 
   final RegistrationDeliveryLocalization? appLocalizations;
 
-  final String beneficiaryId;
+  final AcknowledgementType acknowledgementType;
 
   final bool? enableViewHousehold;
 
   @override
   String toString() {
-    return 'CustomBeneficiaryAcknowledgementRouteArgs{key: $key, appLocalizations: $appLocalizations, beneficiaryId: $beneficiaryId, enableViewHousehold: $enableViewHousehold}';
+    return 'CustomBeneficiaryAcknowledgementRouteArgs{key: $key, appLocalizations: $appLocalizations, acknowledgementType: $acknowledgementType, enableViewHousehold: $enableViewHousehold}';
   }
 }
 
