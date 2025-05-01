@@ -12,7 +12,6 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:reactive_forms/reactive_forms.dart';
 
-import 'package:registration_delivery/blocs/beneficiary_registration/beneficiary_registration.dart';
 import 'package:registration_delivery/models/entities/household.dart';
 import 'package:registration_delivery/router/registration_delivery_router.gm.dart';
 import 'package:registration_delivery/utils/i18_key_constants.dart' as i18;
@@ -22,6 +21,7 @@ import 'package:registration_delivery/widgets/localized.dart';
 import 'package:registration_delivery/widgets/showcase/config/showcase_constants.dart';
 import 'package:registration_delivery/widgets/showcase/showcase_button.dart';
 
+import '../../blocs/registration_delivery/custom_beneficairy_registration.dart';
 import '../../router/app_router.dart';
 import '../../utils/environment_config.dart';
 import '../../utils/extensions/extensions.dart';
@@ -51,13 +51,13 @@ class CaregiverConsentPageState extends LocalizedState<CaregiverConsentPage> {
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
     final textTheme = theme.digitTextTheme(context);
-    final bloc = context.read<BeneficiaryRegistrationBloc>();
+    final bloc = context.read<CustomBeneficiaryRegistrationBloc>();
     final router = context.router;
     final bool isCommunity = RegistrationDeliverySingleton().householdType ==
         HouseholdType.community;
 
     return Scaffold(
-      body: BlocBuilder<BeneficiaryRegistrationBloc,
+      body: BlocBuilder<CustomBeneficiaryRegistrationBloc,
           BeneficiaryRegistrationState>(builder: (context, registrationState) {
         return ScrollableContent(
           enableFixedDigitButton: true,
@@ -154,28 +154,27 @@ class CaregiverConsentPageState extends LocalizedState<CaregiverConsentPage> {
                                   context.millisecondsSinceEpoch(),
                             ),
                             address: addressModel,
-                            additionalFields: HouseholdAdditionalFields(
-                                version: 1, fields: []));
+                            additionalFields:
+                                HouseholdAdditionalFields(version: 1, fields: [
+                              const AdditionalField(
+                                "caregiver_consent",
+                                false,
+                              ),
+                            ]));
 
                         bloc.add(
-                          BeneficiaryRegistrationSaveHouseholdDetailsEvent(
+                          BeneficiaryRegistrationCreateHouseholdEvent(
                             household: household,
                             registrationDate: DateTime.now(),
+                            boundary: RegistrationDeliverySingleton().boundary!,
                           ),
                         );
-                        context.router.push(
-                          CustomIndividualDetailsRoute(isHeadOfHousehold: true),
-                        );
+                        router.popUntil((route) =>
+                            route.settings.name == SearchBeneficiaryRoute.name);
                         context.router.push(
                             CustomBeneficiaryAcknowledgementRoute(
                                 acknowledgementType:
                                     AcknowledgementType.addHousehold));
-                        // clear search on consent being no
-                        // final searchBloc =
-                        //     context.read<SearchHouseholdsBloc>();
-                        // searchBloc.add(
-                        //   const SearchHouseholdsClearEvent(),
-                        // );
                       });
                     }
                   },
