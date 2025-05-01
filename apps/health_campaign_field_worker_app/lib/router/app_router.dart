@@ -123,6 +123,7 @@ class AppRouter extends _$AppRouter {
           page: SearchReferralReconciliationsRoute.page,
           path: 'search-referrals',
         ),
+
         AutoRoute(
             page: CustomRegistrationDeliveryWrapperRoute.page,
             path: 'custom-registration-delivery-wrapper',
@@ -258,6 +259,10 @@ class AppRouter extends _$AppRouter {
                   AutoRoute(
                     page: HouseholdAcknowledgementRoute.page,
                     path: 'household-acknowledgement',
+                  ),
+                  AutoRoute(
+                    page: DeliverySummaryRoute.page,
+                    path: 'delivery-summary',
                   ),
                 ],
               ),
