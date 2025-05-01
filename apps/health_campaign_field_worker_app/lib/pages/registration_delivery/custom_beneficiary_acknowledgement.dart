@@ -6,7 +6,8 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:registration_delivery/blocs/beneficiary_registration/beneficiary_registration.dart';
 import 'package:registration_delivery/blocs/household_overview/household_overview.dart';
-import 'package:registration_delivery/blocs/search_households/search_households.dart';
+import 'package:registration_delivery/blocs/search_households/search_households.dart'
+    as registration_delivery;
 
 import 'package:registration_delivery/utils/i18_key_constants.dart' as i18;
 import 'package:registration_delivery/utils/utils.dart';
@@ -14,6 +15,7 @@ import 'package:registration_delivery/widgets/localized.dart';
 import 'package:registration_delivery/blocs/search_households/search_bloc_common_wrapper.dart';
 import 'package:registration_delivery/router/registration_delivery_router.gm.dart';
 
+import '../../blocs/registration_delivery/custom_search_household.dart';
 import '../../models/entities/identifier_types.dart';
 import '../../widgets/digit_ui_component/custom_panel_card.dart';
 import '../../utils/i18_key_constants.dart' as i18_local;
@@ -39,19 +41,13 @@ class CustomBeneficiaryAcknowledgementPage extends LocalizedStatefulWidget {
 
 class CustomBeneficiaryAcknowledgementPageState
     extends LocalizedState<CustomBeneficiaryAcknowledgementPage> {
-  late final HouseholdMemberWrapper? householdMember;
-
   @override
   void initState() {
     super.initState();
-    final bloc = context.read<SearchBlocWrapper>();
-    final overviewBloc = context.read<HouseholdOverviewBloc>();
-    householdMember = bloc.state.householdMembers.isEmpty
-        ? overviewBloc.state.householdMemberWrapper
-        : bloc.state.householdMembers.lastOrNull;
   }
 
-  Map<String, String>? subtitleMap(HouseholdMemberWrapper? householdMember) {
+  Map<String, String>? subtitleMap(
+      registration_delivery.HouseholdMemberWrapper? householdMember) {
     String? beneficiaryId = householdMember?.members?.lastOrNull?.identifiers
         ?.lastWhereOrNull((e) =>
             e.identifierType == IdentifierTypes.uniqueBeneficiaryID.toValue())
@@ -66,21 +62,40 @@ class CustomBeneficiaryAcknowledgementPageState
 
   @override
   Widget build(BuildContext context) {
-    final bloc = context.read<SearchBlocWrapper>();
     return Scaffold(
       body: Padding(
         padding: const EdgeInsets.all(spacer2),
-        child: BlocConsumer<BeneficiaryRegistrationBloc,
-            BeneficiaryRegistrationState>(
-          listener: (context, householdState) {},
-          builder: (context, householdState) {
+        child: BlocConsumer<CustomSearchHouseholdsBloc,
+            CustomSearchHouseholdsState>(
+          listener: (context, searchHouseholdsState) {},
+          builder: (context, searchHouseholdsState) {
+            HouseholdMemberWrapper? i =
+                searchHouseholdsState.householdMembers.lastOrNull;
+            registration_delivery.HouseholdMemberWrapper?
+                householdMemberWrapper;
+            if (i == null) {
+              householdMemberWrapper = null;
+            } else {
+              householdMemberWrapper =
+                  registration_delivery.HouseholdMemberWrapper(
+                household: i.household,
+                headOfHousehold: i.headOfHousehold,
+                members: i.members,
+                projectBeneficiaries: i.projectBeneficiaries,
+                distance: i.distance,
+                tasks: i.tasks,
+                sideEffects: i.sideEffects,
+                referrals: i.referrals,
+              );
+            }
+
             return CustomPanelCard(
               type: PanelType.success,
               title: localizations.translate(
                   i18.acknowledgementSuccess.acknowledgementLabelText),
-              subTitle: subtitleMap(householdMember),
+              subTitle: subtitleMap(householdMemberWrapper),
               actions: [
-                if (householdMember != null)
+                if (householdMemberWrapper != null)
                   DigitButton(
                       label: localizations.translate(
                         i18.householdDetails.viewHouseHoldDetailsAction,
@@ -88,7 +103,7 @@ class CustomBeneficiaryAcknowledgementPageState
                       onPressed: () {
                         context.router.popAndPush(
                           BeneficiaryWrapperRoute(
-                            wrapper: householdMember!,
+                            wrapper: householdMemberWrapper!,
                           ),
                         );
                       },

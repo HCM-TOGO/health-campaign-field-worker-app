@@ -19,6 +19,7 @@ import 'package:intl/intl.dart';
 import 'package:reactive_forms/reactive_forms.dart';
 import 'package:registration_delivery/blocs/search_households/search_bloc_common_wrapper.dart';
 import 'package:registration_delivery/blocs/search_households/search_households.dart';
+import 'package:registration_delivery/models/entities/household.dart';
 import 'package:registration_delivery/utils/constants.dart';
 import 'package:registration_delivery/utils/extensions/extensions.dart';
 
@@ -32,9 +33,11 @@ import 'package:registration_delivery/widgets/localized.dart';
 import 'package:registration_delivery/widgets/showcase/config/showcase_constants.dart';
 import 'package:registration_delivery/widgets/showcase/showcase_button.dart';
 
+import '../../blocs/registration_delivery/custom_search_household.dart';
 import '../../models/entities/identifier_types.dart';
 import '../../router/app_router.dart';
 import '../../utils/registration_delivery/registration_delivery_utils.dart';
+import 'custom_beneficiary_acknowledgement.dart';
 
 @RoutePage()
 class CustomIndividualDetailsPage extends LocalizedStatefulWidget {
@@ -69,6 +72,85 @@ class CustomIndividualDetailsPageState
   final beneficiaryType = RegistrationDeliverySingleton().beneficiaryType!;
   Set<String>? beneficiaryId;
 
+  late final CustomSearchHouseholdsBloc customSearchHouseholdsBloc;
+
+  @override
+  void initState() {
+    customSearchHouseholdsBloc = context.read<CustomSearchHouseholdsBloc>();
+    super.initState();
+  }
+
+  onSubmit(name) async {
+    final bloc = context.read<BeneficiaryRegistrationBloc>();
+    final router = context.router;
+    final submit = await showDialog(
+      context: context,
+      builder: (ctx) => Popup(
+        title: localizations.translate(
+          i18.deliverIntervention.dialogTitle,
+        ),
+        description: localizations.translate(
+          i18.deliverIntervention.dialogContent,
+        ),
+        actions: [
+          DigitButton(
+              label: localizations.translate(
+                i18.common.coreCommonSubmit,
+              ),
+              onPressed: () {
+                clickedStatus.value = true;
+                Navigator.of(
+                  context,
+                  rootNavigator: true,
+                ).pop(true);
+              },
+              type: DigitButtonType.primary,
+              size: DigitButtonSize.large),
+          DigitButton(
+              label: localizations.translate(
+                i18.common.coreCommonCancel,
+              ),
+              onPressed: () => Navigator.of(
+                    context,
+                    rootNavigator: true,
+                  ).pop(false),
+              type: DigitButtonType.secondary,
+              size: DigitButtonSize.large)
+        ],
+      ),
+    );
+
+    if (submit ?? false) {
+      if (context.mounted) {
+        bloc.add(
+          BeneficiaryRegistrationCreateEvent(
+              projectId: RegistrationDeliverySingleton().projectId!,
+              userUuid: RegistrationDeliverySingleton().loggedInUserUuid!,
+              boundary: RegistrationDeliverySingleton().boundary!,
+              tag: null,
+              navigateToSummary: false),
+        );
+        router.popUntil(
+            (route) => route.settings.name == SearchBeneficiaryRoute.name);
+
+        customSearchHouseholdsBloc.add(
+          CustomSearchHouseholdsEvent.searchByHouseholdHead(
+            searchText: name.trim(),
+            projectId: RegistrationDeliverySingleton().projectId!,
+            isProximityEnabled: false,
+            maxRadius: RegistrationDeliverySingleton().maxRadius,
+            limit: customSearchHouseholdsBloc.state.limit,
+            offset: 0,
+          ),
+        );
+        router.push(CustomBeneficiaryAcknowledgementRoute(
+          enableViewHousehold: true,
+          acknowledgementType: AcknowledgementType.addHousehold,
+        ));
+      }
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     final bloc = context.read<BeneficiaryRegistrationBloc>();
@@ -86,26 +168,26 @@ class CustomIndividualDetailsPageState
             state.mapOrNull(
               persisted: (value) async {
                 if (value.navigateToRoot) {
-                  final overviewBloc = context.read<HouseholdOverviewBloc>();
+                  // final overviewBloc = context.read<HouseholdOverviewBloc>();
 
-                  overviewBloc.add(
-                    HouseholdOverviewReloadEvent(
-                      projectId:
-                          RegistrationDeliverySingleton().projectId.toString(),
-                      projectBeneficiaryType:
-                          RegistrationDeliverySingleton().beneficiaryType ??
-                              BeneficiaryType.household,
-                    ),
-                  );
+                  // overviewBloc.add(
+                  //   HouseholdOverviewReloadEvent(
+                  //     projectId:
+                  //         RegistrationDeliverySingleton().projectId.toString(),
+                  //     projectBeneficiaryType:
+                  //         RegistrationDeliverySingleton().beneficiaryType ??
+                  //             BeneficiaryType.household,
+                  //   ),
+                  // );
 
-                  await overviewBloc.stream.firstWhere((element) =>
-                      element.loading == false &&
-                      element.householdMemberWrapper.household != null);
-                  HouseholdMemberWrapper memberWrapper =
-                      overviewBloc.state.householdMemberWrapper;
-                  final route = router.parent() as StackRouter;
-                  route.popUntilRouteWithName(SearchBeneficiaryRoute.name);
-                  route.push(BeneficiaryWrapperRoute(wrapper: memberWrapper));
+                  // await overviewBloc.stream.firstWhere((element) =>
+                  //     element.loading == false &&
+                  //     element.householdMemberWrapper.household != null);
+                  // HouseholdMemberWrapper memberWrapper =
+                  //     overviewBloc.state.householdMemberWrapper;
+                  // final route = router.parent() as StackRouter;
+                  // route.popUntilRouteWithName(SearchBeneficiaryRoute.name);
+                  // route.push(BeneficiaryWrapperRoute(wrapper: memberWrapper));
                 }
               },
             );
@@ -244,7 +326,9 @@ class CustomIndividualDetailsPageState
                                           : null,
                                     ),
                                   );
-                                  router.push(CustomSummaryRoute());
+                                  // router.push(CustomSummaryRoute());
+                                  await onSubmit(
+                                      individual.name?.givenName ?? "");
 
                                   // final submit = await showDialog(
                                   //   context: context,

@@ -269,42 +269,42 @@ class CustomSummaryPageState extends LocalizedState<CustomSummaryPage> {
                                       labelFlex: 5,
                                       padding: const EdgeInsets.only(
                                           bottom: spacer2)),
-                                  LabelValueItem(
-                                    label: localizations.translate(i18
-                                        .householdDetails
-                                        .noOfPregnantWomenCountLabel),
-                                    value: householdState.householdModel
-                                            ?.additionalFields?.fields
-                                            .where((h) =>
-                                                h.key ==
-                                                AdditionalFieldsType
-                                                    .pregnantWomen
-                                                    .toValue())
-                                            .firstOrNull
-                                            ?.value
-                                            .toString() ??
-                                        '0',
-                                    isInline: true,
-                                    labelFlex: 5,
-                                  ),
-                                  LabelValueItem(
-                                      label: localizations.translate(i18
-                                          .householdDetails
-                                          .noOfChildrenBelow5YearsLabel),
-                                      value: householdState.householdModel
-                                              ?.additionalFields?.fields
-                                              .where((h) =>
-                                                  h.key ==
-                                                  AdditionalFieldsType.children
-                                                      .toValue())
-                                              .firstOrNull
-                                              ?.value
-                                              .toString() ??
-                                          '0',
-                                      isInline: true,
-                                      labelFlex: 5,
-                                      padding:
-                                          const EdgeInsets.only(top: spacer2)),
+                                  // LabelValueItem(
+                                  //   label: localizations.translate(i18
+                                  //       .householdDetails
+                                  //       .noOfPregnantWomenCountLabel),
+                                  //   value: householdState.householdModel
+                                  //           ?.additionalFields?.fields
+                                  //           .where((h) =>
+                                  //               h.key ==
+                                  //               AdditionalFieldsType
+                                  //                   .pregnantWomen
+                                  //                   .toValue())
+                                  //           .firstOrNull
+                                  //           ?.value
+                                  //           .toString() ??
+                                  //       '0',
+                                  //   isInline: true,
+                                  //   labelFlex: 5,
+                                  // ),
+                                  // LabelValueItem(
+                                  //     label: localizations.translate(i18
+                                  //         .householdDetails
+                                  //         .noOfChildrenBelow5YearsLabel),
+                                  //     value: householdState.householdModel
+                                  //             ?.additionalFields?.fields
+                                  //             .where((h) =>
+                                  //                 h.key ==
+                                  //                 AdditionalFieldsType.children
+                                  //                     .toValue())
+                                  //             .firstOrNull
+                                  //             ?.value
+                                  //             .toString() ??
+                                  //         '0',
+                                  //     isInline: true,
+                                  //     labelFlex: 5,
+                                  //     padding:
+                                  //         const EdgeInsets.only(top: spacer2)),
                                 ]),
                           ]),
                       // DigitCard(
