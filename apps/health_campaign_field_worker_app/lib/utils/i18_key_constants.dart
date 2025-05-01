@@ -157,6 +157,12 @@ class HouseholdOverView {
 
   String get householdOverViewRedoseActionText =>
       'HOUSEHOLD_OVER_VIEW_REDOSE_ACTION_TEXT';
+
+  String get householdOverViewSMCDeliveredIconLabel =>
+      'HOUSEHOLD_OVER_VIEW_SMC_DELIVERED_ICON_LABEL';
+
+  String get householdOverViewVASDeliveredIconLabel =>
+      'HOUSEHOLD_OVER_VIEW_VAS_DELIVERED_ICON_LABEL';
 }
 
 class DeliverIntervention {

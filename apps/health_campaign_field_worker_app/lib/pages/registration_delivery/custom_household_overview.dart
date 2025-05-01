@@ -975,7 +975,7 @@ class _CustomHouseholdOverviewPageState
                                                     ),
                                             isBeneficiaryReferred:
                                                 isBeneficiaryReferred,
-                                            isDelivered: taskData == null
+                                            isSMCDelivered: taskData == null
                                                 ? false
                                                 : taskData.isNotEmpty &&
                                                         !checkStatus(
@@ -984,6 +984,7 @@ class _CustomHouseholdOverviewPageState
                                                         )
                                                     ? true
                                                     : false,
+                                            isVASDelivered: false,
                                             localizations: localizations,
                                             projectBeneficiaryClientReferenceId:
                                                 projectBeneficiaryId,

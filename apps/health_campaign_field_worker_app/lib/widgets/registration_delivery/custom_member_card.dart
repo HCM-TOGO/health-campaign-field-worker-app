@@ -31,7 +31,8 @@ class CustomMemberCard extends StatelessWidget {
   final bool isHead;
   final IndividualModel individual;
   final List<ProjectBeneficiaryModel>? projectBeneficiaries;
-  final bool isDelivered;
+  final bool isSMCDelivered;
+  final bool isVASDelivered;
 
   final VoidCallback setAsHeadAction;
   final VoidCallback editMemberAction;
@@ -55,7 +56,8 @@ class CustomMemberCard extends StatelessWidget {
     this.isHead = false,
     this.months = 0,
     required this.localizations,
-    required this.isDelivered,
+    required this.isSMCDelivered,
+    required this.isVASDelivered,
     required this.setAsHeadAction,
     required this.editMemberAction,
     required this.deleteMemberAction,
@@ -67,6 +69,83 @@ class CustomMemberCard extends StatelessWidget {
     this.isBeneficiaryReferred = false,
     this.sideEffects,
   });
+
+  Widget statusWidget(context) {
+    final theme = Theme.of(context);
+    if (isSMCDelivered && isVASDelivered) {
+      return Column(
+        children: [
+          if (isSMCDelivered)
+            Align(
+              alignment: Alignment.centerLeft,
+              child: DigitIconButton(
+                icon: Icons.check_circle,
+                iconText: localizations.translate(
+                  i18_local
+                      .householdOverView.householdOverViewSMCDeliveredIconLabel,
+                ),
+                iconSize: 20,
+                iconTextColor: DigitTheme.instance.colorScheme.onSurfaceVariant,
+                iconColor: DigitTheme.instance.colorScheme.onSurfaceVariant,
+              ),
+            ),
+          if (isVASDelivered)
+            Align(
+              alignment: Alignment.centerLeft,
+              child: DigitIconButton(
+                icon: Icons.check_circle,
+                iconText: localizations.translate(
+                  i18_local
+                      .householdOverView.householdOverViewVASDeliveredIconLabel,
+                ),
+                iconSize: 20,
+                iconTextColor: DigitTheme.instance.colorScheme.onSurfaceVariant,
+                iconColor: DigitTheme.instance.colorScheme.onSurfaceVariant,
+              ),
+            ),
+        ],
+      );
+    } else if (isNotEligible ||
+        isBeneficiaryIneligible ||
+        isBeneficiaryReferred) {
+      return Align(
+        alignment: Alignment.centerLeft,
+        child: DigitIconButton(
+          icon: Icons.info_rounded,
+          iconSize: 20,
+          iconText: localizations.translate(
+            isHead
+                ? i18_local
+                    .householdOverView.householdOverViewHouseholderHeadLabel
+                : (isNotEligible || isBeneficiaryIneligible)
+                    ? i18
+                        .householdOverView.householdOverViewNotEligibleIconLabel
+                    : isBeneficiaryReferred
+                        ? i18.householdOverView
+                            .householdOverViewBeneficiaryReferredLabel
+                        : isBeneficiaryRefused
+                            ? Status.beneficiaryRefused.toValue()
+                            : Status.notVisited.toValue(),
+          ),
+          iconTextColor: theme.colorScheme.error,
+          iconColor: theme.colorScheme.error,
+        ),
+      );
+    } else if (isBeneficiaryRefused) {
+      return Align(
+          alignment: Alignment.centerLeft,
+          child: DigitIconButton(
+            icon: Icons.info_rounded,
+            iconSize: 20,
+            iconText:
+                localizations.translate(Status.beneficiaryRefused.toValue()),
+            iconTextColor: theme.colorScheme.error,
+            iconColor: theme.colorScheme.error,
+          ));
+    } else {
+      return Container();
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -222,49 +301,7 @@ class CustomMemberCard extends StatelessWidget {
             ),
             child: Offstage(
               offstage: beneficiaryType != BeneficiaryType.individual,
-              child: !isDelivered ||
-                      isNotEligible ||
-                      isBeneficiaryRefused ||
-                      isBeneficiaryIneligible ||
-                      isBeneficiaryReferred
-                  ? Align(
-                      alignment: Alignment.centerLeft,
-                      child: DigitIconButton(
-                        icon: Icons.info_rounded,
-                        iconSize: 20,
-                        iconText: localizations.translate(
-                          isHead
-                              ? i18_local.householdOverView
-                                  .householdOverViewHouseholderHeadLabel
-                              : (isNotEligible || isBeneficiaryIneligible)
-                                  ? i18.householdOverView
-                                      .householdOverViewNotEligibleIconLabel
-                                  : isBeneficiaryReferred
-                                      ? i18.householdOverView
-                                          .householdOverViewBeneficiaryReferredLabel
-                                      : isBeneficiaryRefused
-                                          ? Status.beneficiaryRefused.toValue()
-                                          : Status.notVisited.toValue(),
-                        ),
-                        iconTextColor: theme.colorScheme.error,
-                        iconColor: theme.colorScheme.error,
-                      ),
-                    )
-                  : Align(
-                      alignment: Alignment.centerLeft,
-                      child: DigitIconButton(
-                        icon: Icons.check_circle,
-                        iconText: localizations.translate(
-                          i18.householdOverView
-                              .householdOverViewDeliveredIconLabel,
-                        ),
-                        iconSize: 20,
-                        iconTextColor:
-                            DigitTheme.instance.colorScheme.onSurfaceVariant,
-                        iconColor:
-                            DigitTheme.instance.colorScheme.onSurfaceVariant,
-                      ),
-                    ),
+              child: statusWidget(context),
             ),
           ),
           Offstage(
