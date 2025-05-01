@@ -94,6 +94,13 @@ class MainApplicationState extends State<MainApplication>
           sql: widget.sql,
           child: MultiBlocProvider(
             providers: [
+               BlocProvider(
+                create: (_) {
+                  return LocationBloc(location: Location())
+                    ..add(const LoadLocationEvent());
+                },
+                lazy: false,
+              ),
               // INFO : Need to add bloc of package Here
               BlocProvider(
                 create: (_) {
@@ -113,13 +120,7 @@ class MainApplicationState extends State<MainApplication>
                 lazy: false,
               ),
 
-              BlocProvider(
-                create: (_) {
-                  return LocationBloc(location: Location())
-                    ..add(const LoadLocationEvent());
-                },
-                lazy: false,
-              ),
+            
               BlocProvider(
                 create: (context) {
                   return UserBloc(

@@ -453,10 +453,10 @@ class _CustomSearchBeneficiaryPageState
                       mainAxisSize: MainAxisSize.max,
                       type: DigitButtonType.primary,
                       size: DigitButtonSize.large,
-                      isDisabled: searchHouseholdsState.searchQuery != null &&
-                              searchHouseholdsState.searchQuery!.isNotEmpty
-                          ? false
-                          : true,
+                      // isDisabled: searchHouseholdsState.searchQuery != null &&
+                      //         searchHouseholdsState.searchQuery!.isNotEmpty
+                      //     ? false
+                      //     : true,
                       onPressed: () {
                         FocusManager.instance.primaryFocus?.unfocus();
                         context.read<DigitScannerBloc>().add(

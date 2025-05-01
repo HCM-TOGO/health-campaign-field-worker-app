@@ -63,6 +63,7 @@ class _EligibilityChecklistViewPage
 
   @override
   void initState() {
+    // context.read<LocationBloc>().add(const LocationEvent.load());
     // context.read<ServiceBloc>().add(
     //       service.ServiceChecklistEvent(
     //         value: Random().nextInt(100).toString(),
@@ -94,8 +95,12 @@ class _EligibilityChecklistViewPage
           ? () async => false
           : () async => _onBackPressed(context, ifIneligible),
       child: Scaffold(
-        body: BlocBuilder<HouseholdOverviewBloc, HouseholdOverviewState>(
+        // body: BlocBuilder<LocationBloc, LocationState> (
+        //  builder: (context, locationState) {
+        body:  BlocBuilder <HouseholdOverviewBloc, HouseholdOverviewState>(
           builder: (context, householdOverviewState) {
+                //             double? latitude = locationState.latitude;
+                // double? longitude = locationState.longitude;
             return BlocBuilder<ServiceDefinitionBloc, ServiceDefinitionState>(
               builder: (context, state) {
                 state.mapOrNull(
@@ -106,7 +111,7 @@ class _EligibilityChecklistViewPage
                               '${context.selectedProject.name}.ELIGIBLITY_ASSESSMENT.${context.isCommunityDistributor ? RolesType.communityDistributor.toValue() : RolesType.healthFacilitySupervisor.toValue()}',
                             ))
                         .toList()
-                        .firstOrNull as ServiceDefinitionModel?;
+                        .firstOrNull;
                     initialAttributes = selectedServiceDefinition?.attributes;
                     if (!isControllersInitialized) {
                       initialAttributes?.forEach((e) {
@@ -130,21 +135,16 @@ class _EligibilityChecklistViewPage
                             showHelp: false,
                             showcaseButton: null,
                           ),
+
                       ]),
                       enableFixedButton: true,
-                      footer: BlocListener<LocationBloc, LocationState>(
-                        listener: (context, state) async {
-                          if (state.accuracy != null && triggerLocalization) {
-                            triggerLocalization = false;
-                            final router = context.router;
-                            // close the location capturing `dialog`
-                            DigitComponentsUtils().hideDialog(context);
-
-                            // Wait for the location to be obtained
-                            final locationState =
-                                context.read<LocationBloc>().state;
-                            double? latitude = locationState.latitude;
-                            double? longitude = locationState.longitude;
+                      footer:  DigitCard(
+                          margin: const EdgeInsets.fromLTRB(0, kPadding, 0, 0),
+                          padding: const EdgeInsets.fromLTRB(
+                              kPadding, 0, kPadding, 0),
+                          child: DigitElevatedButton(
+                            onPressed: () async {
+                            // final router = context.router;
 
                             List<String>? referralReasons = [];
                             List<String?> ineligibilityReasons = [];
@@ -238,14 +238,15 @@ class _EligibilityChecklistViewPage
                                         additionalFields:
                                             ServiceAttributesAdditionalFields(
                                           version: 1,
+                                          // TODO: This needs to be done after adding locationbloc
                                           fields: [
-                                            AdditionalField(
+                                            const AdditionalField(
                                               'latitude',
-                                              latitude,
+                                              'latitude',
                                             ),
-                                            AdditionalField(
+                                            const AdditionalField(
                                               'longitude',
-                                              longitude,
+                                              'longitude',
                                             ),
                                           ],
                                         ),
@@ -327,6 +328,7 @@ class _EligibilityChecklistViewPage
                                   ((ifDeliver || ifAdministration) ||
                                       ifIneligible ||
                                       ifReferral)) {
+                                        final router = context.router;
                                 if (ifIneligible) {
                                   // added the deliversubmitevent here
                                   final clientReferenceId = IdGen.i.identifier;
@@ -403,28 +405,20 @@ class _EligibilityChecklistViewPage
                                         enableViewHousehold: true),
                                   );
                                 } else if (ifReferral) {
-                                  // router.push(
-                                  //   CustomReferBeneficiarySMCRoute(
-                                  //     projectBeneficiaryClientRefId:
-                                  //         projectBeneficiaryClientReferenceId ??
-                                  //             "",
-                                  //     individual: widget.individual!,
-                                  //     referralReasons: referralReasons,
-                                  //   ),
-                                  // );
+                                  router.push(
+                                    CustomReferBeneficiarySMCRoute(
+                                      projectBeneficiaryClientRefId:
+                                          projectBeneficiaryClientReferenceId ??
+                                              "",
+                                      individual: widget.individual!,
+                                      referralReasons: referralReasons,
+                                    ),
+                                  );
                                 } else {
                                   router.push(BeneficiaryDetailsRoute());
                                 }
                               }
-                            }
-                          }
-                        },
-                        child: DigitCard(
-                          margin: const EdgeInsets.fromLTRB(0, kPadding, 0, 0),
-                          padding: const EdgeInsets.fromLTRB(
-                              kPadding, 0, kPadding, 0),
-                          child: DigitElevatedButton(
-                            onPressed: () async {
+                            
                               final router = context.router;
                               submitTriggered = true;
 
@@ -482,16 +476,17 @@ class _EligibilityChecklistViewPage
                               triggerLocalization = true;
 
                               // Request location from LocationBloc
-                              context
-                                  .read<LocationBloc>()
-                                  .add(const LocationEvent.load());
-                              DigitComponentsUtils()
-                                  .showLocationCapturingDialog(
-                                context,
-                                localizations.translate(
-                                    i18_local.common.locationCapturing),
-                                DigitSyncDialogType.inProgress,
-                              );
+                              // context
+                              //     .read<LocationBloc>()
+                              //     .add(const LocationEvent.load());
+                              // DigitComponentsUtils()
+                              //     .showLocationCapturingDialog(
+                              //   context,
+                              //   localizations.translate(
+                              //       i18_local.common.locationCapturing),
+                              //   DigitSyncDialogType.inProgress,
+                              // );
+                            }
                             },
                             child: Text(
                               localizations
@@ -499,7 +494,6 @@ class _EligibilityChecklistViewPage
                             ),
                           ),
                         ),
-                      ),
                       children: [
                         Form(
                           key: checklistFormKey, //assigning key to form
@@ -681,9 +675,8 @@ class _EligibilityChecklistViewPage
               },
             );
           },
-        ),
-      ),
-    );
+        )));
+      
   }
 
   Widget _buildChecklist(
@@ -719,7 +712,7 @@ class _EligibilityChecklistViewPage
           Align(
             alignment: Alignment.topLeft,
             child: Padding(
-              padding: const EdgeInsets.all(16.0), // Add padding here
+              padding: const EdgeInsets.all(4.0), // Add padding here
               child: Text(
                 '${localizations.translate(
                   '${selectedServiceDefinition?.code}.${item.code}',
@@ -933,7 +926,7 @@ class _EligibilityChecklistViewPage
     bool ifAdministration,
   ) {
     var isIneligible = false;
-    var q4Key = "SEA3";
+    var q4Key = "KBEA3.NO.ADT1";
     Map<String, String> keyVsReason = {
       q4Key: "CHILD_ON_MEDICATION_1",
     };
@@ -963,9 +956,9 @@ class _EligibilityChecklistViewPage
     List<String?> referralReasons,
   ) {
     var isReferral = false;
-    var q1Key = "SEA1";
-    var q2Key = "SEA1.YES.ADT1";
-    var q3Key = "SEA2";
+    var q1Key = "KBEA1";
+    var q2Key = "KBEA2";
+    var q3Key = "KBEA3";
     Map<String, String> referralKeysVsCode = {
       q1Key: "SICK",
       q2Key: "FEVER",
