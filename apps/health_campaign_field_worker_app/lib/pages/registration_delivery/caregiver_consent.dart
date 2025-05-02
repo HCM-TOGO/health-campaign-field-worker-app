@@ -5,6 +5,7 @@ import 'package:digit_ui_components/digit_components.dart';
 import 'package:digit_ui_components/models/RadioButtonModel.dart';
 import 'package:digit_ui_components/services/location_bloc.dart';
 import 'package:digit_ui_components/theme/digit_extended_theme.dart';
+import 'package:digit_ui_components/widgets/atoms/pop_up_card.dart';
 import 'package:digit_ui_components/widgets/atoms/selection_card.dart';
 import 'package:digit_ui_components/widgets/atoms/text_block.dart';
 import 'package:digit_ui_components/widgets/molecules/digit_card.dart';
@@ -46,12 +47,78 @@ class CaregiverConsentPage extends LocalizedStatefulWidget {
 
 class CaregiverConsentPageState extends LocalizedState<CaregiverConsentPage> {
   CaregiverConsentEnum selectedConsent = CaregiverConsentEnum.yes;
+  final clickedStatus = ValueNotifier<bool>(false);
+
+  onSubmit(HouseholdModel? householdModel, AddressModel? addressModel) {
+    final bloc = context.read<CustomBeneficiaryRegistrationBloc>();
+    final router = context.router;
+    var household = householdModel;
+    household ??= HouseholdModel(
+      tenantId: RegistrationDeliverySingleton().tenantId,
+      clientReferenceId:
+          householdModel?.clientReferenceId ?? IdGen.i.identifier,
+      rowVersion: 1,
+      clientAuditDetails: ClientAuditDetails(
+        createdBy: RegistrationDeliverySingleton().loggedInUserUuid!,
+        createdTime: context.millisecondsSinceEpoch(),
+        lastModifiedBy: RegistrationDeliverySingleton().loggedInUserUuid,
+        lastModifiedTime: context.millisecondsSinceEpoch(),
+      ),
+      auditDetails: AuditDetails(
+        createdBy: RegistrationDeliverySingleton().loggedInUserUuid!,
+        createdTime: context.millisecondsSinceEpoch(),
+        lastModifiedBy: RegistrationDeliverySingleton().loggedInUserUuid,
+        lastModifiedTime: context.millisecondsSinceEpoch(),
+      ),
+    );
+
+    household = household.copyWith(
+        rowVersion: 1,
+        tenantId: RegistrationDeliverySingleton().tenantId,
+        clientReferenceId:
+            householdModel?.clientReferenceId ?? IdGen.i.identifier,
+        memberCount: 0,
+        clientAuditDetails: ClientAuditDetails(
+          createdBy:
+              RegistrationDeliverySingleton().loggedInUserUuid.toString(),
+          createdTime: context.millisecondsSinceEpoch(),
+          lastModifiedBy:
+              RegistrationDeliverySingleton().loggedInUserUuid.toString(),
+          lastModifiedTime: context.millisecondsSinceEpoch(),
+        ),
+        auditDetails: AuditDetails(
+          createdBy:
+              RegistrationDeliverySingleton().loggedInUserUuid.toString(),
+          createdTime: context.millisecondsSinceEpoch(),
+          lastModifiedBy:
+              RegistrationDeliverySingleton().loggedInUserUuid.toString(),
+          lastModifiedTime: context.millisecondsSinceEpoch(),
+        ),
+        address: addressModel,
+        additionalFields: HouseholdAdditionalFields(version: 1, fields: [
+          const AdditionalField(
+            "caregiver_consent_registration",
+            false,
+          ),
+        ]));
+
+    bloc.add(
+      BeneficiaryRegistrationCreateHouseholdEvent(
+        household: household,
+        registrationDate: DateTime.now(),
+        boundary: RegistrationDeliverySingleton().boundary!,
+      ),
+    );
+    router.popUntil(
+        (route) => route.settings.name == SearchBeneficiaryRoute.name);
+    context.router.push(CustomBeneficiaryAcknowledgementRoute(
+        acknowledgementType: AcknowledgementType.addHousehold));
+  }
 
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
     final textTheme = theme.digitTextTheme(context);
-    final bloc = context.read<CustomBeneficiaryRegistrationBloc>();
     final router = context.router;
     final bool isCommunity = RegistrationDeliverySingleton().householdType ==
         HouseholdType.community;
@@ -98,83 +165,46 @@ class CaregiverConsentPageState extends LocalizedState<CaregiverConsentPage> {
                         searchQuery,
                         loading,
                         isHeadOfHousehold,
-                      ) {
-                        var household = householdModel;
-                        household ??= HouseholdModel(
-                          tenantId: RegistrationDeliverySingleton().tenantId,
-                          clientReferenceId:
-                              householdModel?.clientReferenceId ??
-                                  IdGen.i.identifier,
-                          rowVersion: 1,
-                          clientAuditDetails: ClientAuditDetails(
-                            createdBy: RegistrationDeliverySingleton()
-                                .loggedInUserUuid!,
-                            createdTime: context.millisecondsSinceEpoch(),
-                            lastModifiedBy: RegistrationDeliverySingleton()
-                                .loggedInUserUuid,
-                            lastModifiedTime: context.millisecondsSinceEpoch(),
-                          ),
-                          auditDetails: AuditDetails(
-                            createdBy: RegistrationDeliverySingleton()
-                                .loggedInUserUuid!,
-                            createdTime: context.millisecondsSinceEpoch(),
-                            lastModifiedBy: RegistrationDeliverySingleton()
-                                .loggedInUserUuid,
-                            lastModifiedTime: context.millisecondsSinceEpoch(),
+                      ) async {
+                        final submit = await showDialog(
+                          context: context,
+                          builder: (ctx) => Popup(
+                            title: localizations.translate(
+                              i18.deliverIntervention.dialogTitle,
+                            ),
+                            description: localizations.translate(
+                              i18.deliverIntervention.dialogContent,
+                            ),
+                            actions: [
+                              DigitButton(
+                                  label: localizations.translate(
+                                    i18.common.coreCommonSubmit,
+                                  ),
+                                  onPressed: () {
+                                    clickedStatus.value = true;
+                                    Navigator.of(
+                                      context,
+                                      rootNavigator: true,
+                                    ).pop(true);
+                                  },
+                                  type: DigitButtonType.primary,
+                                  size: DigitButtonSize.large),
+                              DigitButton(
+                                  label: localizations.translate(
+                                    i18.common.coreCommonCancel,
+                                  ),
+                                  onPressed: () => Navigator.of(
+                                        context,
+                                        rootNavigator: true,
+                                      ).pop(false),
+                                  type: DigitButtonType.secondary,
+                                  size: DigitButtonSize.large)
+                            ],
                           ),
                         );
-
-                        household = household.copyWith(
-                            rowVersion: 1,
-                            tenantId: RegistrationDeliverySingleton().tenantId,
-                            clientReferenceId:
-                                householdModel?.clientReferenceId ??
-                                    IdGen.i.identifier,
-                            memberCount: 0,
-                            clientAuditDetails: ClientAuditDetails(
-                              createdBy: RegistrationDeliverySingleton()
-                                  .loggedInUserUuid
-                                  .toString(),
-                              createdTime: context.millisecondsSinceEpoch(),
-                              lastModifiedBy: RegistrationDeliverySingleton()
-                                  .loggedInUserUuid
-                                  .toString(),
-                              lastModifiedTime:
-                                  context.millisecondsSinceEpoch(),
-                            ),
-                            auditDetails: AuditDetails(
-                              createdBy: RegistrationDeliverySingleton()
-                                  .loggedInUserUuid
-                                  .toString(),
-                              createdTime: context.millisecondsSinceEpoch(),
-                              lastModifiedBy: RegistrationDeliverySingleton()
-                                  .loggedInUserUuid
-                                  .toString(),
-                              lastModifiedTime:
-                                  context.millisecondsSinceEpoch(),
-                            ),
-                            address: addressModel,
-                            additionalFields:
-                                HouseholdAdditionalFields(version: 1, fields: [
-                              const AdditionalField(
-                                "caregiver_consent",
-                                false,
-                              ),
-                            ]));
-
-                        bloc.add(
-                          BeneficiaryRegistrationCreateHouseholdEvent(
-                            household: household,
-                            registrationDate: DateTime.now(),
-                            boundary: RegistrationDeliverySingleton().boundary!,
-                          ),
-                        );
-                        router.popUntil((route) =>
-                            route.settings.name == SearchBeneficiaryRoute.name);
-                        context.router.push(
-                            CustomBeneficiaryAcknowledgementRoute(
-                                acknowledgementType:
-                                    AcknowledgementType.addHousehold));
+                        if (submit == true) {
+                          onSubmit(householdModel, addressModel);
+                        }
                       });
                     }
                   },
