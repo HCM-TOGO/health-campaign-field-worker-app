@@ -1014,7 +1014,7 @@ class CustomIndividualDetailsPageState
         Validators.pattern(Constants.mobileNumberRegExp,
             validationMessage:
                 localizations.translate(i18.common.coreCommonMobileNumber)),
-        Validators.maxLength(10)
+        Validators.maxLength(11)
       ]),
     });
   }
