@@ -117,7 +117,7 @@ class _CustomSearchBeneficiaryPageState
                                       ? i18.searchBeneficiary.searchCLFLabel
                                       : RegistrationDeliverySingleton()
                                                   .beneficiaryType !=
-                                              BeneficiaryType.individual
+                                              BeneficiaryType.household
                                           ? i18.searchBeneficiary
                                               .statisticsLabelText
                                           : i18.searchBeneficiary
