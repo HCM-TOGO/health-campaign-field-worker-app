@@ -75,11 +75,10 @@ class AppRouter extends _$AppRouter {
       path: '/',
       children: [
         AutoRoute(
-          page: LanguageSelectionRoute.page,
-          path: 'language_selection',
+          page: LoginRoute.page,
+          path: 'login',
           initial: true,
         ),
-        AutoRoute(page: LoginRoute.page, path: 'login'),
       ],
     ),
     AutoRoute(
@@ -217,7 +216,7 @@ class AppRouter extends _$AppRouter {
                     page: BeneficiaryDetailsRoute.page,
                     path: 'beneficiary-details',
                   ),
-                   AutoRoute(
+                  AutoRoute(
                     page: CustomBeneficiaryDetailsRoute.page,
                     path: 'custom-beneficiary-details',
                   ),

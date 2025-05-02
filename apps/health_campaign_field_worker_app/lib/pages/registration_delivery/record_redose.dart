@@ -76,10 +76,28 @@ class _RecordRedosePageState extends LocalizedState<RecordRedosePage> {
       ProjectState projectState,
       HouseholdOverviewState householdOverviewState,
       DeliverInterventionState deliveryInterventionstate) {
+    DeliveryModel? deliveryModel = projectState
+        .projectType!
+        .cycles![deliveryInterventionstate.cycle - 1]
+        .deliveries![deliveryInterventionstate.dose - 1];
     List<DeliveryProductVariant>? productVariants = fetchProductVariant(
-      projectState.projectType!.cycles![deliveryInterventionstate.cycle - 1]
-              .deliveries![deliveryInterventionstate.dose - 1]
-          as ProjectCycleDelivery?,
+      ProjectCycleDelivery(
+        id: deliveryModel.id,
+        deliveryStrategy: deliveryModel.deliveryStrategy!,
+        doseCriteria: deliveryModel.doseCriteria
+            ?.map((DoseCriteriaModel e) => DeliveryDoseCriteria(
+                  condition: e.condition,
+                  productVariants: e.productVariants
+                      ?.map((e) => DeliveryProductVariant(
+                            productVariantId: e.productVariantId!,
+                            quantity: e.quantity,
+                          ))
+                      .toList(),
+                ))
+            .toList(),
+        mandatoryWaitSinceLastDeliveryInDays: int.parse(
+            deliveryModel.mandatoryWaitSinceLastDeliveryInDays ?? '0'),
+      ),
       householdOverviewState.selectedIndividual,
       null,
     )?.productVariants;

@@ -96,7 +96,7 @@ class CustomResourceBeneficiaryCardState
             onChange: (value) {
               widget.form
                   .control('quantityDistributed.${widget.cardIndex}')
-                  .value = int.parse(value);
+                  .value = value;
             },
           ),
         ),
