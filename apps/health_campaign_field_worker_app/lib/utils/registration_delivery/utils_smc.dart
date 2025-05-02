@@ -1,11 +1,11 @@
 import 'package:digit_data_model/models/entities/individual.dart';
 import 'package:digit_data_model/models/entities/project_type.dart';
 import 'package:digit_data_model/models/project_type/project_type_model.dart';
+import 'package:health_campaign_field_worker_app/utils/constants.dart';
 import 'package:registration_delivery/models/entities/additional_fields_type.dart';
 import 'package:registration_delivery/models/entities/side_effect.dart';
 import 'package:registration_delivery/models/entities/status.dart';
 import 'package:registration_delivery/models/entities/task.dart';
-import 'package:registration_delivery/utils/constants.dart';
 
 bool redosePending(List<TaskModel>? tasks, ProjectCycle? selectedCycle) {
   var redosePending = true;
