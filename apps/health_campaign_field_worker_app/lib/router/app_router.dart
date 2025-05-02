@@ -50,6 +50,9 @@ import '../pages/registration_delivery/record_redose.dart';
 import '../pages/reports/beneficiary/beneficaries_report.dart';
 import '../pages/unauthenticated.dart';
 export 'package:auto_route/auto_route.dart';
+import '../pages/beneficiary/check_eligibility/custom_beneficiary_details_page.dart';
+import '../pages/beneficiary/check_eligibility/custom_deliver_intervention_page.dart';
+import '../pages/beneficiary/check_eligibility/custom_delivery_summary_page.dart';
 
 part 'app_router.gr.dart';
 
@@ -214,9 +217,25 @@ class AppRouter extends _$AppRouter {
                     page: BeneficiaryDetailsRoute.page,
                     path: 'beneficiary-details',
                   ),
+                   AutoRoute(
+                    page: CustomBeneficiaryDetailsRoute.page,
+                    path: 'custom-beneficiary-details',
+                  ),
+                  RedirectRoute(
+                    path: 'beneficiary-details',
+                    redirectTo: 'custom-beneficiary-details',
+                  ),
+                  AutoRoute(
+                    page: CustomDeliverInterventionRoute.page,
+                    path: 'custom-deliver-intervention',
+                  ),
                   AutoRoute(
                     page: DeliverInterventionRoute.page,
                     path: 'deliver-intervention',
+                  ),
+                  RedirectRoute(
+                    path: 'deliver-intervention',
+                    redirectTo: 'custom-deliver-intervention',
                   ),
                   AutoRoute(
                     page: SideEffectsRoute.page,
@@ -265,6 +284,14 @@ class AppRouter extends _$AppRouter {
                   AutoRoute(
                     page: DeliverySummaryRoute.page,
                     path: 'delivery-summary',
+                  ),
+                  AutoRoute(
+                    page: CustomDeliverySummaryRoute.page,
+                    path: 'custom-delivery-summary',
+                  ),
+                  RedirectRoute(
+                    path: 'delivery-summary',
+                    redirectTo: 'custom-delivery-summary',
                   ),
                 ],
               ),

@@ -79,6 +79,17 @@ abstract class _$AppRouter extends RootStackRouter {
         ),
       );
     },
+    CustomBeneficiaryDetailsRoute.name: (routeData) {
+      final args = routeData.argsAs<CustomBeneficiaryDetailsRouteArgs>(
+          orElse: () => const CustomBeneficiaryDetailsRouteArgs());
+      return AutoRoutePage<dynamic>(
+        routeData: routeData,
+        child: CustomBeneficiaryDetailsPage(
+          key: args.key,
+          appLocalizations: args.appLocalizations,
+        ),
+      );
+    },
     CustomBeneficiaryRegistrationWrapperRoute.name: (routeData) {
       final args =
           routeData.argsAs<CustomBeneficiaryRegistrationWrapperRouteArgs>();
@@ -89,6 +100,29 @@ abstract class _$AppRouter extends RootStackRouter {
           key: args.key,
           initialState: args.initialState,
         )),
+      );
+    },
+    CustomDeliverInterventionRoute.name: (routeData) {
+      final args = routeData.argsAs<CustomDeliverInterventionRouteArgs>(
+          orElse: () => const CustomDeliverInterventionRouteArgs());
+      return AutoRoutePage<dynamic>(
+        routeData: routeData,
+        child: CustomDeliverInterventionPage(
+          key: args.key,
+          appLocalizations: args.appLocalizations,
+          isEditing: args.isEditing,
+        ),
+      );
+    },
+    CustomDeliverySummaryRoute.name: (routeData) {
+      final args = routeData.argsAs<CustomDeliverySummaryRouteArgs>(
+          orElse: () => const CustomDeliverySummaryRouteArgs());
+      return AutoRoutePage<dynamic>(
+        routeData: routeData,
+        child: CustomDeliverySummaryPage(
+          key: args.key,
+          appLocalizations: args.appLocalizations,
+        ),
       );
     },
     CustomFacilitySelectionSMCRoute.name: (routeData) {
@@ -621,6 +655,45 @@ class CustomBeneficiaryAcknowledgementRouteArgs {
 }
 
 /// generated route for
+/// [CustomBeneficiaryDetailsPage]
+class CustomBeneficiaryDetailsRoute
+    extends PageRouteInfo<CustomBeneficiaryDetailsRouteArgs> {
+  CustomBeneficiaryDetailsRoute({
+    Key? key,
+    RegistrationDeliveryLocalization? appLocalizations,
+    List<PageRouteInfo>? children,
+  }) : super(
+          CustomBeneficiaryDetailsRoute.name,
+          args: CustomBeneficiaryDetailsRouteArgs(
+            key: key,
+            appLocalizations: appLocalizations,
+          ),
+          initialChildren: children,
+        );
+
+  static const String name = 'CustomBeneficiaryDetailsRoute';
+
+  static const PageInfo<CustomBeneficiaryDetailsRouteArgs> page =
+      PageInfo<CustomBeneficiaryDetailsRouteArgs>(name);
+}
+
+class CustomBeneficiaryDetailsRouteArgs {
+  const CustomBeneficiaryDetailsRouteArgs({
+    this.key,
+    this.appLocalizations,
+  });
+
+  final Key? key;
+
+  final RegistrationDeliveryLocalization? appLocalizations;
+
+  @override
+  String toString() {
+    return 'CustomBeneficiaryDetailsRouteArgs{key: $key, appLocalizations: $appLocalizations}';
+  }
+}
+
+/// generated route for
 /// [CustomBeneficiaryRegistrationWrapperPage]
 class CustomBeneficiaryRegistrationWrapperRoute
     extends PageRouteInfo<CustomBeneficiaryRegistrationWrapperRouteArgs> {
@@ -656,6 +729,89 @@ class CustomBeneficiaryRegistrationWrapperRouteArgs {
   @override
   String toString() {
     return 'CustomBeneficiaryRegistrationWrapperRouteArgs{key: $key, initialState: $initialState}';
+  }
+}
+
+/// generated route for
+/// [CustomDeliverInterventionPage]
+class CustomDeliverInterventionRoute
+    extends PageRouteInfo<CustomDeliverInterventionRouteArgs> {
+  CustomDeliverInterventionRoute({
+    Key? key,
+    RegistrationDeliveryLocalization? appLocalizations,
+    bool isEditing = false,
+    List<PageRouteInfo>? children,
+  }) : super(
+          CustomDeliverInterventionRoute.name,
+          args: CustomDeliverInterventionRouteArgs(
+            key: key,
+            appLocalizations: appLocalizations,
+            isEditing: isEditing,
+          ),
+          initialChildren: children,
+        );
+
+  static const String name = 'CustomDeliverInterventionRoute';
+
+  static const PageInfo<CustomDeliverInterventionRouteArgs> page =
+      PageInfo<CustomDeliverInterventionRouteArgs>(name);
+}
+
+class CustomDeliverInterventionRouteArgs {
+  const CustomDeliverInterventionRouteArgs({
+    this.key,
+    this.appLocalizations,
+    this.isEditing = false,
+  });
+
+  final Key? key;
+
+  final RegistrationDeliveryLocalization? appLocalizations;
+
+  final bool isEditing;
+
+  @override
+  String toString() {
+    return 'CustomDeliverInterventionRouteArgs{key: $key, appLocalizations: $appLocalizations, isEditing: $isEditing}';
+  }
+}
+
+/// generated route for
+/// [CustomDeliverySummaryPage]
+class CustomDeliverySummaryRoute
+    extends PageRouteInfo<CustomDeliverySummaryRouteArgs> {
+  CustomDeliverySummaryRoute({
+    Key? key,
+    RegistrationDeliveryLocalization? appLocalizations,
+    List<PageRouteInfo>? children,
+  }) : super(
+          CustomDeliverySummaryRoute.name,
+          args: CustomDeliverySummaryRouteArgs(
+            key: key,
+            appLocalizations: appLocalizations,
+          ),
+          initialChildren: children,
+        );
+
+  static const String name = 'CustomDeliverySummaryRoute';
+
+  static const PageInfo<CustomDeliverySummaryRouteArgs> page =
+      PageInfo<CustomDeliverySummaryRouteArgs>(name);
+}
+
+class CustomDeliverySummaryRouteArgs {
+  const CustomDeliverySummaryRouteArgs({
+    this.key,
+    this.appLocalizations,
+  });
+
+  final Key? key;
+
+  final RegistrationDeliveryLocalization? appLocalizations;
+
+  @override
+  String toString() {
+    return 'CustomDeliverySummaryRouteArgs{key: $key, appLocalizations: $appLocalizations}';
   }
 }
 
