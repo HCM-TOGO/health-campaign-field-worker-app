@@ -668,7 +668,7 @@ void setPackagesSingleton(BuildContext context) {
           searchCLFFilters: [],
           houseStructureTypes: [],
           refusalReasons: [],
-          loggedInUser: null,
+          loggedInUser: context.loggedInUserModel,
         );
 
         InventorySingleton().setInitialData(
