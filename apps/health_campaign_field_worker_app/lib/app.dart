@@ -55,7 +55,7 @@ class MainApplicationState extends State<MainApplication>
     with WidgetsBindingObserver {
   @override
   void initState() {
-    LocalizationParams().setModule('boundary', true);
+    LocalizationParams().setModule(['boundary'], true);
     super.initState();
     requestDisableBatteryOptimization();
   }
@@ -94,7 +94,7 @@ class MainApplicationState extends State<MainApplication>
           sql: widget.sql,
           child: MultiBlocProvider(
             providers: [
-               BlocProvider(
+              BlocProvider(
                 create: (_) {
                   return LocationBloc(location: Location())
                     ..add(const LoadLocationEvent());
@@ -120,7 +120,6 @@ class MainApplicationState extends State<MainApplication>
                 lazy: false,
               ),
 
-            
               BlocProvider(
                 create: (context) {
                   return UserBloc(
@@ -171,9 +170,11 @@ class MainApplicationState extends State<MainApplication>
                     final localizationModulesList = appConfig.backendInterface;
                     var firstLanguage;
                     firstLanguage = appConfig.languages?.lastOrNull?.value;
+
                     final selectedLocale =
                         AppSharedPreferences().getSelectedLocale ??
                             firstLanguage;
+                    AppSharedPreferences().setSelectedLocale("en_NG");
                     LocalizationParams().setLocale(Locale(selectedLocale));
                     final languages = appConfig.languages;
 

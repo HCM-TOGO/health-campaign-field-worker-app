@@ -104,7 +104,6 @@ int getAgeMonths(DigitDOBAge age) {
   return (age.years * 12) + age.months;
 }
 
-
 performBackgroundService({
   BuildContext? context,
   required bool stopService,
@@ -143,7 +142,6 @@ performBackgroundService({
     }
   }
 }
-
 
 int getUnderFiveChildCount(HouseholdModel? householdCaptured) {
   final additionalFields = householdCaptured?.additionalFields?.fields;
@@ -224,8 +222,6 @@ Map<String, dynamic>? customValidMobileNumber(
 
   return {'mobileNumber': true}; // Invalid
 }
-
-
 
 String maskString(String input) {
   // Define the character to use for masking (e.g., "*")
@@ -588,7 +584,7 @@ class LocalizationParams {
   LocalizationParams._internal();
 
   List<String>? _code;
-  String? _module;
+  List<String>? _module;
   Locale? _locale;
   bool? _exclude = true;
 
@@ -596,7 +592,7 @@ class LocalizationParams {
     _code = code;
   }
 
-  void setModule(String? module, bool? exclude) {
+  void setModule(List<String>? module, bool? exclude) {
     _module = module;
     _exclude = exclude;
   }
@@ -612,7 +608,7 @@ class LocalizationParams {
 
   List<String>? get code => _code;
 
-  String? get module => _module;
+  List<String>? get module => _module;
 
   Locale? get locale => _locale;
 

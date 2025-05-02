@@ -584,7 +584,8 @@ class _HomePageState extends LocalizedState<HomePage> {
           ) {
             final appConfig = appConfiguration;
             final localizationModulesList = appConfiguration.backendInterface;
-            final selectedLocale = AppSharedPreferences().getSelectedLocale;
+            final selectedLocale =
+                "en_NG"; //AppSharedPreferences().getSelectedLocale;
             LocalizationParams()
                 .setCode(LeastLevelBoundarySingleton().boundary);
             context
@@ -734,11 +735,14 @@ void setPackagesSingleton(BuildContext context) {
 
 void loadLocalization(
     BuildContext context, AppConfiguration appConfiguration) async {
-  context.read<LocalizationBloc>().add(
-      LocalizationEvent.onUpdateLocalizationIndex(
-          index: appConfiguration.languages!.indexWhere((element) =>
-              element.value == AppSharedPreferences().getSelectedLocale),
-          code: AppSharedPreferences().getSelectedLocale!));
+  LocalizationParams().setModule(['boundary'], true);
+  context
+      .read<LocalizationBloc>()
+      .add(LocalizationEvent.onUpdateLocalizationIndex(
+        index: appConfiguration.languages!.indexWhere((element) =>
+            element.value == AppSharedPreferences().getSelectedLocale),
+        code: "en_NG", //AppSharedPreferences().getSelectedLocale!
+      ));
 }
 
 class _HomeItemDataModel {
