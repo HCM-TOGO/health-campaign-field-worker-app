@@ -107,7 +107,7 @@ class CustomDeliverInterventionPageState
               navigateToSummary: true,
               householdMemberWrapper: householdMember),
         );
-    context.router.push(SplashAcknowledgementRoute());
+    context.router.push(DeliverySummaryRoute());
   }
 
   void handleLocationState(
@@ -345,51 +345,82 @@ class CustomDeliverInterventionPageState
                                                               type: ToastType
                                                                   .error);
                                                         } else {
-  
-                                                          final shouldSubmit = await dialog.DigitDialog.show<bool>(
+                                                          final shouldSubmit =
+                                                              await dialog
+                                                                      .DigitDialog
+                                                                  .show<bool>(
                                                             context,
-                                                            options: dialog.DigitDialogOptions(
-                                                              titleText: localizations.translate(
-                                                                i18.deliverIntervention.dialogTitle,
+                                                            options: dialog
+                                                                .DigitDialogOptions(
+                                                              titleText:
+                                                                  localizations
+                                                                      .translate(
+                                                                i18.deliverIntervention
+                                                                    .dialogTitle,
                                                               ),
-                                                              contentText: localizations.translate(
-                                                                i18.deliverIntervention.dialogContent,
+                                                              contentText:
+                                                                  localizations
+                                                                      .translate(
+                                                                i18.deliverIntervention
+                                                                    .dialogContent,
                                                               ),
-                                                              primaryAction: dialog.DigitDialogActions(
-                                                                label: localizations.translate(
-                                                                  i18.common.coreCommonSubmit,
+                                                              primaryAction: dialog
+                                                                  .DigitDialogActions(
+                                                                label: localizations
+                                                                    .translate(
+                                                                  i18.common
+                                                                      .coreCommonSubmit,
                                                                 ),
                                                                 action: (ctx) {
-                                                                  Navigator.of(ctx, rootNavigator: true).pop(true);
+                                                                  Navigator.of(
+                                                                          ctx,
+                                                                          rootNavigator:
+                                                                              true)
+                                                                      .pop(
+                                                                          true);
                                                                 },
                                                               ),
-                                                              secondaryAction: dialog.DigitDialogActions(
-                                                                label: localizations.translate(
-                                                                  i18.common.coreCommonCancel,
+                                                              secondaryAction:
+                                                                  dialog
+                                                                      .DigitDialogActions(
+                                                                label: localizations
+                                                                    .translate(
+                                                                  i18.common
+                                                                      .coreCommonCancel,
                                                                 ),
                                                                 action: (ctx) {
-                                                                  Navigator.of(ctx, rootNavigator: true).pop(false);
+                                                                  Navigator.of(
+                                                                          ctx,
+                                                                          rootNavigator:
+                                                                              true)
+                                                                      .pop(
+                                                                          false);
                                                                 },
                                                               ),
                                                             ),
                                                           );
 
                                                           // Check the result of the dialog
-                                                          if (shouldSubmit == true) {
+                                                          if (shouldSubmit ==
+                                                              true) {
                                                             // Proceed with submission
-                                                            context.read<LocationBloc>().add(const LoadLocationEvent());
+                                                            context
+                                                                .read<
+                                                                    LocationBloc>()
+                                                                .add(
+                                                                    const LoadLocationEvent());
                                                             handleLocationState(
                                                               locationState,
                                                               context,
                                                               deliveryInterventionState,
                                                               form,
                                                               householdMemberWrapper,
-                                                              projectBeneficiary!.first,
+                                                              projectBeneficiary!
+                                                                  .first,
                                                             );
                                                           }
                                                         }
                                                       },
-                                                      
                                                     );
                                                   });
                                                 },
@@ -399,7 +430,8 @@ class CustomDeliverInterventionPageState
                                     ),
                                     header: const Column(children: [
                                       Padding(
-                                        padding: EdgeInsets.only(bottom:spacer2),
+                                        padding:
+                                            EdgeInsets.only(bottom: spacer2),
                                         child: BackNavigationHelpHeaderWidget(
                                           showHelp: false,
                                         ),
@@ -417,7 +449,12 @@ class CustomDeliverInterventionPageState
                                                     i18.deliverIntervention
                                                         .deliverInterventionLabel,
                                                   ),
-                                                  style: textTheme.headingXl.copyWith(color: theme.colorTheme.primary.primary2),
+                                                  style: textTheme.headingXl
+                                                      .copyWith(
+                                                          color: theme
+                                                              .colorTheme
+                                                              .primary
+                                                              .primary2),
                                                 ),
                                                 if (RegistrationDeliverySingleton()
                                                         .beneficiaryType ==
@@ -499,9 +536,12 @@ class CustomDeliverInterventionPageState
                                                     i18.deliverIntervention
                                                         .deliverInterventionResourceLabel,
                                                   ),
-                                                  style: textTheme.headingXl.copyWith(
-                                                    color: theme.colorTheme.primary.primary2
-                                                  ),
+                                                  style: textTheme.headingXl
+                                                      .copyWith(
+                                                          color: theme
+                                                              .colorTheme
+                                                              .primary
+                                                              .primary2),
                                                 ),
                                                 ..._controllers.map((e) =>
                                                     ResourceBeneficiaryCard(
@@ -574,9 +614,12 @@ class CustomDeliverInterventionPageState
                                                     i18.deliverIntervention
                                                         .deliveryCommentHeading,
                                                   ),
-                                                  style: textTheme.headingXl.copyWith(
-                                                    color: theme.colorTheme.primary.primary2
-                                                  ),
+                                                  style: textTheme.headingXl
+                                                      .copyWith(
+                                                          color: theme
+                                                              .colorTheme
+                                                              .primary
+                                                              .primary2),
                                                 ),
                                                 ReactiveWrapperField(
                                                   formControlName:
