@@ -25,7 +25,8 @@ import '../../../utils/i18_key_constants.dart' as i18_local;
 import '../../../utils/utils.dart';
 import '../../../widgets/header/back_navigation_help_header.dart';
 import '../../../widgets/localized.dart';
-import '../../../models/entities/assessment_checklist/status.dart' as status_local;
+import '../../../models/entities/assessment_checklist/status.dart'
+    as status_local;
 import 'package:digit_ui_components/services/location_bloc.dart' as location;
 
 @RoutePage()
@@ -64,15 +65,13 @@ class _EligibilityChecklistViewPage
 
   @override
   void initState() {
-     context
+    context
         .read<location.LocationBloc>()
         .add(const location.LocationEvent.load());
-    context.read<ServiceBloc>().add(
-            ServiceSurveyFormEvent(
-            value: Random().nextInt(100).toString(),
-            submitTriggered: true,
-          )
-        );
+    context.read<ServiceBloc>().add(ServiceSurveyFormEvent(
+          value: Random().nextInt(100).toString(),
+          submitTriggered: true,
+        ));
     super.initState();
   }
 
@@ -93,55 +92,54 @@ class _EligibilityChecklistViewPage
         widget.projectBeneficiaryClientReferenceId;
 
     return WillPopScope(
-      onWillPop: context.isHealthFacilitySupervisor &&
-              widget.referralClientRefId != null
-          ? () async => false
-          : () async => _onBackPressed(context, ifIneligible),
-      child: Scaffold(
-        body: BlocBuilder<location.LocationBloc, location.LocationState> (
-         builder: (context, locationState) {
-        return   BlocBuilder <HouseholdOverviewBloc, HouseholdOverviewState>(
-          builder: (context, householdOverviewState) {
-                            double? latitude = locationState.latitude;
-                double? longitude = locationState.longitude;
-            return BlocBuilder<ServiceDefinitionBloc, ServiceDefinitionState>(
-              builder: (context, state) {
-                state.mapOrNull(
-                  serviceDefinitionFetch: (value) {
-                    // todo: verify the checklist name
-                    selectedServiceDefinition = value.serviceDefinitionList
-                        .where((element) => element.code.toString().contains(
-                              '${context.selectedProject.name}.ELIGIBLITY_ASSESSMENT.${context.isCommunityDistributor ? RolesType.communityDistributor.toValue() : RolesType.healthFacilitySupervisor.toValue()}',
-                            ))
-                        .toList()
-                        .firstOrNull;
-                    initialAttributes = selectedServiceDefinition?.attributes;
-                    if (!isControllersInitialized) {
-                      initialAttributes?.forEach((e) {
-                        controller.add(TextEditingController());
-                      });
+        onWillPop: context.isHealthFacilitySupervisor &&
+                widget.referralClientRefId != null
+            ? () async => false
+            : () async => _onBackPressed(context, ifIneligible),
+        child: Scaffold(body:
+            BlocBuilder<location.LocationBloc, location.LocationState>(
+                builder: (context, locationState) {
+          return BlocBuilder<HouseholdOverviewBloc, HouseholdOverviewState>(
+            builder: (context, householdOverviewState) {
+              double? latitude = locationState.latitude;
+              double? longitude = locationState.longitude;
+              return BlocBuilder<ServiceDefinitionBloc, ServiceDefinitionState>(
+                builder: (context, state) {
+                  state.mapOrNull(
+                    serviceDefinitionFetch: (value) {
+                      // todo: verify the checklist name
+                      selectedServiceDefinition = value.serviceDefinitionList
+                          .where((element) => element.code.toString().contains(
+                                '${context.selectedProject.name}.ELIGIBLITY_ASSESSMENT.${context.isCommunityDistributor ? RolesType.communityDistributor.toValue() : RolesType.healthFacilitySupervisor.toValue()}',
+                              ))
+                          .toList()
+                          .firstOrNull;
+                      initialAttributes = selectedServiceDefinition?.attributes;
+                      if (!isControllersInitialized) {
+                        initialAttributes?.forEach((e) {
+                          controller.add(TextEditingController());
+                        });
 
-                      // Set the flag to true after initializing controllers
-                      isControllersInitialized = true;
-                    }
-                  },
-                );
+                        // Set the flag to true after initializing controllers
+                        isControllersInitialized = true;
+                      }
+                    },
+                  );
 
-                return state.maybeMap(
-                  orElse: () => Text(state.runtimeType.toString()),
-                  serviceDefinitionFetch: (value) {
-                    return ScrollableContent(
-                      header: Column(children: [
-                        if (!(context.isHealthFacilitySupervisor &&
-                            widget.referralClientRefId != null))
-                          const BackNavigationHelpHeaderWidget(
-                            showHelp: false,
-                            showcaseButton: null,
-                          ),
-
-                      ]),
-                      enableFixedButton: true,
-                      footer:  DigitCard(
+                  return state.maybeMap(
+                    orElse: () => Text(state.runtimeType.toString()),
+                    serviceDefinitionFetch: (value) {
+                      return ScrollableContent(
+                        header: Column(children: [
+                          if (!(context.isHealthFacilitySupervisor &&
+                              widget.referralClientRefId != null))
+                            const BackNavigationHelpHeaderWidget(
+                              showHelp: false,
+                              showcaseButton: null,
+                            ),
+                        ]),
+                        enableFixedButton: true,
+                        footer: DigitCard(
                           margin: const EdgeInsets.fromLTRB(0, kPadding, 0, 0),
                           padding: const EdgeInsets.fromLTRB(
                               kPadding, 0, kPadding, 0),
@@ -193,304 +191,311 @@ class _EligibilityChecklistViewPage
                                 responses[attributeCode] = value;
                               }
                               triggerLocalization = true;
-                            // final router = context.router;
+                              // final router = context.router;
 
-                            List<String>? referralReasons = [];
-                            List<String?> ineligibilityReasons = [];
-                            List<bool> checkIfIneligibleFlow = [];
+                              List<String>? referralReasons = [];
+                              List<String?> ineligibilityReasons = [];
+                              List<bool> checkIfIneligibleFlow = [];
 
-                            ifReferral = isReferral(responses, referralReasons);
-                            ifDeliver = isDelivery(responses);
-                            checkIfIneligibleFlow = isIneligible(
-                              responses,
-                              ineligibilityReasons,
-                              ifAdministration,
-                            );
-                            if (checkIfIneligibleFlow.isNotEmpty &&
-                                checkIfIneligibleFlow.length >= 2) {
-                              ifIneligible = checkIfIneligibleFlow[0];
-                              ifAdministration = checkIfIneligibleFlow[1];
-                            }
-
-                            var descriptionText = ifIneligible
-                                ? localizations.translate(
-                                    i18_local.deliverIntervention
-                                        .beneficiaryIneligibleDescription,
-                                  )
-                                : ifReferral
-                                    ? localizations.translate(
-                                        i18_local.deliverIntervention
-                                            .beneficiaryReferralDescription,
-                                      )
-                                    : localizations.translate(
-                                        i18_local.deliverIntervention
-                                            .spaqRedirectionScreenDescription,
-                                      );
-
-                            final shouldSubmit = await DigitDialog.show(
-                              context,
-                              options: DigitDialogOptions(
-                                titleText: localizations.translate(
-                                  i18_local
-                                      .checklist.submitButtonDialogLabelText,
-                                ),
-                                content: Text(localizations
-                                    .translate(
-                                      i18_local.checklist
-                                          .checklistDialogDynamicDescription,
-                                    )
-                                    .replaceFirst('{}', descriptionText)),
-                                primaryAction: DigitDialogActions(
-                                  label: localizations.translate(
-                                    i18_local
-                                        .checklist.checklistDialogPrimaryAction,
-                                  ),
-                                  action: (ctx) {
-                                    final referenceId = IdGen.i.identifier;
-                                    List<ServiceAttributesModel> attributes =
-                                        [];
-                                    for (int i = 0;
-                                        i < controller.length;
-                                        i++) {
-                                      final attribute = initialAttributes;
-
-                                      attributes.add(ServiceAttributesModel(
-                                        auditDetails: AuditDetails(
-                                          createdBy: context.loggedInUserUuid,
-                                          createdTime:
-                                              context.millisecondsSinceEpoch(),
-                                        ),
-                                        attributeCode: '${attribute?[i].code}',
-                                        dataType: attribute?[i].dataType,
-                                        clientReferenceId: IdGen.i.identifier,
-                                        referenceId: isHealthFacilityWorker &&
-                                                widget.referralClientRefId !=
-                                                    null
-                                            ? widget.referralClientRefId
-                                            : referenceId,
-                                        value: attribute?[i].dataType !=
-                                                'SingleValueList'
-                                            ? controller[i]
-                                                    .text
-                                                    .toString()
-                                                    .trim()
-                                                    .isNotEmpty
-                                                ? controller[i].text.toString()
-                                                : ''
-                                            : visibleChecklistIndexes
-                                                    .contains(i)
-                                                ? controller[i].text.toString()
-                                                : i18_local
-                                                    .checklist.notSelectedKey,
-                                        rowVersion: 1,
-                                        tenantId: attribute?[i].tenantId,
-                                        additionalFields:
-                                            ServiceAttributesAdditionalFields(
-                                          version: 1,
-                                          // TODO: This needs to be done after adding locationbloc
-                                          fields: [
-                                            AdditionalField(
-                                              'latitude',
-                                              latitude,
-                                            ),
-                                            AdditionalField(
-                                              'longitude',
-                                              longitude,
-                                            ),
-                                          ],
-                                        ),
-                                      ));
-                                    }
-
-                                    context.read<ServiceBloc>().add(
-                                          ServiceCreateEvent(
-                                            serviceModel: ServiceModel(
-                                              createdAt: DigitDateUtils
-                                                  .getDateFromTimestamp(
-                                                DateTime.now()
-                                                    .toLocal()
-                                                    .millisecondsSinceEpoch,
-                                                dateFormat: Constants
-                                                    .checklistViewDateFormat,
-                                              ),
-                                              tenantId:
-                                                  selectedServiceDefinition!
-                                                      .tenantId,
-                                              clientId: isHealthFacilityWorker &&
-                                                      widget.referralClientRefId !=
-                                                          null
-                                                  ? widget.referralClientRefId
-                                                      .toString()
-                                                  : referenceId,
-                                              serviceDefId:
-                                                  selectedServiceDefinition?.id,
-                                              attributes: attributes,
-                                              rowVersion: 1,
-                                              accountId: context.projectId,
-                                              auditDetails: AuditDetails(
-                                                createdBy:
-                                                    context.loggedInUserUuid,
-                                                createdTime: DateTime.now()
-                                                    .millisecondsSinceEpoch,
-                                              ),
-                                              clientAuditDetails:
-                                                  ClientAuditDetails(
-                                                createdBy:
-                                                    context.loggedInUserUuid,
-                                                createdTime: context
-                                                    .millisecondsSinceEpoch(),
-                                                lastModifiedBy:
-                                                    context.loggedInUserUuid,
-                                                lastModifiedTime: context
-                                                    .millisecondsSinceEpoch(),
-                                              ),
-                                              additionalDetails: {
-                                                "boundaryCode":
-                                                    context.boundary.code
-                                              },
-                                            ),
-                                          ),
-                                        );
-
-                                    Navigator.of(
-                                      context,
-                                      rootNavigator: true,
-                                    ).pop(true);
-                                  },
-                                ),
-                                secondaryAction: DigitDialogActions(
-                                  label: localizations.translate(
-                                    i18_local.checklist
-                                        .checklistDialogSecondaryAction,
-                                  ),
-                                  action: (context) {
-                                    Navigator.of(
-                                      context,
-                                      rootNavigator: true,
-                                    ).pop(false);
-                                  },
-                                ),
-                              ),
-                            );
-                            if (shouldSubmit ?? false) {
-                              if (context.mounted &&
-                                  ((ifDeliver || ifAdministration) ||
-                                      ifIneligible ||
-                                      ifReferral)) {
-                                        final router = context.router;
-                                if (ifIneligible) {
-                                  // added the deliversubmitevent here
-                                  final clientReferenceId = IdGen.i.identifier;
-                                  context.read<DeliverInterventionBloc>().add(
-                                        DeliverInterventionSubmitEvent(
-                                            task: TaskModel(
-                                              projectBeneficiaryClientReferenceId:
-                                                  projectBeneficiaryClientReferenceId,
-                                              clientReferenceId:
-                                                  clientReferenceId,
-                                              tenantId:
-                                                  envConfig.variables.tenantId,
-                                              rowVersion: 1,
-                                              auditDetails: AuditDetails(
-                                                createdBy:
-                                                    context.loggedInUserUuid,
-                                                createdTime: context
-                                                    .millisecondsSinceEpoch(),
-                                              ),
-                                              projectId: context.projectId,
-                                              status: status_local.Status
-                                                  .beneficiaryInEligible
-                                                  .toValue(),
-                                              clientAuditDetails:
-                                                  ClientAuditDetails(
-                                                createdBy:
-                                                    context.loggedInUserUuid,
-                                                createdTime: context
-                                                    .millisecondsSinceEpoch(),
-                                                lastModifiedBy:
-                                                    context.loggedInUserUuid,
-                                                lastModifiedTime: context
-                                                    .millisecondsSinceEpoch(),
-                                              ),
-                                              additionalFields:
-                                                  TaskAdditionalFields(
-                                                version: 1,
-                                                fields: [
-                                                  // AdditionalField(
-                                                  //   'taskStatus',
-                                                  //   Status.beneficiaryInEligible
-                                                  //       .toValue(),
-                                                  // ),
-                                                  AdditionalField(
-                                                    'ineligibleReasons',
-                                                    ineligibilityReasons
-                                                        .join(","),
-                                                  ),
-                                                ],
-                                              ),
-                                              address: widget
-                                                  .individual!.address?.first
-                                                  .copyWith(
-                                                relatedClientReferenceId:
-                                                    clientReferenceId,
-                                                id: null,
-                                              ),
-                                            ),
-                                            isEditing: false,
-                                            boundaryModel: context.boundary,
-                                            navigateToSummary: false,
-                                            householdMemberWrapper:
-                                                householdOverviewState
-                                                    .householdMemberWrapper),
-                                      );
-                                  final searchBloc =
-                                      context.read<SearchHouseholdsBloc>();
-                                  searchBloc.add(
-                                    const SearchHouseholdsClearEvent(),
-                                  );
-
-                                  router.push(
-                                    HouseholdAcknowledgementRoute(
-                                        enableViewHousehold: true),
-                                  );
-                                } else if (ifReferral) {
-                                  router.push(
-                                    CustomReferBeneficiarySMCRoute(
-                                      projectBeneficiaryClientRefId:
-                                          projectBeneficiaryClientReferenceId ??
-                                              "",
-                                      individual: widget.individual!,
-                                      referralReasons: referralReasons,
-                                    ),
-                                  );
-                                } else {
-                                  router.push(BeneficiaryDetailsRoute());
-                                }
+                              ifReferral =
+                                  isReferral(responses, referralReasons);
+                              ifDeliver = isDelivery(responses);
+                              checkIfIneligibleFlow = isIneligible(
+                                responses,
+                                ineligibilityReasons,
+                                ifAdministration,
+                              );
+                              if (checkIfIneligibleFlow.isNotEmpty &&
+                                  checkIfIneligibleFlow.length >= 2) {
+                                ifIneligible = checkIfIneligibleFlow[0];
+                                ifAdministration = checkIfIneligibleFlow[1];
                               }
 
-                              final router = context.router;
-                              submitTriggered = true;
+                              var descriptionText = ifIneligible
+                                  ? localizations.translate(
+                                      i18_local.deliverIntervention
+                                          .beneficiaryIneligibleDescription,
+                                    )
+                                  : ifReferral
+                                      ? localizations.translate(
+                                          i18_local.deliverIntervention
+                                              .beneficiaryReferralDescription,
+                                        )
+                                      : localizations.translate(
+                                          i18_local.deliverIntervention
+                                              .spaqRedirectionScreenDescription,
+                                        );
 
-                              context.read<ServiceBloc>().add(
-                                    const ServiceSurveyFormEvent(
-                                      value: '',
-                                      submitTriggered: true,
+                              final shouldSubmit = await DigitDialog.show(
+                                context,
+                                options: DigitDialogOptions(
+                                  titleText: localizations.translate(
+                                    i18_local
+                                        .checklist.submitButtonDialogLabelText,
+                                  ),
+                                  content: Text(localizations
+                                      .translate(
+                                        i18_local.checklist
+                                            .checklistDialogDynamicDescription,
+                                      )
+                                      .replaceFirst('{}', descriptionText)),
+                                  primaryAction: DigitDialogActions(
+                                    label: localizations.translate(
+                                      i18_local.checklist
+                                          .checklistDialogPrimaryAction,
                                     ),
-                                  );
+                                    action: (ctx) {
+                                      final referenceId = IdGen.i.identifier;
+                                      List<ServiceAttributesModel> attributes =
+                                          [];
+                                      for (int i = 0;
+                                          i < controller.length;
+                                          i++) {
+                                        final attribute = initialAttributes;
 
+                                        attributes.add(ServiceAttributesModel(
+                                          auditDetails: AuditDetails(
+                                            createdBy: context.loggedInUserUuid,
+                                            createdTime: context
+                                                .millisecondsSinceEpoch(),
+                                          ),
+                                          attributeCode:
+                                              '${attribute?[i].code}',
+                                          dataType: attribute?[i].dataType,
+                                          clientReferenceId: IdGen.i.identifier,
+                                          referenceId: isHealthFacilityWorker &&
+                                                  widget.referralClientRefId !=
+                                                      null
+                                              ? widget.referralClientRefId
+                                              : referenceId,
+                                          value: attribute?[i].dataType !=
+                                                  'SingleValueList'
+                                              ? controller[i]
+                                                      .text
+                                                      .toString()
+                                                      .trim()
+                                                      .isNotEmpty
+                                                  ? controller[i]
+                                                      .text
+                                                      .toString()
+                                                  : ''
+                                              : visibleChecklistIndexes
+                                                      .contains(i)
+                                                  ? controller[i]
+                                                      .text
+                                                      .toString()
+                                                  : i18_local
+                                                      .checklist.notSelectedKey,
+                                          rowVersion: 1,
+                                          tenantId: attribute?[i].tenantId,
+                                          additionalFields:
+                                              ServiceAttributesAdditionalFields(
+                                            version: 1,
+                                            // TODO: This needs to be done after adding locationbloc
+                                            fields: [
+                                              AdditionalField(
+                                                'latitude',
+                                                latitude,
+                                              ),
+                                              AdditionalField(
+                                                'longitude',
+                                                longitude,
+                                              ),
+                                            ],
+                                          ),
+                                        ));
+                                      }
 
-                              // Request location from LocationBloc
-                              // context
-                              //     .read<location.LocationBloc>()
-                              //     .add(const location.LocationEvent.load());
-                              // DigitComponentsUtils()
-                              //     .showLocationCapturingDialog(
-                              //   context,
-                              //   localizations.translate(
-                              //       i18_local.common.locationCapturing),
-                              //   DigitSyncDialogType.inProgress,
-                              // );
-                            }
+                                      context.read<ServiceBloc>().add(
+                                            ServiceCreateEvent(
+                                              serviceModel: ServiceModel(
+                                                createdAt: DigitDateUtils
+                                                    .getDateFromTimestamp(
+                                                  DateTime.now()
+                                                      .toLocal()
+                                                      .millisecondsSinceEpoch,
+                                                  dateFormat: Constants
+                                                      .checklistViewDateFormat,
+                                                ),
+                                                tenantId:
+                                                    selectedServiceDefinition!
+                                                        .tenantId,
+                                                clientId: isHealthFacilityWorker &&
+                                                        widget.referralClientRefId !=
+                                                            null
+                                                    ? widget.referralClientRefId
+                                                        .toString()
+                                                    : referenceId,
+                                                serviceDefId:
+                                                    selectedServiceDefinition
+                                                        ?.id,
+                                                attributes: attributes,
+                                                rowVersion: 1,
+                                                accountId: context.projectId,
+                                                auditDetails: AuditDetails(
+                                                  createdBy:
+                                                      context.loggedInUserUuid,
+                                                  createdTime: DateTime.now()
+                                                      .millisecondsSinceEpoch,
+                                                ),
+                                                clientAuditDetails:
+                                                    ClientAuditDetails(
+                                                  createdBy:
+                                                      context.loggedInUserUuid,
+                                                  createdTime: context
+                                                      .millisecondsSinceEpoch(),
+                                                  lastModifiedBy:
+                                                      context.loggedInUserUuid,
+                                                  lastModifiedTime: context
+                                                      .millisecondsSinceEpoch(),
+                                                ),
+                                                additionalDetails: {
+                                                  "boundaryCode":
+                                                      context.boundary.code
+                                                },
+                                              ),
+                                            ),
+                                          );
+
+                                      Navigator.of(
+                                        context,
+                                        rootNavigator: true,
+                                      ).pop(true);
+                                    },
+                                  ),
+                                  secondaryAction: DigitDialogActions(
+                                    label: localizations.translate(
+                                      i18_local.checklist
+                                          .checklistDialogSecondaryAction,
+                                    ),
+                                    action: (context) {
+                                      Navigator.of(
+                                        context,
+                                        rootNavigator: true,
+                                      ).pop(false);
+                                    },
+                                  ),
+                                ),
+                              );
+                              if (shouldSubmit ?? false) {
+                                if (context.mounted &&
+                                    ((ifDeliver || ifAdministration) ||
+                                        ifIneligible ||
+                                        ifReferral)) {
+                                  final router = context.router;
+                                  if (ifIneligible) {
+                                    // added the deliversubmitevent here
+                                    final clientReferenceId =
+                                        IdGen.i.identifier;
+                                    context.read<DeliverInterventionBloc>().add(
+                                          DeliverInterventionSubmitEvent(
+                                              task: TaskModel(
+                                                projectBeneficiaryClientReferenceId:
+                                                    projectBeneficiaryClientReferenceId,
+                                                clientReferenceId:
+                                                    clientReferenceId,
+                                                tenantId: envConfig
+                                                    .variables.tenantId,
+                                                rowVersion: 1,
+                                                auditDetails: AuditDetails(
+                                                  createdBy:
+                                                      context.loggedInUserUuid,
+                                                  createdTime: context
+                                                      .millisecondsSinceEpoch(),
+                                                ),
+                                                projectId: context.projectId,
+                                                status: status_local.Status
+                                                    .beneficiaryInEligible
+                                                    .toValue(),
+                                                clientAuditDetails:
+                                                    ClientAuditDetails(
+                                                  createdBy:
+                                                      context.loggedInUserUuid,
+                                                  createdTime: context
+                                                      .millisecondsSinceEpoch(),
+                                                  lastModifiedBy:
+                                                      context.loggedInUserUuid,
+                                                  lastModifiedTime: context
+                                                      .millisecondsSinceEpoch(),
+                                                ),
+                                                additionalFields:
+                                                    TaskAdditionalFields(
+                                                  version: 1,
+                                                  fields: [
+                                                    // AdditionalField(
+                                                    //   'taskStatus',
+                                                    //   Status.beneficiaryInEligible
+                                                    //       .toValue(),
+                                                    // ),
+                                                    AdditionalField(
+                                                      'ineligibleReasons',
+                                                      ineligibilityReasons
+                                                          .join(","),
+                                                    ),
+                                                  ],
+                                                ),
+                                                address: widget
+                                                    .individual!.address?.first
+                                                    .copyWith(
+                                                  relatedClientReferenceId:
+                                                      clientReferenceId,
+                                                  id: null,
+                                                ),
+                                              ),
+                                              isEditing: false,
+                                              boundaryModel: context.boundary,
+                                              navigateToSummary: false,
+                                              householdMemberWrapper:
+                                                  householdOverviewState
+                                                      .householdMemberWrapper),
+                                        );
+                                    final searchBloc =
+                                        context.read<SearchHouseholdsBloc>();
+                                    searchBloc.add(
+                                      const SearchHouseholdsClearEvent(),
+                                    );
+
+                                    router.push(
+                                      HouseholdAcknowledgementRoute(
+                                          enableViewHousehold: true),
+                                    );
+                                  } else if (ifReferral) {
+                                    router.push(
+                                      CustomReferBeneficiarySMCRoute(
+                                        projectBeneficiaryClientRefId:
+                                            projectBeneficiaryClientReferenceId ??
+                                                "",
+                                        individual: widget.individual!,
+                                        referralReasons: referralReasons,
+                                      ),
+                                    );
+                                  } else {
+                                    router.push(BeneficiaryDetailsRoute());
+                                  }
+                                }
+
+                                final router = context.router;
+                                submitTriggered = true;
+
+                                context.read<ServiceBloc>().add(
+                                      const ServiceSurveyFormEvent(
+                                        value: '',
+                                        submitTriggered: true,
+                                      ),
+                                    );
+
+                                // Request location from LocationBloc
+                                // context
+                                //     .read<location.LocationBloc>()
+                                //     .add(const location.LocationEvent.load());
+                                // DigitComponentsUtils()
+                                //     .showLocationCapturingDialog(
+                                //   context,
+                                //   localizations.translate(
+                                //       i18_local.common.locationCapturing),
+                                //   DigitSyncDialogType.inProgress,
+                                // );
+                              }
                             },
                             child: Text(
                               localizations
@@ -498,191 +503,207 @@ class _EligibilityChecklistViewPage
                             ),
                           ),
                         ),
-                      children: [
-                        Form(
-                          key: checklistFormKey, //assigning key to form
-                          child: DigitCard(
-                            child: Column(children: [
-                              Padding(
-                                padding: const EdgeInsets.only(bottom: 8),
-                                child: Text(
-                                  "",
-                                  style: theme.textTheme.displayMedium,
-                                  textAlign: TextAlign.left,
-                                ),
-                              ),
-                              ...initialAttributes!.map((
-                                e,
-                              ) {
-                                int index =
-                                    (initialAttributes ?? []).indexOf(e);
-
-                                return Column(children: [
-                                  if (e.dataType == 'String' &&
-                                      !(e.code ?? '').contains('.')) ...[
-                                    DigitTextField(
-                                      autoValidation:
-                                          AutovalidateMode.onUserInteraction,
-                                      isRequired: true,
-                                      controller: controller[index],
-                                      // inputFormatter: [
-                                      //   FilteringTextInputFormatter.allow(RegExp(
-                                      //     "[a-zA-Z0-9]",
-                                      //   )),
-                                      // ],
-                                      validator: (value) {
-                                        if (((value == null || value == '') &&
-                                            e.required == true)) {
-                                          return localizations.translate(
-                                            i18_local.common.corecommonRequired,
-                                          );
-                                        }
-                                        if (e.regex != null) {
-                                          return (RegExp(e.regex!)
-                                                  .hasMatch(value!))
-                                              ? null
-                                              : localizations
-                                                  .translate("${e.code}_REGEX");
-                                        }
-
-                                        return null;
-                                      },
-                                      label: localizations.translate(
-                                        '${selectedServiceDefinition?.code}.${e.code}',
+                        children: [
+                          Form(
+                            key: checklistFormKey, //assigning key to form
+                            child: DigitCard(
+                              child: Column(
+                                  crossAxisAlignment: CrossAxisAlignment.start,
+                                  children: [
+                                    Padding(
+                                      padding: const EdgeInsets.only(left: 8),
+                                      child: Text(
+                                        localizations.translate(
+                                          selectedServiceDefinition!.code
+                                              .toString(),
+                                        ),
+                                        style: theme.textTheme.displayMedium,
+                                        textAlign: TextAlign.left,
                                       ),
                                     ),
-                                  ] else if (e.dataType == 'Number' &&
-                                      !(e.code ?? '').contains('.')) ...[
-                                    DigitTextField(
-                                      autoValidation:
-                                          AutovalidateMode.onUserInteraction,
-                                      textStyle: theme.textTheme.headlineMedium,
-                                      textInputType: TextInputType.number,
-                                      inputFormatter: [
-                                        FilteringTextInputFormatter.allow(
-                                          RegExp(
-                                            "[0-9]",
-                                          ),
-                                        ),
-                                      ],
-                                      validator: (value) {
-                                        if (((value == null || value == '') &&
-                                            e.required == true)) {
-                                          return localizations.translate(
-                                            i18_local.common.corecommonRequired,
-                                          );
-                                        }
-                                        if (e.regex != null) {
-                                          return (RegExp(e.regex!)
-                                                  .hasMatch(value!))
-                                              ? null
-                                              : localizations
-                                                  .translate("${e.code}_REGEX");
-                                        }
+                                    ...initialAttributes!.map((
+                                      e,
+                                    ) {
+                                      int index =
+                                          (initialAttributes ?? []).indexOf(e);
 
-                                        return null;
-                                      },
-                                      controller: controller[index],
-                                      label: '${localizations.translate(
-                                            '${selectedServiceDefinition?.code}.${e.code}',
-                                          ).trim()} ${e.required == true ? '*' : ''}',
-                                    ),
-                                  ] else if (e.dataType == 'MultiValueList' &&
-                                      !(e.code ?? '').contains('.')) ...[
-                                    Align(
-                                      alignment: Alignment.topLeft,
-                                      child: Padding(
-                                        padding: const EdgeInsets.all(8),
-                                        child: Column(
-                                          children: [
-                                            Text(
-                                              '${localizations.translate(
-                                                '${selectedServiceDefinition?.code}.${e.code}',
-                                              )} ${e.required == true ? '*' : ''}',
-                                              style:
-                                                  theme.textTheme.headlineSmall,
+                                      return Column(children: [
+                                        if (e.dataType == 'String' &&
+                                            !(e.code ?? '').contains('.')) ...[
+                                          DigitTextField(
+                                            autoValidation: AutovalidateMode
+                                                .onUserInteraction,
+                                            isRequired: true,
+                                            controller: controller[index],
+                                            // inputFormatter: [
+                                            //   FilteringTextInputFormatter.allow(RegExp(
+                                            //     "[a-zA-Z0-9]",
+                                            //   )),
+                                            // ],
+                                            validator: (value) {
+                                              if (((value == null ||
+                                                      value == '') &&
+                                                  e.required == true)) {
+                                                return localizations.translate(
+                                                  i18_local.common
+                                                      .corecommonRequired,
+                                                );
+                                              }
+                                              if (e.regex != null) {
+                                                return (RegExp(e.regex!)
+                                                        .hasMatch(value!))
+                                                    ? null
+                                                    : localizations.translate(
+                                                        "${e.code}_REGEX");
+                                              }
+
+                                              return null;
+                                            },
+                                            label: localizations.translate(
+                                              '${selectedServiceDefinition?.code}.${e.code}',
                                             ),
-                                          ],
-                                        ),
-                                      ),
+                                          ),
+                                        ] else if (e.dataType == 'Number' &&
+                                            !(e.code ?? '').contains('.')) ...[
+                                          DigitTextField(
+                                            autoValidation: AutovalidateMode
+                                                .onUserInteraction,
+                                            textStyle:
+                                                theme.textTheme.headlineMedium,
+                                            textInputType: TextInputType.number,
+                                            inputFormatter: [
+                                              FilteringTextInputFormatter.allow(
+                                                RegExp(
+                                                  "[0-9]",
+                                                ),
+                                              ),
+                                            ],
+                                            validator: (value) {
+                                              if (((value == null ||
+                                                      value == '') &&
+                                                  e.required == true)) {
+                                                return localizations.translate(
+                                                  i18_local.common
+                                                      .corecommonRequired,
+                                                );
+                                              }
+                                              if (e.regex != null) {
+                                                return (RegExp(e.regex!)
+                                                        .hasMatch(value!))
+                                                    ? null
+                                                    : localizations.translate(
+                                                        "${e.code}_REGEX");
+                                              }
+
+                                              return null;
+                                            },
+                                            controller: controller[index],
+                                            label: '${localizations.translate(
+                                                  '${selectedServiceDefinition?.code}.${e.code}',
+                                                ).trim()} ${e.required == true ? '*' : ''}',
+                                          ),
+                                        ] else if (e.dataType ==
+                                                'MultiValueList' &&
+                                            !(e.code ?? '').contains('.')) ...[
+                                          Align(
+                                            alignment: Alignment.topLeft,
+                                            child: Padding(
+                                              padding: const EdgeInsets.all(8),
+                                              child: Column(
+                                                children: [
+                                                  Text(
+                                                    '${localizations.translate(
+                                                      '${selectedServiceDefinition?.code}.${e.code}',
+                                                    )} ${e.required == true ? '*' : ''}',
+                                                    style: theme.textTheme
+                                                        .headlineSmall,
+                                                  ),
+                                                ],
+                                              ),
+                                            ),
+                                          ),
+                                          BlocBuilder<ServiceBloc,
+                                              ServiceState>(
+                                            builder: (context, state) {
+                                              return Column(
+                                                children: e.values!
+                                                    .map((e) =>
+                                                        DigitCheckboxTile(
+                                                          label: e,
+                                                          value:
+                                                              controller[index]
+                                                                  .text
+                                                                  .split('.')
+                                                                  .contains(e),
+                                                          onChanged: (value) {
+                                                            // context
+                                                            //     .read<ServiceBloc>()
+                                                            //     .add(
+                                                            //       ServiceChecklistEvent(
+                                                            //         value:
+                                                            //             e.toString(),
+                                                            //         submitTriggered:
+                                                            //             submitTriggered,
+                                                            //       ),
+                                                            //     );
+                                                            final String ele;
+                                                            var val =
+                                                                controller[
+                                                                        index]
+                                                                    .text
+                                                                    .split('.');
+                                                            if (val
+                                                                .contains(e)) {
+                                                              val.remove(e);
+                                                              ele =
+                                                                  val.join(".");
+                                                            } else {
+                                                              ele =
+                                                                  "${controller[index].text}.$e";
+                                                            }
+                                                            controller[index]
+                                                                    .value =
+                                                                TextEditingController
+                                                                    .fromValue(
+                                                              TextEditingValue(
+                                                                text: ele,
+                                                              ),
+                                                            ).value;
+                                                          },
+                                                        ))
+                                                    .toList(),
+                                              );
+                                            },
+                                          ),
+                                        ] else if (e.dataType ==
+                                            'SingleValueList') ...[
+                                          if (!(e.code ?? '').contains('.'))
+                                            DigitCard(
+                                              child: _buildChecklist(
+                                                e,
+                                                index,
+                                                selectedServiceDefinition,
+                                                context,
+                                              ),
+                                            ),
+                                        ],
+                                      ]);
+                                    }).toList(),
+                                    const SizedBox(
+                                      height: 15,
                                     ),
-                                    BlocBuilder<ServiceBloc, ServiceState>(
-                                      builder: (context, state) {
-                                        return Column(
-                                          children: e.values!
-                                              .map((e) => DigitCheckboxTile(
-                                                    label: e,
-                                                    value: controller[index]
-                                                        .text
-                                                        .split('.')
-                                                        .contains(e),
-                                                    onChanged: (value) {
-                                                      // context
-                                                      //     .read<ServiceBloc>()
-                                                      //     .add(
-                                                      //       ServiceChecklistEvent(
-                                                      //         value:
-                                                      //             e.toString(),
-                                                      //         submitTriggered:
-                                                      //             submitTriggered,
-                                                      //       ),
-                                                      //     );
-                                                      final String ele;
-                                                      var val =
-                                                          controller[index]
-                                                              .text
-                                                              .split('.');
-                                                      if (val.contains(e)) {
-                                                        val.remove(e);
-                                                        ele = val.join(".");
-                                                      } else {
-                                                        ele =
-                                                            "${controller[index].text}.$e";
-                                                      }
-                                                      controller[index].value =
-                                                          TextEditingController
-                                                              .fromValue(
-                                                        TextEditingValue(
-                                                          text: ele,
-                                                        ),
-                                                      ).value;
-                                                    },
-                                                  ))
-                                              .toList(),
-                                        );
-                                      },
-                                    ),
-                                  ] else if (e.dataType ==
-                                      'SingleValueList') ...[
-                                    if (!(e.code ?? '').contains('.'))
-                                      DigitCard(
-                                        child: _buildChecklist(
-                                          e,
-                                          index,
-                                          selectedServiceDefinition,
-                                          context,
-                                        ),
-                                      ),
-                                  ],
-                                ]);
-                              }).toList(),
-                              const SizedBox(
-                                height: 15,
-                              ),
-                            ]),
+                                  ]),
+                            ),
                           ),
-                        ),
-                      ],
-                    );
-                  },
-                );
-              },
-            );
-          },
-        );
-         }
-   ))
-    );
+                        ],
+                      );
+                    },
+                  );
+                },
+              );
+            },
+          );
+        })));
   }
 
   Widget _buildChecklist(
@@ -979,7 +1000,6 @@ class _EligibilityChecklistViewPage
 
     return [isIneligible, ifAdministration];
   }
-
 
   bool isReferral(
     Map<String?, String> responses,
