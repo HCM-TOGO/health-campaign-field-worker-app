@@ -1011,9 +1011,10 @@ class CustomIndividualDetailsPageState
       _genderKey: FormControl<String>(value: getGenderOptions(individual)),
       _mobileNumberKey:
           FormControl<String>(value: individual?.mobileNumber, validators: [
-        Validators.pattern(Constants.mobileNumberRegExp,
-            validationMessage:
-                localizations.translate(i18.common.coreCommonMobileNumber)),
+        // Validators.pattern(Constants.mobileNumberRegExp,
+        //     validationMessage:
+        //         localizations.translate(i18.common.coreCommonMobileNumber)),
+        Validators.minLength(11),
         Validators.maxLength(11)
       ]),
     });
