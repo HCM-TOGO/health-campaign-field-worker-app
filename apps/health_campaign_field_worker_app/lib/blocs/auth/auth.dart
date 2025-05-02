@@ -53,6 +53,8 @@ class AuthBloc extends Bloc<AuthEvent, AuthState> {
       final userObject = await localSecureStore.userRequestModel;
       final actionsList = await localSecureStore.savedActions;
       final userIndividualId = await localSecureStore.userIndividualId;
+      final spaq1 = await localSecureStore.spaq1;
+      final spaq2 = await localSecureStore.spaq2;
       if (accessToken == null ||
           refreshToken == null ||
           userObject == null ||
@@ -65,6 +67,8 @@ class AuthBloc extends Bloc<AuthEvent, AuthState> {
           userModel: userObject,
           individualId: userIndividualId,
           actionsWrapper: actionsList,
+          spaq1Count: spaq1,
+          spaq2Count: spaq2,
         ));
       }
     } catch (_) {
@@ -97,6 +101,8 @@ class AuthBloc extends Bloc<AuthEvent, AuthState> {
         "enabled": true,
       });
       await localSecureStore.setBoundaryRefetch(true);
+      final spaq1 = await localSecureStore.spaq1;
+      final spaq2 = await localSecureStore.spaq2;
 
       await localSecureStore.setRoleActions(actionsWrapper);
       if (result.userRequestModel.roles
@@ -119,6 +125,8 @@ class AuthBloc extends Bloc<AuthEvent, AuthState> {
           userModel: result.userRequestModel,
           actionsWrapper: actionsWrapper,
           individualId: await localSecureStore.userIndividualId,
+          spaq1Count: spaq1,
+          spaq2Count: spaq2,
         ),
       );
     } on DioException catch (error) {

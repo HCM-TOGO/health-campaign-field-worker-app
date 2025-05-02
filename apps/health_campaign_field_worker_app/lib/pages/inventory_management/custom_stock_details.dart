@@ -1,5 +1,6 @@
 import 'package:auto_route/auto_route.dart';
 import 'package:collection/collection.dart';
+import 'package:digit_components/widgets/atoms/digit_toaster.dart';
 // import 'package:digit_ui_components/widgets/atoms/digit_reactive_dropdown.dart';
 import 'package:digit_data_model/data_model.dart';
 import 'package:digit_scanner/blocs/scanner.dart';
@@ -17,7 +18,6 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:gs1_barcode_parser/gs1_barcode_parser.dart';
 import 'package:inventory_management/inventory_management.dart';
 import 'package:inventory_management/router/inventory_router.gm.dart';
-import 'package:inventory_management/utils/extensions/extensions.dart';
 import 'package:reactive_forms/reactive_forms.dart';
 
 import 'package:inventory_management/utils/i18_key_constants.dart' as i18;
@@ -26,6 +26,9 @@ import 'package:inventory_management/blocs/product_variant.dart';
 import 'package:inventory_management/blocs/record_stock.dart';
 import 'package:inventory_management/widgets/back_navigation_help_header.dart';
 
+import '../../blocs/auth/auth.dart';
+import '../../utils/constants.dart';
+import '../../utils/extensions/extensions.dart';
 import '../../utils/i18_key_constants.dart' as i18_local;
 
 @RoutePage()
@@ -102,6 +105,7 @@ class CustomStockDetailsPageState
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
     final textTheme = theme.digitTextTheme(context);
+    final isDistributor = context.isDistributor;
 
     bool isWareHouseMgr = InventorySingleton().isWareHouseMgr;
 
@@ -408,6 +412,70 @@ class CustomStockDetailsPageState
                                                 .control(_deliveryTeamKey)
                                                 .value as String?;
 
+                                            int spaq1 = 0;
+                                            int spaq2 = 0;
+
+                                            int totalQuantity = 0;
+                                            int totalRemainingQuantityInMl =
+                                                context.spaq1;
+
+                                            int totalExpectedUnusedBottles =
+                                                totalRemainingQuantityInMl ~/
+                                                    Constants.mlPerBottle;
+
+                                            int totalExpectedPartialQuantityInMl =
+                                                totalRemainingQuantityInMl %
+                                                    Constants.mlPerBottle;
+
+                                            int totalExpectedPartialBottles =
+                                                totalRemainingQuantityInMl %
+                                                            Constants
+                                                                .mlPerBottle !=
+                                                        0
+                                                    ? 1
+                                                    : 0;
+
+                                            totalQuantity = quantity != null
+                                                ? int.parse(
+                                                    quantity.toString(),
+                                                  )
+                                                : 0;
+
+                                            spaq1 = totalQuantity *
+                                                Constants.mlPerBottle;
+
+                                            if (spaq1 >
+                                                    totalRemainingQuantityInMl &&
+                                                isDistributor &&
+                                                entryType ==
+                                                    StockRecordEntryType
+                                                        .dispatch) {
+                                              DigitToast.show(
+                                                context,
+                                                options: DigitToastOptions(
+                                                  localizations
+                                                      .translate(
+                                                        i18_local.stockDetails
+                                                            .quantityReturnedMaxError,
+                                                      )
+                                                      .replaceAll(
+                                                        "{1}",
+                                                        totalRemainingQuantityInMl
+                                                            .toString(),
+                                                      )
+                                                      .replaceAll(
+                                                        "{2}",
+                                                        totalExpectedUnusedBottles
+                                                            .toString(),
+                                                      ),
+                                                  true,
+                                                  theme,
+                                                ),
+                                              );
+
+                                              return;
+                                            }
+
                                             String? senderId;
                                             String? senderType;
                                             String? receiverId;
@@ -649,6 +717,25 @@ class CustomStockDetailsPageState
                                               bloc.add(
                                                 const RecordStockCreateStockEntryEvent(),
                                               );
+
+                                              if (isDistributor) {
+                                                totalQuantity = entryType ==
+                                                        StockRecordEntryType
+                                                            .dispatch
+                                                    ? totalRemainingQuantityInMl *
+                                                        -1
+                                                    : totalQuantity *
+                                                        Constants.mlPerBottle;
+
+                                                spaq1 = totalQuantity;
+
+                                                context.read<AuthBloc>().add(
+                                                      AuthAddSpaqCountsEvent(
+                                                        spaq1Count: spaq1,
+                                                        spaq2Count: spaq2,
+                                                      ),
+                                                    );
+                                              }
                                             }
                                           });
                                         }
@@ -1321,6 +1408,64 @@ class CustomStockDetailsPageState
           },
         ),
       ),
+    );
+  }
+
+  String? wastageQuantity(
+    FormGroup form,
+    BuildContext context,
+  ) {
+    final quantity = form
+        .control(
+          _transactionQuantityKey,
+        )
+        .value;
+
+    final partialBlisters = form
+        .control(
+          _transactionPartialQuantityKey,
+        )
+        .value;
+
+    if (quantity == null || partialBlisters == null) {
+      return null;
+    }
+
+    int totalQuantity = 0;
+    int totalRemainingQuantityInMl = context.spaq1;
+
+    int totalExpectedUnusedBottles =
+        totalRemainingQuantityInMl ~/ Constants.mlPerBottle;
+
+    int totalExpectedPartialQuantityInMl =
+        totalRemainingQuantityInMl % Constants.mlPerBottle;
+
+    int totalExpectedPartialBottles =
+        totalRemainingQuantityInMl % Constants.mlPerBottle != 0 ? 1 : 0;
+
+    totalQuantity = quantity != null
+        ? int.parse(
+            quantity.toString(),
+          )
+        : 0;
+
+    return (((totalExpectedUnusedBottles - totalQuantity) *
+                Constants.mlPerBottle) +
+            ((totalExpectedPartialBottles >
+                    (partialBlisters != null
+                        ? int.parse(
+                            partialBlisters.toString(),
+                          )
+                        : 0))
+                ? totalExpectedPartialQuantityInMl
+                : 0))
+        .toString();
+  }
+
+  num _getQuantityCount(Iterable<StockModel> stocks) {
+    return stocks.fold<num>(
+      0.0,
+      (old, e) => (num.tryParse(e.quantity ?? '') ?? 0.0) + old,
     );
   }
 

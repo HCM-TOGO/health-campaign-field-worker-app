@@ -149,6 +149,21 @@ extension ContextUtilityExtensions on BuildContext {
     return false;
   }
 
+  bool get isDistributor {
+    try {
+      bool isDistributorUser = loggedInUserRoles
+          .where(
+            (role) => role.code == RolesType.communityDistributor.toValue(),
+          )
+          .toList()
+          .isNotEmpty;
+
+      return isDistributorUser;
+    } catch (_) {
+      return false;
+    }
+  }
+
   bool get isCDD {
     UserRequestModel loggedInUser;
 

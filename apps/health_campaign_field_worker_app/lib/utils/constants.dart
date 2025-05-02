@@ -93,6 +93,8 @@ class Constants {
   static const String reDoseQuantityKey = 'reDoseQuantity';
   static const String healthFacility = 'Health Facility';
 
+  static const int mlPerBottle = 30;
+
   static const String dashboardAnalyticsPath =
       '/dashboard-analytics/dashboard/getChartV2';
 

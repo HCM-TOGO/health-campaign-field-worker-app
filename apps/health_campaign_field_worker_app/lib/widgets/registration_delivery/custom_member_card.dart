@@ -373,7 +373,7 @@ class CustomMemberCard extends StatelessWidget {
                                                 .resources!.first.quantity!,
                                           ).round();
 
-                                          if (true || spaq1 >= doseCount) {
+                                          if (spaq1 >= doseCount) {
                                             context.router.push(
                                               RecordRedoseRoute(
                                                 tasks: [successfulTask!],
