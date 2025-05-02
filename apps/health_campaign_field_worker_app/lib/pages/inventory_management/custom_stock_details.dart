@@ -1,6 +1,6 @@
 import 'package:auto_route/auto_route.dart';
 import 'package:collection/collection.dart';
-import 'package:digit_components/widgets/atoms/digit_reactive_dropdown.dart';
+// import 'package:digit_ui_components/widgets/atoms/digit_reactive_dropdown.dart';
 import 'package:digit_data_model/data_model.dart';
 import 'package:digit_scanner/blocs/scanner.dart';
 import 'package:digit_scanner/pages/qr_scanner.dart';
@@ -323,6 +323,7 @@ class CustomStockDetailsPageState
                                           context
                                               .read<LocationBloc>()
                                               .add(const LoadLocationEvent());
+
                                           DigitComponentsUtils.showDialog(
                                               context,
                                               localizations.translate(
@@ -710,6 +711,26 @@ class CustomStockDetailsPageState
                                                   code: variant.id,
                                                 );
                                               }).toList(),
+                                              selectedOption: (form
+                                                          .control(
+                                                              _productVariantKey)
+                                                          .value !=
+                                                      null)
+                                                  ? DropdownItem(
+                                                      name: localizations.translate((form
+                                                                      .control(
+                                                                          _productVariantKey)
+                                                                      .value
+                                                                  as ProductVariantModel)
+                                                              .sku ??
+                                                          (form.control(_productVariantKey).value
+                                                                  as ProductVariantModel)
+                                                              .id),
+                                                      code: (form.control(_productVariantKey).value
+                                                              as ProductVariantModel)
+                                                          .id)
+                                                  : const DropdownItem(
+                                                      name: '', code: ''),
                                               onSelect: (value) {
                                                 /// Find the selected product variant model by matching the id
                                                 ProductVariantModel?
@@ -758,6 +779,22 @@ class CustomStockDetailsPageState
                                             code: reason.toString(),
                                           );
                                         }).toList(),
+                                        selectedOption: (form
+                                                    .control(
+                                                        _transactionReasonKey)
+                                                    .value !=
+                                                null)
+                                            ? DropdownItem(
+                                                name: localizations.translate(form
+                                                    .control(
+                                                        _transactionReasonKey)
+                                                    .value),
+                                                code: form
+                                                    .control(
+                                                        _transactionReasonKey)
+                                                    .value)
+                                            : const DropdownItem(
+                                                name: '', code: ''),
                                         onSelect: (value) {
                                           final selectedReason =
                                               reasons?.firstWhere(
@@ -1130,6 +1167,23 @@ class CustomStockDetailsPageState
                                                   code: type.code,
                                                 );
                                               }).toList(),
+                                              selectedOption: (form
+                                                          .control(
+                                                              _typeOfTransportKey)
+                                                          .value !=
+                                                      null)
+                                                  ? DropdownItem(
+                                                      name: localizations
+                                                          .translate(form
+                                                              .control(
+                                                                  _typeOfTransportKey)
+                                                              .value),
+                                                      code: form
+                                                          .control(
+                                                              _typeOfTransportKey)
+                                                          .value)
+                                                  : const DropdownItem(
+                                                      name: '', code: ''),
                                               onSelect: (value) {
                                                 field.control.value =
                                                     value.name;
