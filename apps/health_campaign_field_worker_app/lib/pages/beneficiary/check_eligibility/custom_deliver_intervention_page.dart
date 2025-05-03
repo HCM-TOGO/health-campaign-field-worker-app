@@ -576,14 +576,6 @@ class CustomDeliverInterventionPageState
                                                           .deliverIntervention
                                                           .doseadministeredby),
                                                   child:
-                                                      // DigitTextFormInput(
-                                                      //   readOnly: true,
-                                                      //   initialValue:
-                                                      //       RegistrationDeliverySingleton()
-                                                      //               .loggedInUser
-                                                      //               ?.name ??
-                                                      //           '',
-                                                      // ),
                                                       DigitTextFormInput(
                                                     suffixIcon:
                                                         Icons.arrow_drop_down,
