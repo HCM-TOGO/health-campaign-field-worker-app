@@ -80,11 +80,11 @@ abstract class _$AppRouter extends RootStackRouter {
       );
     },
     CustomBeneficiaryDetailsRoute.name: (routeData) {
-      final args = routeData.argsAs<CustomBeneficiaryDetailsRouteArgs>(
-          orElse: () => const CustomBeneficiaryDetailsRouteArgs());
+      final args = routeData.argsAs<CustomBeneficiaryDetailsRouteArgs>();
       return AutoRoutePage<dynamic>(
         routeData: routeData,
         child: CustomBeneficiaryDetailsPage(
+          eligibilityAssessmentType: args.eligibilityAssessmentType,
           key: args.key,
           appLocalizations: args.appLocalizations,
         ),
@@ -318,8 +318,7 @@ abstract class _$AppRouter extends RootStackRouter {
       );
     },
     EligibilityChecklistViewRoute.name: (routeData) {
-      final args = routeData.argsAs<EligibilityChecklistViewRouteArgs>(
-          orElse: () => const EligibilityChecklistViewRouteArgs());
+      final args = routeData.argsAs<EligibilityChecklistViewRouteArgs>();
       return AutoRoutePage<dynamic>(
         routeData: routeData,
         child: EligibilityChecklistViewPage(
@@ -328,6 +327,7 @@ abstract class _$AppRouter extends RootStackRouter {
           individual: args.individual,
           projectBeneficiaryClientReferenceId:
               args.projectBeneficiaryClientReferenceId,
+          eligibilityAssessmentType: args.eligibilityAssessmentType,
           appLocalizations: args.appLocalizations,
         ),
       );
@@ -424,6 +424,8 @@ abstract class _$AppRouter extends RootStackRouter {
     ...InventoryRoute().pagesMap,
     ...RegistrationDeliveryRoute().pagesMap,
     ...ReferralReconciliationRoute().pagesMap,
+    ...AttendanceRoute().pagesMap,
+    ...ComplaintsRoute().pagesMap,
   };
 }
 
@@ -659,12 +661,14 @@ class CustomBeneficiaryAcknowledgementRouteArgs {
 class CustomBeneficiaryDetailsRoute
     extends PageRouteInfo<CustomBeneficiaryDetailsRouteArgs> {
   CustomBeneficiaryDetailsRoute({
+    required EligibilityAssessmentType eligibilityAssessmentType,
     Key? key,
     RegistrationDeliveryLocalization? appLocalizations,
     List<PageRouteInfo>? children,
   }) : super(
           CustomBeneficiaryDetailsRoute.name,
           args: CustomBeneficiaryDetailsRouteArgs(
+            eligibilityAssessmentType: eligibilityAssessmentType,
             key: key,
             appLocalizations: appLocalizations,
           ),
@@ -679,9 +683,12 @@ class CustomBeneficiaryDetailsRoute
 
 class CustomBeneficiaryDetailsRouteArgs {
   const CustomBeneficiaryDetailsRouteArgs({
+    required this.eligibilityAssessmentType,
     this.key,
     this.appLocalizations,
   });
+
+  final EligibilityAssessmentType eligibilityAssessmentType;
 
   final Key? key;
 
@@ -689,7 +696,7 @@ class CustomBeneficiaryDetailsRouteArgs {
 
   @override
   String toString() {
-    return 'CustomBeneficiaryDetailsRouteArgs{key: $key, appLocalizations: $appLocalizations}';
+    return 'CustomBeneficiaryDetailsRouteArgs{eligibilityAssessmentType: $eligibilityAssessmentType, key: $key, appLocalizations: $appLocalizations}';
   }
 }
 
@@ -1526,6 +1533,7 @@ class EligibilityChecklistViewRoute
     String? referralClientRefId,
     IndividualModel? individual,
     String? projectBeneficiaryClientReferenceId,
+    required EligibilityAssessmentType eligibilityAssessmentType,
     AppLocalizations? appLocalizations,
     List<PageRouteInfo>? children,
   }) : super(
@@ -1536,6 +1544,7 @@ class EligibilityChecklistViewRoute
             individual: individual,
             projectBeneficiaryClientReferenceId:
                 projectBeneficiaryClientReferenceId,
+            eligibilityAssessmentType: eligibilityAssessmentType,
             appLocalizations: appLocalizations,
           ),
           initialChildren: children,
@@ -1553,6 +1562,7 @@ class EligibilityChecklistViewRouteArgs {
     this.referralClientRefId,
     this.individual,
     this.projectBeneficiaryClientReferenceId,
+    required this.eligibilityAssessmentType,
     this.appLocalizations,
   });
 
@@ -1564,11 +1574,13 @@ class EligibilityChecklistViewRouteArgs {
 
   final String? projectBeneficiaryClientReferenceId;
 
+  final EligibilityAssessmentType eligibilityAssessmentType;
+
   final AppLocalizations? appLocalizations;
 
   @override
   String toString() {
-    return 'EligibilityChecklistViewRouteArgs{key: $key, referralClientRefId: $referralClientRefId, individual: $individual, projectBeneficiaryClientReferenceId: $projectBeneficiaryClientReferenceId, appLocalizations: $appLocalizations}';
+    return 'EligibilityChecklistViewRouteArgs{key: $key, referralClientRefId: $referralClientRefId, individual: $individual, projectBeneficiaryClientReferenceId: $projectBeneficiaryClientReferenceId, eligibilityAssessmentType: $eligibilityAssessmentType, appLocalizations: $appLocalizations}';
   }
 }
 

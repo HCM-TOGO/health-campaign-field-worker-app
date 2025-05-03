@@ -1,7 +1,7 @@
 name: health_campaign_field_worker_app
 description: A new Flutter project.
 publish_to: 'none'
-version: 1.7.1
+version: 1.7.3
 
 environment:
   sdk: '>=3.3.0 <=4.0.0'
@@ -60,7 +60,7 @@ dependencies:
   sync_service: ^1.0.1
   attendance_management: ^1.0.4+1
   digit_scanner: ^1.0.5
-  digit_data_model: ^1.0.6
+  digit_data_model: 1.0.6
   disable_battery_optimization: ^1.1.1
   digit_dss: ^1.0.4
   digit_location_tracker: ^1.0.0
@@ -70,6 +70,7 @@ dependencies:
   survey_form: 1.0.1
   crypto: 3.0.3
   referral_reconciliation: 1.0.4
+  complaints: ^1.0.2
 
 dev_dependencies:
   flutter_test:

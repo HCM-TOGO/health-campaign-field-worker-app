@@ -1,5 +1,9 @@
 import 'dart:io';
 
+import 'package:complaints/data/repositories/local/pgr_service.dart';
+import 'package:complaints/data/repositories/oplog/oplog.dart';
+import 'package:complaints/data/repositories/remote/pgr_service.dart';
+import 'package:complaints/models/pgr_complaints.dart';
 import 'package:digit_data_model/data_model.dart';
 import 'package:digit_ui_components/digit_components.dart';
 import 'package:digit_ui_components/widgets/molecules/digit_card.dart';
@@ -14,6 +18,7 @@ import 'package:provider/provider.dart';
 import 'package:survey_form/data/repositories/local/service.dart';
 import 'package:survey_form/data/repositories/local/service_definition.dart';
 import 'package:survey_form/data/repositories/oplog/oplog.dart';
+import 'package:survey_form/data/repositories/remote/service.dart';
 import 'package:survey_form/data/repositories/remote/service_definition.dart';
 import 'package:survey_form/models/entities/service.dart';
 import 'package:survey_form/models/entities/service_definition.dart';
@@ -30,6 +35,7 @@ import '../models/downsync/downsync.dart';
 import 'package:inventory_management/inventory_management.dart';
 import 'package:registration_delivery/registration_delivery.dart';
 import 'package:referral_reconciliation/referral_reconciliation.dart';
+import 'package:attendance_management/attendance_management.dart';
 
 class NetworkManagerProviderWrapper extends StatelessWidget {
   final LocalSqlDataStore sql;
@@ -174,12 +180,6 @@ class NetworkManagerProviderWrapper extends StatelessWidget {
 
       // INFO Need to add packages here
 
-      // RepositoryProvider<LocalRepository<StockModel, StockSearchModel>>(
-      //   create: (_) => StockLocalRepository(
-      //     sql,
-      //     StockOpLogManager(isar),
-      //   ),
-      // ),
       RepositoryProvider<LocalRepository<StockModel, StockSearchModel>>(
         create: (_) => CustomStockLocalRepository(
           sql,
@@ -265,6 +265,28 @@ class NetworkManagerProviderWrapper extends StatelessWidget {
         create: (_) => HFReferralLocalRepository(
           sql,
           HFReferralOpLogManager(isar),
+        ),
+      ),
+      RepositoryProvider<
+          LocalRepository<PgrServiceModel, PgrServiceSearchModel>>(
+        create: (_) => PgrServiceLocalRepository(
+          sql,
+          PgrServiceOpLogManager(isar),
+        ),
+      ),
+      RepositoryProvider<
+          LocalRepository<AttendanceRegisterModel,
+              AttendanceRegisterSearchModel>>(
+        create: (_) => AttendanceLocalRepository(
+          sql,
+          AttendanceOpLogManager(isar),
+        ),
+      ),
+      RepositoryProvider<
+          LocalRepository<AttendanceLogModel, AttendanceLogSearchModel>>(
+        create: (_) => AttendanceLogsLocalRepository(
+          sql,
+          AttendanceLogOpLogManager(isar),
         ),
       ),
     ];
@@ -363,14 +385,6 @@ class NetworkManagerProviderWrapper extends StatelessWidget {
               actionMap: actions,
             ),
           ),
-        if (value == DataModelType.productVariant)
-          RepositoryProvider<
-              RemoteRepository<ProductVariantModel, ProductVariantSearchModel>>(
-            create: (_) => ProductVariantRemoteRepository(
-              dio,
-              actionMap: actions,
-            ),
-          ),
 
         if (value == DataModelType.user)
           RepositoryProvider<RemoteRepository<UserModel, UserSearchModel>>(
@@ -461,6 +475,36 @@ class NetworkManagerProviderWrapper extends StatelessWidget {
           RepositoryProvider<
               RemoteRepository<HFReferralModel, HFReferralSearchModel>>(
             create: (_) => HFReferralRemoteRepository(dio, actionMap: actions),
+          ),
+
+        if (value == DataModelType.service)
+          RepositoryProvider<
+              RemoteRepository<ServiceModel, ServiceSearchModel>>(
+            create: (_) => ServiceRemoteRepository(
+              dio,
+              actionMap: actions,
+            ),
+          ),
+
+        if (value == DataModelType.complaints)
+          RepositoryProvider<
+              RemoteRepository<PgrServiceModel, PgrServiceSearchModel>>(
+            create: (_) => PgrServiceRemoteRepository(
+              dio,
+              actionMap: actions,
+            ),
+          ),
+        if (value == DataModelType.attendanceRegister)
+          RepositoryProvider<
+              RemoteRepository<AttendanceRegisterModel,
+                  AttendanceRegisterSearchModel>>(
+            create: (_) => AttendanceRemoteRepository(dio, actionMap: actions),
+          ),
+        if (value == DataModelType.attendance)
+          RepositoryProvider<
+              RemoteRepository<AttendanceLogModel, AttendanceLogSearchModel>>(
+            create: (_) =>
+                AttendanceLogRemoteRepository(dio, actionMap: actions),
           ),
       ]);
     }

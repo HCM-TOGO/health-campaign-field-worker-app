@@ -3,6 +3,8 @@ library app_utils;
 import 'package:collection/collection.dart';
 import 'package:digit_components/utils/date_utils.dart';
 import 'package:digit_data_model/models/entities/individual.dart';
+import 'package:digit_data_model/models/entities/product_variant.dart';
+import 'package:digit_data_model/models/entities/project_type.dart';
 import 'package:registration_delivery/models/entities/additional_fields_type.dart';
 import 'package:registration_delivery/models/entities/household.dart';
 import 'package:survey_form/survey_form.init.dart' as surveyForm_mappers;
@@ -56,6 +58,8 @@ import 'extensions/extensions.dart';
 export 'app_exception.dart';
 export 'constants.dart';
 export 'extensions/extensions.dart';
+
+enum EligibilityAssessmentType { smc, vas }
 
 class CustomValidator {
   /// Validates that control's value must be `true`
@@ -141,6 +145,34 @@ performBackgroundService({
       }
     }
   }
+}
+
+String formatAgeRange(String condition) {
+  final regex =
+      RegExp(r'(\d+)\s*<=\s*ageandage\s*<\s*(\d+)', caseSensitive: false);
+  final match = regex.firstMatch(condition);
+  if (match != null && match.groupCount == 2) {
+    final min = match.group(1);
+    final max = match.group(2);
+    return '$min - $max months';
+  }
+  return condition;
+}
+
+String? getAgeConditionStringFromVariant(
+    DeliveryProductVariant productVariant, List<ProductVariantModel>? variant) {
+  String? finalCondition;
+  String? value = variant
+      ?.firstWhereOrNull(
+        (element) => element.id == productVariant.productVariantId,
+      )
+      ?.sku;
+
+  if (value != null) {
+    finalCondition = value.split('(').last.split(')').first;
+  }
+
+  return finalCondition;
 }
 
 int getUnderFiveChildCount(HouseholdModel? householdCaptured) {

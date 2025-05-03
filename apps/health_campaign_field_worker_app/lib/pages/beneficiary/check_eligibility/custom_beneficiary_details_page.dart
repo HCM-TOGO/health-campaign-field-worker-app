@@ -9,10 +9,10 @@ import 'package:digit_ui_components/widgets/molecules/digit_card.dart';
 import 'package:digit_ui_components/widgets/molecules/show_pop_up.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:health_campaign_field_worker_app/widgets/registration_delivery/past_delivery_smc.dart';
 import 'package:intl/intl.dart';
 import 'package:recase/recase.dart';
 import 'package:registration_delivery/blocs/app_localization.dart';
-import 'package:registration_delivery/pages/beneficiary/widgets/past_delivery.dart';
 
 import 'package:registration_delivery/blocs/delivery_intervention/deliver_intervention.dart';
 import 'package:registration_delivery/blocs/household_overview/household_overview.dart';
@@ -28,15 +28,20 @@ import 'package:registration_delivery/widgets/localized.dart';
 import 'package:registration_delivery/widgets/table_card/table_card.dart';
 import 'package:registration_delivery/pages/beneficiary/widgets/record_delivery_cycle.dart';
 
+import '../../../utils/utils.dart';
+
 @RoutePage()
 class CustomBeneficiaryDetailsPage extends LocalizedStatefulWidget {
+  final EligibilityAssessmentType eligibilityAssessmentType;
   const CustomBeneficiaryDetailsPage({
+    required this.eligibilityAssessmentType,
     super.key,
     super.appLocalizations,
   });
 
   @override
-  State<CustomBeneficiaryDetailsPage> createState() => CustomBeneficiaryDetailsPageState();
+  State<CustomBeneficiaryDetailsPage> createState() =>
+      CustomBeneficiaryDetailsPageState();
 }
 
 class CustomBeneficiaryDetailsPageState
@@ -255,7 +260,8 @@ class CustomBeneficiaryDetailsPageState
                               margin: const EdgeInsets.all(spacer2),
                               children: [
                                 Text(
-                                  localizations.translate(i18_local.deliverIntervention
+                                  localizations.translate(i18_local
+                                      .deliverIntervention
                                       .deliversmcintervention),
                                   style: textTheme.headingXl.copyWith(
                                       color: theme.colorTheme.primary.primary2),
@@ -277,17 +283,16 @@ class CustomBeneficiaryDetailsPageState
                                         : state.selectedIndividual?.name
                                                 ?.givenName ??
                                             '--',
-                                    localizations.translate(
-                                      i18_local.beneficiaryDetails.beneficiaryId
-                                    ): () {
-                                      final String? beneficiaryId =
-                                      state.selectedIndividual?.identifiers
-                                              ?.lastWhereOrNull((e) =>
-                                                  e.identifierType ==
-                                                  IdentifierTypes
-                                                      .uniqueBeneficiaryID
-                                                      .toValue())
-                                              ?.identifierId; 
+                                    localizations.translate(i18_local
+                                        .beneficiaryDetails.beneficiaryId): () {
+                                      final String? beneficiaryId = state
+                                          .selectedIndividual?.identifiers
+                                          ?.lastWhereOrNull((e) =>
+                                              e.identifierType ==
+                                              IdentifierTypes
+                                                  .uniqueBeneficiaryID
+                                                  .toValue())
+                                          ?.identifierId;
                                       return beneficiaryId ?? '--';
                                     }(),
                                     localizations.translate(
@@ -332,7 +337,6 @@ class CustomBeneficiaryDetailsPageState
                                         : state.selectedIndividual?.gender?.name
                                                 .sentenceCase ??
                                             '--',
-                                    
                                     localizations.translate(
                                       i18.deliverIntervention
                                           .dateOfRegistrationLabel,

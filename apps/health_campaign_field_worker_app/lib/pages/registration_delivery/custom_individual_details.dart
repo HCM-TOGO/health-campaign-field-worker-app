@@ -68,6 +68,7 @@ class CustomIndividualDetailsPageState
   DateTime now = DateTime.now();
 
   bool isEditIndividual = false;
+  bool isAddIndividual = false;
 
   final beneficiaryType = RegistrationDeliverySingleton().beneficiaryType!;
   Set<String>? beneficiaryId;
@@ -245,6 +246,7 @@ class CustomIndividualDetailsPageState
                               );
 
                               isEditIndividual = false;
+                              isAddIndividual = false;
                               state.maybeWhen(
                                 orElse: () {
                                   return;
@@ -460,6 +462,7 @@ class CustomIndividualDetailsPageState
                                   householdModel,
                                   loading,
                                 ) {
+                                  isAddIndividual = true;
                                   final individual = _getIndividualModel(
                                     context,
                                     form: form,
@@ -731,11 +734,13 @@ class CustomIndividualDetailsPageState
                             child: ReactiveWrapperField(
                               formControlName: _mobileNumberKey,
                               validationMessages: {
-                                'maxLength': (object) => localizations.translate(
-                                    i18.individualDetails
+                                'maxLength': (object) =>
+                                    localizations.translate(i18
+                                        .individualDetails
                                         .mobileNumberLengthValidationMessage),
-                                'minLength': (object) => localizations.translate(
-                                    i18.individualDetails
+                                'minLength': (object) =>
+                                    localizations.translate(i18
+                                        .individualDetails
                                         .mobileNumberLengthValidationMessage),
                               },
                               builder: (field) => LabeledField(
@@ -751,7 +756,8 @@ class CustomIndividualDetailsPageState
                                   initialValue:
                                       form.control(_mobileNumberKey).value,
                                   onChange: (value) {
-                                    form.control(_mobileNumberKey).value = value;
+                                    form.control(_mobileNumberKey).value =
+                                        value;
                                   },
                                   errorMessage: field.errorText,
                                 ),

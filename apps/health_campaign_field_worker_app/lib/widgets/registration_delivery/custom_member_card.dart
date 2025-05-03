@@ -354,6 +354,8 @@ class CustomMemberCard extends StatelessWidget {
                                             projectBeneficiaryClientReferenceId:
                                                 projectBeneficiaryClientReferenceId,
                                             individual: individual,
+                                            eligibilityAssessmentType:
+                                                EligibilityAssessmentType.smc,
                                           ),
                                         );
                                       } else {
@@ -419,7 +421,10 @@ class CustomMemberCard extends StatelessWidget {
                                           }
                                         } else {
                                           context.router.push(
-                                            BeneficiaryDetailsRoute(),
+                                            CustomBeneficiaryDetailsRoute(
+                                              eligibilityAssessmentType:
+                                                  EligibilityAssessmentType.smc,
+                                            ),
                                           );
                                         }
                                       }

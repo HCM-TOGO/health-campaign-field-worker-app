@@ -49,6 +49,7 @@ class Common {
 
   String get coreCommonContinue => 'CORE_COMMON_CONTINUE';
   String get coreCommonWarning => 'CORE_COMMON_WARNING';
+  String get noProjectSelected => 'NO_PROJECT_SELECTED';
 
   String get coreCommonAge => 'CORE_COMMON_AGE';
 
@@ -179,16 +180,16 @@ class DeliverIntervention {
       'DELIVER_INTERVENTION_SELECT_REASON_FOR_REDOSE_LABEL';
   String get redoseQuantityLabel =>
       'DELIVER_INTERVENTION_REDOSE_QUANTITY_LABEL';
+  String get dose => 'DELIVER_INTERVENTION_DOSE';
 
   String get beneficiaryIneligibleDescription => 'BENEFICIARY_INELIGIBLE_DESC';
   String get beneficiaryReferralDescription => 'BENEFICIARY_REFERRAL_DESC';
   String get spaqRedirectionScreenDescription => 'SPAQ_REDIRECTED_SCREEN_DESC';
-  String get deliversmcintervention =>
-      'DELIVER_SMC_INTERVENTION';
   String get recordsmcdeliverdetails =>
       'RECORD_SMC_DELIVER_DETAILS';
   String get doseadministeredby =>
       'DOSE_ADMINISTERED_BY';
+  String get deliversmcintervention => 'DELIVER_SMC_INTERVENTION';
 }
 
 class Checklist {

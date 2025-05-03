@@ -1,8 +1,11 @@
+import 'package:attendance_management/attendance_management.dart';
+import 'package:complaints/models/pgr_complaints.dart';
 import 'package:referral_reconciliation/models/entities/hf_referral.dart';
 import 'package:registration_delivery/registration_delivery.dart';
 import 'package:inventory_management/inventory_management.dart';
 import 'package:digit_data_model/data/local_store/no_sql/schema/entity_mapper_listener.dart';
 import 'package:digit_data_model/data_model.dart';
+import 'package:survey_form/survey_form.dart';
 
 /// The `EntityMapper` class extends `EntityMapperListener` and provides a concrete implementation
 /// for the `getEntityMappers` method. This method is responsible for mapping a given entity type
@@ -59,6 +62,18 @@ class EntityMapper extends EntityMapperListener {
 
       case "hFReferral":
         final entity = HFReferralModelMapper.fromJson(entityString);
+        return entity;
+
+      case "service":
+        final entity = ServiceModelMapper.fromJson(entityString);
+        return entity;
+
+      case "attendance":
+        final entity = AttendanceLogModelMapper.fromJson(entityString);
+        return entity;
+
+      case "complaints":
+        final entity = PgrServiceModelMapper.fromJson(entityString);
         return entity;
 
       default:

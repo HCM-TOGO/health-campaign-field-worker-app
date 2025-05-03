@@ -12,7 +12,7 @@ import 'package:location/location.dart';
 import 'package:registration_delivery/data/repositories/local/household_global_search.dart';
 import 'package:registration_delivery/data/repositories/local/individual_global_search.dart';
 import 'package:registration_delivery/data/repositories/oplog/oplog.dart';
-import 'package:survey_form/models/entities/service_definition.dart';
+import 'package:survey_form/survey_form.dart';
 
 import 'blocs/app_initialization/app_initialization.dart';
 import 'blocs/auth/auth.dart';
@@ -208,6 +208,7 @@ class MainApplicationState extends State<MainApplication>
                             serviceDefinitionRemoteRepository: ctx.read<
                                 RemoteRepository<ServiceDefinitionModel,
                                     ServiceDefinitionSearchModel>>(),
+                            isar: widget.isar,
                             serviceDefinitionLocalRepository: ctx.read<
                                 LocalRepository<ServiceDefinitionModel,
                                     ServiceDefinitionSearchModel>>(),
@@ -243,7 +244,6 @@ class MainApplicationState extends State<MainApplication>
                             projectRemoteRepository: ctx.read<
                                 RemoteRepository<ProjectModel,
                                     ProjectSearchModel>>(),
-                            isar: widget.isar,
                             boundaryRemoteRepository: ctx.read<
                                 RemoteRepository<BoundaryModel,
                                     BoundarySearchModel>>(),

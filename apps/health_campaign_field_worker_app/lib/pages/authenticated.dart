@@ -21,6 +21,12 @@ import 'package:health_campaign_field_worker_app/widgets/showcase/showcase_wrapp
 import 'package:isar/isar.dart';
 import 'package:location/location.dart';
 import 'package:qr_flutter/qr_flutter.dart';
+import 'package:registration_delivery/models/entities/household.dart';
+import 'package:registration_delivery/models/entities/household_member.dart';
+import 'package:registration_delivery/models/entities/project_beneficiary.dart';
+import 'package:registration_delivery/models/entities/referral.dart';
+import 'package:registration_delivery/models/entities/side_effect.dart';
+import 'package:registration_delivery/models/entities/task.dart';
 import 'package:sync_service/sync_service_lib.dart';
 import 'package:survey_form/survey_form.dart';
 
@@ -213,6 +219,23 @@ class AuthenticatedPageWrapper extends StatelessWidget {
                           downSyncLocalRepository: ctx.read<
                               LocalRepository<DownsyncModel,
                                   DownsyncSearchModel>>(),
+                          householdLocalRepository: ctx.read<
+                              LocalRepository<HouseholdModel,
+                                  HouseholdSearchModel>>(),
+                          householdMemberLocalRepository: ctx.read<
+                              LocalRepository<HouseholdMemberModel,
+                                  HouseholdMemberSearchModel>>(),
+                          projectBeneficiaryLocalRepository: ctx.read<
+                              LocalRepository<ProjectBeneficiaryModel,
+                                  ProjectBeneficiarySearchModel>>(),
+                          taskLocalRepository: ctx.read<
+                              LocalRepository<TaskModel, TaskSearchModel>>(),
+                          sideEffectLocalRepository: ctx.read<
+                              LocalRepository<SideEffectModel,
+                                  SideEffectSearchModel>>(),
+                          referralLocalRepository: ctx.read<
+                              LocalRepository<ReferralModel,
+                                  ReferralSearchModel>>(),
                         ),
                       ),
                     ],
