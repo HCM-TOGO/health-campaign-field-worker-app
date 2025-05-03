@@ -29,6 +29,7 @@ import 'package:registration_delivery/widgets/back_navigation_help_header.dart';
 import 'package:registration_delivery/widgets/beneficiary/resource_beneficiary_card.dart';
 import 'package:registration_delivery/widgets/component_wrapper/product_variant_bloc_wrapper.dart';
 import 'package:registration_delivery/widgets/localized.dart';
+import '../../../utils/i18_key_constants.dart' as i18_local;
 
 @RoutePage()
 class CustomDeliverInterventionPage extends LocalizedStatefulWidget {
@@ -50,7 +51,6 @@ class CustomDeliverInterventionPageState
   // Constants for form control keys
   static const _resourceDeliveredKey = 'resourceDelivered';
   static const _quantityDistributedKey = 'quantityDistributed';
-  static const _deliveryCommentKey = 'deliveryComment';
   static const _doseAdministrationKey = 'doseAdministered';
   static const _dateOfAdministrationKey = 'dateOfAdministration';
   final clickedStatus = ValueNotifier<bool>(false);
@@ -107,7 +107,6 @@ class CustomDeliverInterventionPageState
               navigateToSummary: true,
               householdMemberWrapper: householdMember),
         );
-    context.router.push(DeliverySummaryRoute());
   }
 
   void handleLocationState(
@@ -124,7 +123,7 @@ class CustomDeliverInterventionPageState
         DialogType.inProgress,
       );
 
-      Future.delayed(const Duration(seconds: 2), () {
+      Future.delayed(const Duration(seconds: 0), () {
         // After delay, hide the initial dialog
         DigitComponentsUtils.hideDialog(context);
         handleCapturedLocationState(
@@ -135,6 +134,46 @@ class CustomDeliverInterventionPageState
             householdMember,
             projectBeneficiary);
       });
+    }
+  }
+
+  Future<void> handleSubmit(
+    BuildContext context,
+    DeliverInterventionState deliverState,
+  ) async {
+    context.read<DeliverInterventionBloc>().add(
+          DeliverInterventionSubmitEvent(
+            task: deliverState.oldTask!,
+            isEditing: (deliverState.tasks ?? []).isNotEmpty &&
+                    RegistrationDeliverySingleton().beneficiaryType ==
+                        BeneficiaryType.household
+                ? true
+                : false,
+            boundaryModel: RegistrationDeliverySingleton().boundary!,
+          ),
+        );
+
+    if (deliverState.futureDeliveries != null &&
+        deliverState.futureDeliveries!.isNotEmpty &&
+        RegistrationDeliverySingleton().projectType?.cycles?.isNotEmpty ==
+            true) {
+      context.router.popUntilRouteWithName(BeneficiaryWrapperRoute.name);
+      context.router.push(
+        SplashAcknowledgementRoute(enableBackToSearch: false),
+      );
+    } else {
+      final reloadState = context.read<HouseholdOverviewBloc>();
+
+      reloadState.add(
+        HouseholdOverviewReloadEvent(
+          projectId: RegistrationDeliverySingleton().projectId!,
+          projectBeneficiaryType:
+              RegistrationDeliverySingleton().beneficiaryType!,
+        ),
+      );
+      context.router.popAndPush(
+        HouseholdAcknowledgementRoute(enableViewHousehold: true),
+      );
     }
   }
 
@@ -401,23 +440,28 @@ class CustomDeliverInterventionPageState
                                                           );
 
                                                           // Check the result of the dialog
-                                                          if (shouldSubmit ==
-                                                              true) {
-                                                            // Proceed with submission
-                                                            context
-                                                                .read<
-                                                                    LocationBloc>()
-                                                                .add(
-                                                                    const LoadLocationEvent());
-                                                            handleLocationState(
-                                                              locationState,
-                                                              context,
-                                                              deliveryInterventionState,
-                                                              form,
-                                                              householdMemberWrapper,
-                                                              projectBeneficiary!
-                                                                  .first,
-                                                            );
+                                                          if (shouldSubmit ??
+                                                              false) {
+                                                            if (context
+                                                                .mounted) {
+                                                              context
+                                                                  .read<
+                                                                      LocationBloc>()
+                                                                  .add(
+                                                                      const LoadLocationEvent());
+                                                              handleLocationState(
+                                                                locationState,
+                                                                context,
+                                                                deliveryInterventionState,
+                                                                form,
+                                                                householdMemberWrapper,
+                                                                projectBeneficiary!
+                                                                    .first,
+                                                              );
+                                                              await handleSubmit(
+                                                                  context,
+                                                                  deliveryInterventionState);
+                                                            }
                                                           }
                                                         }
                                                       },
@@ -526,6 +570,23 @@ class CustomDeliverInterventionPageState
                                                     ),
                                                   ),
                                                 ),
+                                                 LabeledField(
+                                                  label: localizations
+                                                      .translate(i18_local
+                                                          .deliverIntervention
+                                                          .doseadministeredby),
+                                                  child:
+                                                      DigitTextFormInput(
+                                                    suffixIcon:
+                                                        Icons.arrow_drop_down,
+                                                    readOnly: true,
+                                                    initialValue:
+                                                        RegistrationDeliverySingleton()
+                                                                .loggedInUser
+                                                                ?.name ??
+                                                            '',
+                                                  ),
+                                                ),
                                               ]),
                                           DigitCard(
                                               margin:
@@ -544,7 +605,7 @@ class CustomDeliverInterventionPageState
                                                               .primary2),
                                                 ),
                                                 ..._controllers.map((e) =>
-                                                    ResourceBeneficiaryCard(
+                                                    CustomResourceBeneficiaryCard(
                                                       form: form,
                                                       cardIndex: _controllers
                                                           .indexOf(e),
@@ -602,64 +663,6 @@ class CustomDeliverInterventionPageState
                                                     },
                                                     prefixIcon:
                                                         Icons.add_circle,
-                                                  ),
-                                                ),
-                                              ]),
-                                          DigitCard(
-                                              margin:
-                                                  const EdgeInsets.all(spacer2),
-                                              children: [
-                                                Text(
-                                                  localizations.translate(
-                                                    i18.deliverIntervention
-                                                        .deliveryCommentHeading,
-                                                  ),
-                                                  style: textTheme.headingXl
-                                                      .copyWith(
-                                                          color: theme
-                                                              .colorTheme
-                                                              .primary
-                                                              .primary2),
-                                                ),
-                                                ReactiveWrapperField(
-                                                  formControlName:
-                                                      _deliveryCommentKey,
-                                                  builder: (field) =>
-                                                      LabeledField(
-                                                    label:
-                                                        localizations.translate(
-                                                      i18.deliverIntervention
-                                                          .deliveryCommentLabel,
-                                                    ),
-                                                    child:
-                                                        DigitDropdown<String>(
-                                                      items:
-                                                          RegistrationDeliverySingleton()
-                                                              .deliveryCommentOptions!
-                                                              .map((e) =>
-                                                                  DropdownItem(
-                                                                    name: localizations
-                                                                        .translate(
-                                                                            e),
-                                                                    code: e,
-                                                                  ))
-                                                              .toList()
-                                                            ..sort((a, b) => a
-                                                                .code
-                                                                .compareTo(
-                                                                    b.code)),
-                                                      emptyItemText:
-                                                          localizations
-                                                              .translate(i18
-                                                                  .common
-                                                                  .noMatchFound),
-                                                      onChange: (value) {
-                                                        form
-                                                            .control(
-                                                                _deliveryCommentKey)
-                                                            .value = value;
-                                                      },
-                                                    ),
                                                   ),
                                                 ),
                                               ]),
@@ -774,7 +777,6 @@ class CustomDeliverInterventionPageState
     final productvariantList =
         ((form.control(_resourceDeliveredKey) as FormArray).value
             as List<ProductVariantModel?>);
-    final deliveryComment = form.control(_deliveryCommentKey).value as String?;
     // Update the task with information from the form and other context
     task = task.copyWith(
       projectId: RegistrationDeliverySingleton().projectId,
@@ -846,12 +848,6 @@ class CustomDeliverInterventionPageState
               AdditionalFieldsType.longitude.toValue(),
               longitude,
             ),
-          if (deliveryComment != null &&
-              deliveryComment.trim().toString().isNotEmpty)
-            AdditionalField(
-              AdditionalFieldsType.deliveryComment.toValue(),
-              deliveryComment,
-            ),
         ],
       ),
     );
@@ -905,25 +901,6 @@ class CustomDeliverInterventionPageState
                 .toString(),
         validators: [],
       ),
-      _deliveryCommentKey: FormControl<String>(
-        value: RegistrationDeliverySingleton().beneficiaryType !=
-                BeneficiaryType.individual
-            ? (bloc.tasks?.lastOrNull?.additionalFields?.fields
-                            .where((a) =>
-                                a.key ==
-                                AdditionalFieldsType.deliveryComment.toValue())
-                            .toList() ??
-                        [])
-                    .isNotEmpty
-                ? bloc.tasks?.lastOrNull?.additionalFields?.fields
-                    .where((a) =>
-                        a.key == AdditionalFieldsType.deliveryComment.toValue())
-                    .first
-                    .value
-                : ''
-            : null,
-        validators: [],
-      ),
       _dateOfAdministrationKey:
           FormControl<DateTime>(value: DateTime.now(), validators: []),
       _resourceDeliveredKey: FormArray<ProductVariantModel>(
@@ -959,5 +936,78 @@ class CustomDeliverInterventionPageState
         ),
       ]),
     });
+  }
+}
+
+
+class CustomResourceBeneficiaryCard extends LocalizedStatefulWidget {
+  final void Function(int) onDelete;
+  final int cardIndex;
+  final FormGroup form;
+  final int totalItems;
+
+  const CustomResourceBeneficiaryCard({
+    super.key,
+    super.appLocalizations,
+    required this.onDelete,
+    required this.cardIndex,
+    required this.form,
+    required this.totalItems,
+  });
+
+  @override
+  State<CustomResourceBeneficiaryCard> createState() =>
+      CustomResourceBeneficiaryCardState();
+}
+
+class CustomResourceBeneficiaryCardState
+    extends LocalizedState<CustomResourceBeneficiaryCard> {
+  @override
+  Widget build(BuildContext context) {
+    return DigitCard(cardType: CardType.secondary, children: [
+      BlocBuilder<ProductVariantBloc, ProductVariantState>(
+        builder: (context, productState) {
+          return productState.maybeWhen(
+            orElse: () => const Offstage(),
+            fetched: (productVariants) {
+              return DropdownButton<ProductVariantModel>(
+                isExpanded: true,
+                value: widget.form
+                    .control('resourceDelivered.${widget.cardIndex}')
+                    .value,
+                items: productVariants
+                    .map((variant) => DropdownMenuItem<ProductVariantModel>(
+                          value: variant,
+                          child: Text(
+                            localizations.translate(variant.sku ?? variant.id),
+                          ),
+                        ))
+                    .toList(),
+                onChanged: null, // Disabled dropdown
+                dropdownColor: Theme.of(context).colorScheme.surface,
+              );
+            },
+          );
+        },
+      ),
+      ReactiveWrapperField(
+        formControlName: 'quantityDistributed.${widget.cardIndex}',
+        builder: (field) => LabeledField(
+          label: localizations.translate(
+            i18.deliverIntervention.quantityDistributedLabel,
+          ),
+          child: DigitNumericFormInput(
+            minValue: 1,
+            step: 1,
+            initialValue: "0",
+            onChange: (value) {
+              widget.form
+                  .control('quantityDistributed.${widget.cardIndex}')
+                  .value = int.parse(value);
+            },
+          ),
+        ),
+      ),
+    ]);
   }
 }

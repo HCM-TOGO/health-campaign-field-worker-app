@@ -349,15 +349,7 @@ class CustomHouseholdLocationPageState
                                         .householdLocationLabelText,
                                   ),
                             headingStyle: textTheme.headingXl.copyWith(
-                                color: theme.colorTheme.primary.primary2),
-                            description: (RegistrationDeliverySingleton()
-                                        .householdType ==
-                                    HouseholdType.community)
-                                ? null
-                                : localizations.translate(
-                                    i18.householdLocation
-                                        .householdLocationDescriptionText,
-                                  )),
+                                color: theme.colorTheme.primary.primary2),),
                         householdLocationShowcaseData.administrativeArea
                             .buildWith(
                           child: ReactiveWrapperField(
