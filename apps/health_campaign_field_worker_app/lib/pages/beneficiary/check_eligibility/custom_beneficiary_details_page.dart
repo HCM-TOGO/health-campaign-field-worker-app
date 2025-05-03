@@ -9,16 +9,17 @@ import 'package:digit_ui_components/widgets/molecules/digit_card.dart';
 import 'package:digit_ui_components/widgets/molecules/show_pop_up.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:health_campaign_field_worker_app/widgets/registration_delivery/past_delivery_smc.dart';
 import 'package:intl/intl.dart';
 import 'package:recase/recase.dart';
 import 'package:registration_delivery/blocs/app_localization.dart';
-import 'package:registration_delivery/pages/beneficiary/widgets/past_delivery.dart';
 
 import 'package:registration_delivery/blocs/delivery_intervention/deliver_intervention.dart';
 import 'package:registration_delivery/blocs/household_overview/household_overview.dart';
 import 'package:registration_delivery/models/entities/additional_fields_type.dart';
 import 'package:registration_delivery/router/registration_delivery_router.gm.dart';
 import 'package:registration_delivery/utils/i18_key_constants.dart' as i18;
+import '../../../models/entities/identifier_types.dart';
 import '../../../utils/i18_key_constants.dart' as i18_local;
 import 'package:registration_delivery/utils/utils.dart';
 import 'package:registration_delivery/widgets/back_navigation_help_header.dart';
@@ -278,6 +279,18 @@ class CustomBeneficiaryDetailsPageState
                                         : state.selectedIndividual?.name
                                                 ?.givenName ??
                                             '--',
+                                    localizations.translate(i18_local
+                                        .beneficiaryDetails.beneficiaryId): () {
+                                      final String? beneficiaryId = state
+                                          .selectedIndividual?.identifiers
+                                          ?.lastWhereOrNull((e) =>
+                                              e.identifierType ==
+                                              IdentifierTypes
+                                                  .uniqueBeneficiaryID
+                                                  .toValue())
+                                          ?.identifierId;
+                                      return beneficiaryId ?? '--';
+                                    }(),
                                     localizations.translate(
                                       i18.common.coreCommonAge,
                                     ): () {
@@ -308,7 +321,7 @@ class CustomBeneficiaryDetailsPageState
                                             DateTime.now(),
                                       ).months;
 
-                                      return "$years  ${localizations.translate(months.toString().toUpperCase())} ${localizations.translate(i18.memberCard.deliverDetailsMonthsText)}";
+                                      return "$years ${localizations.translate(i18.memberCard.deliverDetailsYearText)} ${localizations.translate(months.toString().toUpperCase())} ${localizations.translate(i18.memberCard.deliverDetailsMonthsText)}";
                                     }(),
                                     localizations.translate(
                                       i18.common.coreCommonGender,
@@ -320,16 +333,6 @@ class CustomBeneficiaryDetailsPageState
                                         : state.selectedIndividual?.gender?.name
                                                 .sentenceCase ??
                                             '--',
-                                    localizations.translate(
-                                      i18.common.coreCommonMobileNumber,
-                                    ): RegistrationDeliverySingleton()
-                                                .beneficiaryType !=
-                                            BeneficiaryType.individual
-                                        ? householdMemberWrapper
-                                            .headOfHousehold?.mobileNumber
-                                        : state.selectedIndividual
-                                                ?.mobileNumber ??
-                                            'Not Available',
                                     localizations.translate(
                                       i18.deliverIntervention
                                           .dateOfRegistrationLabel,

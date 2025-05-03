@@ -728,8 +728,9 @@ class CustomIndividualDetailsPageState
                                   .translate(i18.common.corecommonRequired)
                               : null,
                         ),
-                        if (isAddIndividual == false)
-                          individualDetailsShowcaseData.mobile.buildWith(
+                        individualDetailsShowcaseData.mobile.buildWith(
+                          child: Offstage(
+                            offstage: !widget.isHeadOfHousehold,
                             child: ReactiveWrapperField(
                               formControlName: _mobileNumberKey,
                               validationMessages: {
@@ -763,6 +764,7 @@ class CustomIndividualDetailsPageState
                               ),
                             ),
                           ),
+                        ),
                         // const SizedBox(height: spacer4),
                         // if ((RegistrationDeliverySingleton().beneficiaryType ==
                         //             BeneficiaryType.household &&
