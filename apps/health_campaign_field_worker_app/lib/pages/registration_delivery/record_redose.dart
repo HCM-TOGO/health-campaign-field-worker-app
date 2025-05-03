@@ -308,8 +308,10 @@ class _RecordRedosePageState extends LocalizedState<RecordRedosePage> {
                                                         productVariant,
                                                       );
 
-                                                      final quantity =
-                                                          quantityDistributedFormArray
+                                                      final quantity = quantityIndex <
+                                                              0
+                                                          ? 0
+                                                          : quantityDistributedFormArray
                                                               .value![
                                                                   quantityIndex]
                                                               .toString()
