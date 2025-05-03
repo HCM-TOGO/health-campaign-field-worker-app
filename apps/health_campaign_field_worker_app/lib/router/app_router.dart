@@ -1,3 +1,7 @@
+import 'package:attendance_management/router/attendance_router.dart';
+import 'package:attendance_management/router/attendance_router.gm.dart';
+import 'package:complaints/router/complaints_router.dart';
+import 'package:complaints/router/complaints_router.gm.dart';
 import 'package:health_campaign_field_worker_app/blocs/registration_delivery/custom_beneficairy_registration.dart';
 import 'package:referral_reconciliation/router/referral_reconciliation_router.gm.dart';
 import 'package:referral_reconciliation/router/referral_reconciliation_router.dart';
@@ -54,6 +58,8 @@ import '../pages/beneficiary/check_eligibility/custom_beneficiary_details_page.d
 import '../pages/beneficiary/check_eligibility/custom_deliver_intervention_page.dart';
 import '../pages/beneficiary/check_eligibility/custom_delivery_summary_page.dart';
 import '../utils/utils.dart';
+import 'package:survey_form/router/survey_form_router.dart';
+import 'package:survey_form/router/survey_form_router.gm.dart';
 
 part 'app_router.gr.dart';
 
@@ -63,6 +69,8 @@ part 'app_router.gr.dart';
     InventoryRoute,
     RegistrationDeliveryRoute,
     ReferralReconciliationRoute,
+    AttendanceRoute,
+    ComplaintsRoute,
   ],
 )
 class AppRouter extends _$AppRouter {
@@ -95,6 +103,24 @@ class AppRouter extends _$AppRouter {
         ),
 
         // INFO : Need to add Router of package Here
+        // Attendance Route
+        AutoRoute(
+          page: ManageAttendanceRoute.page,
+          path: 'manage-attendance',
+        ),
+        AutoRoute(
+          page: AttendanceDateSessionSelectionRoute.page,
+          path: 'attendance-date-session-selection',
+        ),
+        AutoRoute(
+          page: MarkAttendanceRoute.page,
+          path: 'mark-attendance',
+        ),
+        AutoRoute(
+          page: AttendanceAcknowledgementRoute.page,
+          path: 'attendance-acknowledgement',
+        ),
+
         // Referral Reconciliation Route
         AutoRoute(
             page: HFCreateReferralWrapperRoute.page,
@@ -390,6 +416,61 @@ class AppRouter extends _$AppRouter {
         AutoRoute(
           page: BoundarySelectionRoute.page,
           path: 'select-boundary',
+        ),
+
+        AutoRoute(
+          page: ComplaintsInboxWrapperRoute.page,
+          path: 'complaints-inbox',
+          children: [
+            AutoRoute(
+              page: ComplaintsInboxRoute.page,
+              path: 'complaints-inbox-items',
+              initial: true,
+            ),
+            AutoRoute(
+              page: ComplaintsInboxFilterRoute.page,
+              path: 'complaints-inbox-filter',
+            ),
+            AutoRoute(
+              page: ComplaintsInboxSearchRoute.page,
+              path: 'complaints-inbox-search',
+            ),
+            AutoRoute(
+              page: ComplaintsInboxSortRoute.page,
+              path: 'complaints-inbox-sort',
+            ),
+            AutoRoute(
+              page: ComplaintsDetailsViewRoute.page,
+              path: 'complaints-inbox-view-details',
+            ),
+          ],
+        ),
+
+        /// Complaints registration
+        AutoRoute(
+          page: ComplaintsRegistrationWrapperRoute.page,
+          path: 'complaints-registration',
+          children: [
+            AutoRoute(
+              page: ComplaintTypeRoute.page,
+              path: 'complaints-type',
+              initial: true,
+            ),
+            AutoRoute(
+              page: ComplaintsLocationRoute.page,
+              path: 'complaints-location',
+            ),
+            AutoRoute(
+              page: ComplaintsDetailsRoute.page,
+              path: 'complaints-details',
+            ),
+          ],
+        ),
+
+        /// Complaints Acknowledgemnet
+        AutoRoute(
+          page: ComplaintsAcknowledgementRoute.page,
+          path: 'complaints-acknowledgement',
         ),
       ],
     )
