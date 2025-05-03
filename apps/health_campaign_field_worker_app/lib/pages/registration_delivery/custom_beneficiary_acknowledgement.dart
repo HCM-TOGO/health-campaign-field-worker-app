@@ -102,10 +102,7 @@ class CustomBeneficiaryAcknowledgementPageState
                   title: localizations.translate(
                       i18.acknowledgementSuccess.acknowledgementLabelText),
                   subTitle: subtitleMap(householdMemberWrapper,
-                      householdMemberWrapper?.members?.lastOrNull?.identifiers
-        ?.lastWhereOrNull((e) =>
-            e.identifierType == IdentifierTypes.uniqueBeneficiaryID.toValue())
-        ?.identifierId),
+                      state.householdModel?.clientReferenceId),
                   actions: [
                     if (householdMemberWrapper != null)
                       DigitButton(
