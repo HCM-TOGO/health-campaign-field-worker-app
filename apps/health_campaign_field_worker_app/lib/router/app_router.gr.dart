@@ -424,6 +424,8 @@ abstract class _$AppRouter extends RootStackRouter {
     ...InventoryRoute().pagesMap,
     ...RegistrationDeliveryRoute().pagesMap,
     ...ReferralReconciliationRoute().pagesMap,
+    ...AttendanceRoute().pagesMap,
+    ...ComplaintsRoute().pagesMap,
   };
 }
 

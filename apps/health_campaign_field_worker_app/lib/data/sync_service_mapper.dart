@@ -3,7 +3,12 @@ import 'dart:convert';
 
 import 'package:attendance_management/attendance_management.dart';
 import 'package:collection/collection.dart';
+import 'package:complaints/data/repositories/remote/pgr_service.dart';
+import 'package:complaints/models/pgr_address.dart';
+import 'package:complaints/models/pgr_complaints.dart';
+import 'package:complaints/models/pgr_complaints_response.dart';
 import 'package:digit_data_model/data_model.dart';
+import 'package:digit_data_model/models/entities/pgr_application_status.dart';
 import 'package:inventory_management/inventory_management.dart';
 import 'package:referral_reconciliation/referral_reconciliation.dart';
 import 'package:registration_delivery/registration_delivery.dart';
@@ -714,71 +719,71 @@ class SyncServiceMapper extends SyncEntityMapperListener {
 
       // Note: Uncomment the following code block to enable complaints sync down
 
-      // case DataModelType.complaints:
-      //   if (remote is! PgrServiceRemoteRepository) return responseEntities;
-      //
-      //   final futures = entities
-      //       .whereType<PgrServiceModel>()
-      //       .map((e) => e.serviceRequestId)
-      //       .whereNotNull()
-      //       .map(
-      //     (e) {
-      //       final future = remote.searchWithoutClientReferenceId(
-      //         PgrServiceSearchModel(
-      //           serviceRequestId: e,
-      //         ),
-      //       );
-      //
-      //       return Future.sync(() => future);
-      //     },
-      //   );
-      //
-      //   final resolvedFutures = await Future.wait(futures);
-      //
-      //   responseEntities = resolvedFutures
-      //       .expand((element) => element)
-      //       .whereType<PgrServiceResponseModel>()
-      //       // We only need serviceRequestId and application status
-      //       .map((e) => PgrServiceModel(
-      //             clientReferenceId: '',
-      //             tenantId: e.tenantId ?? '',
-      //             serviceCode: e.serviceCode ?? '',
-      //             description: e.description ?? '',
-      //             serviceRequestId: e.serviceRequestId,
-      //             applicationStatus: e.applicationStatus ??
-      //                 PgrServiceApplicationStatus.pendingAssignment,
-      //             user: PgrComplainantModel(
-      //               clientReferenceId: '',
-      //               tenantId: '',
-      //               complaintClientReferenceId: e.serviceRequestId ?? '',
-      //             ),
-      //             address: PgrAddressModel(),
-      //           ))
-      //       .toList();
-      //
-      //   for (var element in operationGroupedEntity.value) {
-      //     if (element.id == null) continue;
-      //     final entity = element.entity as PgrServiceModel;
-      //     final responseEntity =
-      //         responseEntities.whereType<PgrServiceModel>().firstWhereOrNull(
-      //               (e) => e.clientReferenceId == entity.clientReferenceId,
-      //             );
-      //
-      //     final serverGeneratedId = responseEntity?.serviceRequestId;
-      //     final rowVersion = responseEntity?.rowVersion;
-      //
-      //     if (serverGeneratedId != null) {
-      //       await local.opLogManager.updateServerGeneratedIds(
-      //         model: UpdateServerGeneratedIdModel(
-      //           clientReferenceId: entity.clientReferenceId,
-      //           serverGeneratedId: serverGeneratedId,
-      //           dataOperation: element.operation,
-      //           rowVersion: rowVersion,
-      //         ),
-      //       );
-      //     }
-      //   }
-      //   break;
+      case DataModelType.complaints:
+        if (remote is! PgrServiceRemoteRepository) return responseEntities;
+
+        final futures = entities
+            .whereType<PgrServiceModel>()
+            .map((e) => e.serviceRequestId)
+            .whereNotNull()
+            .map(
+          (e) {
+            final future = remote.searchWithoutClientReferenceId(
+              PgrServiceSearchModel(
+                serviceRequestId: e,
+              ),
+            );
+
+            return Future.sync(() => future);
+          },
+        );
+
+        final resolvedFutures = await Future.wait(futures);
+
+        responseEntities = resolvedFutures
+            .expand((element) => element)
+            .whereType<PgrServiceResponseModel>()
+            // We only need serviceRequestId and application status
+            .map((e) => PgrServiceModel(
+                  clientReferenceId: '',
+                  tenantId: e.tenantId ?? '',
+                  serviceCode: e.serviceCode ?? '',
+                  description: e.description ?? '',
+                  serviceRequestId: e.serviceRequestId,
+                  applicationStatus: e.applicationStatus ??
+                      PgrServiceApplicationStatus.pendingAssignment,
+                  user: PgrComplainantModel(
+                    clientReferenceId: '',
+                    tenantId: '',
+                    complaintClientReferenceId: e.serviceRequestId ?? '',
+                  ),
+                  address: PgrAddressModel(),
+                ))
+            .toList();
+
+        for (var element in operationGroupedEntity.value) {
+          if (element.id == null) continue;
+          final entity = element.entity as PgrServiceModel;
+          final responseEntity =
+              responseEntities.whereType<PgrServiceModel>().firstWhereOrNull(
+                    (e) => e.clientReferenceId == entity.clientReferenceId,
+                  );
+
+          final serverGeneratedId = responseEntity?.serviceRequestId;
+          final rowVersion = responseEntity?.rowVersion;
+
+          if (serverGeneratedId != null) {
+            await local.opLogManager.updateServerGeneratedIds(
+              model: UpdateServerGeneratedIdModel(
+                clientReferenceId: entity.clientReferenceId,
+                serverGeneratedId: serverGeneratedId,
+                dataOperation: element.operation,
+                rowVersion: rowVersion,
+              ),
+            );
+          }
+        }
+        break;
 
       default:
         break;

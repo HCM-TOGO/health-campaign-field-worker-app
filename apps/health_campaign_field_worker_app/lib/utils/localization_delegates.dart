@@ -13,14 +13,16 @@ import 'package:digit_scanner/blocs/app_localization.dart'
     as scanner_localization;
 import 'package:digit_ui_components/services/AppLocalization.dart'
     as component_localization;
+import 'package:complaints/blocs/localization/app_localization.dart'
+    as complaints_localization;
+import 'package:inventory_management/blocs/app_localization.dart'
+    as inventory_localization;
+
 import 'package:flutter_localizations/flutter_localizations.dart';
 
 import '../blocs/localization/app_localization.dart';
 import '../data/local_store/no_sql/schema/app_configuration.dart';
 import '../data/repositories/local/localization.dart';
-
-import 'package:inventory_management/blocs/app_localization.dart'
-    as inventory_localization;
 
 import 'utils.dart';
 
@@ -63,6 +65,14 @@ getAppLocalizationDelegates({
       appConfig.languages!,
     ),
     referral_reconciliation_localization.ReferralReconLocalization.getDelegate(
+      LocalizationLocalRepository().returnLocalizationFromSQL(sql) as Future,
+      appConfig.languages!,
+    ),
+    attendance_localization.AttendanceLocalization.getDelegate(
+      LocalizationLocalRepository().returnLocalizationFromSQL(sql) as Future,
+      appConfig.languages!,
+    ),
+    complaints_localization.ComplaintsLocalization.getDelegate(
       LocalizationLocalRepository().returnLocalizationFromSQL(sql) as Future,
       appConfig.languages!,
     ),

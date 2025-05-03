@@ -1,3 +1,9 @@
+import 'package:attendance_management/attendance_management.dart';
+import 'package:attendance_management/router/attendance_router.gm.dart';
+import 'package:complaints/complaints.dart';
+
+import 'package:complaints/models/pgr_complaints.dart';
+import 'package:complaints/router/complaints_router.gm.dart';
 import 'package:referral_reconciliation/referral_reconciliation.dart';
 import 'package:referral_reconciliation/router/referral_reconciliation_router.gm.dart';
 
@@ -439,10 +445,27 @@ class _HomePageState extends LocalizedState<HomePage> {
           },
         ),
       ),
+      i18.home.fileComplaint:
+          homeShowcaseData.distributorFileComplaint.buildWith(
+        child: HomeItemCard(
+          icon: Icons.announcement,
+          label: i18.home.fileComplaint,
+          onPressed: () {
+            if (isTriggerLocalisation) {
+              triggerLocalization();
+              isTriggerLocalisation = false;
+            }
+            context.router.push(const ComplaintsInboxWrapperRoute());
+          },
+        ),
+      ),
     };
 
     final Map<String, GlobalKey> homeItemsShowcaseMap = {
       // INFO : Need to add showcase keys of package Here
+      i18.home.manageAttendanceLabel:
+          homeShowcaseData.manageAttendance.showcaseKey,
+
       i18.home.beneficiaryReferralLabel:
           homeShowcaseData.hfBeneficiaryReferral.showcaseKey,
 
@@ -455,6 +478,8 @@ class _HomePageState extends LocalizedState<HomePage> {
           homeShowcaseData.wareHouseManagerStockReconciliation.showcaseKey,
       i18.home.viewReportsLabel: homeShowcaseData.inventoryReport.showcaseKey,
       i18.home.syncDataLabel: homeShowcaseData.distributorSyncData.showcaseKey,
+      i18.home.fileComplaint:
+          homeShowcaseData.distributorFileComplaint.showcaseKey,
       i18.home.db: homeShowcaseData.db.showcaseKey,
       i18.home.dashboard: homeShowcaseData.dashBoard.showcaseKey,
       i18.home.clfLabel: homeShowcaseData.clf.showcaseKey,
@@ -462,6 +487,8 @@ class _HomePageState extends LocalizedState<HomePage> {
 
     final homeItemsLabel = <String>[
       // INFO: Need to add items label of package Here
+      i18.home.manageAttendanceLabel,
+
       i18.home.beneficiaryReferralLabel,
 
       i18.home.beneficiaryLabel,
@@ -470,6 +497,7 @@ class _HomePageState extends LocalizedState<HomePage> {
       i18.home.stockReconciliationLabel,
       i18.home.viewReportsLabel,
       i18.home.syncDataLabel,
+      i18.home.fileComplaint,
       i18.home.db,
       i18.home.dashboard,
     ];
@@ -511,6 +539,12 @@ class _HomePageState extends LocalizedState<HomePage> {
               localRepositories: [
                 // INFO : Need to add local repo of package Here
                 context.read<
+                    LocalRepository<AttendanceLogModel,
+                        AttendanceLogSearchModel>>(),
+
+                context.read<
+                    LocalRepository<PgrServiceModel, PgrServiceSearchModel>>(),
+                context.read<
                     LocalRepository<HFReferralModel, HFReferralSearchModel>>(),
 
                 context
@@ -543,6 +577,10 @@ class _HomePageState extends LocalizedState<HomePage> {
               remoteRepositories: [
                 // INFO : Need to add repo repo of package Here
                 context.read<
+                    RemoteRepository<AttendanceLogModel,
+                        AttendanceLogSearchModel>>(),
+
+                context.read<
                     RemoteRepository<HFReferralModel, HFReferralSearchModel>>(),
 
                 context.read<
@@ -566,6 +604,10 @@ class _HomePageState extends LocalizedState<HomePage> {
 
                 context.read<
                     RemoteRepository<IndividualModel, IndividualSearchModel>>(),
+                context.read<
+                    RemoteRepository<PgrServiceModel, PgrServiceSearchModel>>(),
+                context
+                    .read<RemoteRepository<ServiceModel, ServiceSearchModel>>()
                 // context.read<
                 //     RemoteRepository<UserActionModel, UserActionSearchModel>>(),
               ],
@@ -615,6 +657,12 @@ void setPackagesSingleton(BuildContext context) {
             dashboardConfigSchema ?? [], context.projectTypeCode ?? "");
         loadLocalization(context, appConfiguration);
         // INFO : Need to add singleton of package Here
+        AttendanceSingleton().setInitialData(
+            projectId: context.projectId,
+            loggedInIndividualId: context.loggedInIndividualId ?? '',
+            loggedInUserUuid: context.loggedInUserUuid,
+            appVersion: Constants().version);
+
         ReferralReconSingleton().setInitialData(
           userName: context.loggedInUser.name ?? '',
           userUUid: context.loggedInUserUuid,
@@ -730,6 +778,15 @@ void setPackagesSingleton(BuildContext context) {
               .toList(),
         );
         InventorySingleton().setBoundary(boundary: context.boundary);
+        ComplaintsSingleton().setInitialData(
+          tenantId: envConfig.variables.tenantId,
+          loggedInUserUuid: context.loggedInUserUuid,
+          userMobileNumber: context.loggedInUser.mobileNumber,
+          loggedInUserName: context.loggedInUser.name,
+          complaintTypes:
+              appConfiguration.complaintTypes!.map((e) => e.code).toList(),
+          userName: context.loggedInUser.name ?? '',
+        );
       });
 }
 

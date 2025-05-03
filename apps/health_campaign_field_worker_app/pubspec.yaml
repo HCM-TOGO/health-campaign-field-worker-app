@@ -70,6 +70,7 @@ dependencies:
   survey_form: 1.0.1
   crypto: 3.0.3
   referral_reconciliation: 1.0.4
+  complaints: ^1.0.2
 
 dev_dependencies:
   flutter_test:
