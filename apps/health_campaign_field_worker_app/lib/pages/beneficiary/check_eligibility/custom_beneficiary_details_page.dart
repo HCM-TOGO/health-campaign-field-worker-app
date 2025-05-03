@@ -28,9 +28,13 @@ import 'package:registration_delivery/widgets/localized.dart';
 import 'package:registration_delivery/widgets/table_card/table_card.dart';
 import 'package:registration_delivery/pages/beneficiary/widgets/record_delivery_cycle.dart';
 
+import '../../../utils/utils.dart';
+
 @RoutePage()
 class CustomBeneficiaryDetailsPage extends LocalizedStatefulWidget {
+  final EligibilityAssessmentType eligibilityAssessmentType;
   const CustomBeneficiaryDetailsPage({
+    required this.eligibilityAssessmentType,
     super.key,
     super.appLocalizations,
   });

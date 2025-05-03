@@ -59,6 +59,8 @@ export 'app_exception.dart';
 export 'constants.dart';
 export 'extensions/extensions.dart';
 
+enum EligibilityAssessmentType { smc, vas }
+
 class CustomValidator {
   /// Validates that control's value must be `true`
   static Map<String, dynamic>? requiredMin(
