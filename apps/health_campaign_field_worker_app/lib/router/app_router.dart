@@ -57,6 +57,7 @@ export 'package:auto_route/auto_route.dart';
 import '../pages/beneficiary/check_eligibility/custom_beneficiary_details_page.dart';
 import '../pages/beneficiary/check_eligibility/custom_deliver_intervention_page.dart';
 import '../pages/beneficiary/check_eligibility/custom_delivery_summary_page.dart';
+import '../utils/utils.dart';
 import 'package:survey_form/router/survey_form_router.dart';
 import 'package:survey_form/router/survey_form_router.gm.dart';
 
@@ -238,18 +239,18 @@ class AppRouter extends _$AppRouter {
                     path: 'custom-overview',
                     initial: true,
                   ),
-                  AutoRoute(
-                    page: BeneficiaryDetailsRoute.page,
-                    path: 'beneficiary-details',
-                  ),
+                  // AutoRoute(
+                  //   page: BeneficiaryDetailsRoute.page,
+                  //   path: 'beneficiary-details',
+                  // ),
                   AutoRoute(
                     page: CustomBeneficiaryDetailsRoute.page,
                     path: 'custom-beneficiary-details',
                   ),
-                  RedirectRoute(
-                    path: 'beneficiary-details',
-                    redirectTo: 'custom-beneficiary-details',
-                  ),
+                  // RedirectRoute(
+                  //   path: 'beneficiary-details',
+                  //   redirectTo: 'custom-beneficiary-details',
+                  // ),
                   AutoRoute(
                     page: CustomDeliverInterventionRoute.page,
                     path: 'custom-deliver-intervention',
