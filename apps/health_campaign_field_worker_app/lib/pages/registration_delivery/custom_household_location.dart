@@ -350,14 +350,7 @@ class CustomHouseholdLocationPageState
                                   ),
                             headingStyle: textTheme.headingXl.copyWith(
                                 color: theme.colorTheme.primary.primary2),
-                            description: (RegistrationDeliverySingleton()
-                                        .householdType ==
-                                    HouseholdType.community)
-                                ? null
-                                : localizations.translate(
-                                    i18.householdLocation
-                                        .householdLocationDescriptionText,
-                                  )),
+    ),
                         householdLocationShowcaseData.administrativeArea
                             .buildWith(
                           child: ReactiveWrapperField(

@@ -341,9 +341,6 @@ class CustomHouseHoldDetailsPageState
                                   ),
                             headingStyle: textTheme.headingXl.copyWith(
                                 color: theme.colorTheme.primary.primary2),
-                            description: localizations.translate(
-                              i18.householdDetails.householdDetailsDescription,
-                            ),
                           ),
                           householdDetailsShowcaseData.dateOfRegistration
                               .buildWith(
