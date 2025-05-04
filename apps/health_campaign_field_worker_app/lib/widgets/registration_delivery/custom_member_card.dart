@@ -1,4 +1,5 @@
 import 'package:auto_route/auto_route.dart';
+import 'package:collection/collection.dart';
 import 'package:digit_components/digit_components.dart';
 import 'package:digit_data_model/data_model.dart';
 import 'package:digit_ui_components/theme/digit_extended_theme.dart';
@@ -23,6 +24,9 @@ import '../../utils/utils.dart';
 import '../action_card/action_card.dart';
 
 import '../../utils/i18_key_constants.dart' as i18_local;
+
+import '../../models/entities/additional_fields_type.dart'
+    as additional_fields_local;
 
 class CustomMemberCard extends StatelessWidget {
   final String name;
@@ -70,6 +74,34 @@ class CustomMemberCard extends StatelessWidget {
     this.isBeneficiaryReferred = false,
     this.sideEffects,
   });
+
+  List<TaskModel>? _getSMCStatusData() {
+    return tasks
+        ?.where((e) =>
+            e.additionalFields?.fields.firstWhereOrNull(
+              (element) =>
+                  element.key ==
+                      additional_fields_local.AdditionalFieldsType.deliveryType
+                          .toValue() &&
+                  element.value == EligibilityAssessmentStatus.smcDone.name,
+            ) !=
+            null)
+        .toList();
+  }
+
+  List<TaskModel>? _getVACStatusData() {
+    return tasks
+        ?.where((e) =>
+            e.additionalFields?.fields.firstWhereOrNull(
+              (element) =>
+                  element.key ==
+                      additional_fields_local.AdditionalFieldsType.deliveryType
+                          .toValue() &&
+                  element.value == EligibilityAssessmentStatus.vasDone.name,
+            ) !=
+            null)
+        .toList();
+  }
 
   Widget statusWidget(context) {
     final theme = Theme.of(context);
@@ -153,130 +185,162 @@ class CustomMemberCard extends StatelessWidget {
   Widget actionButton(BuildContext context) {
     final theme = Theme.of(context);
     final textTheme = theme.digitTextTheme(context);
-    final doseStatus = checkStatus(tasks, context.selectedCycle);
-    bool smcAssessmentPendingStatus = assessmentSMCPending(tasks);
-    bool vasAssessmentPendingStatus = assessmentVASPending(tasks);
+    List<TaskModel>? smcTasks = _getSMCStatusData();
+    List<TaskModel>? vasTasks = _getVACStatusData();
+    final doseStatus = checkStatus(smcTasks, context.selectedCycle);
+    bool smcAssessmentPendingStatus = assessmentSMCPending(smcTasks);
+    bool vasAssessmentPendingStatus = assessmentVASPending(vasTasks);
     final redosePendingStatus = smcAssessmentPendingStatus
         ? true
-        : redosePending(tasks, context.selectedCycle);
-    return ((isNotEligible ||
-                isBeneficiaryIneligible ||
-                isBeneficiaryReferred) &&
-            !doseStatus)
-        ? const Offstage()
-        : isNotEligible || !vasAssessmentPendingStatus
-            ? const Offstage()
-            : DigitElevatedButton(
-                child: Center(
-                  child: Text(
-                    smcAssessmentPendingStatus
-                        ? localizations.translate(
-                            i18_local.householdOverView
-                                .householdOverViewSMCAssessmentActionText,
-                          )
-                        : redosePendingStatus
-                            ? localizations.translate(
-                                i18_local.householdOverView
-                                    .householdOverViewRedoseActionText,
-                              )
-                            : localizations.translate(
-                                i18_local.householdOverView
-                                    .householdOverViewVASAssessmentActionText,
-                              ),
-                    style: textTheme.headingM.copyWith(color: Colors.white),
-                  ),
+        : redosePending(smcTasks, context.selectedCycle);
+    if ((isNotEligible || isBeneficiaryIneligible || isBeneficiaryReferred) &&
+        !doseStatus) return const Offstage();
+    if (isNotEligible || !vasAssessmentPendingStatus) return const Offstage();
+    return Column(
+      children: [
+        if (smcAssessmentPendingStatus)
+          DigitElevatedButton(
+            child: Center(
+              child: Text(
+                localizations.translate(
+                  i18_local.householdOverView
+                      .householdOverViewSMCAssessmentActionText,
                 ),
-                onPressed: () async {
-                  final bloc = context.read<HouseholdOverviewBloc>();
-                  bloc.add(
-                    HouseholdOverviewEvent.selectedIndividual(
-                      individualModel: individual,
-                    ),
-                  );
+                style: textTheme.headingM.copyWith(color: Colors.white),
+              ),
+            ),
+            onPressed: () async {
+              final bloc = context.read<HouseholdOverviewBloc>();
+              bloc.add(
+                HouseholdOverviewEvent.selectedIndividual(
+                  individualModel: individual,
+                ),
+              );
 
-                  if ((tasks ?? []).isEmpty) {
-                    // TODO: Add eligibility page
+              if ((smcTasks ?? []).isEmpty) {
+                context.router.push(
+                  EligibilityChecklistViewRoute(
+                    projectBeneficiaryClientReferenceId:
+                        projectBeneficiaryClientReferenceId,
+                    individual: individual,
+                    eligibilityAssessmentType: EligibilityAssessmentType.smc,
+                  ),
+                );
+              }
+            },
+          ),
+        if (!smcAssessmentPendingStatus && redosePendingStatus)
+          DigitElevatedButton(
+            child: Center(
+              child: Text(
+                localizations.translate(
+                  i18_local.householdOverView.householdOverViewRedoseActionText,
+                ),
+                style: textTheme.headingM.copyWith(color: Colors.white),
+              ),
+            ),
+            onPressed: () async {
+              final bloc = context.read<HouseholdOverviewBloc>();
+              bloc.add(
+                HouseholdOverviewEvent.selectedIndividual(
+                  individualModel: individual,
+                ),
+              );
+
+              if ((smcTasks ?? []).isNotEmpty) {
+                var successfulTask = smcTasks!
+                    .where(
+                      (element) =>
+                          element.status ==
+                          Status.administeredSuccess.toValue(),
+                    )
+                    .lastOrNull;
+                if (redosePendingStatus) {
+                  final spaq1 = context.spaq1;
+
+                  int doseCount = double.parse(
+                    successfulTask!.resources!.first.quantity!,
+                  ).round();
+
+                  if (true || spaq1 >= doseCount) {
                     context.router.push(
-                      EligibilityChecklistViewRoute(
-                        projectBeneficiaryClientReferenceId:
-                            projectBeneficiaryClientReferenceId,
-                        individual: individual,
-                        eligibilityAssessmentType:
-                            EligibilityAssessmentType.smc,
+                      RecordRedoseRoute(
+                        tasks: [successfulTask!],
                       ),
                     );
                   } else {
-                    var successfulTask = tasks!
-                        .where(
-                          (element) =>
-                              element.status ==
-                              Status.administeredSuccess.toValue(),
-                        )
-                        .lastOrNull;
-                    if (redosePendingStatus) {
-                      final spaq1 = context.spaq1;
-
-                      int doseCount = double.parse(
-                        successfulTask!.resources!.first.quantity!,
-                      ).round();
-
-                      if (true || spaq1 >= doseCount) {
-                        context.router.push(
-                          RecordRedoseRoute(
-                            tasks: [successfulTask!],
-                          ),
-                        );
-                      } else {
-                        DigitDialog.show(
-                          context,
-                          options: DigitDialogOptions(
-                            titleText: localizations.translate(
-                              i18_local
-                                  .beneficiaryDetails.insufficientStockHeading,
-                            ),
-                            titleIcon: Icon(
-                              Icons.warning,
-                              color: DigitTheme.instance.colorScheme.error,
-                            ),
-                            contentText: "${localizations.translate(
-                              i18_local.beneficiaryDetails
-                                  .insufficientAZTStockMessageDelivery,
-                            )}=$spaq1${localizations.translate(
-                              i18_local.beneficiaryDetails.beneficiaryDoseUnit,
-                            )}",
-                            primaryAction: DigitDialogActions(
-                              label: localizations.translate(i18_local
-                                  .beneficiaryDetails.backToHouseholdDetails),
-                              action: (ctx) {
-                                Navigator.of(
-                                  ctx,
-                                  rootNavigator: true,
-                                ).pop();
-                              },
-                            ),
-                          ),
-                        );
-                      }
-                    } else {
-                      // context.router.push(
-                      //   CustomBeneficiaryDetailsRoute(
-                      //     eligibilityAssessmentType:
-                      //         EligibilityAssessmentType.smc,
-                      //   ),
-                      // );
-                      context.router.push(
-                        EligibilityChecklistViewRoute(
-                          projectBeneficiaryClientReferenceId:
-                              projectBeneficiaryClientReferenceId,
-                          individual: individual,
-                          eligibilityAssessmentType:
-                              EligibilityAssessmentType.vas,
+                    DigitDialog.show(
+                      context,
+                      options: DigitDialogOptions(
+                        titleText: localizations.translate(
+                          i18_local.beneficiaryDetails.insufficientStockHeading,
                         ),
-                      );
-                    }
+                        titleIcon: Icon(
+                          Icons.warning,
+                          color: DigitTheme.instance.colorScheme.error,
+                        ),
+                        contentText: "${localizations.translate(
+                          i18_local.beneficiaryDetails
+                              .insufficientAZTStockMessageDelivery,
+                        )}=$spaq1${localizations.translate(
+                          i18_local.beneficiaryDetails.beneficiaryDoseUnit,
+                        )}",
+                        primaryAction: DigitDialogActions(
+                          label: localizations.translate(i18_local
+                              .beneficiaryDetails.backToHouseholdDetails),
+                          action: (ctx) {
+                            Navigator.of(
+                              ctx,
+                              rootNavigator: true,
+                            ).pop();
+                          },
+                        ),
+                      ),
+                    );
                   }
-                },
+                }
+              }
+            },
+          ),
+        if (!smcAssessmentPendingStatus && redosePendingStatus)
+          DigitElevatedButton(
+            child: Center(
+              child: Text(
+                localizations.translate(
+                  i18_local.householdOverView
+                      .householdOverViewVASAssessmentActionText,
+                ),
+                style: textTheme.headingM.copyWith(color: Colors.white),
+              ),
+            ),
+            onPressed: () async {
+              final bloc = context.read<HouseholdOverviewBloc>();
+              bloc.add(
+                HouseholdOverviewEvent.selectedIndividual(
+                  individualModel: individual,
+                ),
               );
+
+              if ((vasTasks ?? []).isEmpty) {
+                // context.router.push(
+                //   CustomBeneficiaryDetailsRoute(
+                //     eligibilityAssessmentType:
+                //         EligibilityAssessmentType.smc,
+                //   ),
+                // );
+                context.router.push(
+                  EligibilityChecklistViewRoute(
+                    projectBeneficiaryClientReferenceId:
+                        projectBeneficiaryClientReferenceId,
+                    individual: individual,
+                    eligibilityAssessmentType: EligibilityAssessmentType.vas,
+                  ),
+                );
+              }
+            },
+          ),
+      ],
+    );
   }
 
   @override
