@@ -126,6 +126,7 @@ class CustomHouseholdLocationPageState
                   Padding(
                     padding: const EdgeInsets.only(bottom: spacer2),
                     child: BackNavigationHelpHeaderWidget(
+                      showHelp: true,
                       showcaseButton: ShowcaseButton(
                         isCommunity: isCommunity,
                       ),
