@@ -350,20 +350,23 @@ class CustomHouseHoldDetailsPageState
                                 label: localizations.translate(
                                   i18.householdDetails.dateOfRegistrationLabel,
                                 ),
-                                child: DigitDateFormInput(
-                                  readOnly: true,
-                                  confirmText: localizations.translate(
-                                    i18.common.coreCommonOk,
+                                child: AbsorbPointer(
+                                  absorbing: true,
+                                  child: DigitDateFormInput(
+                                    readOnly: false,
+                                    confirmText: localizations.translate(
+                                      i18.common.coreCommonOk,
+                                    ),
+                                    cancelText: localizations.translate(
+                                      i18.common.coreCommonCancel,
+                                    ),
+                                    initialValue: DateFormat(
+                                            Constants().dateMonthYearFormat)
+                                        .format(form
+                                            .control(_dateOfRegistrationKey)
+                                            .value)
+                                        .toString(),
                                   ),
-                                  cancelText: localizations.translate(
-                                    i18.common.coreCommonCancel,
-                                  ),
-                                  initialValue: DateFormat(
-                                          Constants().dateMonthYearFormat)
-                                      .format(form
-                                          .control(_dateOfRegistrationKey)
-                                          .value)
-                                      .toString(),
                                 ),
                               ),
                             ),
