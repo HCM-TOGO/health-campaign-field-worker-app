@@ -582,7 +582,10 @@ class CustomDeliverInterventionPageState
                                                   ),
                                                 ),
                                                 LabeledField(
-                                                  label: "Dose Administered By",
+                                                  label: localizations.translate(
+                                                    i18_local.deliverIntervention
+                                                        .doseadministeredby,
+                                                  ),
                                                   child: DigitTextFormInput(
                                                     suffixIcon:
                                                         Icons.arrow_drop_down,
