@@ -104,7 +104,7 @@ class CustomIndividualDetailsPageState
       }
       router.popUntil(
           (route) => route.settings.name == SearchBeneficiaryRoute.name);
-
+      customSearchHouseholdsBloc.add(const CustomSearchHouseholdsEvent.clear());
       customSearchHouseholdsBloc.add(
         CustomSearchHouseholdsEvent.searchByHouseholdHead(
           searchText: name.trim(),

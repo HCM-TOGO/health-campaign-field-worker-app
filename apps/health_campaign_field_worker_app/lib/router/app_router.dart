@@ -53,7 +53,7 @@ import '../pages/registration_delivery/custom_individual_details.dart';
 import '../pages/registration_delivery/custom_registration_delivery_wrapper.dart';
 import '../pages/registration_delivery/custom_search_beneficiary.dart';
 import '../pages/registration_delivery/custom_summary.dart';
-import '../pages/registration_delivery/record_redose.dart';
+import '../pages/beneficiary/check_eligibility/record_redose.dart';
 import '../pages/reports/beneficiary/beneficaries_report.dart';
 import '../pages/unauthenticated.dart';
 export 'package:auto_route/auto_route.dart';

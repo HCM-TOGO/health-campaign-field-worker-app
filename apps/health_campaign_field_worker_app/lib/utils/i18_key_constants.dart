@@ -182,6 +182,9 @@ class DeliverIntervention {
       'DELIVER_INTERVENTION_REDOSE_QUANTITY_LABEL';
   String get dose => 'DELIVER_INTERVENTION_DOSE';
 
+  String get quantityAdministratedLabel =>
+      'DELIVER_INTERVENTION_QUANTITY_ADMINISTRATED_LABEL';
+
   String get beneficiaryIneligibleDescription => 'BENEFICIARY_INELIGIBLE_DESC';
   String get beneficiaryReferralDescription => 'BENEFICIARY_REFERRAL_DESC';
   String get spaqRedirectionScreenDescription => 'SPAQ_REDIRECTED_SCREEN_DESC';

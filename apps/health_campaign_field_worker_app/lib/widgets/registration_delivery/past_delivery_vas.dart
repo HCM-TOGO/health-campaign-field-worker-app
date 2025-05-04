@@ -83,7 +83,7 @@ Widget buildTableContentVAS(
               ): fetchProductVariant(item, individualModel, householdModel)
                           ?.condition !=
                       null
-                  ? formatAgeRange(fetchProductVariant(
+                  ? customFormatAgeRange(fetchProductVariant(
                           item, individualModel, householdModel)!
                       .condition!)
                   : null,

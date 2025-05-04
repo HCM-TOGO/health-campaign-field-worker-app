@@ -157,7 +157,7 @@ String formatAgeRange(String condition) {
   return condition;
 }
 
-String customformatAgeRange(String condition) {
+String customFormatAgeRange(String condition) {
   final regex =
       RegExp(r'(\d+)\s*<\s*ageandage\s*<\s*(\d+)', caseSensitive: false);
   final match = regex.firstMatch(condition);

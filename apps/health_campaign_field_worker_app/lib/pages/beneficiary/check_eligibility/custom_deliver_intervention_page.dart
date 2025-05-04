@@ -535,7 +535,10 @@ class CustomDeliverInterventionPageState
                                                       ),
                                                     ),
                                                   ),
-                                                if (numberOfDoses > 1)
+                                                if (widget.eligibilityAssessmentType ==
+                                                        EligibilityAssessmentType
+                                                            .smc &&
+                                                    numberOfDoses > 1)
                                                   SizedBox(
                                                     height: MediaQuery.sizeOf(
                                                                 context)
@@ -557,8 +560,14 @@ class CustomDeliverInterventionPageState
                                                       LabeledField(
                                                     label:
                                                         localizations.translate(
-                                                      i18.householdDetails
-                                                          .dateOfRegistrationLabel,
+                                                      widget.eligibilityAssessmentType ==
+                                                              EligibilityAssessmentType
+                                                                  .smc
+                                                          ? i18.householdDetails
+                                                              .dateOfRegistrationLabel
+                                                          : i18_local
+                                                              .householdDetails
+                                                              .dateOfAdministrationLabel,
                                                     ),
                                                     child: DigitDateFormInput(
                                                       readOnly: true,
@@ -617,6 +626,9 @@ class CustomDeliverInterventionPageState
                                                 ..._controllers.map((e) =>
                                                     CustomResourceBeneficiaryCard(
                                                       form: form,
+                                                      eligibilityAssessmentType:
+                                                          widget
+                                                              .eligibilityAssessmentType,
                                                       cardIndex: _controllers
                                                           .indexOf(e),
                                                       totalItems:
@@ -944,9 +956,9 @@ class CustomDeliverInterventionPageState
                     BeneficiaryType.individual
                 ? int.tryParse(
                     bloc.tasks?.lastOrNull?.resources?.elementAt(i).quantity ??
-                        '0',
+                        '1',
                   )
-                : 0,
+                : 1,
             validators: [Validators.min(1)],
           ),
         ),
@@ -960,6 +972,7 @@ class CustomResourceBeneficiaryCard extends LocalizedStatefulWidget {
   final int cardIndex;
   final FormGroup form;
   final int totalItems;
+  final EligibilityAssessmentType eligibilityAssessmentType;
 
   const CustomResourceBeneficiaryCard({
     super.key,
@@ -968,6 +981,7 @@ class CustomResourceBeneficiaryCard extends LocalizedStatefulWidget {
     required this.cardIndex,
     required this.form,
     required this.totalItems,
+    required this.eligibilityAssessmentType,
   });
 
   @override
@@ -977,6 +991,7 @@ class CustomResourceBeneficiaryCard extends LocalizedStatefulWidget {
 
 class CustomResourceBeneficiaryCardState
     extends LocalizedState<CustomResourceBeneficiaryCard> {
+  CustomResourceBeneficiaryCardState();
   @override
   Widget build(BuildContext context) {
     return DigitCard(cardType: CardType.secondary, children: [
@@ -994,7 +1009,10 @@ class CustomResourceBeneficiaryCardState
                     .map((variant) => DropdownMenuItem<ProductVariantModel>(
                           value: variant,
                           child: Text(
-                            localizations.translate(variant.sku ?? variant.id),
+                            widget.eligibilityAssessmentType ==
+                                    EligibilityAssessmentType.smc
+                                ? variant.sku ?? variant.id
+                                : 'VAS - ${(variant.sku ?? variant.id) == "SPAQ 1" ? "Blue" : "Red"} Capsule',
                           ),
                         ))
                     .toList(),
@@ -1009,12 +1027,12 @@ class CustomResourceBeneficiaryCardState
         formControlName: 'quantityDistributed.${widget.cardIndex}',
         builder: (field) => LabeledField(
           label: localizations.translate(
-            i18.deliverIntervention.quantityDistributedLabel,
+            i18_local.deliverIntervention.quantityAdministratedLabel,
           ),
           child: DigitNumericFormInput(
             minValue: 1,
             step: 1,
-            initialValue: "0",
+            initialValue: "1",
             onChange: (value) {
               widget.form
                   .control('quantityDistributed.${widget.cardIndex}')
