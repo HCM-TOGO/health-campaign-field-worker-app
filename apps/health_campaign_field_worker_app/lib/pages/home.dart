@@ -144,7 +144,7 @@ class _HomePageState extends LocalizedState<HomePage> {
             children: [
               BackNavigationHelpHeaderWidget(
                 showBackNavigation: false,
-                showHelp: true,
+                showHelp: false,
                 showcaseButton: ShowcaseButton(
                   showcaseFor: showcaseKeys.toSet().toList(),
                 ),
@@ -787,6 +787,7 @@ void setPackagesSingleton(BuildContext context) {
               appConfiguration.complaintTypes!.map((e) => e.code).toList(),
           userName: context.loggedInUser.name ?? '',
         );
+        ComplaintsSingleton().setBoundary(boundary: context.boundary);
       });
 }
 

@@ -8,7 +8,7 @@ import 'package:digit_data_model/models/entities/project_type.dart';
 import 'package:registration_delivery/models/entities/additional_fields_type.dart';
 import 'package:registration_delivery/models/entities/household.dart';
 import 'package:survey_form/survey_form.init.dart' as surveyForm_mappers;
-// import 'package:complaints/complaints.init.dart' as complaints_mappers;
+import 'package:complaints/complaints.init.dart' as complaints_mappers;
 
 import 'dart:convert';
 
@@ -27,7 +27,6 @@ import 'dart:io';
 import 'package:attendance_management/attendance_management.dart'
     as attendance_mappers;
 import 'package:survey_form/survey_form.dart' as surveyForm_mappers;
-// import 'package:complaints/complaints.dart' as complaints_mappers;
 import 'package:connectivity_plus/connectivity_plus.dart';
 import 'package:digit_data_model/data_model.dart' as data_model;
 import 'package:digit_data_model/data_model.init.dart' as data_model_mappers;
@@ -611,7 +610,7 @@ initializeAllMappers() async {
     Future(() => registration_delivery_mappers.initializeMappers()),
     Future(() => inventory_mappers.initializeMappers()),
     Future(() => surveyForm_mappers.initializeMappers()),
-    // Future(() => complaints_mappers.initializeMappers()),
+    Future(() => complaints_mappers.initializeMappers()),
   ];
   await Future.wait(initializations);
 }

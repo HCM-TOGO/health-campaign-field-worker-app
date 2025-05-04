@@ -533,7 +533,7 @@ class CustomIndividualDetailsPageState
                             i18.individualDetails.individualsDetailsLabelText,
                           ),
                           style: textTheme.headingXl.copyWith(
-                              color: theme.colorTheme.primary.primary2),
+                              color: theme.colorTheme.text.primary,),
                         ),
                         Column(
                           children: [
