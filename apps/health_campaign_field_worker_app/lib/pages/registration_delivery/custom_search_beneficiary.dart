@@ -15,6 +15,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_keyboard_visibility/flutter_keyboard_visibility.dart';
 import 'package:health_campaign_field_worker_app/blocs/registration_delivery/custom_beneficairy_registration.dart';
+import 'package:health_campaign_field_worker_app/widgets/custom_back_navigation.dart';
 import 'package:registration_delivery/blocs/search_households/search_bloc_common_wrapper.dart';
 import 'package:registration_delivery/blocs/search_households/search_households.dart'
     as registration_delivery;
@@ -94,7 +95,7 @@ class _CustomSearchBeneficiaryPageState
             builder: (context, searchHouseholdsState) {
               return ScrollableContent(
                 header: const Column(children: [
-                  BackNavigationHelpHeaderWidget(showHelp:true,),
+                  CustomBackNavigationHelpHeaderWidget(showHelp:true,),
                 ]),
                 slivers: [
                   SliverToBoxAdapter(
@@ -124,7 +125,7 @@ class _CustomSearchBeneficiaryPageState
                                               .searchIndividualLabelText,
                                 ),
                                 style: textTheme.headingXl.copyWith(
-                                  color: theme.colorTheme.primary.primary2,
+                                  color: theme.colorTheme.text.primary,
                                 ),
                                 textAlign: TextAlign.left,
                               ),
