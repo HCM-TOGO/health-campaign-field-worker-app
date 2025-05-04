@@ -229,6 +229,7 @@ class CustomStockDetailsPageState
                       return ScrollableContent(
                         header: Column(children: [
                           BackNavigationHelpHeaderWidget(
+                            showHelp: true,
                             handleBack: () {
                               final stockState =
                                   context.read<RecordStockBloc>().state;

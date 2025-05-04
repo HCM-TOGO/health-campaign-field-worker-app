@@ -55,8 +55,8 @@ Widget buildTableContentSMC(
   const rowHeight = 84;
   const paddingHeight = (spacer2 * 2);
   final containerHeight = (numRows + 1) * rowHeight + (paddingHeight * 2);
-  const columnWidth = 150.0;
-  const cellHeight = 59.5;
+  const columnWidth = spacer10*3;
+  const cellHeight = spacer10;
 
   return Container(
     padding: const EdgeInsets.only(
@@ -81,7 +81,7 @@ Widget buildTableContentSMC(
               ): fetchProductVariant(item, individualModel, householdModel)
                           ?.condition !=
                       null
-                  ? formatAgeRange(fetchProductVariant(
+                  ? customformatAgeRange(fetchProductVariant(
                           item, individualModel, householdModel)!
                       .condition!)
                   : null,

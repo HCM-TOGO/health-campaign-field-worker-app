@@ -123,7 +123,7 @@ class CustomReferBeneficiarySMCPageState
                     widget.isReadministrationUnSuccessful
                         ? const BackNavigationHelpHeaderWidget(
                             showBackNavigation: false,
-                            showHelp: false,
+                            showHelp: true,
                             showcaseButton: null,
                           )
                         : const BackNavigationHelpHeaderWidget(
