@@ -107,7 +107,7 @@ class CustomHouseHoldDetailsPageState
                   Padding(
                     padding: const EdgeInsets.only(bottom: spacer2),
                     child: BackNavigationHelpHeaderWidget(
-                      showHelp: false,
+                      showHelp: true,
                       showcaseButton: ShowcaseButton(
                         isCommunity: isCommunity,
                       ),

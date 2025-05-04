@@ -144,7 +144,7 @@ class _HomePageState extends LocalizedState<HomePage> {
             children: [
               BackNavigationHelpHeaderWidget(
                 showBackNavigation: false,
-                showHelp: false,
+                showHelp: true,
                 showcaseButton: ShowcaseButton(
                   showcaseFor: showcaseKeys.toSet().toList(),
                 ),

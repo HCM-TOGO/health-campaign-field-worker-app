@@ -139,7 +139,7 @@ class CustomIndividualDetailsPageState
                 Padding(
                   padding: const EdgeInsets.only(bottom: spacer2),
                   child: BackNavigationHelpHeaderWidget(
-                    showHelp: false,
+                    showHelp: true,
                     handleBack: () {
                       if (isEditIndividual) {
                         final parent = context.router.parent() as StackRouter;

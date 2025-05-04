@@ -142,7 +142,7 @@ class CustomBeneficiaryDetailsPageState
                       body: ScrollableContent(
                         enableFixedDigitButton: true,
                         header: const Column(children: [
-                          BackNavigationHelpHeaderWidget(),
+                          BackNavigationHelpHeaderWidget(showHelp: true,),
                         ]),
                         footer: BlocBuilder<DeliverInterventionBloc,
                             DeliverInterventionState>(

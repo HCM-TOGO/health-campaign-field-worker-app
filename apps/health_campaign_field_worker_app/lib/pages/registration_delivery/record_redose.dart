@@ -403,7 +403,7 @@ class _RecordRedosePageState extends LocalizedState<RecordRedosePage> {
                                     ),
                                     header: const Column(children: [
                                       BackNavigationHelpHeaderWidget(
-                                        showHelp: false,
+                                        showHelp: true,
                                       ),
                                     ]),
                                     children: [
