@@ -709,46 +709,7 @@ class CustomIndividualDetailsPageState
                             }
                           },
                         ),
-                        // SelectionCard<String>(
-                        //   isRequired: true,
-                        //   showParentContainer: true,
-                        //   title: localizations.translate(
-                        //     i18.individualDetails.genderLabelText,
-                        //   ),
-                        //   allowMultipleSelection: false,
-                        //   width: 126,
-                        //   initialSelection:
-                        //       form.control(_genderKey).value != null
-                        //           ? [form.control(_genderKey).value]
-                        //           : [],
-                        //   options: RegistrationDeliverySingleton()
-                        //       .genderOptions!
-                        //       .map(
-                        //         (e) => e,
-                        //       )
-                        //       .toList(),
-                        //   onSelectionChanged: (value) {
-                        //     setState(() {
-                        //       if (value.isNotEmpty) {
-                        //         form.control(_genderKey).value = value.first;
-                        //       } else {
-                        //         form.control(_genderKey).value = null;
-                        //         setState(() {
-                        //           form
-                        //               .control(_genderKey)
-                        //               .setErrors({'': true});
-                        //         });
-                        //       }
-                        //     });
-                        //   },
-                        //   valueMapper: (value) {
-                        //     return localizations.translate(value);
-                        //   },
-                        //   errorMessage: form.control(_genderKey).hasErrors
-                        //       ? localizations
-                        //           .translate(i18.common.corecommonRequired)
-                        //       : null,
-                        // ),
+
                         individualDetailsShowcaseData.mobile.buildWith(
                           child: Offstage(
                             offstage: !widget.isHeadOfHousehold,
