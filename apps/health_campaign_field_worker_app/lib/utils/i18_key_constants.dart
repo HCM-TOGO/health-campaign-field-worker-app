@@ -185,6 +185,9 @@ class DeliverIntervention {
   String get quantityAdministratedLabel =>
       'DELIVER_INTERVENTION_QUANTITY_ADMINISTRATED_LABEL';
 
+  String get selectTheResourceDeliveredLabel =>
+      'DELIVER_INTERVENTION_SELECT_RESOURCE_DELIVERED_LABEL';
+
   String get beneficiaryIneligibleDescription => 'BENEFICIARY_INELIGIBLE_DESC';
   String get beneficiaryReferralDescription => 'BENEFICIARY_REFERRAL_DESC';
   String get spaqRedirectionScreenDescription => 'SPAQ_REDIRECTED_SCREEN_DESC';

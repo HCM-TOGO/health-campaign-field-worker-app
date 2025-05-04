@@ -8,6 +8,7 @@ import 'package:digit_data_model/data_model.dart';
 import 'package:digit_ui_components/enum/app_enums.dart';
 import 'package:digit_ui_components/utils/component_utils.dart';
 import 'package:digit_ui_components/widgets/atoms/digit_numeric_form_input.dart';
+import 'package:digit_ui_components/widgets/atoms/digit_text_form_input.dart';
 import 'package:digit_ui_components/widgets/atoms/labelled_fields.dart';
 import 'package:digit_ui_components/widgets/atoms/reactive_fields.dart';
 import 'package:digit_ui_components/widgets/molecules/digit_card.dart';
@@ -858,29 +859,27 @@ class CustomResourceBeneficiaryCardState
       BlocBuilder<ProductVariantBloc, ProductVariantState>(
         builder: (context, productState) {
           return productState.maybeWhen(
-            orElse: () => const Offstage(),
-            fetched: (productVariants) {
-              return DropdownButton<ProductVariantModel>(
-                isExpanded: true,
-                value: widget.form
+              orElse: () => const Offstage(),
+              fetched: (productVariants) {
+                var variant = widget.form
                     .control('resourceDelivered.${widget.cardIndex}')
-                    .value,
-                items: productVariants
-                    .map((variant) => DropdownMenuItem<ProductVariantModel>(
-                          value: variant,
-                          child: Text(
-                            widget.eligibilityAssessmentType ==
-                                    EligibilityAssessmentType.smc
-                                ? variant.sku ?? variant.id
-                                : 'VAS - ${(variant.sku ?? variant.id) == "SPAQ 1" ? "Blue" : "Red"} Capsule',
-                          ),
-                        ))
-                    .toList(),
-                onChanged: null, // Disabled dropdown
-                dropdownColor: Theme.of(context).colorScheme.surface,
-              );
-            },
-          );
+                    .value;
+                return LabeledField(
+                  label: localizations.translate(
+                    i18_local
+                        .deliverIntervention.selectTheResourceDeliveredLabel,
+                  ),
+                  isRequired: true,
+                  child: DigitTextFormInput(
+                    suffixIcon: Icons.arrow_drop_down,
+                    readOnly: true,
+                    initialValue: widget.eligibilityAssessmentType ==
+                            EligibilityAssessmentType.smc
+                        ? variant.sku ?? variant.id
+                        : 'VAS - ${(variant.sku ?? variant.id) == "SPAQ 1" ? "Blue" : "Red"} Capsule',
+                  ),
+                );
+              });
         },
       ),
       IgnorePointer(
@@ -890,11 +889,11 @@ class CustomResourceBeneficiaryCardState
             label: localizations.translate(
               i18_local.deliverIntervention.quantityAdministratedLabel,
             ),
+            isRequired: true,
             child: DigitNumericFormInput(
               minValue: 1,
               step: 1,
               initialValue: "1",
-              editable: false,
               onChange: (value) {
                 widget.form
                     .control('quantityDistributed.${widget.cardIndex}')

@@ -591,8 +591,10 @@ class CustomDeliverInterventionPageState
                                                   ),
                                                 ),
                                                 LabeledField(
-                                                  label: localizations.translate(
-                                                    i18_local.deliverIntervention
+                                                  label:
+                                                      localizations.translate(
+                                                    i18_local
+                                                        .deliverIntervention
                                                         .doseadministeredby,
                                                   ),
                                                   child: DigitTextFormInput(
@@ -654,39 +656,39 @@ class CustomDeliverInterventionPageState
                                                         });
                                                       },
                                                     )),
-                                                Center(
-                                                  child: DigitButton(
-                                                    label:
-                                                        localizations.translate(
-                                                      i18.deliverIntervention
-                                                          .resourceAddBeneficiary,
-                                                    ),
-                                                    type: DigitButtonType
-                                                        .tertiary,
-                                                    size:
-                                                        DigitButtonSize.medium,
-                                                    isDisabled: ((form.control(_resourceDeliveredKey)
-                                                                            as FormArray)
-                                                                        .value ??
-                                                                    [])
-                                                                .length <
-                                                            (productVariants ??
-                                                                    [])
-                                                                .length
-                                                        ? false
-                                                        : true,
-                                                    onPressed: () async {
-                                                      addController(form);
-                                                      setState(() {
-                                                        _controllers.add(
-                                                          _controllers.length,
-                                                        );
-                                                      });
-                                                    },
-                                                    prefixIcon:
-                                                        Icons.add_circle,
-                                                  ),
-                                                ),
+                                                // Center(
+                                                //   child: DigitButton(
+                                                //     label:
+                                                //         localizations.translate(
+                                                //       i18.deliverIntervention
+                                                //           .resourceAddBeneficiary,
+                                                //     ),
+                                                //     type: DigitButtonType
+                                                //         .tertiary,
+                                                //     size:
+                                                //         DigitButtonSize.medium,
+                                                //     isDisabled: ((form.control(_resourceDeliveredKey)
+                                                //                             as FormArray)
+                                                //                         .value ??
+                                                //                     [])
+                                                //                 .length <
+                                                //             (productVariants ??
+                                                //                     [])
+                                                //                 .length
+                                                //         ? false
+                                                //         : true,
+                                                //     onPressed: () async {
+                                                //       addController(form);
+                                                //       setState(() {
+                                                //         _controllers.add(
+                                                //           _controllers.length,
+                                                //         );
+                                                //       });
+                                                //     },
+                                                //     prefixIcon:
+                                                //         Icons.add_circle,
+                                                //   ),
+                                                // ),
                                               ]),
                                         ],
                                       ),
@@ -998,29 +1000,27 @@ class CustomResourceBeneficiaryCardState
       BlocBuilder<ProductVariantBloc, ProductVariantState>(
         builder: (context, productState) {
           return productState.maybeWhen(
-            orElse: () => const Offstage(),
-            fetched: (productVariants) {
-              return DropdownButton<ProductVariantModel>(
-                isExpanded: true,
-                value: widget.form
+              orElse: () => const Offstage(),
+              fetched: (productVariants) {
+                var variant = widget.form
                     .control('resourceDelivered.${widget.cardIndex}')
-                    .value,
-                items: productVariants
-                    .map((variant) => DropdownMenuItem<ProductVariantModel>(
-                          value: variant,
-                          child: Text(
-                            widget.eligibilityAssessmentType ==
-                                    EligibilityAssessmentType.smc
-                                ? variant.sku ?? variant.id
-                                : 'VAS - ${(variant.sku ?? variant.id) == "SPAQ 1" ? "Blue" : "Red"} Capsule',
-                          ),
-                        ))
-                    .toList(),
-                onChanged: null, // Disabled dropdown
-                dropdownColor: Theme.of(context).colorScheme.surface,
-              );
-            },
-          );
+                    .value;
+                return LabeledField(
+                  label: localizations.translate(
+                    i18_local
+                        .deliverIntervention.selectTheResourceDeliveredLabel,
+                  ),
+                  isRequired: true,
+                  child: DigitTextFormInput(
+                    suffixIcon: Icons.arrow_drop_down,
+                    readOnly: true,
+                    initialValue: widget.eligibilityAssessmentType ==
+                            EligibilityAssessmentType.smc
+                        ? variant.sku ?? variant.id
+                        : 'VAS - ${(variant.sku ?? variant.id) == "SPAQ 1" ? "Blue" : "Red"} Capsule',
+                  ),
+                );
+              });
         },
       ),
       ReactiveWrapperField(
@@ -1029,6 +1029,7 @@ class CustomResourceBeneficiaryCardState
           label: localizations.translate(
             i18_local.deliverIntervention.quantityAdministratedLabel,
           ),
+          isRequired: true,
           child: DigitNumericFormInput(
             minValue: 1,
             step: 1,
