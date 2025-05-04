@@ -8,6 +8,8 @@ import 'package:registration_delivery/models/entities/side_effect.dart';
 import 'package:registration_delivery/models/entities/status.dart';
 import 'package:registration_delivery/models/entities/task.dart';
 
+import '../../models/entities/additional_fields_type.dart'
+    as additional_fields_local;
 import '../app_enums.dart';
 
 bool redosePending(List<TaskModel>? tasks, ProjectCycle? selectedCycle) {
@@ -76,7 +78,10 @@ bool assessmentVASPending(List<TaskModel>? tasks) {
         (element) => (element.status == Status.administeredSuccess.toValue() &&
             element.additionalFields?.fields.firstWhereOrNull(
                   (e) =>
-                      e.key == AdditionalFieldsType.deliveryType.toValue() &&
+                      e.key ==
+                          additional_fields_local
+                              .AdditionalFieldsType.deliveryType
+                              .toValue() &&
                       e.value == EligibilityAssessmentStatus.vasDone.name,
                 ) !=
                 null),

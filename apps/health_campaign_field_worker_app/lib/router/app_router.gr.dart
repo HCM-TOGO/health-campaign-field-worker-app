@@ -103,13 +103,13 @@ abstract class _$AppRouter extends RootStackRouter {
       );
     },
     CustomDeliverInterventionRoute.name: (routeData) {
-      final args = routeData.argsAs<CustomDeliverInterventionRouteArgs>(
-          orElse: () => const CustomDeliverInterventionRouteArgs());
+      final args = routeData.argsAs<CustomDeliverInterventionRouteArgs>();
       return AutoRoutePage<dynamic>(
         routeData: routeData,
         child: CustomDeliverInterventionPage(
           key: args.key,
           appLocalizations: args.appLocalizations,
+          eligibilityAssessmentType: args.eligibilityAssessmentType,
           isEditing: args.isEditing,
         ),
       );
@@ -746,6 +746,7 @@ class CustomDeliverInterventionRoute
   CustomDeliverInterventionRoute({
     Key? key,
     RegistrationDeliveryLocalization? appLocalizations,
+    required EligibilityAssessmentType eligibilityAssessmentType,
     bool isEditing = false,
     List<PageRouteInfo>? children,
   }) : super(
@@ -753,6 +754,7 @@ class CustomDeliverInterventionRoute
           args: CustomDeliverInterventionRouteArgs(
             key: key,
             appLocalizations: appLocalizations,
+            eligibilityAssessmentType: eligibilityAssessmentType,
             isEditing: isEditing,
           ),
           initialChildren: children,
@@ -768,6 +770,7 @@ class CustomDeliverInterventionRouteArgs {
   const CustomDeliverInterventionRouteArgs({
     this.key,
     this.appLocalizations,
+    required this.eligibilityAssessmentType,
     this.isEditing = false,
   });
 
@@ -775,11 +778,13 @@ class CustomDeliverInterventionRouteArgs {
 
   final RegistrationDeliveryLocalization? appLocalizations;
 
+  final EligibilityAssessmentType eligibilityAssessmentType;
+
   final bool isEditing;
 
   @override
   String toString() {
-    return 'CustomDeliverInterventionRouteArgs{key: $key, appLocalizations: $appLocalizations, isEditing: $isEditing}';
+    return 'CustomDeliverInterventionRouteArgs{key: $key, appLocalizations: $appLocalizations, eligibilityAssessmentType: $eligibilityAssessmentType, isEditing: $isEditing}';
   }
 }
 

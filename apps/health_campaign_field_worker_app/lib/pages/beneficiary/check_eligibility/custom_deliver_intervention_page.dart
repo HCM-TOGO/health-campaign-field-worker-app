@@ -32,6 +32,8 @@ import 'package:registration_delivery/widgets/localized.dart';
 
 import '../../../utils/app_enums.dart';
 import '../../../utils/i18_key_constants.dart' as i18_local;
+import '../../../models/entities/additional_fields_type.dart'
+    as additional_fields_local;
 
 @RoutePage()
 class CustomDeliverInterventionPage extends LocalizedStatefulWidget {
@@ -852,7 +854,7 @@ class CustomDeliverInterventionPageState
               longitude,
             ),
           AdditionalField(
-            AdditionalFieldsType.deliveryType.toValue(),
+            additional_fields_local.AdditionalFieldsType.deliveryType.toValue(),
             widget.eligibilityAssessmentType == EligibilityAssessmentType.smc
                 ? EligibilityAssessmentStatus.smcDone.name
                 : EligibilityAssessmentStatus.vasDone.name,
