@@ -195,7 +195,10 @@ class CustomMemberCard extends StatelessWidget {
         : redosePending(smcTasks, context.selectedCycle);
     if ((isNotEligible || isBeneficiaryIneligible || isBeneficiaryReferred) &&
         !doseStatus) return const Offstage();
-    if (isNotEligible || !vasAssessmentPendingStatus) return const Offstage();
+    if (isNotEligible ||
+        (!vasAssessmentPendingStatus && !redosePendingStatus)) {
+      return const Offstage();
+    }
     return Column(
       children: [
         if (smcAssessmentPendingStatus)
@@ -302,7 +305,7 @@ class CustomMemberCard extends StatelessWidget {
               }
             },
           ),
-        if (!smcAssessmentPendingStatus && redosePendingStatus)
+        if (!smcAssessmentPendingStatus && vasAssessmentPendingStatus)
           DigitElevatedButton(
             child: Center(
               child: Text(

@@ -30,6 +30,7 @@ import 'package:registration_delivery/widgets/beneficiary/resource_beneficiary_c
 import 'package:registration_delivery/widgets/component_wrapper/product_variant_bloc_wrapper.dart';
 import 'package:registration_delivery/widgets/localized.dart';
 
+import '../../../router/app_router.dart';
 import '../../../utils/app_enums.dart';
 import '../../../utils/i18_key_constants.dart' as i18_local;
 import '../../../models/entities/additional_fields_type.dart'
@@ -167,7 +168,9 @@ class CustomDeliverInterventionPageState
             true) {
       context.router.popUntilRouteWithName(BeneficiaryWrapperRoute.name);
       context.router.push(
-        SplashAcknowledgementRoute(enableBackToSearch: false),
+        CustomSplashAcknowledgementRoute(
+            enableBackToSearch: false,
+            eligibilityAssessmentType: widget.eligibilityAssessmentType),
       );
     } else {
       final reloadState = context.read<HouseholdOverviewBloc>();
@@ -180,7 +183,10 @@ class CustomDeliverInterventionPageState
         ),
       );
       context.router.popAndPush(
-        HouseholdAcknowledgementRoute(enableViewHousehold: true),
+        CustomHouseholdAcknowledgementRoute(
+          enableViewHousehold: true,
+          eligibilityAssessmentType: widget.eligibilityAssessmentType,
+        ),
       );
     }
   }

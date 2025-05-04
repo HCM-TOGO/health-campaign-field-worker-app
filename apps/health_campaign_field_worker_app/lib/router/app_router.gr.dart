@@ -126,13 +126,13 @@ abstract class _$AppRouter extends RootStackRouter {
       );
     },
     CustomDoseAdministeredRoute.name: (routeData) {
-      final args = routeData.argsAs<CustomDoseAdministeredRouteArgs>(
-          orElse: () => const CustomDoseAdministeredRouteArgs());
+      final args = routeData.argsAs<CustomDoseAdministeredRouteArgs>();
       return AutoRoutePage<dynamic>(
         routeData: routeData,
         child: CustomDoseAdministeredPage(
           key: args.key,
           appLocalizations: args.appLocalizations,
+          eligibilityAssessmentType: args.eligibilityAssessmentType,
         ),
       );
     },
@@ -155,6 +155,18 @@ abstract class _$AppRouter extends RootStackRouter {
         child: CustomHouseHoldDetailsPage(
           key: args.key,
           appLocalizations: args.appLocalizations,
+        ),
+      );
+    },
+    CustomHouseholdAcknowledgementRoute.name: (routeData) {
+      final args = routeData.argsAs<CustomHouseholdAcknowledgementRouteArgs>();
+      return AutoRoutePage<dynamic>(
+        routeData: routeData,
+        child: CustomHouseholdAcknowledgementPage(
+          key: args.key,
+          appLocalizations: args.appLocalizations,
+          enableViewHousehold: args.enableViewHousehold,
+          eligibilityAssessmentType: args.eligibilityAssessmentType,
         ),
       );
     },
@@ -281,6 +293,18 @@ abstract class _$AppRouter extends RootStackRouter {
         child: CustomSearchBeneficiaryPage(
           key: args.key,
           appLocalizations: args.appLocalizations,
+        ),
+      );
+    },
+    CustomSplashAcknowledgementRoute.name: (routeData) {
+      final args = routeData.argsAs<CustomSplashAcknowledgementRouteArgs>();
+      return AutoRoutePage<dynamic>(
+        routeData: routeData,
+        child: CustomSplashAcknowledgementPage(
+          key: args.key,
+          appLocalizations: args.appLocalizations,
+          enableBackToSearch: args.enableBackToSearch,
+          eligibilityAssessmentType: args.eligibilityAssessmentType,
         ),
       );
     },
@@ -845,12 +869,14 @@ class CustomDoseAdministeredRoute
   CustomDoseAdministeredRoute({
     Key? key,
     RegistrationDeliveryLocalization? appLocalizations,
+    required EligibilityAssessmentType eligibilityAssessmentType,
     List<PageRouteInfo>? children,
   }) : super(
           CustomDoseAdministeredRoute.name,
           args: CustomDoseAdministeredRouteArgs(
             key: key,
             appLocalizations: appLocalizations,
+            eligibilityAssessmentType: eligibilityAssessmentType,
           ),
           initialChildren: children,
         );
@@ -865,15 +891,18 @@ class CustomDoseAdministeredRouteArgs {
   const CustomDoseAdministeredRouteArgs({
     this.key,
     this.appLocalizations,
+    required this.eligibilityAssessmentType,
   });
 
   final Key? key;
 
   final RegistrationDeliveryLocalization? appLocalizations;
 
+  final EligibilityAssessmentType eligibilityAssessmentType;
+
   @override
   String toString() {
-    return 'CustomDoseAdministeredRouteArgs{key: $key, appLocalizations: $appLocalizations}';
+    return 'CustomDoseAdministeredRouteArgs{key: $key, appLocalizations: $appLocalizations, eligibilityAssessmentType: $eligibilityAssessmentType}';
   }
 }
 
@@ -957,6 +986,55 @@ class CustomHouseHoldDetailsRouteArgs {
   @override
   String toString() {
     return 'CustomHouseHoldDetailsRouteArgs{key: $key, appLocalizations: $appLocalizations}';
+  }
+}
+
+/// generated route for
+/// [CustomHouseholdAcknowledgementPage]
+class CustomHouseholdAcknowledgementRoute
+    extends PageRouteInfo<CustomHouseholdAcknowledgementRouteArgs> {
+  CustomHouseholdAcknowledgementRoute({
+    Key? key,
+    RegistrationDeliveryLocalization? appLocalizations,
+    bool? enableViewHousehold,
+    required EligibilityAssessmentType eligibilityAssessmentType,
+    List<PageRouteInfo>? children,
+  }) : super(
+          CustomHouseholdAcknowledgementRoute.name,
+          args: CustomHouseholdAcknowledgementRouteArgs(
+            key: key,
+            appLocalizations: appLocalizations,
+            enableViewHousehold: enableViewHousehold,
+            eligibilityAssessmentType: eligibilityAssessmentType,
+          ),
+          initialChildren: children,
+        );
+
+  static const String name = 'CustomHouseholdAcknowledgementRoute';
+
+  static const PageInfo<CustomHouseholdAcknowledgementRouteArgs> page =
+      PageInfo<CustomHouseholdAcknowledgementRouteArgs>(name);
+}
+
+class CustomHouseholdAcknowledgementRouteArgs {
+  const CustomHouseholdAcknowledgementRouteArgs({
+    this.key,
+    this.appLocalizations,
+    this.enableViewHousehold,
+    required this.eligibilityAssessmentType,
+  });
+
+  final Key? key;
+
+  final RegistrationDeliveryLocalization? appLocalizations;
+
+  final bool? enableViewHousehold;
+
+  final EligibilityAssessmentType eligibilityAssessmentType;
+
+  @override
+  String toString() {
+    return 'CustomHouseholdAcknowledgementRouteArgs{key: $key, appLocalizations: $appLocalizations, enableViewHousehold: $enableViewHousehold, eligibilityAssessmentType: $eligibilityAssessmentType}';
   }
 }
 
@@ -1421,6 +1499,55 @@ class CustomSearchBeneficiaryRouteArgs {
   @override
   String toString() {
     return 'CustomSearchBeneficiaryRouteArgs{key: $key, appLocalizations: $appLocalizations}';
+  }
+}
+
+/// generated route for
+/// [CustomSplashAcknowledgementPage]
+class CustomSplashAcknowledgementRoute
+    extends PageRouteInfo<CustomSplashAcknowledgementRouteArgs> {
+  CustomSplashAcknowledgementRoute({
+    Key? key,
+    RegistrationDeliveryLocalization? appLocalizations,
+    bool? enableBackToSearch,
+    required EligibilityAssessmentType eligibilityAssessmentType,
+    List<PageRouteInfo>? children,
+  }) : super(
+          CustomSplashAcknowledgementRoute.name,
+          args: CustomSplashAcknowledgementRouteArgs(
+            key: key,
+            appLocalizations: appLocalizations,
+            enableBackToSearch: enableBackToSearch,
+            eligibilityAssessmentType: eligibilityAssessmentType,
+          ),
+          initialChildren: children,
+        );
+
+  static const String name = 'CustomSplashAcknowledgementRoute';
+
+  static const PageInfo<CustomSplashAcknowledgementRouteArgs> page =
+      PageInfo<CustomSplashAcknowledgementRouteArgs>(name);
+}
+
+class CustomSplashAcknowledgementRouteArgs {
+  const CustomSplashAcknowledgementRouteArgs({
+    this.key,
+    this.appLocalizations,
+    this.enableBackToSearch,
+    required this.eligibilityAssessmentType,
+  });
+
+  final Key? key;
+
+  final RegistrationDeliveryLocalization? appLocalizations;
+
+  final bool? enableBackToSearch;
+
+  final EligibilityAssessmentType eligibilityAssessmentType;
+
+  @override
+  String toString() {
+    return 'CustomSplashAcknowledgementRouteArgs{key: $key, appLocalizations: $appLocalizations, enableBackToSearch: $enableBackToSearch, eligibilityAssessmentType: $eligibilityAssessmentType}';
   }
 }
 

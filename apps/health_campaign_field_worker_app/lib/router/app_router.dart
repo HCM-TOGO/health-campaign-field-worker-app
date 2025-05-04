@@ -23,7 +23,9 @@ import '../pages/acknowledgement.dart';
 import '../pages/authenticated.dart';
 import '../pages/beneficiary/check_eligibility/check_eligibility_assessment.dart';
 import '../pages/beneficiary/check_eligibility/custom_dose_administered.dart';
+import '../pages/beneficiary/check_eligibility/custom_splash_acknowledge.dart';
 import '../pages/beneficiary/check_eligibility/facility_selection_smc.dart';
+import '../pages/beneficiary/check_eligibility/custom_household_acknowledgement.dart';
 import '../pages/beneficiary/check_eligibility/household_acknowledgement_smc.dart';
 import '../pages/beneficiary/check_eligibility/inventory_facility_selection_smc.dart';
 import '../pages/beneficiary/check_eligibility/refer_beneficiary_smc.dart';
@@ -292,18 +294,26 @@ class AppRouter extends _$AppRouter {
                     page: CustomDoseAdministeredRoute.page,
                     path: 'custom-dose-administered',
                   ),
-                  RedirectRoute(
-                    path: 'dose-administered',
-                    redirectTo: 'custom-dose-administered',
-                  ),
+                  // RedirectRoute(
+                  //   path: 'dose-administered',
+                  //   redirectTo: 'custom-dose-administered',
+                  // ),
                   AutoRoute(
                     page: RecordRedoseRoute.page,
                     path: 'record-redose',
                   ),
+                  // AutoRoute(
+                  //   page: SplashAcknowledgementRoute.page,
+                  //   path: 'splash-acknowledgement',
+                  // ),
                   AutoRoute(
-                    page: SplashAcknowledgementRoute.page,
+                    page: CustomSplashAcknowledgementRoute.page,
                     path: 'splash-acknowledgement',
                   ),
+                  // RedirectRoute(
+                  //   path: 'splash-acknowledgement',
+                  //   redirectTo: 'custom-splash-acknowledgement',
+                  // ),
                   AutoRoute(
                     page: ReasonForDeletionRoute.page,
                     path: 'reason-for-deletion',
@@ -312,9 +322,14 @@ class AppRouter extends _$AppRouter {
                     page: RecordPastDeliveryDetailsRoute.page,
                     path: 'record-past-delivery-details',
                   ),
+                  // AutoRoute(
+                  //   page: HouseholdAcknowledgementRoute.page,
+                  //   path: 'household-acknowledgement',
+                  // ),
+
                   AutoRoute(
-                    page: HouseholdAcknowledgementRoute.page,
-                    path: 'household-acknowledgement',
+                    page: CustomHouseholdAcknowledgementRoute.page,
+                    path: 'custom-household-acknowledgement',
                   ),
                   AutoRoute(
                     page: DeliverySummaryRoute.page,

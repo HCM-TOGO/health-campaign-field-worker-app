@@ -463,8 +463,10 @@ class _EligibilityChecklistViewPage
                                     );
 
                                     router.push(
-                                      HouseholdAcknowledgementRoute(
-                                          enableViewHousehold: true),
+                                      CustomHouseholdAcknowledgementRoute(
+                                          enableViewHousehold: true,
+                                          eligibilityAssessmentType:
+                                              widget.eligibilityAssessmentType),
                                     );
                                   } else if (ifReferral) {
                                     router.push(
