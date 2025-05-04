@@ -787,6 +787,7 @@ void setPackagesSingleton(BuildContext context) {
               appConfiguration.complaintTypes!.map((e) => e.code).toList(),
           userName: context.loggedInUser.name ?? '',
         );
+        ComplaintsSingleton().setBoundary(boundary: context.boundary);
       });
 }
 

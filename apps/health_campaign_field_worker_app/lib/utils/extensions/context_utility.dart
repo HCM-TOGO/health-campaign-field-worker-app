@@ -117,6 +117,7 @@ extension ContextUtilityExtensions on BuildContext {
     LocationTrackerSingleton()
         .setBoundaryName(boundaryName: selectedBoundary.code!);
     InventorySingleton().setBoundaryName(boundaryName: selectedBoundary.code!);
+    ComplaintsSingleton().setBoundary(boundary: selectedBoundary);
     return selectedBoundary;
   }
 
