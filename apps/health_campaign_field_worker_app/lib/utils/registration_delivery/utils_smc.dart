@@ -31,7 +31,7 @@ bool checkStatusSMC(List<TaskModel>? tasks, ProjectCycle? currentCycle) {
           ) !=
           null) ==
       null) {
-    return false;
+    return true;
   }
 
   final lastTask = tasks.last;
@@ -75,7 +75,7 @@ bool checkStatusVAS(List<TaskModel>? tasks, ProjectCycle? currentCycle) {
           ) !=
           null) ==
       null) {
-    return false;
+    return true;
   }
 
   final lastTask = tasks.last;

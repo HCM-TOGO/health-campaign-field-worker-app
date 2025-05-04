@@ -105,12 +105,10 @@ class CustomMemberCard extends StatelessWidget {
 
   Widget statusWidget(context) {
     final theme = Theme.of(context);
-    bool smcAssessmentPendingStatus = assessmentSMCPending(tasks);
-    bool vasAssessmentPendingStatus = assessmentVASPending(tasks);
-    if (!smcAssessmentPendingStatus || !vasAssessmentPendingStatus) {
+    if (isSMCDelivered || isVASDelivered) {
       return Column(
         children: [
-          if (!smcAssessmentPendingStatus)
+          if (isSMCDelivered)
             Align(
               alignment: Alignment.centerLeft,
               child: DigitIconButton(
@@ -124,7 +122,7 @@ class CustomMemberCard extends StatelessWidget {
                 iconColor: DigitTheme.instance.colorScheme.onSurfaceVariant,
               ),
             ),
-          if (!vasAssessmentPendingStatus)
+          if (isVASDelivered)
             Align(
               alignment: Alignment.centerLeft,
               child: DigitIconButton(
