@@ -50,7 +50,7 @@ class BackNavigationHelpHeaderWidget extends StatelessWidget {
                         size: MediaQuery.of(context).size.width < 500
                             ? Theme.of(context).spacerTheme.spacer5
                             : Theme.of(context).spacerTheme.spacer6,
-                        color: Theme.of(context).colorTheme.primary.primary2,
+                        color: Theme.of(context).colorTheme.text.primary,
                       ),
                     ),
                     handleBack: () {

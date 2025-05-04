@@ -18,6 +18,7 @@ import 'package:digit_ui_components/widgets/scrollable_content.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:health_campaign_field_worker_app/blocs/registration_delivery/custom_beneficairy_registration.dart';
+import 'package:health_campaign_field_worker_app/widgets/custom_back_navigation.dart';
 import 'package:survey_form/survey_form.dart';
 
 import 'package:registration_delivery/widgets/status_filter/status_filter.dart';
@@ -102,7 +103,7 @@ class _CustomHouseholdOverviewPageState
                     child: ScrollableContent(
                       header: Padding(
                         padding: const EdgeInsets.only(bottom: spacer2),
-                        child: BackNavigationHelpHeaderWidget(
+                        child: CustomBackNavigationHelpHeaderWidget(
                           handleBack: () {
                             context
                                 .read<SearchHouseholdsBloc>()
@@ -332,7 +333,7 @@ class _CustomHouseholdOverviewPageState
                                               style: textTheme.headingXl
                                                   .copyWith(
                                                       color: theme.colorTheme
-                                                          .primary.primary2),
+                                                          .text.primary),
                                             ),
                                           ),
                                         ),

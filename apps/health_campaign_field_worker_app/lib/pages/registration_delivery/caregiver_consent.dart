@@ -11,6 +11,7 @@ import 'package:digit_ui_components/widgets/atoms/text_block.dart';
 import 'package:digit_ui_components/widgets/molecules/digit_card.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:health_campaign_field_worker_app/widgets/custom_back_navigation.dart';
 import 'package:reactive_forms/reactive_forms.dart';
 
 import 'package:registration_delivery/models/entities/household.dart';
@@ -128,15 +129,12 @@ class CaregiverConsentPageState extends LocalizedState<CaregiverConsentPage> {
           BeneficiaryRegistrationState>(builder: (context, registrationState) {
         return ScrollableContent(
           enableFixedDigitButton: true,
-          header: Column(
+          header: const Column(
             children: [
               Padding(
-                padding: const EdgeInsets.only(bottom: spacer2),
-                child: BackNavigationHelpHeaderWidget(
+                padding: EdgeInsets.only(bottom: spacer2),
+                child: CustomBackNavigationHelpHeaderWidget(
                   showHelp: true,
-                  showcaseButton: ShowcaseButton(
-                    isCommunity: isCommunity,
-                  ),
                 ),
               ),
             ],
@@ -222,7 +220,7 @@ class CaregiverConsentPageState extends LocalizedState<CaregiverConsentPage> {
                   heading: localizations.translate(
                       i18_local.caregiverConsent.caregiverConsentLabelText),
                   headingStyle: textTheme.headingXl
-                      .copyWith(color: theme.colorTheme.primary.primary2),
+                      .copyWith(color: theme.colorTheme.text.primary),
                   description: localizations.translate(
                     i18_local.caregiverConsent.caregiverConsentDescriptionText,
                   ),
