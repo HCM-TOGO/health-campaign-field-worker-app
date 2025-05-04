@@ -38,6 +38,7 @@ import 'package:registration_delivery/widgets/table_card/table_card.dart';
 
 import '../../router/app_router.dart';
 import '../../utils/app_enums.dart';
+import '../../utils/registration_delivery/utils_smc.dart';
 import '../../widgets/registration_delivery/custom_member_card.dart';
 
 @RoutePage()
@@ -990,7 +991,7 @@ class _CustomHouseholdOverviewPageState
                                             gender: e.gender?.name,
                                             isBeneficiaryRefused:
                                                 isBeneficiaryRefused &&
-                                                    !checkStatus(
+                                                    !checkStatusSMC(
                                                       taskData,
                                                       currentCycle,
                                                     ),
@@ -999,13 +1000,21 @@ class _CustomHouseholdOverviewPageState
                                             isSMCDelivered: taskData == null
                                                 ? false
                                                 : taskData.isNotEmpty &&
-                                                        !checkStatus(
+                                                        !checkStatusSMC(
                                                           taskData,
                                                           currentCycle,
                                                         )
                                                     ? true
                                                     : false,
-                                            isVASDelivered: false,
+                                            isVASDelivered: taskData == null
+                                                ? false
+                                                : taskData.isNotEmpty &&
+                                                        !checkStatusVAS(
+                                                          taskData,
+                                                          currentCycle,
+                                                        )
+                                                    ? true
+                                                    : false,
                                             localizations: localizations,
                                             projectBeneficiaryClientReferenceId:
                                                 projectBeneficiaryId,

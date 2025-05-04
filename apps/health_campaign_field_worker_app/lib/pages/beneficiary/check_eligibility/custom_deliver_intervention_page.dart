@@ -86,24 +86,24 @@ class CustomDeliverInterventionPageState
       ProjectBeneficiaryModel projectBeneficiary) async {
     final lat = locationState.latitude;
     final long = locationState.longitude;
+    TaskModel taskModel = _getTaskModel(
+      context,
+      form: form,
+      oldTask: RegistrationDeliverySingleton().beneficiaryType ==
+              BeneficiaryType.household
+          ? deliverInterventionState.tasks?.lastOrNull
+          : null,
+      projectBeneficiaryClientReferenceId: projectBeneficiary.clientReferenceId,
+      dose: deliverInterventionState.dose,
+      cycle: deliverInterventionState.cycle,
+      deliveryStrategy: DeliverStrategyType.direct.toValue(),
+      address: householdMember.members?.first.address?.first,
+      latitude: lat,
+      longitude: long,
+    );
     context.read<DeliverInterventionBloc>().add(
           DeliverInterventionSubmitEvent(
-              task: _getTaskModel(
-                context,
-                form: form,
-                oldTask: RegistrationDeliverySingleton().beneficiaryType ==
-                        BeneficiaryType.household
-                    ? deliverInterventionState.tasks?.lastOrNull
-                    : null,
-                projectBeneficiaryClientReferenceId:
-                    projectBeneficiary.clientReferenceId,
-                dose: deliverInterventionState.dose,
-                cycle: deliverInterventionState.cycle,
-                deliveryStrategy: DeliverStrategyType.direct.toValue(),
-                address: householdMember.members?.first.address?.first,
-                latitude: lat,
-                longitude: long,
-              ),
+              task: taskModel,
               isEditing: (deliverInterventionState.tasks ?? []).isNotEmpty &&
                       RegistrationDeliverySingleton().beneficiaryType ==
                           BeneficiaryType.household
@@ -113,7 +113,7 @@ class CustomDeliverInterventionPageState
               navigateToSummary: true,
               householdMemberWrapper: householdMember),
         );
-    await handleSubmit(context, deliverInterventionState);
+    await handleSubmit(context, taskModel, deliverInterventionState);
   }
 
   void handleLocationState(
@@ -146,11 +146,12 @@ class CustomDeliverInterventionPageState
 
   Future<void> handleSubmit(
     BuildContext context,
+    TaskModel taskModel,
     DeliverInterventionState deliverState,
   ) async {
     context.read<DeliverInterventionBloc>().add(
           DeliverInterventionSubmitEvent(
-            task: deliverState.oldTask!,
+            task: deliverState.oldTask ?? taskModel,
             isEditing: (deliverState.tasks ?? []).isNotEmpty &&
                     RegistrationDeliverySingleton().beneficiaryType ==
                         BeneficiaryType.household

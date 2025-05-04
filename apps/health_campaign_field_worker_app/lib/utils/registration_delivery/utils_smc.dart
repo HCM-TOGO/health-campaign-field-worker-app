@@ -12,6 +12,94 @@ import '../../models/entities/additional_fields_type.dart'
     as additional_fields_local;
 import '../app_enums.dart';
 
+bool checkStatusSMC(List<TaskModel>? tasks, ProjectCycle? currentCycle) {
+  if (currentCycle == null) {
+    return false;
+  }
+
+  if (tasks == null || tasks.isEmpty) {
+    return true;
+  }
+
+  if (tasks.firstWhereOrNull((e) =>
+          e.additionalFields?.fields.firstWhereOrNull(
+            (element) =>
+                element.key ==
+                    additional_fields_local.AdditionalFieldsType.deliveryType
+                        .toValue() &&
+                element.value == EligibilityAssessmentStatus.smcDone.name,
+          ) !=
+          null) ==
+      null) {
+    return false;
+  }
+
+  final lastTask = tasks.last;
+  final lastTaskCreatedTime = lastTask.clientAuditDetails?.createdTime;
+
+  if (lastTaskCreatedTime == null) {
+    return false;
+  }
+
+  final date = DateTime.fromMillisecondsSinceEpoch(lastTaskCreatedTime);
+  final diff = DateTime.now().difference(date);
+  final isLastCycleRunning = lastTaskCreatedTime >= currentCycle.startDate &&
+      lastTaskCreatedTime <= currentCycle.endDate;
+
+  if (isLastCycleRunning) {
+    if (lastTask.status == Status.delivered.name) {
+      return true;
+    }
+    return diff.inHours >= 24; // [TODO: Move gap between doses to config]
+  }
+
+  return true;
+}
+
+bool checkStatusVAS(List<TaskModel>? tasks, ProjectCycle? currentCycle) {
+  if (currentCycle == null) {
+    return false;
+  }
+
+  if (tasks == null || tasks.isEmpty) {
+    return true;
+  }
+
+  if (tasks.firstWhereOrNull((e) =>
+          e.additionalFields?.fields.firstWhereOrNull(
+            (element) =>
+                element.key ==
+                    additional_fields_local.AdditionalFieldsType.deliveryType
+                        .toValue() &&
+                element.value == EligibilityAssessmentStatus.vasDone.name,
+          ) !=
+          null) ==
+      null) {
+    return false;
+  }
+
+  final lastTask = tasks.last;
+  final lastTaskCreatedTime = lastTask.clientAuditDetails?.createdTime;
+
+  if (lastTaskCreatedTime == null) {
+    return false;
+  }
+
+  final date = DateTime.fromMillisecondsSinceEpoch(lastTaskCreatedTime);
+  final diff = DateTime.now().difference(date);
+  final isLastCycleRunning = lastTaskCreatedTime >= currentCycle.startDate &&
+      lastTaskCreatedTime <= currentCycle.endDate;
+
+  if (isLastCycleRunning) {
+    if (lastTask.status == Status.delivered.name) {
+      return true;
+    }
+    return diff.inHours >= 24; // [TODO: Move gap between doses to config]
+  }
+
+  return true;
+}
+
 bool redosePending(List<TaskModel>? tasks, ProjectCycle? selectedCycle) {
   var redosePending = true;
   if ((tasks ?? []).isEmpty) {
