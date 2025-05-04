@@ -7,6 +7,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:group_radio_button/group_radio_button.dart';
+import 'package:health_campaign_field_worker_app/widgets/custom_back_navigation.dart';
 import 'package:registration_delivery/blocs/household_overview/household_overview.dart';
 import 'package:intl/intl.dart';
 import 'package:registration_delivery/models/entities/status.dart';
@@ -140,9 +141,8 @@ class _EligibilityChecklistViewPage
                         header: Column(children: [
                           if (!(context.isHealthFacilitySupervisor &&
                               widget.referralClientRefId != null))
-                            const BackNavigationHelpHeaderWidget(
-                              showHelp: false,
-                              showcaseButton: null,
+                            const CustomBackNavigationHelpHeaderWidget(
+                              showHelp: true,
                             ),
                         ]),
                         enableFixedButton: true,
@@ -463,8 +463,10 @@ class _EligibilityChecklistViewPage
                                     );
 
                                     router.push(
-                                      HouseholdAcknowledgementRoute(
-                                          enableViewHousehold: true),
+                                      CustomHouseholdAcknowledgementRoute(
+                                          enableViewHousehold: true,
+                                          eligibilityAssessmentType:
+                                              widget.eligibilityAssessmentType),
                                     );
                                   } else if (ifReferral) {
                                     router.push(

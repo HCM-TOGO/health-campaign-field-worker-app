@@ -56,7 +56,7 @@ class CustomDeliverySummaryPageState extends LocalizedState<CustomDeliverySummar
               enableFixedDigitButton: true,
               header: Column(children: [
                 const BackNavigationHelpHeaderWidget(
-                  showHelp: false,
+                  showHelp: true,
                 ),
                 Padding(
                   padding: const EdgeInsets.all(spacer2),

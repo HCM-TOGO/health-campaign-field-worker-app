@@ -8,6 +8,7 @@ import 'package:digit_ui_components/widgets/molecules/digit_card.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:health_campaign_field_worker_app/widgets/custom_back_navigation.dart';
 import 'package:intl/intl.dart';
 import 'package:reactive_forms/reactive_forms.dart';
 import 'package:registration_delivery/blocs/household_overview/household_overview.dart';
@@ -103,14 +104,11 @@ class CustomHouseHoldDetailsPageState
             },
             builder: (context, registrationState) {
               return ScrollableContent(
-                header: Column(children: [
+                header: const Column(children: [
                   Padding(
-                    padding: const EdgeInsets.only(bottom: spacer2),
-                    child: BackNavigationHelpHeaderWidget(
-                      showHelp: false,
-                      showcaseButton: ShowcaseButton(
-                        isCommunity: isCommunity,
-                      ),
+                    padding: EdgeInsets.only(bottom: spacer2),
+                    child: CustomBackNavigationHelpHeaderWidget(
+                      showHelp: true,
                     ),
                   ),
                 ]),
@@ -350,20 +348,23 @@ class CustomHouseHoldDetailsPageState
                                 label: localizations.translate(
                                   i18.householdDetails.dateOfRegistrationLabel,
                                 ),
-                                child: DigitDateFormInput(
-                                  readOnly: true,
-                                  confirmText: localizations.translate(
-                                    i18.common.coreCommonOk,
+                                child: AbsorbPointer(
+                                  absorbing: true,
+                                  child: DigitDateFormInput(
+                                    readOnly: false,
+                                    confirmText: localizations.translate(
+                                      i18.common.coreCommonOk,
+                                    ),
+                                    cancelText: localizations.translate(
+                                      i18.common.coreCommonCancel,
+                                    ),
+                                    initialValue: DateFormat(
+                                            Constants().dateMonthYearFormat)
+                                        .format(form
+                                            .control(_dateOfRegistrationKey)
+                                            .value)
+                                        .toString(),
                                   ),
-                                  cancelText: localizations.translate(
-                                    i18.common.coreCommonCancel,
-                                  ),
-                                  initialValue: DateFormat(
-                                          Constants().dateMonthYearFormat)
-                                      .format(form
-                                          .control(_dateOfRegistrationKey)
-                                          .value)
-                                      .toString(),
                                 ),
                               ),
                             ),

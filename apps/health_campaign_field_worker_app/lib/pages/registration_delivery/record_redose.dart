@@ -22,6 +22,7 @@ import '../../blocs/auth/auth.dart';
 import '../../blocs/project/project.dart';
 import '../../data/local_store/no_sql/schema/app_configuration.dart';
 import '../../router/app_router.dart';
+import '../../utils/app_enums.dart';
 import '../../utils/environment_config.dart';
 import '../../utils/i18_key_constants.dart' as i18_local;
 import '../../utils/utils.dart';
@@ -379,9 +380,12 @@ class _RecordRedosePageState extends LocalizedState<RecordRedosePage> {
                                                         },
                                                       ).then((value) => {
                                                             context.router.push(
-                                                              HouseholdAcknowledgementRoute(
+                                                              CustomHouseholdAcknowledgementRoute(
                                                                 enableViewHousehold:
                                                                     true,
+                                                                eligibilityAssessmentType:
+                                                                    EligibilityAssessmentType
+                                                                        .smc,
                                                               ),
                                                             ),
                                                           });
@@ -403,7 +407,7 @@ class _RecordRedosePageState extends LocalizedState<RecordRedosePage> {
                                     ),
                                     header: const Column(children: [
                                       BackNavigationHelpHeaderWidget(
-                                        showHelp: false,
+                                        showHelp: true,
                                       ),
                                     ]),
                                     children: [

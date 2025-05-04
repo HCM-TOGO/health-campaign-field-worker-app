@@ -1,6 +1,7 @@
 import 'package:auto_route/auto_route.dart';
 import 'package:collection/collection.dart';
 import 'package:dart_mappable/dart_mappable.dart';
+import 'package:digit_components/utils/date_utils.dart' as digits;
 import 'package:digit_data_model/data_model.dart';
 import 'package:digit_data_model/models/entities/household_type.dart';
 import 'package:digit_scanner/blocs/scanner.dart';
@@ -15,6 +16,11 @@ import 'package:digit_ui_components/widgets/molecules/digit_card.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:digit_components/widgets/atoms/digit_dropdown.dart' as dropdown;
+import 'package:health_campaign_field_worker_app/blocs/app_initialization/app_initialization.dart';
+import 'package:health_campaign_field_worker_app/models/app_config/app_config_model.dart';
+import 'package:health_campaign_field_worker_app/widgets/date/custom_digit_dob_picker.dart';
+import 'package:health_campaign_field_worker_app/widgets/header/custom_back_button.dart';
 import 'package:intl/intl.dart';
 import 'package:reactive_forms/reactive_forms.dart';
 import 'package:registration_delivery/blocs/search_households/search_bloc_common_wrapper.dart';
@@ -138,7 +144,7 @@ class CustomIndividualDetailsPageState
               header: Column(children: [
                 Padding(
                   padding: const EdgeInsets.only(bottom: spacer2),
-                  child: BackNavigationHelpHeaderWidget(
+                  child: CustomeBackNavigationHelpHeaderWidget(
                     showHelp: false,
                     handleBack: () {
                       if (isEditIndividual) {
@@ -527,7 +533,7 @@ class CustomIndividualDetailsPageState
                             i18.individualDetails.individualsDetailsLabelText,
                           ),
                           style: textTheme.headingXl.copyWith(
-                              color: theme.colorTheme.primary.primary2),
+                              color: theme.colorTheme.text.primary,),
                         ),
                         Column(
                           children: [
@@ -637,7 +643,7 @@ class CustomIndividualDetailsPageState
                         // ),
 
                         individualDetailsShowcaseData.dateOfBirth.buildWith(
-                          child: DigitDobPicker(
+                          child: CustomDigitDobPicker(
                             datePickerFormControl: _dobKey,
                             datePickerLabel: localizations.translate(
                               i18.individualDetails.dobLabelText,
@@ -648,86 +654,62 @@ class CustomIndividualDetailsPageState
                             yearsHintLabel: localizations.translate(
                               i18.individualDetails.yearsHintText,
                             ),
-                            monthsHintLabel: localizations.translate(
-                              i18.individualDetails.monthsHintText,
-                            ),
                             separatorLabel: localizations.translate(
                               i18.individualDetails.separatorLabelText,
                             ),
                             yearsAndMonthsErrMsg: localizations.translate(
                               i18.individualDetails.yearsAndMonthsErrorText,
                             ),
-                            errorMessage: form.control(_dobKey).hasErrors
-                                ? localizations
-                                    .translate(i18.common.corecommonRequired)
-                                : null,
                             initialDate: before150Years,
-                            initialValue: getInitialDateValue(form),
-                            onChangeOfFormControl: (value) {
-                              setState(() {
-                                if (value == null) {
-                                  form.control(_dobKey).setErrors({'': true});
-                                } else {
-                                  DigitDOBAgeConvertor age =
-                                      DigitDateUtils.calculateAge(value);
-                                  if ((age.years == 0 && age.months == 0) ||
-                                      (age.months > 11) ||
-                                      (age.years >= 150 && age.months >= 0)) {
-                                    form.control(_dobKey).setErrors({'': true});
-                                  } else {
-                                    form.control(_dobKey).value = value;
-                                    form.control(_dobKey).removeError('');
-                                  }
-                                }
-                              });
+                            onChangeOfFormControl: (formControl) {
                               // Handle changes to the control's value here
+                              final value = formControl.value;
+
+                              digits.DigitDOBAge age =
+                                  digits.DigitDateUtils.calculateAge(value);
+                              if ((age.years == 0 && age.months == 0) ||
+                                  age.months > 11 ||
+                                  (age.years >= 150 && age.months >= 0)) {
+                                formControl.setErrors({'': true});
+                              } else {
+                                formControl.removeError('');
+                              }
                             },
                             cancelText: localizations
                                 .translate(i18.common.coreCommonCancel),
                             confirmText: localizations
                                 .translate(i18.common.coreCommonOk),
+                            monthsHintLabel: 'Month',
                           ),
                         ),
-                        SelectionCard<String>(
-                          isRequired: true,
-                          showParentContainer: true,
-                          title: localizations.translate(
+                        dropdown.DigitDropdown<String>(
+                          label: localizations.translate(
                             i18.individualDetails.genderLabelText,
                           ),
-                          allowMultipleSelection: false,
-                          width: 126,
-                          initialSelection:
-                              form.control(_genderKey).value != null
-                                  ? [form.control(_genderKey).value]
-                                  : [],
-                          options: RegistrationDeliverySingleton()
+                          valueMapper: (value) =>
+                              localizations.translate(value),
+                          initialValue: form.control(_genderKey).value,
+                          menuItems: RegistrationDeliverySingleton()
                               .genderOptions!
-                              .map(
-                                (e) => e,
-                              )
+                              .map((e) => e)
                               .toList(),
-                          onSelectionChanged: (value) {
-                            setState(() {
-                              if (value.isNotEmpty) {
-                                form.control(_genderKey).value = value.first;
-                              } else {
-                                form.control(_genderKey).value = null;
-                                setState(() {
-                                  form
-                                      .control(_genderKey)
-                                      .setErrors({'': true});
-                                });
-                              }
-                            });
+                          formControlName: _genderKey,
+                          isRequired: true,
+                          validationMessages: {
+                            'required': (_) => localizations.translate(
+                                  i18.common.corecommonRequired,
+                                ),
                           },
-                          valueMapper: (value) {
-                            return localizations.translate(value);
+                          onChanged: (value) {
+                            if (value != null && value.isNotEmpty) {
+                              form.control(_genderKey).value = value;
+                            } else {
+                              form.control(_genderKey).value = null;
+                              form.control(_genderKey).setErrors({'': true});
+                            }
                           },
-                          errorMessage: form.control(_genderKey).hasErrors
-                              ? localizations
-                                  .translate(i18.common.corecommonRequired)
-                              : null,
                         ),
+
                         individualDetailsShowcaseData.mobile.buildWith(
                           child: Offstage(
                             offstage: !widget.isHeadOfHousehold,

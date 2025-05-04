@@ -38,7 +38,7 @@ class CustomManageStocksPageState
 
     return Scaffold(
       body: ScrollableContent(
-        header: const BackNavigationHelpHeaderWidget(),
+        header: const BackNavigationHelpHeaderWidget(showHelp: true,),
         children: [
           Column(
             crossAxisAlignment: CrossAxisAlignment.start,

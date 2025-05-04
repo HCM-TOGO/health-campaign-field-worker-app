@@ -156,6 +156,18 @@ String formatAgeRange(String condition) {
   return condition;
 }
 
+String customformatAgeRange(String condition) {
+  final regex =
+      RegExp(r'(\d+)\s*<\s*ageandage\s*<\s*(\d+)', caseSensitive: false);
+  final match = regex.firstMatch(condition);
+  if (match != null && match.groupCount == 2) {
+    final min = match.group(1);
+    final max = match.group(2);
+    return '$min - $max months';
+  }
+  return condition;
+}
+
 String? getAgeConditionStringFromVariant(
     DeliveryProductVariant productVariant, List<ProductVariantModel>? variant) {
   String? finalCondition;
