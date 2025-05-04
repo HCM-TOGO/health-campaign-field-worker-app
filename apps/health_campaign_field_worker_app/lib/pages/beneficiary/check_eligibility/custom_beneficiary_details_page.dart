@@ -20,6 +20,7 @@ import 'package:registration_delivery/models/entities/additional_fields_type.dar
 import 'package:registration_delivery/router/registration_delivery_router.gm.dart';
 import 'package:registration_delivery/utils/i18_key_constants.dart' as i18;
 import '../../../models/entities/identifier_types.dart';
+import '../../../utils/app_enums.dart';
 import '../../../utils/i18_key_constants.dart' as i18_local;
 import 'package:registration_delivery/utils/utils.dart';
 import 'package:registration_delivery/widgets/back_navigation_help_header.dart';
@@ -27,8 +28,6 @@ import 'package:registration_delivery/widgets/component_wrapper/product_variant_
 import 'package:registration_delivery/widgets/localized.dart';
 import 'package:registration_delivery/widgets/table_card/table_card.dart';
 import 'package:registration_delivery/pages/beneficiary/widgets/record_delivery_cycle.dart';
-
-import '../../../utils/utils.dart';
 
 @RoutePage()
 class CustomBeneficiaryDetailsPage extends LocalizedStatefulWidget {
@@ -260,9 +259,13 @@ class CustomBeneficiaryDetailsPageState
                               margin: const EdgeInsets.all(spacer2),
                               children: [
                                 Text(
-                                  localizations.translate(i18_local
-                                      .deliverIntervention
-                                      .deliversmcintervention),
+                                  localizations.translate(
+                                      widget.eligibilityAssessmentType ==
+                                              EligibilityAssessmentType.smc
+                                          ? i18_local.deliverIntervention
+                                              .deliversmcintervention
+                                          : i18_local.deliverIntervention
+                                              .deliverVASIntervention),
                                   style: textTheme.headingXl.copyWith(
                                       color: theme.colorTheme.primary.primary2),
                                 ),

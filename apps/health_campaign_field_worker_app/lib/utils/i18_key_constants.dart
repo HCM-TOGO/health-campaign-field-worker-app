@@ -186,6 +186,7 @@ class DeliverIntervention {
   String get beneficiaryReferralDescription => 'BENEFICIARY_REFERRAL_DESC';
   String get spaqRedirectionScreenDescription => 'SPAQ_REDIRECTED_SCREEN_DESC';
   String get deliversmcintervention => 'DELIVER_SMC_INTERVENTION';
+  String get deliverVASIntervention => 'DELIVER_VAS_INTERVENTION';
 }
 
 class Checklist {

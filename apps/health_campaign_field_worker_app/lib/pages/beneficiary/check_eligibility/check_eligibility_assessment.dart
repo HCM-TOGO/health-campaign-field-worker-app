@@ -20,6 +20,7 @@ import 'package:registration_delivery/router/registration_delivery_router.gm.dar
 // import '../../../blocs/service/service.dart' as service;
 import '../../../models/entities/roles_type.dart';
 import '../../../router/app_router.dart';
+import '../../../utils/app_enums.dart';
 import '../../../utils/environment_config.dart';
 import '../../../utils/i18_key_constants.dart' as i18_local;
 import '../../../utils/utils.dart';

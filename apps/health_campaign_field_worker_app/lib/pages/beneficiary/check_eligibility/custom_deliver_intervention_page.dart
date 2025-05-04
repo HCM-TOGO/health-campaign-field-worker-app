@@ -30,13 +30,17 @@ import 'package:registration_delivery/widgets/beneficiary/resource_beneficiary_c
 import 'package:registration_delivery/widgets/component_wrapper/product_variant_bloc_wrapper.dart';
 import 'package:registration_delivery/widgets/localized.dart';
 
+import '../../../utils/app_enums.dart';
+
 @RoutePage()
 class CustomDeliverInterventionPage extends LocalizedStatefulWidget {
+  final EligibilityAssessmentType eligibilityAssessmentType;
   final bool isEditing;
 
   const CustomDeliverInterventionPage({
     super.key,
     super.appLocalizations,
+    required this.eligibilityAssessmentType,
     this.isEditing = false,
   });
 
@@ -852,6 +856,12 @@ class CustomDeliverInterventionPageState
               AdditionalFieldsType.deliveryComment.toValue(),
               deliveryComment,
             ),
+          AdditionalField(
+            AdditionalFieldsType.deliveryType.toValue(),
+            widget.eligibilityAssessmentType == EligibilityAssessmentType.smc
+                ? EligibilityAssessmentStatus.smcDone.name
+                : EligibilityAssessmentStatus.vasDone.name,
+          ),
         ],
       ),
     );
