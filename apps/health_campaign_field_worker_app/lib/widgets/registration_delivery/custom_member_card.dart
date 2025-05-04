@@ -73,10 +73,12 @@ class CustomMemberCard extends StatelessWidget {
 
   Widget statusWidget(context) {
     final theme = Theme.of(context);
-    if (isSMCDelivered || isVASDelivered) {
+    bool smcAssessmentPendingStatus = assessmentSMCPending(tasks);
+    bool vasAssessmentPendingStatus = assessmentVASPending(tasks);
+    if (!smcAssessmentPendingStatus || !vasAssessmentPendingStatus) {
       return Column(
         children: [
-          if (isSMCDelivered)
+          if (!smcAssessmentPendingStatus)
             Align(
               alignment: Alignment.centerLeft,
               child: DigitIconButton(
@@ -90,7 +92,7 @@ class CustomMemberCard extends StatelessWidget {
                 iconColor: DigitTheme.instance.colorScheme.onSurfaceVariant,
               ),
             ),
-          if (isVASDelivered)
+          if (!vasAssessmentPendingStatus)
             Align(
               alignment: Alignment.centerLeft,
               child: DigitIconButton(
@@ -162,8 +164,9 @@ class CustomMemberCard extends StatelessWidget {
                 isBeneficiaryReferred) &&
             !doseStatus)
         ? const Offstage()
-        : !isNotEligible
-            ? DigitElevatedButton(
+        : isNotEligible || !vasAssessmentPendingStatus
+            ? const Offstage()
+            : DigitElevatedButton(
                 child: Center(
                   child: Text(
                     smcAssessmentPendingStatus
@@ -217,7 +220,7 @@ class CustomMemberCard extends StatelessWidget {
                         successfulTask!.resources!.first.quantity!,
                       ).round();
 
-                      if (spaq1 >= doseCount) {
+                      if (true || spaq1 >= doseCount) {
                         context.router.push(
                           RecordRedoseRoute(
                             tasks: [successfulTask!],
@@ -273,8 +276,7 @@ class CustomMemberCard extends StatelessWidget {
                     }
                   }
                 },
-              )
-            : const Offstage();
+              );
   }
 
   @override

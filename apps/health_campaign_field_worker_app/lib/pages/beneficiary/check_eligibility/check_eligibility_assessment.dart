@@ -106,6 +106,10 @@ class _EligibilityChecklistViewPage
             builder: (context, householdOverviewState) {
               double? latitude = locationState.latitude;
               double? longitude = locationState.longitude;
+              String eligibilityAssessment = widget.eligibilityAssessmentType ==
+                      EligibilityAssessmentType.smc
+                  ? "ELIGIBLITY_ASSESSMENT"
+                  : "ELIGIBLITY_ASSESSMENT_2";
               return BlocBuilder<ServiceDefinitionBloc, ServiceDefinitionState>(
                 builder: (context, state) {
                   state.mapOrNull(
@@ -113,7 +117,7 @@ class _EligibilityChecklistViewPage
                       // todo: verify the checklist name
                       selectedServiceDefinition = value.serviceDefinitionList
                           .where((element) => element.code.toString().contains(
-                                '${context.selectedProject.name}.ELIGIBLITY_ASSESSMENT.${context.isCommunityDistributor ? RolesType.communityDistributor.toValue() : RolesType.healthFacilitySupervisor.toValue()}',
+                                '${context.selectedProject.name}.$eligibilityAssessment.${context.isCommunityDistributor ? RolesType.communityDistributor.toValue() : RolesType.healthFacilitySupervisor.toValue()}',
                               ))
                           .toList()
                           .firstOrNull;

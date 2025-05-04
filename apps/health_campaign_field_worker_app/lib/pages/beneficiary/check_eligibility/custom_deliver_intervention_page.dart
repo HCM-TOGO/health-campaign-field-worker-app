@@ -113,6 +113,7 @@ class CustomDeliverInterventionPageState
               navigateToSummary: true,
               householdMemberWrapper: householdMember),
         );
+    await handleSubmit(context, deliverInterventionState);
   }
 
   void handleLocationState(
@@ -464,9 +465,6 @@ class CustomDeliverInterventionPageState
                                                                 projectBeneficiary!
                                                                     .first,
                                                               );
-                                                              await handleSubmit(
-                                                                  context,
-                                                                  deliveryInterventionState);
                                                             }
                                                           }
                                                         }

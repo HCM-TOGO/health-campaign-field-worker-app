@@ -61,7 +61,17 @@ bool assessmentSMCPending(List<TaskModel>? tasks) {
   }
   var successfulTask = tasks!
       .where(
-        (element) => element.status == Status.administeredSuccess.toValue(),
+        (element) =>
+            element.status == Status.administeredSuccess.toValue() &&
+            element.additionalFields?.fields.firstWhereOrNull(
+                  (e) =>
+                      e.key ==
+                          additional_fields_local
+                              .AdditionalFieldsType.deliveryType
+                              .toValue() &&
+                      e.value == EligibilityAssessmentStatus.smcDone.name,
+                ) !=
+                null,
       )
       .lastOrNull;
 

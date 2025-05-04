@@ -37,6 +37,7 @@ import 'package:registration_delivery/widgets/member_card/member_card.dart';
 import 'package:registration_delivery/widgets/table_card/table_card.dart';
 
 import '../../router/app_router.dart';
+import '../../utils/app_enums.dart';
 import '../../widgets/registration_delivery/custom_member_card.dart';
 
 @RoutePage()
@@ -160,7 +161,10 @@ class _CustomHouseholdOverviewPageState
                                                           .toList()
                                                           .isEmpty) {
                                                         context.router.push(
-                                                          DeliverInterventionRoute(),
+                                                          CustomDeliverInterventionRoute(
+                                                              eligibilityAssessmentType:
+                                                                  EligibilityAssessmentType
+                                                                      .smc),
                                                         );
                                                       } else {
                                                         navigateToChecklist(
@@ -235,7 +239,10 @@ class _CustomHouseholdOverviewPageState
                                                         .toList()
                                                         .isEmpty) {
                                                       context.router.push(
-                                                        DeliverInterventionRoute(),
+                                                        CustomDeliverInterventionRoute(
+                                                            eligibilityAssessmentType:
+                                                                EligibilityAssessmentType
+                                                                    .smc),
                                                       );
                                                     } else {
                                                       navigateToChecklist(

@@ -22,6 +22,7 @@ import '../blocs/localization/app_localization.dart';
 import '../pages/acknowledgement.dart';
 import '../pages/authenticated.dart';
 import '../pages/beneficiary/check_eligibility/check_eligibility_assessment.dart';
+import '../pages/beneficiary/check_eligibility/custom_dose_administered.dart';
 import '../pages/beneficiary/check_eligibility/facility_selection_smc.dart';
 import '../pages/beneficiary/check_eligibility/household_acknowledgement_smc.dart';
 import '../pages/beneficiary/check_eligibility/inventory_facility_selection_smc.dart';
@@ -255,14 +256,14 @@ class AppRouter extends _$AppRouter {
                     page: CustomDeliverInterventionRoute.page,
                     path: 'custom-deliver-intervention',
                   ),
-                  AutoRoute(
-                    page: DeliverInterventionRoute.page,
-                    path: 'deliver-intervention',
-                  ),
-                  RedirectRoute(
-                    path: 'deliver-intervention',
-                    redirectTo: 'custom-deliver-intervention',
-                  ),
+                  // AutoRoute(
+                  //   page: DeliverInterventionRoute.page,
+                  //   path: 'deliver-intervention',
+                  // ),
+                  // RedirectRoute(
+                  //   path: 'deliver-intervention',
+                  //   redirectTo: 'custom-deliver-intervention',
+                  // ),
                   AutoRoute(
                     page: SideEffectsRoute.page,
                     path: 'side-effects',
@@ -286,6 +287,14 @@ class AppRouter extends _$AppRouter {
                   AutoRoute(
                     page: DoseAdministeredRoute.page,
                     path: 'dose-administered',
+                  ),
+                  AutoRoute(
+                    page: CustomDoseAdministeredRoute.page,
+                    path: 'custom-dose-administered',
+                  ),
+                  RedirectRoute(
+                    path: 'dose-administered',
+                    redirectTo: 'custom-dose-administered',
                   ),
                   AutoRoute(
                     page: RecordRedoseRoute.page,

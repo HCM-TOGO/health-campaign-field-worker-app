@@ -13,7 +13,7 @@ import '../../../utils/i18_key_constants.dart' as i18;
 import '../../../utils/utils.dart';
 
 // This function builds a table with the given data and headers
-Widget buildTableContentSMC(
+Widget buildTableContentVAS(
   DeliverInterventionState deliverInterventionState,
   BuildContext context,
   List<ProductVariantModel>? variant,
@@ -34,11 +34,13 @@ Widget buildTableContentSMC(
     DigitTableColumn(
       header: localizations.translate(i18.beneficiaryDetails.beneficiaryDose),
       cellValue: 'dose',
+      width: 50,
     ),
     DigitTableColumn(
       header:
           localizations.translate(i18.beneficiaryDetails.beneficiaryResources),
       cellValue: 'resources',
+      width: 50,
     ),
   ];
 
@@ -55,7 +57,7 @@ Widget buildTableContentSMC(
   const rowHeight = 84;
   const paddingHeight = (spacer2 * 2);
   final containerHeight = (numRows + 1) * rowHeight + (paddingHeight * 2);
-  const columnWidth = 150.0;
+  const columnWidth = 100.0;
   const cellHeight = 59.5;
 
   return Container(
@@ -131,7 +133,7 @@ Widget buildTableContentSMC(
                         : DigitTableData('', cellKey: ''),
                     // Display the SKU value in the second column.
                     DigitTableData(
-                      '$quantity - ${localizations.translate(value.toString())}',
+                      'VAS - ${value == "SPAQ 1" ? "Blue" : "Red"} Capsule',
                       cellKey: 'resources',
                     ),
                   ]);

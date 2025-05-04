@@ -125,6 +125,17 @@ abstract class _$AppRouter extends RootStackRouter {
         ),
       );
     },
+    CustomDoseAdministeredRoute.name: (routeData) {
+      final args = routeData.argsAs<CustomDoseAdministeredRouteArgs>(
+          orElse: () => const CustomDoseAdministeredRouteArgs());
+      return AutoRoutePage<dynamic>(
+        routeData: routeData,
+        child: CustomDoseAdministeredPage(
+          key: args.key,
+          appLocalizations: args.appLocalizations,
+        ),
+      );
+    },
     CustomFacilitySelectionSMCRoute.name: (routeData) {
       final args = routeData.argsAs<CustomFacilitySelectionSMCRouteArgs>();
       return AutoRoutePage<dynamic>(
@@ -824,6 +835,45 @@ class CustomDeliverySummaryRouteArgs {
   @override
   String toString() {
     return 'CustomDeliverySummaryRouteArgs{key: $key, appLocalizations: $appLocalizations}';
+  }
+}
+
+/// generated route for
+/// [CustomDoseAdministeredPage]
+class CustomDoseAdministeredRoute
+    extends PageRouteInfo<CustomDoseAdministeredRouteArgs> {
+  CustomDoseAdministeredRoute({
+    Key? key,
+    RegistrationDeliveryLocalization? appLocalizations,
+    List<PageRouteInfo>? children,
+  }) : super(
+          CustomDoseAdministeredRoute.name,
+          args: CustomDoseAdministeredRouteArgs(
+            key: key,
+            appLocalizations: appLocalizations,
+          ),
+          initialChildren: children,
+        );
+
+  static const String name = 'CustomDoseAdministeredRoute';
+
+  static const PageInfo<CustomDoseAdministeredRouteArgs> page =
+      PageInfo<CustomDoseAdministeredRouteArgs>(name);
+}
+
+class CustomDoseAdministeredRouteArgs {
+  const CustomDoseAdministeredRouteArgs({
+    this.key,
+    this.appLocalizations,
+  });
+
+  final Key? key;
+
+  final RegistrationDeliveryLocalization? appLocalizations;
+
+  @override
+  String toString() {
+    return 'CustomDoseAdministeredRouteArgs{key: $key, appLocalizations: $appLocalizations}';
   }
 }
 
