@@ -1,3 +1,4 @@
+import 'package:collection/collection.dart';
 import 'package:digit_data_model/models/entities/individual.dart';
 import 'package:digit_data_model/models/entities/project_type.dart';
 import 'package:digit_data_model/models/project_type/project_type_model.dart';
@@ -6,6 +7,98 @@ import 'package:registration_delivery/models/entities/additional_fields_type.dar
 import 'package:registration_delivery/models/entities/side_effect.dart';
 import 'package:registration_delivery/models/entities/status.dart';
 import 'package:registration_delivery/models/entities/task.dart';
+
+import '../../models/entities/additional_fields_type.dart'
+    as additional_fields_local;
+import '../app_enums.dart';
+
+bool checkStatusSMC(List<TaskModel>? tasks, ProjectCycle? currentCycle) {
+  if (currentCycle == null) {
+    return false;
+  }
+
+  if (tasks == null || tasks.isEmpty) {
+    return true;
+  }
+
+  if (tasks.firstWhereOrNull((e) =>
+          e.additionalFields?.fields.firstWhereOrNull(
+            (element) =>
+                element.key ==
+                    additional_fields_local.AdditionalFieldsType.deliveryType
+                        .toValue() &&
+                element.value == EligibilityAssessmentStatus.smcDone.name,
+          ) !=
+          null) ==
+      null) {
+    return false;
+  }
+
+  final lastTask = tasks.last;
+  final lastTaskCreatedTime = lastTask.clientAuditDetails?.createdTime;
+
+  if (lastTaskCreatedTime == null) {
+    return false;
+  }
+
+  final date = DateTime.fromMillisecondsSinceEpoch(lastTaskCreatedTime);
+  final diff = DateTime.now().difference(date);
+  final isLastCycleRunning = lastTaskCreatedTime >= currentCycle.startDate &&
+      lastTaskCreatedTime <= currentCycle.endDate;
+
+  if (isLastCycleRunning) {
+    if (lastTask.status == Status.delivered.name) {
+      return true;
+    }
+    return diff.inHours >= 24; // [TODO: Move gap between doses to config]
+  }
+
+  return true;
+}
+
+bool checkStatusVAS(List<TaskModel>? tasks, ProjectCycle? currentCycle) {
+  if (currentCycle == null) {
+    return false;
+  }
+
+  if (tasks == null || tasks.isEmpty) {
+    return true;
+  }
+
+  if (tasks.firstWhereOrNull((e) =>
+          e.additionalFields?.fields.firstWhereOrNull(
+            (element) =>
+                element.key ==
+                    additional_fields_local.AdditionalFieldsType.deliveryType
+                        .toValue() &&
+                element.value == EligibilityAssessmentStatus.vasDone.name,
+          ) !=
+          null) ==
+      null) {
+    return false;
+  }
+
+  final lastTask = tasks.last;
+  final lastTaskCreatedTime = lastTask.clientAuditDetails?.createdTime;
+
+  if (lastTaskCreatedTime == null) {
+    return false;
+  }
+
+  final date = DateTime.fromMillisecondsSinceEpoch(lastTaskCreatedTime);
+  final diff = DateTime.now().difference(date);
+  final isLastCycleRunning = lastTaskCreatedTime >= currentCycle.startDate &&
+      lastTaskCreatedTime <= currentCycle.endDate;
+
+  if (isLastCycleRunning) {
+    if (lastTask.status == Status.delivered.name) {
+      return true;
+    }
+    return diff.inHours >= 24; // [TODO: Move gap between doses to config]
+  }
+
+  return true;
+}
 
 bool redosePending(List<TaskModel>? tasks, ProjectCycle? selectedCycle) {
   var redosePending = true;
@@ -49,14 +142,47 @@ bool redosePending(List<TaskModel>? tasks, ProjectCycle? selectedCycle) {
                   1000);
 }
 
-bool assessmentPending(List<TaskModel>? tasks) {
+bool assessmentSMCPending(List<TaskModel>? tasks) {
   // this task confirms eligibility and dose administrations is done
   if ((tasks ?? []).isEmpty) {
     return true;
   }
   var successfulTask = tasks!
       .where(
-        (element) => element.status == Status.administeredSuccess.toValue(),
+        (element) =>
+            element.status == Status.administeredSuccess.toValue() &&
+            element.additionalFields?.fields.firstWhereOrNull(
+                  (e) =>
+                      e.key ==
+                          additional_fields_local
+                              .AdditionalFieldsType.deliveryType
+                              .toValue() &&
+                      e.value == EligibilityAssessmentStatus.smcDone.name,
+                ) !=
+                null,
+      )
+      .lastOrNull;
+
+  return successfulTask == null;
+}
+
+bool assessmentVASPending(List<TaskModel>? tasks) {
+  // this task confirms eligibility and dose administrations is done
+  if ((tasks ?? []).isEmpty) {
+    return true;
+  }
+  var successfulTask = tasks!
+      .where(
+        (element) => (element.status == Status.administeredSuccess.toValue() &&
+            element.additionalFields?.fields.firstWhereOrNull(
+                  (e) =>
+                      e.key ==
+                          additional_fields_local
+                              .AdditionalFieldsType.deliveryType
+                              .toValue() &&
+                      e.value == EligibilityAssessmentStatus.vasDone.name,
+                ) !=
+                null),
       )
       .lastOrNull;
 

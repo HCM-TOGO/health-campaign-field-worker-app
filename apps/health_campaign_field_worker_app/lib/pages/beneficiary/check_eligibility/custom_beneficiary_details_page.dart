@@ -17,10 +17,15 @@ import 'package:registration_delivery/blocs/app_localization.dart';
 import 'package:registration_delivery/blocs/delivery_intervention/deliver_intervention.dart';
 import 'package:registration_delivery/blocs/household_overview/household_overview.dart';
 import 'package:registration_delivery/models/entities/additional_fields_type.dart';
+import 'package:registration_delivery/models/entities/task.dart';
 import 'package:registration_delivery/router/registration_delivery_router.gm.dart';
 import 'package:registration_delivery/utils/i18_key_constants.dart' as i18;
 import '../../../models/entities/identifier_types.dart';
+import '../../../router/app_router.dart';
+import '../../../utils/app_enums.dart';
 import '../../../utils/i18_key_constants.dart' as i18_local;
+import '../../../models/entities/additional_fields_type.dart'
+    as additional_fields_local;
 import 'package:registration_delivery/utils/utils.dart';
 import 'package:registration_delivery/widgets/back_navigation_help_header.dart';
 import 'package:registration_delivery/widgets/component_wrapper/product_variant_bloc_wrapper.dart';
@@ -28,7 +33,7 @@ import 'package:registration_delivery/widgets/localized.dart';
 import 'package:registration_delivery/widgets/table_card/table_card.dart';
 import 'package:registration_delivery/pages/beneficiary/widgets/record_delivery_cycle.dart';
 
-import '../../../utils/utils.dart';
+import '../../../widgets/registration_delivery/past_delivery_vas.dart';
 
 @RoutePage()
 class CustomBeneficiaryDetailsPage extends LocalizedStatefulWidget {
@@ -50,6 +55,21 @@ class CustomBeneficiaryDetailsPageState
   void initState() {
     // TODO: implement initState
     super.initState();
+  }
+
+  bool checkDeliveryType(TaskModel element) {
+    EligibilityAssessmentStatus eligibilityAssessmentStatus =
+        widget.eligibilityAssessmentType == EligibilityAssessmentType.smc
+            ? EligibilityAssessmentStatus.smcDone
+            : EligibilityAssessmentStatus.vasDone;
+    return element.additionalFields?.fields.firstWhereOrNull(
+          (e) =>
+              e.key ==
+                  additional_fields_local.AdditionalFieldsType.deliveryType
+                      .toValue() &&
+              e.value == eligibilityAssessmentStatus.name,
+        ) !=
+        null;
   }
 
   @override
@@ -81,7 +101,8 @@ class CustomBeneficiaryDetailsPageState
           final taskData = state.householdMemberWrapper.tasks
               ?.where((element) =>
                   element.projectBeneficiaryClientReferenceId ==
-                  projectBeneficiary?.first?.clientReferenceId)
+                      projectBeneficiary?.first?.clientReferenceId &&
+                  checkDeliveryType(element))
               .toList();
           final bloc = context.read<DeliverInterventionBloc>();
           final lastDose = taskData != null && taskData.isNotEmpty
@@ -198,15 +219,27 @@ class CustomBeneficiaryDetailsPageState
                                                         contentPadding:
                                                             EdgeInsets.zero,
                                                         additionalWidgets: [
-                                                          buildTableContent(
-                                                              deliverState,
-                                                              context,
-                                                              variant,
-                                                              state
-                                                                  .selectedIndividual,
-                                                              state
-                                                                  .householdMemberWrapper
-                                                                  .household),
+                                                          widget.eligibilityAssessmentType ==
+                                                                  EligibilityAssessmentType
+                                                                      .smc
+                                                              ? buildTableContentSMC(
+                                                                  deliverState,
+                                                                  context,
+                                                                  variant,
+                                                                  state
+                                                                      .selectedIndividual,
+                                                                  state
+                                                                      .householdMemberWrapper
+                                                                      .household)
+                                                              : buildTableContentVAS(
+                                                                  deliverState,
+                                                                  context,
+                                                                  variant,
+                                                                  state
+                                                                      .selectedIndividual,
+                                                                  state
+                                                                      .householdMemberWrapper
+                                                                      .household),
                                                         ],
                                                         actions: [
                                                           DigitButton(
@@ -221,7 +254,10 @@ class CustomBeneficiaryDetailsPageState
                                                                       true,
                                                                 ).pop();
                                                                 router.push(
-                                                                  DeliverInterventionRoute(),
+                                                                  CustomDeliverInterventionRoute(
+                                                                      eligibilityAssessmentType:
+                                                                          widget
+                                                                              .eligibilityAssessmentType),
                                                                 );
                                                               },
                                                               type:
@@ -249,7 +285,10 @@ class CustomBeneficiaryDetailsPageState
                                           mainAxisSize: MainAxisSize.max,
                                           onPressed: () {
                                             context.router.push(
-                                                DeliverInterventionRoute());
+                                                CustomDeliverInterventionRoute(
+                                                    eligibilityAssessmentType:
+                                                        widget
+                                                            .eligibilityAssessmentType));
                                           },
                                         ),
                                       ]);
@@ -260,9 +299,13 @@ class CustomBeneficiaryDetailsPageState
                               margin: const EdgeInsets.all(spacer2),
                               children: [
                                 Text(
-                                  localizations.translate(i18_local
-                                      .deliverIntervention
-                                      .deliversmcintervention),
+                                  localizations.translate(
+                                      widget.eligibilityAssessmentType ==
+                                              EligibilityAssessmentType.smc
+                                          ? i18_local.deliverIntervention
+                                              .deliversmcintervention
+                                          : i18_local.deliverIntervention
+                                              .deliverVASIntervention),
                                   style: textTheme.headingXl.copyWith(
                                       color: theme.colorTheme.primary.primary2),
                                 ),

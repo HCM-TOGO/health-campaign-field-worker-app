@@ -29,15 +29,21 @@ import 'package:registration_delivery/widgets/back_navigation_help_header.dart';
 import 'package:registration_delivery/widgets/beneficiary/resource_beneficiary_card.dart';
 import 'package:registration_delivery/widgets/component_wrapper/product_variant_bloc_wrapper.dart';
 import 'package:registration_delivery/widgets/localized.dart';
+
+import '../../../utils/app_enums.dart';
 import '../../../utils/i18_key_constants.dart' as i18_local;
+import '../../../models/entities/additional_fields_type.dart'
+    as additional_fields_local;
 
 @RoutePage()
 class CustomDeliverInterventionPage extends LocalizedStatefulWidget {
+  final EligibilityAssessmentType eligibilityAssessmentType;
   final bool isEditing;
 
   const CustomDeliverInterventionPage({
     super.key,
     super.appLocalizations,
+    required this.eligibilityAssessmentType,
     this.isEditing = false,
   });
 
@@ -80,24 +86,24 @@ class CustomDeliverInterventionPageState
       ProjectBeneficiaryModel projectBeneficiary) async {
     final lat = locationState.latitude;
     final long = locationState.longitude;
+    TaskModel taskModel = _getTaskModel(
+      context,
+      form: form,
+      oldTask: RegistrationDeliverySingleton().beneficiaryType ==
+              BeneficiaryType.household
+          ? deliverInterventionState.tasks?.lastOrNull
+          : null,
+      projectBeneficiaryClientReferenceId: projectBeneficiary.clientReferenceId,
+      dose: deliverInterventionState.dose,
+      cycle: deliverInterventionState.cycle,
+      deliveryStrategy: DeliverStrategyType.direct.toValue(),
+      address: householdMember.members?.first.address?.first,
+      latitude: lat,
+      longitude: long,
+    );
     context.read<DeliverInterventionBloc>().add(
           DeliverInterventionSubmitEvent(
-              task: _getTaskModel(
-                context,
-                form: form,
-                oldTask: RegistrationDeliverySingleton().beneficiaryType ==
-                        BeneficiaryType.household
-                    ? deliverInterventionState.tasks?.lastOrNull
-                    : null,
-                projectBeneficiaryClientReferenceId:
-                    projectBeneficiary.clientReferenceId,
-                dose: deliverInterventionState.dose,
-                cycle: deliverInterventionState.cycle,
-                deliveryStrategy: DeliverStrategyType.direct.toValue(),
-                address: householdMember.members?.first.address?.first,
-                latitude: lat,
-                longitude: long,
-              ),
+              task: taskModel,
               isEditing: (deliverInterventionState.tasks ?? []).isNotEmpty &&
                       RegistrationDeliverySingleton().beneficiaryType ==
                           BeneficiaryType.household
@@ -107,6 +113,7 @@ class CustomDeliverInterventionPageState
               navigateToSummary: true,
               householdMemberWrapper: householdMember),
         );
+    await handleSubmit(context, taskModel, deliverInterventionState);
   }
 
   void handleLocationState(
@@ -139,11 +146,12 @@ class CustomDeliverInterventionPageState
 
   Future<void> handleSubmit(
     BuildContext context,
+    TaskModel taskModel,
     DeliverInterventionState deliverState,
   ) async {
     context.read<DeliverInterventionBloc>().add(
           DeliverInterventionSubmitEvent(
-            task: deliverState.oldTask!,
+            task: deliverState.oldTask ?? taskModel,
             isEditing: (deliverState.tasks ?? []).isNotEmpty &&
                     RegistrationDeliverySingleton().beneficiaryType ==
                         BeneficiaryType.household
@@ -458,9 +466,6 @@ class CustomDeliverInterventionPageState
                                                                 projectBeneficiary!
                                                                     .first,
                                                               );
-                                                              await handleSubmit(
-                                                                  context,
-                                                                  deliveryInterventionState);
                                                             }
                                                           }
                                                         }
@@ -570,13 +575,12 @@ class CustomDeliverInterventionPageState
                                                     ),
                                                   ),
                                                 ),
-                                                 LabeledField(
+                                                LabeledField(
                                                   label: localizations
                                                       .translate(i18_local
                                                           .deliverIntervention
                                                           .doseadministeredby),
-                                                  child:
-                                                      DigitTextFormInput(
+                                                  child: DigitTextFormInput(
                                                     suffixIcon:
                                                         Icons.arrow_drop_down,
                                                     readOnly: true,
@@ -848,6 +852,12 @@ class CustomDeliverInterventionPageState
               AdditionalFieldsType.longitude.toValue(),
               longitude,
             ),
+          AdditionalField(
+            additional_fields_local.AdditionalFieldsType.deliveryType.toValue(),
+            widget.eligibilityAssessmentType == EligibilityAssessmentType.smc
+                ? EligibilityAssessmentStatus.smcDone.name
+                : EligibilityAssessmentStatus.vasDone.name,
+          ),
         ],
       ),
     );
@@ -938,7 +948,6 @@ class CustomDeliverInterventionPageState
     });
   }
 }
-
 
 class CustomResourceBeneficiaryCard extends LocalizedStatefulWidget {
   final void Function(int) onDelete;

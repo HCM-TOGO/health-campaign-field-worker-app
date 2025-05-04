@@ -20,6 +20,7 @@ import 'package:registration_delivery/router/registration_delivery_router.gm.dar
 // import '../../../blocs/service/service.dart' as service;
 import '../../../models/entities/roles_type.dart';
 import '../../../router/app_router.dart';
+import '../../../utils/app_enums.dart';
 import '../../../utils/environment_config.dart';
 import '../../../utils/i18_key_constants.dart' as i18_local;
 import '../../../utils/utils.dart';
@@ -105,6 +106,10 @@ class _EligibilityChecklistViewPage
             builder: (context, householdOverviewState) {
               double? latitude = locationState.latitude;
               double? longitude = locationState.longitude;
+              String eligibilityAssessment = widget.eligibilityAssessmentType ==
+                      EligibilityAssessmentType.smc
+                  ? "ELIGIBLITY_ASSESSMENT"
+                  : "ELIGIBLITY_ASSESSMENT_2";
               return BlocBuilder<ServiceDefinitionBloc, ServiceDefinitionState>(
                 builder: (context, state) {
                   state.mapOrNull(
@@ -112,7 +117,7 @@ class _EligibilityChecklistViewPage
                       // todo: verify the checklist name
                       selectedServiceDefinition = value.serviceDefinitionList
                           .where((element) => element.code.toString().contains(
-                                '${context.selectedProject.name}.ELIGIBLITY_ASSESSMENT.${context.isCommunityDistributor ? RolesType.communityDistributor.toValue() : RolesType.healthFacilitySupervisor.toValue()}',
+                                '${context.selectedProject.name}.$eligibilityAssessment.${context.isCommunityDistributor ? RolesType.communityDistributor.toValue() : RolesType.healthFacilitySupervisor.toValue()}',
                               ))
                           .toList()
                           .firstOrNull;

@@ -103,13 +103,13 @@ abstract class _$AppRouter extends RootStackRouter {
       );
     },
     CustomDeliverInterventionRoute.name: (routeData) {
-      final args = routeData.argsAs<CustomDeliverInterventionRouteArgs>(
-          orElse: () => const CustomDeliverInterventionRouteArgs());
+      final args = routeData.argsAs<CustomDeliverInterventionRouteArgs>();
       return AutoRoutePage<dynamic>(
         routeData: routeData,
         child: CustomDeliverInterventionPage(
           key: args.key,
           appLocalizations: args.appLocalizations,
+          eligibilityAssessmentType: args.eligibilityAssessmentType,
           isEditing: args.isEditing,
         ),
       );
@@ -120,6 +120,17 @@ abstract class _$AppRouter extends RootStackRouter {
       return AutoRoutePage<dynamic>(
         routeData: routeData,
         child: CustomDeliverySummaryPage(
+          key: args.key,
+          appLocalizations: args.appLocalizations,
+        ),
+      );
+    },
+    CustomDoseAdministeredRoute.name: (routeData) {
+      final args = routeData.argsAs<CustomDoseAdministeredRouteArgs>(
+          orElse: () => const CustomDoseAdministeredRouteArgs());
+      return AutoRoutePage<dynamic>(
+        routeData: routeData,
+        child: CustomDoseAdministeredPage(
           key: args.key,
           appLocalizations: args.appLocalizations,
         ),
@@ -746,6 +757,7 @@ class CustomDeliverInterventionRoute
   CustomDeliverInterventionRoute({
     Key? key,
     RegistrationDeliveryLocalization? appLocalizations,
+    required EligibilityAssessmentType eligibilityAssessmentType,
     bool isEditing = false,
     List<PageRouteInfo>? children,
   }) : super(
@@ -753,6 +765,7 @@ class CustomDeliverInterventionRoute
           args: CustomDeliverInterventionRouteArgs(
             key: key,
             appLocalizations: appLocalizations,
+            eligibilityAssessmentType: eligibilityAssessmentType,
             isEditing: isEditing,
           ),
           initialChildren: children,
@@ -768,6 +781,7 @@ class CustomDeliverInterventionRouteArgs {
   const CustomDeliverInterventionRouteArgs({
     this.key,
     this.appLocalizations,
+    required this.eligibilityAssessmentType,
     this.isEditing = false,
   });
 
@@ -775,11 +789,13 @@ class CustomDeliverInterventionRouteArgs {
 
   final RegistrationDeliveryLocalization? appLocalizations;
 
+  final EligibilityAssessmentType eligibilityAssessmentType;
+
   final bool isEditing;
 
   @override
   String toString() {
-    return 'CustomDeliverInterventionRouteArgs{key: $key, appLocalizations: $appLocalizations, isEditing: $isEditing}';
+    return 'CustomDeliverInterventionRouteArgs{key: $key, appLocalizations: $appLocalizations, eligibilityAssessmentType: $eligibilityAssessmentType, isEditing: $isEditing}';
   }
 }
 
@@ -819,6 +835,45 @@ class CustomDeliverySummaryRouteArgs {
   @override
   String toString() {
     return 'CustomDeliverySummaryRouteArgs{key: $key, appLocalizations: $appLocalizations}';
+  }
+}
+
+/// generated route for
+/// [CustomDoseAdministeredPage]
+class CustomDoseAdministeredRoute
+    extends PageRouteInfo<CustomDoseAdministeredRouteArgs> {
+  CustomDoseAdministeredRoute({
+    Key? key,
+    RegistrationDeliveryLocalization? appLocalizations,
+    List<PageRouteInfo>? children,
+  }) : super(
+          CustomDoseAdministeredRoute.name,
+          args: CustomDoseAdministeredRouteArgs(
+            key: key,
+            appLocalizations: appLocalizations,
+          ),
+          initialChildren: children,
+        );
+
+  static const String name = 'CustomDoseAdministeredRoute';
+
+  static const PageInfo<CustomDoseAdministeredRouteArgs> page =
+      PageInfo<CustomDoseAdministeredRouteArgs>(name);
+}
+
+class CustomDoseAdministeredRouteArgs {
+  const CustomDoseAdministeredRouteArgs({
+    this.key,
+    this.appLocalizations,
+  });
+
+  final Key? key;
+
+  final RegistrationDeliveryLocalization? appLocalizations;
+
+  @override
+  String toString() {
+    return 'CustomDoseAdministeredRouteArgs{key: $key, appLocalizations: $appLocalizations}';
   }
 }
 
