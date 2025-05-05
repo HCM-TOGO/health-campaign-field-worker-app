@@ -49,14 +49,14 @@ class CustomBeneficiaryAcknowledgementPageState
         ?.lastWhereOrNull((e) =>
             e.identifierType == IdentifierTypes.uniqueBeneficiaryID.toValue())
         ?.identifierId;
-    if (widget.acknowledgementType == AcknowledgementType.addHousehold) {
-      return householdId == null
-          ? null
-          : {
-              'id': i18_local.beneficiaryDetails.householdId,
-              'value': householdId,
-            };
-    }
+    // if (widget.acknowledgementType == AcknowledgementType.addHousehold) {
+    //   return householdId == null
+    //       ? null
+    //       : {
+    //           'id': i18_local.beneficiaryDetails.householdId,
+    //           'value': householdId,
+    //         };
+    // }
     return beneficiaryId == null
         ? null
         : {
@@ -101,8 +101,8 @@ class CustomBeneficiaryAcknowledgementPageState
                   type: PanelType.success,
                   title: localizations.translate(
                       i18.acknowledgementSuccess.acknowledgementLabelText),
-                  subTitle: subtitleMap(householdMemberWrapper,
-                      state.householdModel?.id),
+                  subTitle: subtitleMap(
+                      householdMemberWrapper, state.householdModel?.id),
                   actions: [
                     if (householdMemberWrapper != null)
                       DigitButton(
