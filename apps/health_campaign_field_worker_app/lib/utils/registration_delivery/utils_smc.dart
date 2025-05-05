@@ -2,6 +2,7 @@ import 'package:collection/collection.dart';
 import 'package:digit_data_model/models/entities/individual.dart';
 import 'package:digit_data_model/models/entities/project_type.dart';
 import 'package:digit_data_model/models/project_type/project_type_model.dart';
+import 'package:digit_ui_components/utils/date_utils.dart';
 import 'package:health_campaign_field_worker_app/utils/constants.dart';
 import 'package:registration_delivery/models/entities/additional_fields_type.dart';
 import 'package:registration_delivery/models/entities/side_effect.dart';
@@ -163,6 +164,56 @@ bool checkBeneficiaryReferredSMC(List<TaskModel>? tasks) {
       .lastOrNull;
 
   return successfulTask != null;
+}
+
+bool checkEligibilityForAgeAndSideEffectAll(
+  DigitDOBAgeConvertor age,
+  ProjectTypeModel? projectType,
+  TaskModel? tasks,
+  List<SideEffectModel>? sideEffects,
+) {
+  int totalAgeMonths = age.years * 12 + age.months;
+  final currentCycle = projectType?.cycles?.firstWhereOrNull(
+    (e) =>
+        (e.startDate!) < DateTime.now().millisecondsSinceEpoch &&
+        (e.endDate!) > DateTime.now().millisecondsSinceEpoch,
+    // Return null when no matching cycle is found
+  );
+  if (currentCycle != null &&
+      currentCycle.startDate != null &&
+      currentCycle.endDate != null) {
+    bool recordedSideEffect = false;
+    if ((tasks != null) && sideEffects != null && sideEffects.isNotEmpty) {
+      final lastTaskTime =
+          tasks.clientReferenceId == sideEffects.last.taskClientReferenceId
+              ? tasks.clientAuditDetails?.createdTime
+              : null;
+      recordedSideEffect = lastTaskTime != null &&
+          (lastTaskTime >= currentCycle.startDate! &&
+              lastTaskTime <= currentCycle.endDate!);
+
+      return projectType?.validMinAge != null &&
+              projectType?.validMaxAge != null
+          ? totalAgeMonths >= projectType!.validMinAge! &&
+                  totalAgeMonths <= projectType.validMaxAge!
+              ? recordedSideEffect && !checkStatusSMC([tasks], currentCycle)
+                  ? false
+                  : true
+              : false
+          : false;
+    } else {
+      if (projectType?.validMaxAge != null &&
+          projectType?.validMinAge != null) {
+        return totalAgeMonths >= projectType!.validMinAge! &&
+                totalAgeMonths <= projectType.validMaxAge!
+            ? true
+            : false;
+      }
+      return false;
+    }
+  }
+
+  return false;
 }
 
 bool checkBeneficiaryReferredVAS(List<TaskModel>? tasks) {

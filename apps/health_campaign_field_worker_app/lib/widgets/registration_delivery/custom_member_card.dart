@@ -45,7 +45,8 @@ class CustomMemberCard extends StatelessWidget {
   final RegistrationDeliveryLocalization localizations;
   final List<TaskModel>? tasks;
   final List<SideEffectModel>? sideEffects;
-  final bool isNotEligible;
+  final bool isNotEligibleSMC;
+  final bool isNotEligibleVAS;
   final bool isBeneficiaryRefused;
   final bool isBeneficiaryIneligible;
   final bool isBeneficiaryReferred;
@@ -67,7 +68,8 @@ class CustomMemberCard extends StatelessWidget {
     required this.editMemberAction,
     required this.deleteMemberAction,
     this.tasks,
-    this.isNotEligible = false,
+    this.isNotEligibleSMC = false,
+    this.isNotEligibleVAS = false,
     this.projectBeneficiaryClientReferenceId,
     this.isBeneficiaryRefused = false,
     this.isBeneficiaryIneligible = false,
@@ -152,10 +154,10 @@ class CustomMemberCard extends StatelessWidget {
             ),
         ],
       );
-    } else if (isNotEligible || isBeneficiaryIneligible) {
+    } else if (isNotEligibleSMC || isBeneficiaryIneligible) {
       return Column(
         children: [
-          if (isHead || isNotEligible || isBeneficiaryIneligible)
+          if (isHead || isNotEligibleSMC || isBeneficiaryIneligible)
             Align(
               alignment: Alignment.centerLeft,
               child: DigitIconButton(
@@ -164,7 +166,7 @@ class CustomMemberCard extends StatelessWidget {
                 iconText: localizations.translate(isHead
                     ? i18_local
                         .householdOverView.householdOverViewHouseholderHeadLabel
-                    : (isNotEligible || isBeneficiaryIneligible)
+                    : (isNotEligibleSMC || isBeneficiaryIneligible)
                         ? i18.householdOverView
                             .householdOverViewNotEligibleIconLabel
                         : ""),
@@ -224,9 +226,9 @@ class CustomMemberCard extends StatelessWidget {
     final redosePendingStatus = smcAssessmentPendingStatus
         ? true
         : redosePending(smcTasks, context.selectedCycle);
-    if ((isNotEligible || isBeneficiaryIneligible) && !doseStatus)
+    if ((isNotEligibleSMC || isBeneficiaryIneligible) && !doseStatus)
       return const Offstage();
-    if (isNotEligible ||
+    if (isNotEligibleSMC ||
         (!vasAssessmentPendingStatus && !redosePendingStatus)) {
       return const Offstage();
     }
@@ -263,8 +265,7 @@ class CustomMemberCard extends StatelessWidget {
               }
             },
           ),
-        if ((!smcAssessmentPendingStatus || isBeneficiaryReferredSMC) &&
-            redosePendingStatus)
+        if ((!smcAssessmentPendingStatus) && redosePendingStatus)
           DigitElevatedButton(
             child: Center(
               child: Text(
@@ -283,8 +284,8 @@ class CustomMemberCard extends StatelessWidget {
               );
 
               if ((smcTasks ?? []).isNotEmpty) {
-                var successfulTask = smcTasks!
-                    .where(
+                TaskModel? successfulTask = smcTasks
+                    ?.where(
                       (element) =>
                           element.status ==
                           Status.administeredSuccess.toValue(),
@@ -294,13 +295,13 @@ class CustomMemberCard extends StatelessWidget {
                   final spaq1 = context.spaq1;
 
                   int doseCount = double.parse(
-                    successfulTask!.resources!.first.quantity!,
+                    successfulTask?.resources?.first.quantity ?? "0",
                   ).round();
 
-                  if (spaq1 >= doseCount) {
+                  if (successfulTask != null && spaq1 >= doseCount) {
                     context.router.push(
                       RecordRedoseRoute(
-                        tasks: [successfulTask!],
+                        tasks: [successfulTask],
                       ),
                     );
                   } else {
@@ -339,7 +340,8 @@ class CustomMemberCard extends StatelessWidget {
           ),
         if ((!smcAssessmentPendingStatus || isBeneficiaryReferredSMC) &&
             vasAssessmentPendingStatus &&
-            !isBeneficiaryReferredVAS)
+            !isBeneficiaryReferredVAS &&
+            !isNotEligibleVAS)
           DigitElevatedButton(
             child: Center(
               child: Text(

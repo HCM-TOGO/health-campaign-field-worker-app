@@ -925,18 +925,40 @@ class _CustomHouseholdOverviewPageState
                                                     ]),
                                               );
                                             },
-                                            isNotEligible:
+                                            isNotEligibleSMC:
                                                 RegistrationDeliverySingleton()
                                                             .projectType
                                                             ?.cycles !=
                                                         null
-                                                    ? !checkEligibilityForAgeAndSideEffect(
+                                                    ? !checkEligibilityForAgeAndSideEffectAll(
                                                         DigitDOBAgeConvertor(
                                                           years: ageInYears,
                                                           months: ageInMonths,
                                                         ),
                                                         RegistrationDeliverySingleton()
                                                             .projectType,
+                                                        (taskData ?? [])
+                                                                .isNotEmpty
+                                                            ? taskData
+                                                                ?.lastOrNull
+                                                            : null,
+                                                        sideEffectData,
+                                                      )
+                                                    : false,
+                                            isNotEligibleVAS:
+                                                RegistrationDeliverySingleton()
+                                                            .projectType
+                                                            ?.cycles !=
+                                                        null
+                                                    ? !checkEligibilityForAgeAndSideEffectAll(
+                                                        DigitDOBAgeConvertor(
+                                                          years: ageInYears,
+                                                          months: ageInMonths,
+                                                        ),
+                                                        RegistrationDeliverySingleton()
+                                                            .selectedProject
+                                                            ?.additionalDetails
+                                                            ?.additionalProjectType,
                                                         (taskData ?? [])
                                                                 .isNotEmpty
                                                             ? taskData
