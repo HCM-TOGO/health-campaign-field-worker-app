@@ -97,6 +97,8 @@ class Constants {
 
   static const int mlPerBottle = 30;
 
+  // todo enable before cycle2
+  static const bool isDownSyncEnabled = false;
   static const String dashboardAnalyticsPath =
       '/dashboard-analytics/dashboard/getChartV2';
 
