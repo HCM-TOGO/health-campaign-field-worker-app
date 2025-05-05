@@ -12,6 +12,7 @@ import 'package:registration_delivery/pages/beneficiary/facility_selection.dart'
 import 'package:registration_delivery/router/registration_delivery_router.gm.dart';
 import 'package:registration_delivery/widgets/inventory/no_facilities_assigned_dialog.dart';
 
+import '../../../utils/app_enums.dart';
 import '../../../widgets/localized.dart';
 import 'package:registration_delivery/blocs/delivery_intervention/deliver_intervention.dart';
 import 'package:registration_delivery/blocs/household_overview/household_overview.dart';
@@ -319,8 +320,8 @@ class CustomReferBeneficiarySMCPageState
                                       },
                                     ).then(
                                       (value) => context.router.popAndPush(
-                                        CustomHouseholdAcknowledgementSMCRoute(
-                                          enableViewHousehold: true,
+                                        CustomHouseholdAcknowledgementRoute(
+                                          enableViewHousehold: true, eligibilityAssessmentType: EligibilityAssessmentType.vas,
                                         ),
                                       ),
                                     );

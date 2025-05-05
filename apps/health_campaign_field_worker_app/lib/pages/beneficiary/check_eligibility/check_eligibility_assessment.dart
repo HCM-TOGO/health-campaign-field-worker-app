@@ -955,9 +955,14 @@ class _EligibilityChecklistViewPage
     var isIneligible = false;
     var q3Key = "KBEA3";
     var q5Key = "KBEA4";
+    var q6Key = "KBEA5";
+    var q7Key = "KBEA6";
+
     Map<String, String> keyVsReason = {
       q3Key: "NOT_ADMINISTERED_IN_PREVIOUS_CYCLE",
       q5Key: "CHILD_ON_MEDICATION_1",
+      q6Key: "RESPIRATORY_INFECTION",
+      q7Key: "TAKEN_VITAMIN_A",
     };
     final individualModel = widget.individual;
 
@@ -986,6 +991,14 @@ class _EligibilityChecklistViewPage
           (responses.containsKey(q5Key) && responses[q5Key]!.isNotEmpty)) {
         isIneligible = responses[q5Key] == yes ? true : false;
       }
+      //       if (!isIneligible &&
+      //     (responses.containsKey(q6Key) && responses[q6Key]!.isNotEmpty)) {
+      //   isIneligible = responses[q6Key] == yes ? true : false;
+      // }
+      //       if (!isIneligible &&
+      //     (responses.containsKey(q7Key) && responses[q7Key]!.isNotEmpty)) {
+      //   isIneligible = responses[q7Key] == yes ? true : false;
+      // }
       // passing all the reasons which have response as true
       if (isIneligible) {
         for (var entry in responses.entries) {
@@ -1009,11 +1022,15 @@ class _EligibilityChecklistViewPage
     var q1Key = "KBEA1";
     var q2Key = "KBEA2";
     var q4Key = "KBEA3.NO.ADT1";
+    var q6Key = "KBEA5";
+    var q7Key = "KBEA6";
     // var q3Key = "KBEA3";
     Map<String, String> referralKeysVsCode = {
       q1Key: "SICK",
       q2Key: "FEVER",
       q4Key: "DRUG_SE_PC",
+            q6Key: "RESPIRATORY_INFECTION",
+      q7Key: "TAKEN_VITAMIN_A",
       // q3Key: "DRUG_SE_PC",
     };
     // TODO Configure the reasons ,verify hardcoded strings
@@ -1029,6 +1046,10 @@ class _EligibilityChecklistViewPage
       if (!isReferral &&
           (responses.containsKey(q4Key) && responses[q4Key]!.isNotEmpty)) {
         isReferral = responses[q4Key] == yes ? true : false;
+      }
+      if (!isReferral &&
+          (responses.containsKey(q6Key) && responses[q6Key]!.isNotEmpty) && (responses.containsKey(q7Key) && responses[q7Key]!.isNotEmpty)) {
+        isReferral = (responses[q6Key] == yes) && (responses[q7Key] == yes) ? true : false;
       }
     }
     if (isReferral) {
