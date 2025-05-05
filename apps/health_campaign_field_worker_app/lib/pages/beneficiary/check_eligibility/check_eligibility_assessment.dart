@@ -518,18 +518,6 @@ class _EligibilityChecklistViewPage
                                         submitTriggered: true,
                                       ),
                                     );
-
-                                // Request location from LocationBloc
-                                // context
-                                //     .read<location.LocationBloc>()
-                                //     .add(const location.LocationEvent.load());
-                                // DigitComponentsUtils()
-                                //     .showLocationCapturingDialog(
-                                //   context,
-                                //   localizations.translate(
-                                //       i18_local.common.locationCapturing),
-                                //   DigitSyncDialogType.inProgress,
-                                // );
                               }
                             },
                             child: Text(
@@ -671,16 +659,6 @@ class _EligibilityChecklistViewPage
                                                                   .split('.')
                                                                   .contains(e),
                                                           onChanged: (value) {
-                                                            // context
-                                                            //     .read<ServiceBloc>()
-                                                            //     .add(
-                                                            //       ServiceChecklistEvent(
-                                                            //         value:
-                                                            //             e.toString(),
-                                                            //         submitTriggered:
-                                                            //             submitTriggered,
-                                                            //       ),
-                                                            //     );
                                                             final String ele;
                                                             var val =
                                                                 controller[
@@ -790,14 +768,7 @@ class _EligibilityChecklistViewPage
                   return RadioGroup<String>.builder(
                     groupValue: controller[index].text.trim(),
                     onChanged: (value) {
-                      // context.read<ServiceBloc>().add(
-                      //       ServiceChecklistEvent(
-                      //         value: Random().nextInt(100).toString(),
-                      //         submitTriggered: submitTriggered,
-                      //       ),
-                      //     );
                       setState(() {
-                        // Clear child controllers and update visibility
                         for (final matchingChildItem in childItems) {
                           final childIndex =
                               initialAttributes?.indexOf(matchingChildItem);
@@ -949,12 +920,6 @@ class _EligibilityChecklistViewPage
                           label: e,
                           value: controller[index].text.split('.').contains(e),
                           onChanged: (value) {
-                            // context.read<ServiceBloc>().add(
-                            //       ServiceChecklistEvent(
-                            //         value: e.toString(),
-                            //         submitTriggered: submitTriggered,
-                            //       ),
-                            //     );
                             final String ele;
                             var val = controller[index].text.split('.');
                             if (val.contains(e)) {
