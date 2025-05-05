@@ -7,6 +7,7 @@ import 'package:digit_data_model/models/entities/product_variant.dart';
 import 'package:digit_data_model/models/entities/project_type.dart';
 import 'package:registration_delivery/models/entities/additional_fields_type.dart';
 import 'package:registration_delivery/models/entities/household.dart';
+import 'package:registration_delivery/registration_delivery.dart';
 import 'package:survey_form/survey_form.init.dart' as surveyForm_mappers;
 import 'package:complaints/complaints.init.dart' as complaints_mappers;
 
@@ -655,3 +656,6 @@ class LocalizationParams {
 
   bool? get exclude => _exclude;
 }
+
+
+

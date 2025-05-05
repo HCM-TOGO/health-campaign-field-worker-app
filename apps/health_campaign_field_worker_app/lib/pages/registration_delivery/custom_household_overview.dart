@@ -31,7 +31,7 @@ import 'package:registration_delivery/models/entities/status.dart';
 import 'package:registration_delivery/router/registration_delivery_router.gm.dart';
 import 'package:registration_delivery/utils/i18_key_constants.dart' as i18;
 import 'package:registration_delivery/utils/utils.dart';
-import 'package:registration_delivery/widgets/back_navigation_help_header.dart';
+import '../../widgets/custom_back_navigation.dart';
 import 'package:registration_delivery/widgets/localized.dart';
 import 'package:registration_delivery/widgets/member_card/member_card.dart';
 import 'package:registration_delivery/widgets/table_card/table_card.dart';
@@ -102,8 +102,9 @@ class _CustomHouseholdOverviewPageState
                     child: ScrollableContent(
                       header: Padding(
                         padding: const EdgeInsets.only(bottom: spacer2),
-                        child: BackNavigationHelpHeaderWidget(
-                          handleBack: () {
+                        child: CustomBackNavigationHelpHeaderWidget(
+                          showHelp: true,
+                          handleback: () {
                             context
                                 .read<SearchHouseholdsBloc>()
                                 .add(const SearchHouseholdsEvent.clear());
@@ -283,31 +284,6 @@ class _CustomHouseholdOverviewPageState
                                   crossAxisAlignment: CrossAxisAlignment.start,
                                   mainAxisSize: MainAxisSize.max,
                                   children: [
-                                    ///Old UI Format
-                                    // BlocBuilder<DeliverInterventionBloc,
-                                    //     DeliverInterventionState>(
-                                    //   builder: (ctx, deliverInterventionState) =>
-                                    //       Offstage(
-                                    //     offstage: beneficiaryType ==
-                                    //         BeneficiaryType.individual,
-                                    //     child: Align(
-                                    //       alignment: Alignment.centerLeft,
-                                    //       child: DigitIconButton(
-                                    //         icon: getStatusAttributes(state,
-                                    //             deliverInterventionState)['icon'],
-                                    //         iconText: localizations.translate(
-                                    //           getStatusAttributes(state,
-                                    //                   deliverInterventionState)[
-                                    //               'textLabel'],
-                                    //         ), // [TODO: map task status accordingly based on projectBeneficiaries and tasks]
-                                    //         iconTextColor: getStatusAttributes(state,
-                                    //             deliverInterventionState)['color'],
-                                    //         iconColor: getStatusAttributes(state,
-                                    //             deliverInterventionState)['color'],
-                                    //       ),
-                                    //     ),
-                                    //   ),
-                                    // ),
                                     Row(
                                       children: [
                                         Align(
@@ -332,7 +308,7 @@ class _CustomHouseholdOverviewPageState
                                               style: textTheme.headingXl
                                                   .copyWith(
                                                       color: theme.colorTheme
-                                                          .primary.primary2),
+                                                          .text.primary),
                                             ),
                                           ),
                                         ),

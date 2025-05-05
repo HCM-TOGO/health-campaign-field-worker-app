@@ -89,9 +89,6 @@ Widget buildTableContentSMC(
           ),
         ),
         const DigitDivider(),
-        const SizedBox(
-          height: spacer4,
-        ),
         // Build the DigitTable with the data
         if (fetchProductVariant(item, individualModel, householdModel)
                 ?.productVariants !=
@@ -102,6 +99,7 @@ Widget buildTableContentSMC(
             withColumnDividers: false,
             showSelectedState: false,
             showPagination: false,
+            scrollPhysics: const ClampingScrollPhysics(),
             columns: columnListResource,
             rows: [
               ...fetchProductVariant(item, individualModel, householdModel)!
@@ -114,7 +112,6 @@ Widget buildTableContentSMC(
                         (element) => element.id == e.productVariantId,
                       )
                       ?.sku;
-                  final quantity = e.quantity;
 
                   return DigitTableRow(tableRow: [
                     // Display the dose information in the first column if it's the first row,
@@ -131,7 +128,7 @@ Widget buildTableContentSMC(
                         : DigitTableData('', cellKey: ''),
                     // Display the SKU value in the second column.
                     DigitTableData(
-                      '$quantity - ${localizations.translate(value.toString())}',
+                      localizations.translate(value.toString()),
                       cellKey: 'resources',
                     ),
                   ]);

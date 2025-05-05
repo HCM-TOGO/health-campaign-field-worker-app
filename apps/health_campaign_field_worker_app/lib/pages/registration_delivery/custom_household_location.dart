@@ -378,28 +378,6 @@ class CustomHouseholdLocationPageState
                             ),
                           ),
                         ),
-                        // householdLocationShowcaseData.gpsAccuracy.buildWith(
-                        //   child: ReactiveWrapperField(
-                        //     formControlName: _accuracyKey,
-                        //     validationMessages: {
-                        //       'required': (_) => localizations.translate(
-                        //             i18.common.corecommonRequired,
-                        //           ),
-                        //     },
-                        //     builder: (field) => LabeledField(
-                        //       label: localizations.translate(
-                        //         i18.householdLocation.gpsAccuracyLabel,
-                        //       ),
-                        //       capitalizedFirstLetter: false,
-                        //       child: DigitTextFormInput(
-                        //         readOnly: true,
-                        //         errorMessage: field.errorText,
-                        //         initialValue:
-                        //             form.control(_accuracyKey).value.toString(),
-                        //       ),
-                        //     ),
-                        //   ),
-                        // ),
                         if (RegistrationDeliverySingleton().householdType ==
                             HouseholdType.community)
                           householdLocationShowcaseData.buildingName.buildWith(
@@ -430,60 +408,6 @@ class CustomHouseholdLocationPageState
                                             .control(_buildingNameKey)
                                             .value,
                                       )))),
-                        // householdLocationShowcaseData.addressLine1.buildWith(
-                        //   child: ReactiveWrapperField(
-                        //     formControlName: _addressLine1Key,
-                        //     validationMessages: {
-                        //       'required': (_) => localizations.translate(
-                        //             i18.common.min2CharsRequired,
-                        //           ),
-                        //       'maxLength': (object) => localizations
-                        //           .translate(i18.common.maxCharsRequired)
-                        //           .replaceAll('{}', maxLength.toString()),
-                        //     },
-                        //     builder: (field) => LabeledField(
-                        //       label: localizations.translate(
-                        //         i18.householdLocation
-                        //             .householdAddressLine1LabelText,
-                        //       ),
-                        //       child: DigitTextFormInput(
-                        //         errorMessage: field.errorText,
-                        //         onChange: (value) {
-                        //           form.control(_addressLine1Key).value = value;
-                        //         },
-                        //         initialValue:
-                        //             form.control(_addressLine1Key).value,
-                        //       ),
-                        //     ),
-                        //   ),
-                        // ),
-                        // householdLocationShowcaseData.addressLine2.buildWith(
-                        //   child: ReactiveWrapperField(
-                        //     formControlName: _addressLine2Key,
-                        //     validationMessages: {
-                        //       'required': (_) => localizations.translate(
-                        //             i18.common.min2CharsRequired,
-                        //           ),
-                        //       'maxLength': (object) => localizations
-                        //           .translate(i18.common.maxCharsRequired)
-                        //           .replaceAll('{}', maxLength.toString()),
-                        //     },
-                        //     builder: (field) => LabeledField(
-                        //       label: localizations.translate(
-                        //         i18.householdLocation
-                        //             .householdAddressLine2LabelText,
-                        //       ),
-                        //       child: DigitTextFormInput(
-                        //         errorMessage: field.errorText,
-                        //         onChange: (value) {
-                        //           form.control(_addressLine2Key).value = value;
-                        //         },
-                        //         initialValue:
-                        //             form.control(_addressLine2Key).value,
-                        //       ),
-                        //     ),
-                        //   ),
-                        // ),
                         householdLocationShowcaseData.landmark.buildWith(
                           child: ReactiveWrapperField(
                             formControlName: _landmarkKey,
@@ -509,37 +433,6 @@ class CustomHouseholdLocationPageState
                             ),
                           ),
                         ),
-                        // householdLocationShowcaseData.postalCode.buildWith(
-                        //   child: ReactiveWrapperField(
-                        //     formControlName: _postalCodeKey,
-                        //     validationMessages: {
-                        //       'required': (_) => localizations.translate(
-                        //             i18.common.min2CharsRequired,
-                        //           ),
-                        //       'maxLength': (object) => localizations
-                        //           .translate(i18.common.maxCharsRequired)
-                        //           .replaceAll('{}', '6'),
-                        //     },
-                        //     builder: (field) => LabeledField(
-                        //       label: localizations.translate(
-                        //         i18.householdLocation.postalCodeFormLabel,
-                        //       ),
-                        //       child: DigitTextFormInput(
-                        //         keyboardType: TextInputType.number,
-                        //         inputFormatters: [
-                        //           FilteringTextInputFormatter.digitsOnly,
-                        //         ],
-                        //         errorMessage: field.errorText,
-                        //         onChange: (value) {
-                        //           form.control(_postalCodeKey).value = value;
-                        //         },
-                        //         maxLength: 6,
-                        //         initialValue:
-                        //             form.control(_postalCodeKey).value,
-                        //       ),
-                        //     ),
-                        //   ),
-                        // ),
                       ]),
                 ),
               ],
