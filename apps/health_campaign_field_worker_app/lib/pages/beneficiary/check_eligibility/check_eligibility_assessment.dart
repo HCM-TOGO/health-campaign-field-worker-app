@@ -204,8 +204,10 @@ class _EligibilityChecklistViewPage
                               List<String?> ineligibilityReasons = [];
                               List<bool> checkIfIneligibleFlow = [];
 
-                              ifReferral =
-                                  isReferral(responses, referralReasons);
+                              ifReferral = widget.eligibilityAssessmentType ==
+                                      EligibilityAssessmentType.smc
+                                  ? isReferral(responses, referralReasons)
+                                  : isVASReferral(responses, referralReasons);
                               ifDeliver = isDelivery(responses);
                               checkIfIneligibleFlow = isIneligible(
                                 responses,
@@ -236,42 +238,38 @@ class _EligibilityChecklistViewPage
                               final shouldSubmit = await DigitDialog.show(
                                 context,
                                 options: DigitDialogOptions(
-                                  titleText: 
-                                  widget.eligibilityAssessmentType == EligibilityAssessmentType.smc ?
-                                  localizations.translate(
-                                    i18_local
-                                        .checklist.submitButtonDialogLabelText,
-                                  ):
-                                  localizations.translate(
-                                    i18_local
-                                        .deliverIntervention.proceedToVASLabel,
-                                  ),
-                                  content: 
-                                  
-                                  widget.eligibilityAssessmentType == EligibilityAssessmentType.smc ?
-                                  Text(localizations
-                                      .translate(
-                                        i18_local.checklist
-                                            .checklistDialogDynamicDescription,
-                                      )
-                                      .replaceFirst('{}', descriptionText)):
-                                  Text(localizations
-                                      .translate(
-                                        i18_local.deliverIntervention
-                                            .proceedToVASDescription,
-                                      )),
+                                  titleText: widget.eligibilityAssessmentType ==
+                                          EligibilityAssessmentType.smc
+                                      ? localizations.translate(
+                                          i18_local.checklist
+                                              .submitButtonDialogLabelText,
+                                        )
+                                      : localizations.translate(
+                                          i18_local.deliverIntervention
+                                              .proceedToVASLabel,
+                                        ),
+                                  content: widget.eligibilityAssessmentType ==
+                                          EligibilityAssessmentType.smc
+                                      ? Text(localizations
+                                          .translate(
+                                            i18_local.checklist
+                                                .checklistDialogDynamicDescription,
+                                          )
+                                          .replaceFirst('{}', descriptionText))
+                                      : Text(localizations.translate(
+                                          i18_local.deliverIntervention
+                                              .proceedToVASDescription,
+                                        )),
                                   primaryAction: DigitDialogActions(
-                                    label: 
-                                  
-                                  widget.eligibilityAssessmentType == EligibilityAssessmentType.smc ?
-                                    localizations.translate(
-                                      i18_local.checklist
-                                          .checklistDialogPrimaryAction,
-                                    ):
-                                    localizations.translate(
-                                      i18_local.common
-                                          .coreCommonProceed,
-                                    ),
+                                    label: widget.eligibilityAssessmentType ==
+                                            EligibilityAssessmentType.smc
+                                        ? localizations.translate(
+                                            i18_local.checklist
+                                                .checklistDialogPrimaryAction,
+                                          )
+                                        : localizations.translate(
+                                            i18_local.common.coreCommonProceed,
+                                          ),
                                     action: (ctx) {
                                       final referenceId = IdGen.i.identifier;
                                       List<ServiceAttributesModel> attributes =
@@ -391,21 +389,22 @@ class _EligibilityChecklistViewPage
                                       ).pop(true);
                                     },
                                   ),
-                                  secondaryAction: 
-                                  widget.eligibilityAssessmentType == EligibilityAssessmentType.smc ?
-                                  DigitDialogActions(
-                                    label: localizations.translate(
-                                      i18_local.checklist
-                                          .checklistDialogSecondaryAction,
-                                    ),
-                                    action: (context) {
-                                      Navigator.of(
-                                        context,
-                                        rootNavigator: true,
-                                      ).pop(false);
-                                    },
-                                  ):
-                                  null,
+                                  secondaryAction:
+                                      widget.eligibilityAssessmentType ==
+                                              EligibilityAssessmentType.smc
+                                          ? DigitDialogActions(
+                                              label: localizations.translate(
+                                                i18_local.checklist
+                                                    .checklistDialogSecondaryAction,
+                                              ),
+                                              action: (context) {
+                                                Navigator.of(
+                                                  context,
+                                                  rootNavigator: true,
+                                                ).pop(false);
+                                              },
+                                            )
+                                          : null,
                                 ),
                               );
                               if (shouldSubmit ?? false) {
@@ -493,15 +492,25 @@ class _EligibilityChecklistViewPage
                                               widget.eligibilityAssessmentType),
                                     );
                                   } else if (ifReferral) {
-                                    router.push(
-                                      CustomReferBeneficiarySMCRoute(
-                                        projectBeneficiaryClientRefId:
-                                            projectBeneficiaryClientReferenceId ??
-                                                "",
-                                        individual: widget.individual!,
-                                        referralReasons: referralReasons,
-                                      ),
-                                    );
+                                    widget.eligibilityAssessmentType ==
+                                            EligibilityAssessmentType.smc
+                                        ? router.push(
+                                            CustomReferBeneficiarySMCRoute(
+                                            projectBeneficiaryClientRefId:
+                                                projectBeneficiaryClientReferenceId ??
+                                                    "",
+                                            individual: widget.individual!,
+                                            referralReasons: referralReasons,
+                                          ))
+                                        : router.push(
+                                            CustomReferBeneficiaryVASRoute(
+                                              projectBeneficiaryClientRefId:
+                                                  projectBeneficiaryClientReferenceId ??
+                                                      "",
+                                              individual: widget.individual!,
+                                              referralReasons: referralReasons,
+                                            ),
+                                          );
                                   } else {
                                     router.push(CustomBeneficiaryDetailsRoute(
                                         eligibilityAssessmentType:
@@ -1029,7 +1038,7 @@ class _EligibilityChecklistViewPage
       q1Key: "SICK",
       q2Key: "FEVER",
       q4Key: "DRUG_SE_PC",
-            q6Key: "RESPIRATORY_INFECTION",
+      q6Key: "RESPIRATORY_INFECTION",
       q7Key: "TAKEN_VITAMIN_A",
       // q3Key: "DRUG_SE_PC",
     };
@@ -1048,8 +1057,49 @@ class _EligibilityChecklistViewPage
         isReferral = responses[q4Key] == yes ? true : false;
       }
       if (!isReferral &&
-          (responses.containsKey(q6Key) && responses[q6Key]!.isNotEmpty) && (responses.containsKey(q7Key) && responses[q7Key]!.isNotEmpty)) {
-        isReferral = (responses[q6Key] == yes) && (responses[q7Key] == yes) ? true : false;
+          (responses.containsKey(q6Key) && responses[q6Key]!.isNotEmpty) &&
+          (responses.containsKey(q7Key) && responses[q7Key]!.isNotEmpty)) {
+        isReferral = (responses[q6Key] == yes) && (responses[q7Key] == yes)
+            ? true
+            : false;
+      }
+    }
+    if (isReferral) {
+      for (var entry in referralKeysVsCode.entries) {
+        if (responses.containsKey(entry.key) &&
+            responses[entry.key]!.isNotEmpty) {
+          if (responses[entry.key] == yes) {
+            referralReasons.add(entry.value);
+          }
+        }
+      }
+    }
+
+    return isReferral;
+  }
+
+  bool isVASReferral(
+    Map<String?, String> responses,
+    List<String?> referralReasons,
+  ) {
+    var isReferral = false;
+    var q1Key = "KBEA5";
+    var q2Key = "KBEA6";
+    // var q3Key = "KBEA3";
+    Map<String, String> referralKeysVsCode = {
+      q1Key: "RESPIRATORY_INFECTION",
+      q2Key: "TAKEN_VITAMIN_A",
+      // q3Key: "DRUG_SE_PC",
+    };
+    // TODO Configure the reasons ,verify hardcoded strings
+
+    if (responses.isNotEmpty) {
+      if (responses.containsKey(q1Key) && responses[q1Key]!.isNotEmpty) {
+        isReferral = responses[q1Key] == yes ? true : false;
+      }
+      if (!isReferral &&
+          (responses.containsKey(q2Key) && responses[q2Key]!.isNotEmpty)) {
+        isReferral = responses[q2Key] == yes ? true : false;
       }
     }
     if (isReferral) {

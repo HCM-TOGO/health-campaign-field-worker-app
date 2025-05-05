@@ -163,10 +163,20 @@ class CustomDeliverInterventionPageState
           ),
         );
 
+    ProjectTypeModel? projectTypeModel =
+        widget.eligibilityAssessmentType == EligibilityAssessmentType.smc
+            ? RegistrationDeliverySingleton()
+                .selectedProject
+                ?.additionalDetails
+                ?.projectType
+            : RegistrationDeliverySingleton()
+                .selectedProject
+                ?.additionalDetails
+                ?.additionalProjectType;
+
     if (deliverState.futureDeliveries != null &&
         deliverState.futureDeliveries!.isNotEmpty &&
-        RegistrationDeliverySingleton().projectType?.cycles?.isNotEmpty ==
-            true) {
+        projectTypeModel?.cycles?.isNotEmpty == true) {
       context.router.popUntilRouteWithName(BeneficiaryWrapperRoute.name);
       context.router.push(
         CustomSplashAcknowledgementRoute(
@@ -229,19 +239,21 @@ class CustomDeliverInterventionPageState
                 : BlocBuilder<DeliverInterventionBloc,
                     DeliverInterventionState>(
                     builder: (context, deliveryInterventionState) {
+                      ProjectTypeModel? projectTypeModel =
+                          widget.eligibilityAssessmentType ==
+                                  EligibilityAssessmentType.smc
+                              ? RegistrationDeliverySingleton()
+                                  .selectedProject
+                                  ?.additionalDetails
+                                  ?.projectType
+                              : RegistrationDeliverySingleton()
+                                  .selectedProject
+                                  ?.additionalDetails
+                                  ?.additionalProjectType;
                       List<DeliveryProductVariant>? productVariants =
-                          RegistrationDeliverySingleton()
-                                      .selectedProject
-                                      ?.additionalDetails
-                                      ?.projectType
-                                      ?.cycles
-                                      ?.isNotEmpty ==
-                                  true
+                          projectTypeModel?.cycles?.isNotEmpty == true
                               ? (fetchProductVariant(
-                                      RegistrationDeliverySingleton()
-                                              .selectedProject
-                                              ?.additionalDetails
-                                              ?.projectType
+                                      projectTypeModel
                                               ?.cycles![
                                                   deliveryInterventionState
                                                           .cycle -
@@ -251,22 +263,15 @@ class CustomDeliverInterventionPageState
                                       state.selectedIndividual,
                                       state.householdMemberWrapper.household)
                                   ?.productVariants)
-                              : RegistrationDeliverySingleton()
-                                  .selectedProject
-                                  ?.additionalDetails
-                                  ?.projectType
-                                  ?.resources
+                              : projectTypeModel?.resources
                                   ?.map((r) => DeliveryProductVariant(
                                       productVariantId: r.productVariantId))
                                   .toList();
 
-                      final int numberOfDoses = (RegistrationDeliverySingleton()
-                                  .projectType
-                                  ?.cycles
-                                  ?.isNotEmpty ==
+                      final int numberOfDoses = (projectTypeModel
+                                  ?.cycles?.isNotEmpty ==
                               true)
-                          ? (RegistrationDeliverySingleton()
-                                  .projectType
+                          ? (projectTypeModel
                                   ?.cycles?[deliveryInterventionState.cycle - 1]
                                   .deliveries
                                   ?.length) ??
@@ -658,7 +663,6 @@ class CustomDeliverInterventionPageState
                                                         });
                                                       },
                                                     )),
-
                                               ]),
                                         ],
                                       ),
@@ -867,23 +871,23 @@ class CustomDeliverInterventionPageState
     _controllers.forEachIndexed((index, element) {
       _controllers.removeAt(index);
     });
-
+    ProjectTypeModel? projectTypeModel =
+        widget.eligibilityAssessmentType == EligibilityAssessmentType.smc
+            ? RegistrationDeliverySingleton()
+                .selectedProject
+                ?.additionalDetails
+                ?.projectType
+            : RegistrationDeliverySingleton()
+                .selectedProject
+                ?.additionalDetails
+                ?.additionalProjectType;
     // Add controllers for each product variant to the _controllers list.
     if (_controllers.isEmpty) {
-      final int r = RegistrationDeliverySingleton()
-                  .selectedProject
-                  ?.additionalDetails
-                  ?.projectType
-                  ?.cycles ==
-              null
+      final int r = projectTypeModel?.cycles == null
           ? 1
           : fetchProductVariant(
-                      RegistrationDeliverySingleton()
-                          .selectedProject
-                          ?.additionalDetails
-                          ?.projectType
-                          ?.cycles![bloc.cycle - 1]
-                          .deliveries?[bloc.dose - 1],
+                      projectTypeModel
+                          ?.cycles![bloc.cycle - 1].deliveries?[bloc.dose - 1],
                       overViewbloc.selectedIndividual,
                       overViewbloc.householdMemberWrapper.household)
                   ?.productVariants
@@ -993,18 +997,12 @@ class CustomResourceBeneficiaryCardState
                       selectedOption: DropdownItem(
                           code: (selectedVariant?.sku ?? selectedVariant?.id)
                               as String,
-                          name: widget.eligibilityAssessmentType ==
-                                  EligibilityAssessmentType.smc
-                              ? (selectedVariant?.sku ?? selectedVariant?.id)
-                                  as String
-                              : 'VAS - ${(selectedVariant?.sku ?? selectedVariant?.id) == "SPAQ 1" ? "Blue" : "Red"} Capsule'),
+                          name: (selectedVariant?.sku ?? selectedVariant?.id)
+                              as String),
                       items: productVariants
                           .map((variant) => DropdownItem(
                               code: variant.sku ?? variant.id,
-                              name: widget.eligibilityAssessmentType ==
-                                      EligibilityAssessmentType.smc
-                                  ? variant.sku ?? variant.id
-                                  : 'VAS - ${(variant.sku ?? variant.id) == "SPAQ 1" ? "Blue" : "Red"} Capsule'))
+                              name: variant.sku ?? variant.id))
                           .toList(),
                     ),
                   ),

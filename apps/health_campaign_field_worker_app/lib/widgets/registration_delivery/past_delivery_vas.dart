@@ -46,10 +46,12 @@ Widget buildTableContentVAS(
 
   // Calculate the height of the container based on the number of items in the table
 
-  final ProjectTypeModel projectType =
-      RegistrationDeliverySingleton().projectType!;
+  final ProjectTypeModel? projectType = RegistrationDeliverySingleton()
+      .selectedProject
+      ?.additionalDetails
+      ?.additionalProjectType;
   final item =
-      projectType.cycles?[currentCycle - 1].deliveries?[currentDose - 1];
+      projectType?.cycles?[currentCycle - 1].deliveries?[currentDose - 1];
   final productVariants =
       fetchProductVariant(item, individualModel, householdModel)
           ?.productVariants;
@@ -133,7 +135,7 @@ Widget buildTableContentVAS(
                         : DigitTableData('', cellKey: ''),
                     // Display the SKU value in the second column.
                     DigitTableData(
-                      'VAS - ${value == "SPAQ 1" ? "Blue" : "Red"} Capsule',
+                      value ?? "",
                       cellKey: 'resources',
                     ),
                   ]);

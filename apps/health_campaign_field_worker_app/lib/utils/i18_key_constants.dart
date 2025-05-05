@@ -170,6 +170,12 @@ class HouseholdOverView {
 
   String get householdOverViewVASDeliveredIconLabel =>
       'HOUSEHOLD_OVER_VIEW_VAS_DELIVERED_ICON_LABEL';
+
+  String get householdOverViewBeneficiaryReferredSMCLabel =>
+      'HOUSEHOLD_OVER_VIEW_BENEFICIARY_REFERRED_SMC_LABEL';
+
+  String get householdOverViewBeneficiaryReferredVACLabel =>
+      'HOUSEHOLD_OVER_VIEW_BENEFICIARY_REFERRED_VAC_LABEL';
 }
 
 class DeliverIntervention {
@@ -185,8 +191,7 @@ class DeliverIntervention {
       'DELIVER_INTERVENTION_REDOSE_QUANTITY_LABEL';
   String get dose => 'DELIVER_INTERVENTION_DOSE';
 
-  String get quantityAdministratedLabel =>
-      'QUANTITY_ADMINISTRATED_LABEL';
+  String get quantityAdministratedLabel => 'QUANTITY_ADMINISTRATED_LABEL';
 
   String get selectTheResourceDeliveredLabel =>
       'DELIVER_INTERVENTION_SELECT_RESOURCE_DELIVERED_LABEL';
@@ -199,8 +204,7 @@ class DeliverIntervention {
   String get recordsmcdeliverdetails => 'RECORD_SMC_DELIVER_DETAILS';
   String get doseadministeredby => 'DOSE_ADMINISTERED_BY';
   String get proceedToVASLabel => 'PROCEED_TO_VAS_LABEL';
-  String get proceedToVASDescription =>
-      'PROCEED_TO_VAS_DESCRIPTION';
+  String get proceedToVASDescription => 'PROCEED_TO_VAS_DESCRIPTION';
 }
 
 class Checklist {

@@ -84,6 +84,16 @@ class CustomBeneficiaryDetailsPageState
     return ProductVariantBlocWrapper(
       child: BlocBuilder<HouseholdOverviewBloc, HouseholdOverviewState>(
         builder: (context, state) {
+          ProjectTypeModel? projectType =
+              widget.eligibilityAssessmentType == EligibilityAssessmentType.smc
+                  ? RegistrationDeliverySingleton()
+                      .selectedProject
+                      ?.additionalDetails
+                      ?.projectType
+                  : RegistrationDeliverySingleton()
+                      .selectedProject
+                      ?.additionalDetails
+                      ?.additionalProjectType;
           final householdMemberWrapper = state.householdMemberWrapper;
           // Filtering project beneficiaries based on the selected individual
           final projectBeneficiary =
@@ -127,7 +137,7 @@ class CustomBeneficiaryDetailsPageState
               : '1';
 
           // [TODO] Need to move this to Bloc Lisitner or consumer
-          if (RegistrationDeliverySingleton().projectType != null) {
+          if (projectType != null) {
             bloc.add(
               DeliverInterventionEvent.setActiveCycleDose(
                 lastDose: taskData != null && taskData.isNotEmpty
@@ -143,7 +153,7 @@ class CustomBeneficiaryDetailsPageState
                         1
                     : 1,
                 individualModel: state.selectedIndividual,
-                projectType: RegistrationDeliverySingleton().projectType!,
+                projectType: projectType,
               ),
             );
           }
@@ -165,13 +175,13 @@ class CustomBeneficiaryDetailsPageState
                       body: ScrollableContent(
                         enableFixedDigitButton: true,
                         header: const Column(children: [
-                          CustomBackNavigationHelpHeaderWidget(showHelp: true,),
+                          CustomBackNavigationHelpHeaderWidget(
+                            showHelp: true,
+                          ),
                         ]),
                         footer: BlocBuilder<DeliverInterventionBloc,
                             DeliverInterventionState>(
                           builder: (context, deliverState) {
-                            final projectType =
-                                RegistrationDeliverySingleton().projectType;
                             final cycles = projectType?.cycles;
 
                             return cycles != null && cycles.isNotEmpty
@@ -198,14 +208,12 @@ class CustomBeneficiaryDetailsPageState
                                                     DeliverInterventionEvent
                                                         .selectFutureCycleDose(
                                                       dose: deliverState.dose,
-                                                      cycle:
-                                                          RegistrationDeliverySingleton()
-                                                              .projectType!
-                                                              .cycles!
-                                                              .firstWhere((c) =>
-                                                                  c.id ==
-                                                                  deliverState
-                                                                      .cycle),
+                                                      cycle: projectType!
+                                                          .cycles!
+                                                          .firstWhere((c) =>
+                                                              c.id ==
+                                                              deliverState
+                                                                  .cycle),
                                                       individualModel: state
                                                           .selectedIndividual,
                                                     ),
@@ -402,32 +410,21 @@ class CustomBeneficiaryDetailsPageState
                                   },
                                 ),
                               ]),
-                          if ((RegistrationDeliverySingleton()
-                                      .projectType
-                                      ?.cycles ??
-                                  [])
-                              .isNotEmpty)
+                          if ((projectType?.cycles ?? []).isNotEmpty)
                             DigitCard(
                                 margin: const EdgeInsets.all(spacer2),
-                                children: RegistrationDeliverySingleton()
-                                            .projectType
-                                            ?.cycles !=
-                                        null
+                                children: projectType?.cycles != null
                                     ? [
                                         BlocBuilder<DeliverInterventionBloc,
                                             DeliverInterventionState>(
                                           builder: (context, deliverState) {
                                             return Column(
                                               children: [
-                                                (RegistrationDeliverySingleton()
-                                                                .projectType
-                                                                ?.cycles ??
-                                                            [])
+                                                (projectType?.cycles ?? [])
                                                         .isNotEmpty
                                                     ? CustomRecordDeliveryCycle(
                                                         projectCycles:
-                                                            RegistrationDeliverySingleton()
-                                                                    .projectType
+                                                            projectType
                                                                     ?.cycles ??
                                                                 [],
                                                         taskData:

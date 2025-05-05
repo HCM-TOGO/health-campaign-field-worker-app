@@ -279,6 +279,23 @@ abstract class _$AppRouter extends RootStackRouter {
         ),
       );
     },
+    CustomReferBeneficiaryVASRoute.name: (routeData) {
+      final args = routeData.argsAs<CustomReferBeneficiaryVASRouteArgs>();
+      return AutoRoutePage<dynamic>(
+        routeData: routeData,
+        child: CustomReferBeneficiaryVASPage(
+          key: args.key,
+          appLocalizations: args.appLocalizations,
+          isEditing: args.isEditing,
+          projectBeneficiaryClientRefId: args.projectBeneficiaryClientRefId,
+          individual: args.individual,
+          isReadministrationUnSuccessful: args.isReadministrationUnSuccessful,
+          quantityWasted: args.quantityWasted,
+          productVariantId: args.productVariantId,
+          referralReasons: args.referralReasons,
+        ),
+      );
+    },
     CustomRegistrationDeliveryWrapperRoute.name: (routeData) {
       return AutoRoutePage<dynamic>(
         routeData: routeData,
@@ -1446,6 +1463,80 @@ class CustomReferBeneficiarySMCRouteArgs {
   @override
   String toString() {
     return 'CustomReferBeneficiarySMCRouteArgs{key: $key, appLocalizations: $appLocalizations, isEditing: $isEditing, projectBeneficiaryClientRefId: $projectBeneficiaryClientRefId, individual: $individual, isReadministrationUnSuccessful: $isReadministrationUnSuccessful, quantityWasted: $quantityWasted, productVariantId: $productVariantId, referralReasons: $referralReasons}';
+  }
+}
+
+/// generated route for
+/// [CustomReferBeneficiaryVASPage]
+class CustomReferBeneficiaryVASRoute
+    extends PageRouteInfo<CustomReferBeneficiaryVASRouteArgs> {
+  CustomReferBeneficiaryVASRoute({
+    Key? key,
+    AppLocalizations? appLocalizations,
+    bool isEditing = false,
+    required String projectBeneficiaryClientRefId,
+    required IndividualModel individual,
+    bool isReadministrationUnSuccessful = false,
+    String quantityWasted = "00",
+    String? productVariantId,
+    List<String>? referralReasons,
+    List<PageRouteInfo>? children,
+  }) : super(
+          CustomReferBeneficiaryVASRoute.name,
+          args: CustomReferBeneficiaryVASRouteArgs(
+            key: key,
+            appLocalizations: appLocalizations,
+            isEditing: isEditing,
+            projectBeneficiaryClientRefId: projectBeneficiaryClientRefId,
+            individual: individual,
+            isReadministrationUnSuccessful: isReadministrationUnSuccessful,
+            quantityWasted: quantityWasted,
+            productVariantId: productVariantId,
+            referralReasons: referralReasons,
+          ),
+          initialChildren: children,
+        );
+
+  static const String name = 'CustomReferBeneficiaryVASRoute';
+
+  static const PageInfo<CustomReferBeneficiaryVASRouteArgs> page =
+      PageInfo<CustomReferBeneficiaryVASRouteArgs>(name);
+}
+
+class CustomReferBeneficiaryVASRouteArgs {
+  const CustomReferBeneficiaryVASRouteArgs({
+    this.key,
+    this.appLocalizations,
+    this.isEditing = false,
+    required this.projectBeneficiaryClientRefId,
+    required this.individual,
+    this.isReadministrationUnSuccessful = false,
+    this.quantityWasted = "00",
+    this.productVariantId,
+    this.referralReasons,
+  });
+
+  final Key? key;
+
+  final AppLocalizations? appLocalizations;
+
+  final bool isEditing;
+
+  final String projectBeneficiaryClientRefId;
+
+  final IndividualModel individual;
+
+  final bool isReadministrationUnSuccessful;
+
+  final String quantityWasted;
+
+  final String? productVariantId;
+
+  final List<String>? referralReasons;
+
+  @override
+  String toString() {
+    return 'CustomReferBeneficiaryVASRouteArgs{key: $key, appLocalizations: $appLocalizations, isEditing: $isEditing, projectBeneficiaryClientRefId: $projectBeneficiaryClientRefId, individual: $individual, isReadministrationUnSuccessful: $isReadministrationUnSuccessful, quantityWasted: $quantityWasted, productVariantId: $productVariantId, referralReasons: $referralReasons}';
   }
 }
 

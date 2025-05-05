@@ -29,6 +29,7 @@ import '../pages/beneficiary/check_eligibility/custom_household_acknowledgement.
 import '../pages/beneficiary/check_eligibility/household_acknowledgement_smc.dart';
 import '../pages/beneficiary/check_eligibility/inventory_facility_selection_smc.dart';
 import '../pages/beneficiary/check_eligibility/refer_beneficiary_smc.dart';
+import '../pages/beneficiary/check_eligibility/refer_beneficiary_vas.dart';
 import '../pages/boundary_selection.dart';
 import '../pages/home.dart';
 import '../pages/inventory_management/custom_manage_stock.dart';
@@ -281,6 +282,10 @@ class AppRouter extends _$AppRouter {
                   AutoRoute(
                     page: CustomReferBeneficiarySMCRoute.page,
                     path: 'refer-beneficiary-smc',
+                  ),
+                  AutoRoute(
+                    page: CustomReferBeneficiaryVASRoute.page,
+                    path: 'refer-beneficiary-vas',
                   ),
                   AutoRoute(
                     page: CustomInventoryFacilitySelectionSMCRoute.page,

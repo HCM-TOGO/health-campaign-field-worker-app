@@ -142,6 +142,52 @@ bool redosePending(List<TaskModel>? tasks, ProjectCycle? selectedCycle) {
                   1000);
 }
 
+bool checkBeneficiaryReferredSMC(List<TaskModel>? tasks) {
+  if ((tasks ?? []).isEmpty) {
+    return false;
+  }
+  var successfulTask = tasks!
+      .where(
+        (element) =>
+            element.status == Status.beneficiaryReferred.toValue() &&
+            element.additionalFields?.fields.firstWhereOrNull(
+                  (e) =>
+                      e.key ==
+                          additional_fields_local
+                              .AdditionalFieldsType.deliveryType
+                              .toValue() &&
+                      e.value == EligibilityAssessmentStatus.smcDone.name,
+                ) !=
+                null,
+      )
+      .lastOrNull;
+
+  return successfulTask != null;
+}
+
+bool checkBeneficiaryReferredVAS(List<TaskModel>? tasks) {
+  if ((tasks ?? []).isEmpty) {
+    return false;
+  }
+  var successfulTask = tasks!
+      .where(
+        (element) =>
+            element.status == Status.beneficiaryReferred.toValue() &&
+            element.additionalFields?.fields.firstWhereOrNull(
+                  (e) =>
+                      e.key ==
+                          additional_fields_local
+                              .AdditionalFieldsType.deliveryType
+                              .toValue() &&
+                      e.value == EligibilityAssessmentStatus.vasDone.name,
+                ) !=
+                null,
+      )
+      .lastOrNull;
+
+  return successfulTask != null;
+}
+
 bool assessmentSMCPending(List<TaskModel>? tasks) {
   // this task confirms eligibility and dose administrations is done
   if ((tasks ?? []).isEmpty) {
