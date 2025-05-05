@@ -111,11 +111,23 @@ class CustomMemberCard extends StatelessWidget {
     bool isBeneficiaryReferredSMC = checkBeneficiaryReferredSMC(smcTasks);
     bool isBeneficiaryReferredVAS = checkBeneficiaryReferredVAS(vasTasks);
     final theme = Theme.of(context);
-    if (!isHead &&
-        (isSMCDelivered ||
-            isVASDelivered ||
-            isBeneficiaryReferredSMC ||
-            isBeneficiaryReferredVAS)) {
+    if (isHead) {
+      return Align(
+        alignment: Alignment.centerLeft,
+        child: DigitIconButton(
+          icon: Icons.info_rounded,
+          iconSize: 20,
+          iconText: localizations.translate(i18_local
+              .householdOverView.householdOverViewHouseholderHeadLabel),
+          iconTextColor: theme.colorScheme.error,
+          iconColor: theme.colorScheme.error,
+        ),
+      );
+    }
+    if ((isSMCDelivered ||
+        isVASDelivered ||
+        isBeneficiaryReferredSMC ||
+        isBeneficiaryReferredVAS)) {
       return Column(
         children: [
           if (isSMCDelivered || isBeneficiaryReferredSMC)
@@ -131,8 +143,12 @@ class CustomMemberCard extends StatelessWidget {
                           .householdOverViewSMCDeliveredIconLabel,
                 ),
                 iconSize: 20,
-                iconTextColor: DigitTheme.instance.colorScheme.onSurfaceVariant,
-                iconColor: DigitTheme.instance.colorScheme.onSurfaceVariant,
+                iconTextColor: isBeneficiaryReferredSMC
+                    ? DigitTheme.instance.colorScheme.error
+                    : DigitTheme.instance.colorScheme.onSurfaceVariant,
+                iconColor: isBeneficiaryReferredSMC
+                    ? DigitTheme.instance.colorScheme.error
+                    : DigitTheme.instance.colorScheme.onSurfaceVariant,
               ),
             ),
           if (isVASDelivered || isBeneficiaryReferredVAS)
@@ -143,13 +159,17 @@ class CustomMemberCard extends StatelessWidget {
                 iconText: localizations.translate(
                   isBeneficiaryReferredVAS
                       ? i18_local.householdOverView
-                          .householdOverViewBeneficiaryReferredVACLabel
+                          .householdOverViewBeneficiaryReferredVASLabel
                       : i18_local.householdOverView
                           .householdOverViewVASDeliveredIconLabel,
                 ),
                 iconSize: 20,
-                iconTextColor: DigitTheme.instance.colorScheme.onSurfaceVariant,
-                iconColor: DigitTheme.instance.colorScheme.onSurfaceVariant,
+                iconTextColor: isBeneficiaryReferredVAS
+                    ? DigitTheme.instance.colorScheme.error
+                    : DigitTheme.instance.colorScheme.onSurfaceVariant,
+                iconColor: isBeneficiaryReferredVAS
+                    ? DigitTheme.instance.colorScheme.error
+                    : DigitTheme.instance.colorScheme.onSurfaceVariant,
               ),
             ),
         ],
@@ -163,10 +183,8 @@ class CustomMemberCard extends StatelessWidget {
               child: DigitIconButton(
                 icon: Icons.info_rounded,
                 iconSize: 20,
-                iconText: localizations.translate(isHead
-                    ? i18_local
-                        .householdOverView.householdOverViewHouseholderHeadLabel
-                    : (isNotEligibleSMC || isBeneficiaryIneligible)
+                iconText: localizations.translate(
+                    (isNotEligibleSMC || isBeneficiaryIneligible)
                         ? i18.householdOverView
                             .householdOverViewNotEligibleIconLabel
                         : ""),

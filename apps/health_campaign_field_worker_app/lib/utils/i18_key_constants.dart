@@ -174,8 +174,8 @@ class HouseholdOverView {
   String get householdOverViewBeneficiaryReferredSMCLabel =>
       'HOUSEHOLD_OVER_VIEW_BENEFICIARY_REFERRED_SMC_LABEL';
 
-  String get householdOverViewBeneficiaryReferredVACLabel =>
-      'HOUSEHOLD_OVER_VIEW_BENEFICIARY_REFERRED_VAC_LABEL';
+  String get householdOverViewBeneficiaryReferredVASLabel =>
+      'HOUSEHOLD_OVER_VIEW_BENEFICIARY_REFERRED_VAS_LABEL';
 }
 
 class DeliverIntervention {
