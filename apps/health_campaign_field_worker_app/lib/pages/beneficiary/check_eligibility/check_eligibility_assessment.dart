@@ -236,20 +236,41 @@ class _EligibilityChecklistViewPage
                               final shouldSubmit = await DigitDialog.show(
                                 context,
                                 options: DigitDialogOptions(
-                                  titleText: localizations.translate(
+                                  titleText: 
+                                  widget.eligibilityAssessmentType == EligibilityAssessmentType.smc ?
+                                  localizations.translate(
                                     i18_local
                                         .checklist.submitButtonDialogLabelText,
+                                  ):
+                                  localizations.translate(
+                                    i18_local
+                                        .deliverIntervention.proceedToVASLabel,
                                   ),
-                                  content: Text(localizations
+                                  content: 
+                                  
+                                  widget.eligibilityAssessmentType == EligibilityAssessmentType.smc ?
+                                  Text(localizations
                                       .translate(
                                         i18_local.checklist
                                             .checklistDialogDynamicDescription,
                                       )
-                                      .replaceFirst('{}', descriptionText)),
+                                      .replaceFirst('{}', descriptionText)):
+                                  Text(localizations
+                                      .translate(
+                                        i18_local.deliverIntervention
+                                            .proceedToVASDescription,
+                                      )),
                                   primaryAction: DigitDialogActions(
-                                    label: localizations.translate(
+                                    label: 
+                                  
+                                  widget.eligibilityAssessmentType == EligibilityAssessmentType.smc ?
+                                    localizations.translate(
                                       i18_local.checklist
                                           .checklistDialogPrimaryAction,
+                                    ):
+                                    localizations.translate(
+                                      i18_local.common
+                                          .coreCommonProceed,
                                     ),
                                     action: (ctx) {
                                       final referenceId = IdGen.i.identifier;
@@ -370,7 +391,9 @@ class _EligibilityChecklistViewPage
                                       ).pop(true);
                                     },
                                   ),
-                                  secondaryAction: DigitDialogActions(
+                                  secondaryAction: 
+                                  widget.eligibilityAssessmentType == EligibilityAssessmentType.smc ?
+                                  DigitDialogActions(
                                     label: localizations.translate(
                                       i18_local.checklist
                                           .checklistDialogSecondaryAction,
@@ -381,7 +404,8 @@ class _EligibilityChecklistViewPage
                                         rootNavigator: true,
                                       ).pop(false);
                                     },
-                                  ),
+                                  ):
+                                  null,
                                 ),
                               );
                               if (shouldSubmit ?? false) {
@@ -494,18 +518,6 @@ class _EligibilityChecklistViewPage
                                         submitTriggered: true,
                                       ),
                                     );
-
-                                // Request location from LocationBloc
-                                // context
-                                //     .read<location.LocationBloc>()
-                                //     .add(const location.LocationEvent.load());
-                                // DigitComponentsUtils()
-                                //     .showLocationCapturingDialog(
-                                //   context,
-                                //   localizations.translate(
-                                //       i18_local.common.locationCapturing),
-                                //   DigitSyncDialogType.inProgress,
-                                // );
                               }
                             },
                             child: Text(
@@ -647,16 +659,6 @@ class _EligibilityChecklistViewPage
                                                                   .split('.')
                                                                   .contains(e),
                                                           onChanged: (value) {
-                                                            // context
-                                                            //     .read<ServiceBloc>()
-                                                            //     .add(
-                                                            //       ServiceChecklistEvent(
-                                                            //         value:
-                                                            //             e.toString(),
-                                                            //         submitTriggered:
-                                                            //             submitTriggered,
-                                                            //       ),
-                                                            //     );
                                                             final String ele;
                                                             var val =
                                                                 controller[
@@ -766,14 +768,7 @@ class _EligibilityChecklistViewPage
                   return RadioGroup<String>.builder(
                     groupValue: controller[index].text.trim(),
                     onChanged: (value) {
-                      // context.read<ServiceBloc>().add(
-                      //       ServiceChecklistEvent(
-                      //         value: Random().nextInt(100).toString(),
-                      //         submitTriggered: submitTriggered,
-                      //       ),
-                      //     );
                       setState(() {
-                        // Clear child controllers and update visibility
                         for (final matchingChildItem in childItems) {
                           final childIndex =
                               initialAttributes?.indexOf(matchingChildItem);
@@ -925,12 +920,6 @@ class _EligibilityChecklistViewPage
                           label: e,
                           value: controller[index].text.split('.').contains(e),
                           onChanged: (value) {
-                            // context.read<ServiceBloc>().add(
-                            //       ServiceChecklistEvent(
-                            //         value: e.toString(),
-                            //         submitTriggered: submitTriggered,
-                            //       ),
-                            //     );
                             final String ele;
                             var val = controller[index].text.split('.');
                             if (val.contains(e)) {
@@ -966,9 +955,14 @@ class _EligibilityChecklistViewPage
     var isIneligible = false;
     var q3Key = "KBEA3";
     var q5Key = "KBEA4";
+    var q6Key = "KBEA5";
+    var q7Key = "KBEA6";
+
     Map<String, String> keyVsReason = {
       q3Key: "NOT_ADMINISTERED_IN_PREVIOUS_CYCLE",
       q5Key: "CHILD_ON_MEDICATION_1",
+      q6Key: "RESPIRATORY_INFECTION",
+      q7Key: "TAKEN_VITAMIN_A",
     };
     final individualModel = widget.individual;
 
@@ -997,6 +991,14 @@ class _EligibilityChecklistViewPage
           (responses.containsKey(q5Key) && responses[q5Key]!.isNotEmpty)) {
         isIneligible = responses[q5Key] == yes ? true : false;
       }
+      //       if (!isIneligible &&
+      //     (responses.containsKey(q6Key) && responses[q6Key]!.isNotEmpty)) {
+      //   isIneligible = responses[q6Key] == yes ? true : false;
+      // }
+      //       if (!isIneligible &&
+      //     (responses.containsKey(q7Key) && responses[q7Key]!.isNotEmpty)) {
+      //   isIneligible = responses[q7Key] == yes ? true : false;
+      // }
       // passing all the reasons which have response as true
       if (isIneligible) {
         for (var entry in responses.entries) {
@@ -1020,11 +1022,15 @@ class _EligibilityChecklistViewPage
     var q1Key = "KBEA1";
     var q2Key = "KBEA2";
     var q4Key = "KBEA3.NO.ADT1";
+    var q6Key = "KBEA5";
+    var q7Key = "KBEA6";
     // var q3Key = "KBEA3";
     Map<String, String> referralKeysVsCode = {
       q1Key: "SICK",
       q2Key: "FEVER",
       q4Key: "DRUG_SE_PC",
+            q6Key: "RESPIRATORY_INFECTION",
+      q7Key: "TAKEN_VITAMIN_A",
       // q3Key: "DRUG_SE_PC",
     };
     // TODO Configure the reasons ,verify hardcoded strings
@@ -1040,6 +1046,10 @@ class _EligibilityChecklistViewPage
       if (!isReferral &&
           (responses.containsKey(q4Key) && responses[q4Key]!.isNotEmpty)) {
         isReferral = responses[q4Key] == yes ? true : false;
+      }
+      if (!isReferral &&
+          (responses.containsKey(q6Key) && responses[q6Key]!.isNotEmpty) && (responses.containsKey(q7Key) && responses[q7Key]!.isNotEmpty)) {
+        isReferral = (responses[q6Key] == yes) && (responses[q7Key] == yes) ? true : false;
       }
     }
     if (isReferral) {

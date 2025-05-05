@@ -35,6 +35,7 @@ import '../../../utils/app_enums.dart';
 import '../../../utils/i18_key_constants.dart' as i18_local;
 import '../../../models/entities/additional_fields_type.dart'
     as additional_fields_local;
+import '../../../widgets/custom_back_navigation.dart';
 
 @RoutePage()
 class CustomDeliverInterventionPage extends LocalizedStatefulWidget {
@@ -487,8 +488,9 @@ class CustomDeliverInterventionPageState
                                       Padding(
                                         padding:
                                             EdgeInsets.only(bottom: spacer2),
-                                        child: BackNavigationHelpHeaderWidget(
-                                          showHelp: false,
+                                        child:
+                                            CustomBackNavigationHelpHeaderWidget(
+                                          showHelp: true,
                                         ),
                                       ),
                                     ]),
@@ -508,8 +510,8 @@ class CustomDeliverInterventionPageState
                                                       .copyWith(
                                                           color: theme
                                                               .colorTheme
-                                                              .primary
-                                                              .primary2),
+                                                              .text
+                                                              .primary),
                                                 ),
                                                 if (RegistrationDeliverySingleton()
                                                         .beneficiaryType ==
@@ -622,8 +624,8 @@ class CustomDeliverInterventionPageState
                                                       .copyWith(
                                                           color: theme
                                                               .colorTheme
-                                                              .primary
-                                                              .primary2),
+                                                              .text
+                                                              .primary),
                                                 ),
                                                 ..._controllers.map((e) =>
                                                     CustomResourceBeneficiaryCard(
@@ -656,39 +658,7 @@ class CustomDeliverInterventionPageState
                                                         });
                                                       },
                                                     )),
-                                                // Center(
-                                                //   child: DigitButton(
-                                                //     label:
-                                                //         localizations.translate(
-                                                //       i18.deliverIntervention
-                                                //           .resourceAddBeneficiary,
-                                                //     ),
-                                                //     type: DigitButtonType
-                                                //         .tertiary,
-                                                //     size:
-                                                //         DigitButtonSize.medium,
-                                                //     isDisabled: ((form.control(_resourceDeliveredKey)
-                                                //                             as FormArray)
-                                                //                         .value ??
-                                                //                     [])
-                                                //                 .length <
-                                                //             (productVariants ??
-                                                //                     [])
-                                                //                 .length
-                                                //         ? false
-                                                //         : true,
-                                                //     onPressed: () async {
-                                                //       addController(form);
-                                                //       setState(() {
-                                                //         _controllers.add(
-                                                //           _controllers.length,
-                                                //         );
-                                                //       });
-                                                //     },
-                                                //     prefixIcon:
-                                                //         Icons.add_circle,
-                                                //   ),
-                                                // ),
+
                                               ]),
                                         ],
                                       ),
@@ -1000,47 +970,72 @@ class CustomResourceBeneficiaryCardState
       BlocBuilder<ProductVariantBloc, ProductVariantState>(
         builder: (context, productState) {
           return productState.maybeWhen(
-              orElse: () => const Offstage(),
-              fetched: (productVariants) {
-                var variant = widget.form
-                    .control('resourceDelivered.${widget.cardIndex}')
-                    .value;
-                return LabeledField(
-                  label: localizations.translate(
-                    i18_local
-                        .deliverIntervention.selectTheResourceDeliveredLabel,
+            orElse: () => const Offstage(),
+            fetched: (productVariants) {
+              final selectedVariant = widget.form
+                  .control('resourceDelivered.${widget.cardIndex}')
+                  .value as ProductVariantModel?;
+              return Column(
+                children: [
+                  LabeledField(
+                    isRequired: true,
+                    label: localizations.translate(
+                      i18_local
+                          .deliverIntervention.selectTheResourcDeliveredLabel,
+                    ),
+                    labelStyle: TextStyle(
+                      color: Theme.of(context).colorTheme.text.secondary,
+                      fontSize: 16,
+                    ),
+                    child: DigitDropdown(
+                      isDisabled: true,
+                      readOnly: true,
+                      selectedOption: DropdownItem(
+                          code: (selectedVariant?.sku ?? selectedVariant?.id)
+                              as String,
+                          name: widget.eligibilityAssessmentType ==
+                                  EligibilityAssessmentType.smc
+                              ? (selectedVariant?.sku ?? selectedVariant?.id)
+                                  as String
+                              : 'VAS - ${(selectedVariant?.sku ?? selectedVariant?.id) == "SPAQ 1" ? "Blue" : "Red"} Capsule'),
+                      items: productVariants
+                          .map((variant) => DropdownItem(
+                              code: variant.sku ?? variant.id,
+                              name: widget.eligibilityAssessmentType ==
+                                      EligibilityAssessmentType.smc
+                                  ? variant.sku ?? variant.id
+                                  : 'VAS - ${(variant.sku ?? variant.id) == "SPAQ 1" ? "Blue" : "Red"} Capsule'))
+                          .toList(),
+                    ),
                   ),
-                  isRequired: true,
-                  child: DigitTextFormInput(
-                    suffixIcon: Icons.arrow_drop_down,
-                    readOnly: true,
-                    initialValue: widget.eligibilityAssessmentType ==
-                            EligibilityAssessmentType.smc
-                        ? variant.sku ?? variant.id
-                        : 'VAS - ${(variant.sku ?? variant.id) == "SPAQ 1" ? "Blue" : "Red"} Capsule',
+                  const SizedBox(height: spacer4),
+                  ReactiveWrapperField(
+                    formControlName: 'quantityDistributed.${widget.cardIndex}',
+                    builder: (field) => LabeledField(
+                      isRequired: true,
+                      label: localizations.translate(
+                        i18_local
+                            .deliverIntervention.quantityAdministratedLabel,
+                      ),
+                      child: DigitNumericFormInput(
+                        isDisabled: true,
+                        minValue: 1,
+                        step: 1,
+                        initialValue: "1",
+                        onChange: (value) {
+                          widget.form
+                              .control(
+                                  'quantityDistributed.${widget.cardIndex}')
+                              .value = int.parse(value);
+                        },
+                      ),
+                    ),
                   ),
-                );
-              });
-        },
-      ),
-      ReactiveWrapperField(
-        formControlName: 'quantityDistributed.${widget.cardIndex}',
-        builder: (field) => LabeledField(
-          label: localizations.translate(
-            i18_local.deliverIntervention.quantityAdministratedLabel,
-          ),
-          isRequired: true,
-          child: DigitNumericFormInput(
-            minValue: 1,
-            step: 1,
-            initialValue: "1",
-            onChange: (value) {
-              widget.form
-                  .control('quantityDistributed.${widget.cardIndex}')
-                  .value = int.parse(value);
+                ],
+              );
             },
-          ),
-        ),
+          );
+        },
       ),
     ]);
   }

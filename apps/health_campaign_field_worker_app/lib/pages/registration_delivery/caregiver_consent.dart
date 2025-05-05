@@ -18,7 +18,6 @@ import 'package:registration_delivery/models/entities/household.dart';
 import 'package:registration_delivery/router/registration_delivery_router.gm.dart';
 import 'package:registration_delivery/utils/i18_key_constants.dart' as i18;
 import 'package:registration_delivery/utils/utils.dart';
-import 'package:registration_delivery/widgets/back_navigation_help_header.dart';
 import 'package:registration_delivery/widgets/localized.dart';
 import 'package:registration_delivery/widgets/showcase/config/showcase_constants.dart';
 import 'package:registration_delivery/widgets/showcase/showcase_button.dart';
@@ -28,6 +27,7 @@ import '../../router/app_router.dart';
 import '../../utils/environment_config.dart';
 import '../../utils/extensions/extensions.dart';
 import '../../utils/i18_key_constants.dart' as i18_local;
+import '../../utils/registration_delivery/registration_delivery_utils.dart';
 import 'custom_beneficiary_acknowledgement.dart';
 
 enum CaregiverConsentEnum {
@@ -50,10 +50,12 @@ class CaregiverConsentPageState extends LocalizedState<CaregiverConsentPage> {
   CaregiverConsentEnum selectedConsent = CaregiverConsentEnum.yes;
   final clickedStatus = ValueNotifier<bool>(false);
 
-  onSubmit(HouseholdModel? householdModel, AddressModel? addressModel) {
+  onSubmit(HouseholdModel? householdModel, AddressModel? addressModel) async {
     final bloc = context.read<CustomBeneficiaryRegistrationBloc>();
     final router = context.router;
     var household = householdModel;
+    final  String householdid = await  generateHouseholdId();
+    
     household ??= HouseholdModel(
       tenantId: RegistrationDeliverySingleton().tenantId,
       clientReferenceId:
@@ -96,6 +98,7 @@ class CaregiverConsentPageState extends LocalizedState<CaregiverConsentPage> {
           lastModifiedTime: context.millisecondsSinceEpoch(),
         ),
         address: addressModel,
+        id: householdid,
         additionalFields: HouseholdAdditionalFields(version: 1, fields: [
           const AdditionalField(
             "caregiver_consent_registration",
@@ -113,8 +116,32 @@ class CaregiverConsentPageState extends LocalizedState<CaregiverConsentPage> {
     router.popUntil(
         (route) => route.settings.name == SearchBeneficiaryRoute.name);
     context.router.push(CustomBeneficiaryAcknowledgementRoute(
+        enableViewHousehold: true,
         acknowledgementType: AcknowledgementType.addHousehold));
   }
+
+  Future<String> generateHouseholdId() async {
+  final userId = RegistrationDeliverySingleton().loggedInUserUuid;
+
+  final boundaryBloc = context.read<BoundaryBloc>().state;
+  final code = boundaryBloc.boundaryList.first.code;
+  final bname = boundaryBloc.boundaryList.first.name;
+
+  final locality = (code == null || bname == null)
+      ? null
+      : LocalityModel(code: code, name: bname);
+
+  final localityCode = locality!.code;
+
+  final ids = await UniqueIdGeneration().generateUniqueId(
+    localityCode: localityCode,
+    loggedInUserId: userId!,
+    returnCombinedIds: false,
+  );
+
+  return ids.first;
+}
+
 
   @override
   Widget build(BuildContext context) {
@@ -129,10 +156,10 @@ class CaregiverConsentPageState extends LocalizedState<CaregiverConsentPage> {
           BeneficiaryRegistrationState>(builder: (context, registrationState) {
         return ScrollableContent(
           enableFixedDigitButton: true,
-          header: Column(
+          header: const Column(
             children: [
               Padding(
-                padding: const EdgeInsets.only(bottom: spacer2),
+                padding: EdgeInsets.only(bottom: spacer2),
                 child: CustomBackNavigationHelpHeaderWidget(
                   showHelp: true,
                 ),
