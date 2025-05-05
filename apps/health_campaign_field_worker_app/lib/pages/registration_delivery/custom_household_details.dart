@@ -28,6 +28,7 @@ import 'package:registration_delivery/widgets/showcase/showcase_button.dart';
 
 import '../../blocs/registration_delivery/custom_beneficairy_registration.dart';
 import '../../router/app_router.dart';
+import '../../utils/registration_delivery/registration_delivery_utils.dart';
 
 @RoutePage()
 class CustomHouseHoldDetailsPage extends LocalizedStatefulWidget {
@@ -45,8 +46,6 @@ class CustomHouseHoldDetailsPageState
     extends LocalizedState<CustomHouseHoldDetailsPage> {
   static const _dateOfRegistrationKey = 'dateOfRegistration';
   static const _memberCountKey = 'memberCount';
-  // static const _pregnantWomenCountKey = 'pregnantWomenCount';
-  // static const _childrenCountKey = 'childrenCount';
 
   // Define controllers
   final TextEditingController _pregnantWomenController =
@@ -70,6 +69,28 @@ class CustomHouseHoldDetailsPageState
     final textTheme = theme.digitTextTheme(context);
     final bool isCommunity = RegistrationDeliverySingleton().householdType ==
         HouseholdType.community;
+
+      Future<String> generateHouseholdId() async {
+        final userId = RegistrationDeliverySingleton().loggedInUserUuid;
+
+        final boundaryBloc = context.read<BoundaryBloc>().state;
+        final code = boundaryBloc.boundaryList.first.code;
+        final bname = boundaryBloc.boundaryList.first.name;
+
+        final locality = (code == null || bname == null)
+            ? null
+            : LocalityModel(code: code, name: bname);
+
+        final localityCode = locality!.code;
+
+        final ids = await UniqueIdGeneration().generateUniqueId(
+          localityCode: localityCode,
+          loggedInUserId: userId!,
+          returnCombinedIds: false,
+        );
+
+        return ids.first;
+      }
 
     return Scaffold(
       body: ReactiveFormBuilder(
@@ -150,8 +171,10 @@ class CustomHouseHoldDetailsPageState
                               searchQuery,
                               loading,
                               isHeadOfHousehold,
-                            ) {
+                            ) async {
+                              final  String householdid = await  generateHouseholdId();
                               var household = householdModel;
+     
                               household ??= HouseholdModel(
                                 tenantId:
                                     RegistrationDeliverySingleton().tenantId,
@@ -216,6 +239,7 @@ class CustomHouseHoldDetailsPageState
                                         context.millisecondsSinceEpoch(),
                                   ),
                                   address: addressModel,
+                                  id: householdid,
                                   additionalFields: HouseholdAdditionalFields(
                                       version: 1, fields: []));
 
@@ -338,7 +362,7 @@ class CustomHouseHoldDetailsPageState
                                     i18.householdDetails.householdDetailsLabel,
                                   ),
                             headingStyle: textTheme.headingXl.copyWith(
-                                color: theme.colorTheme.primary.primary2),
+                                color: theme.colorTheme.text.primary),
                           ),
                           householdDetailsShowcaseData.dateOfRegistration
                               .buildWith(

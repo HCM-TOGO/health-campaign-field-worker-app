@@ -9,6 +9,7 @@ import 'package:digit_ui_components/widgets/molecules/digit_card.dart';
 import 'package:digit_ui_components/widgets/molecules/show_pop_up.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:health_campaign_field_worker_app/widgets/custom_back_navigation.dart';
 import 'package:health_campaign_field_worker_app/widgets/registration_delivery/past_delivery_smc.dart';
 import 'package:intl/intl.dart';
 import 'package:recase/recase.dart';
@@ -34,6 +35,7 @@ import 'package:registration_delivery/widgets/table_card/table_card.dart';
 import 'package:registration_delivery/pages/beneficiary/widgets/record_delivery_cycle.dart';
 
 import '../../../widgets/registration_delivery/past_delivery_vas.dart';
+import 'custom_record_delivery_cycle.dart';
 
 @RoutePage()
 class CustomBeneficiaryDetailsPage extends LocalizedStatefulWidget {
@@ -163,7 +165,7 @@ class CustomBeneficiaryDetailsPageState
                       body: ScrollableContent(
                         enableFixedDigitButton: true,
                         header: const Column(children: [
-                          BackNavigationHelpHeaderWidget(showHelp: true,),
+                          CustomBackNavigationHelpHeaderWidget(showHelp: true,),
                         ]),
                         footer: BlocBuilder<DeliverInterventionBloc,
                             DeliverInterventionState>(
@@ -307,7 +309,7 @@ class CustomBeneficiaryDetailsPageState
                                           : i18_local.deliverIntervention
                                               .deliverVASIntervention),
                                   style: textTheme.headingXl.copyWith(
-                                      color: theme.colorTheme.primary.primary2),
+                                      color: theme.colorTheme.text.primary),
                                 ),
                                 DigitTableCard(
                                   element: {
@@ -422,7 +424,7 @@ class CustomBeneficiaryDetailsPageState
                                                                 ?.cycles ??
                                                             [])
                                                         .isNotEmpty
-                                                    ? RecordDeliveryCycle(
+                                                    ? CustomRecordDeliveryCycle(
                                                         projectCycles:
                                                             RegistrationDeliverySingleton()
                                                                     .projectType

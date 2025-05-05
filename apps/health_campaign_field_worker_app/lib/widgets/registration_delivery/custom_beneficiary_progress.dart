@@ -143,7 +143,7 @@ class CustomProgressIndicatorContainer extends StatelessWidget {
                 backgroundColor: theme.colorTheme.generic.background,
                 valueColor: valueColor ??
                     AlwaysStoppedAnimation<Color>(
-                      theme.colorTheme.primary.primary1,
+                      theme.colorTheme.alert.success,
                     ),
                 value: value,
                 minHeight: 7.0,

@@ -2,6 +2,8 @@ import 'package:auto_route/auto_route.dart';
 import 'package:collection/collection.dart';
 import 'package:dart_mappable/dart_mappable.dart';
 import 'package:digit_components/utils/date_utils.dart' as digits;
+import 'package:digit_ui_components/theme/ComponentTheme/checkbox_theme.dart';
+import '../../widgets/custom_back_navigation.dart';
 import 'package:digit_data_model/data_model.dart';
 import 'package:digit_data_model/models/entities/household_type.dart';
 import 'package:digit_scanner/blocs/scanner.dart';
@@ -20,7 +22,7 @@ import 'package:digit_components/widgets/atoms/digit_dropdown.dart' as dropdown;
 import 'package:health_campaign_field_worker_app/blocs/app_initialization/app_initialization.dart';
 import 'package:health_campaign_field_worker_app/models/app_config/app_config_model.dart';
 import 'package:health_campaign_field_worker_app/widgets/date/custom_digit_dob_picker.dart';
-import 'package:health_campaign_field_worker_app/widgets/header/custom_back_button.dart';
+// import 'package:health_campaign_field_worker_app/widgets/header/custom_back_button.dart';
 import 'package:intl/intl.dart';
 import 'package:reactive_forms/reactive_forms.dart';
 import 'package:registration_delivery/blocs/search_households/search_bloc_common_wrapper.dart';
@@ -33,7 +35,7 @@ import 'package:registration_delivery/blocs/household_overview/household_overvie
 import 'package:registration_delivery/router/registration_delivery_router.gm.dart';
 import 'package:registration_delivery/utils/i18_key_constants.dart' as i18;
 import 'package:registration_delivery/utils/utils.dart';
-import 'package:registration_delivery/widgets/back_navigation_help_header.dart';
+// import 'package:registration_delivery/widgets/back_navigation_help_header.dart';
 import 'package:registration_delivery/widgets/localized.dart';
 import 'package:registration_delivery/widgets/showcase/config/showcase_constants.dart';
 import 'package:registration_delivery/widgets/showcase/showcase_button.dart';
@@ -63,8 +65,6 @@ class CustomIndividualDetailsPage extends LocalizedStatefulWidget {
 class CustomIndividualDetailsPageState
     extends LocalizedState<CustomIndividualDetailsPage> {
   static const _individualNameKey = 'individualName';
-  // static const _idTypeKey = 'idType';
-  // static const _idNumberKey = 'idNumber';
   static const _dobKey = 'dob';
   static const _genderKey = 'gender';
   static const _mobileNumberKey = 'mobileNumber';
@@ -144,9 +144,9 @@ class CustomIndividualDetailsPageState
               header: Column(children: [
                 Padding(
                   padding: const EdgeInsets.only(bottom: spacer2),
-                  child: CustomeBackNavigationHelpHeaderWidget(
-                    showHelp: false,
-                    handleBack: () {
+                  child: CustomBackNavigationHelpHeaderWidget(
+                    showHelp: true,
+                    handleback: () {
                       if (isEditIndividual) {
                         final parent = context.router.parent() as StackRouter;
                         parent.maybePop();
@@ -319,79 +319,6 @@ class CustomIndividualDetailsPageState
                                     await onSubmit(
                                         individual.name?.givenName ?? "", true);
 
-                                    // final submit = await showDialog(
-                                    //   context: context,
-                                    //   builder: (ctx) => Popup(
-                                    //     title: localizations.translate(
-                                    //       i18.deliverIntervention.dialogTitle,
-                                    //     ),
-                                    //     description: localizations.translate(
-                                    //       i18.deliverIntervention.dialogContent,
-                                    //     ),
-                                    //     actions: [
-                                    //       DigitButton(
-                                    //           label: localizations.translate(
-                                    //             i18.common.coreCommonSubmit,
-                                    //           ),
-                                    //           onPressed: () {
-                                    //             clickedStatus.value = true;
-                                    //             Navigator.of(
-                                    //               context,
-                                    //               rootNavigator: true,
-                                    //             ).pop(true);
-                                    //           },
-                                    //           type: DigitButtonType.primary,
-                                    //           size: DigitButtonSize.large),
-                                    //       DigitButton(
-                                    //           label: localizations.translate(
-                                    //             i18.common.coreCommonCancel,
-                                    //           ),
-                                    //           onPressed: () => Navigator.of(
-                                    //                 context,
-                                    //                 rootNavigator: true,
-                                    //               ).pop(false),
-                                    //           type: DigitButtonType.secondary,
-                                    //           size: DigitButtonSize.large)
-                                    //     ],
-                                    //   ),
-                                    // );
-
-                                    // if (submit ?? false) {
-                                    //   if (context.mounted) {
-                                    //     bloc.add(
-                                    //       BeneficiaryRegistrationCreateEvent(
-                                    //           projectId: projectId,
-                                    //           userUuid: userId,
-                                    //           boundary:
-                                    //               RegistrationDeliverySingleton()
-                                    //                   .boundary!,
-                                    //           tag: projectBeneficiaryModel?.tag,
-                                    //           navigateToSummary: false),
-                                    //     );
-                                    //     router.popUntil((route) =>
-                                    //         route.settings.name ==
-                                    //         SearchBeneficiaryRoute.name);
-                                    //     context
-                                    //         .read<SearchBlocWrapper>()
-                                    //         .searchHouseholdsBloc
-                                    //         .add(
-                                    //           SearchHouseholdsEvent
-                                    //               .searchByHousehold(
-                                    //             householdModel: householdModel!,
-                                    //             projectId:
-                                    //                 RegistrationDeliverySingleton()
-                                    //                     .projectId!,
-                                    //             isProximityEnabled: false,
-                                    //           ),
-                                    //         );
-                                    //     router.push(
-                                    //         CustomBeneficiaryAcknowledgementRoute(
-                                    //       enableViewHousehold: true,
-                                    //       beneficiaryId:
-                                    //           beneficiaryId?.first ?? "",
-                                    //     ));
-                                    //   }
-                                    // }
                                   }
                                 },
                                 editIndividual: (
@@ -585,62 +512,12 @@ class CustomIndividualDetailsPageState
                                       ),
                                 value: widget.isHeadOfHousehold,
                                 readOnly: widget.isHeadOfHousehold,
+                                checkboxThemeData: DigitCheckboxThemeData(disabledIconColor: theme.colorTheme.primary.primary1),
                                 onChanged: (_) {},
                               ),
                             ),
                           ],
                         ),
-
-                        // ReactiveWrapperField(
-                        //   formControlName: _idTypeKey,
-                        //   validationMessages: {
-                        //     'required': (_) => localizations.translate(
-                        //           i18.common.corecommonRequired,
-                        //         ),
-                        //   },
-                        //   builder: (field) => LabeledField(
-                        //     label: localizations.translate(
-                        //       i18.individualDetails.idTypeLabelText,
-                        //     ),
-                        //     capitalizedFirstLetter: false,
-                        //     isRequired: true,
-                        //     child: DigitDropdown<String>(
-                        //       selectedOption:
-                        //           (form.control(_idTypeKey).value != null)
-                        //               ? DropdownItem(
-                        //                   name: localizations.translate(
-                        //                       form.control(_idTypeKey).value),
-                        //                   code: form.control(_idTypeKey).value)
-                        //               : const DropdownItem(name: '', code: ''),
-                        //       items: RegistrationDeliverySingleton()
-                        //           .idTypeOptions!
-                        //           .map(
-                        //             (e) => DropdownItem(
-                        //                 name: localizations.translate(e),
-                        //                 code: e),
-                        //           )
-                        //           .toList(),
-                        //       onSelect: (value) {
-                        //         form.control(_idTypeKey).value = value.code;
-                        //         setState(() {
-                        //           if (value.code == 'DEFAULT') {
-                        //             form.control(_idNumberKey).value =
-                        //                 IdGen.i.identifier.toString();
-                        //           } else {
-                        //             form.control(_idNumberKey).value = null;
-                        //           }
-                        //         });
-                        //       },
-                        //       emptyItemText: localizations
-                        //           .translate(i18.common.noMatchFound),
-                        //       errorMessage: form.control(_idTypeKey).hasErrors
-                        //           ? localizations.translate(
-                        //               i18.common.corecommonRequired,
-                        //             )
-                        //           : null,
-                        //     ),
-                        //   ),
-                        // ),
 
                         individualDetailsShowcaseData.dateOfBirth.buildWith(
                           child: CustomDigitDobPicker(
@@ -747,96 +624,6 @@ class CustomIndividualDetailsPageState
                             ),
                           ),
                         ),
-                        // const SizedBox(height: spacer4),
-                        // if ((RegistrationDeliverySingleton().beneficiaryType ==
-                        //             BeneficiaryType.household &&
-                        //         widget.isHeadOfHousehold) ||
-                        //     (RegistrationDeliverySingleton().beneficiaryType ==
-                        //         BeneficiaryType.individual))
-                        // BlocBuilder<DigitScannerBloc, DigitScannerState>(
-                        //   buildWhen: (p, c) {
-                        //     return true;
-                        //   },
-                        //   builder: (context, state) => state
-                        //           .qrCodes.isNotEmpty
-                        //       ? Row(
-                        //           mainAxisAlignment:
-                        //               MainAxisAlignment.spaceBetween,
-                        //           children: [
-                        //             SizedBox(
-                        //               width:
-                        //                   MediaQuery.of(context).size.width /
-                        //                       3,
-                        //               child: Text(
-                        //                 localizations.translate(
-                        //                   i18.deliverIntervention.voucherCode,
-                        //                 ),
-                        //                 style: textTheme.headingS,
-                        //               ),
-                        //             ),
-                        //             Flexible(
-                        //               child: Text(
-                        //                 overflow: TextOverflow.ellipsis,
-                        //                 localizations
-                        //                     .translate(state.qrCodes.last),
-                        //               ),
-                        //             ),
-                        //             Padding(
-                        //               padding: const EdgeInsets.only(
-                        //                 bottom: spacer2 * 2,
-                        //               ),
-                        //               child: IconButton(
-                        //                 color:
-                        //                     theme.colorTheme.primary.primary1,
-                        //                 icon: const Icon(Icons.edit),
-                        //                 onPressed: () {
-                        //                   Navigator.of(context).push(
-                        //                     //[TODO: Add the route to auto_route]
-                        //                     MaterialPageRoute(
-                        //                       builder: (context) =>
-                        //                           const DigitScannerPage(
-                        //                         quantity: 1,
-                        //                         isGS1code: false,
-                        //                         singleValue: true,
-                        //                         isEditEnabled: true,
-                        //                       ),
-                        //                       settings: const RouteSettings(
-                        //                           name: '/qr-scanner'),
-                        //                     ),
-                        //                   );
-                        //                 },
-                        //               ),
-                        //             ),
-                        //           ],
-
-                        //           // ignore: no-empty-block
-                        //         )
-                        //       : DigitButton(
-                        //           type: DigitButtonType.secondary,
-                        //           size: DigitButtonSize.large,
-                        //           mainAxisSize: MainAxisSize.max,
-                        //           onPressed: () {
-                        //             Navigator.of(context).push(
-                        //               // [TODO: Add the route to auto_route]
-                        //               MaterialPageRoute(
-                        //                 builder: (context) =>
-                        //                     const DigitScannerPage(
-                        //                   quantity: 1,
-                        //                   isGS1code: false,
-                        //                   singleValue: true,
-                        //                 ),
-                        //                 settings: const RouteSettings(
-                        //                     name: '/qr-scanner'),
-                        //               ),
-                        //             );
-                        //           },
-                        //           prefixIcon: Icons.qr_code,
-                        //           label: localizations.translate(
-                        //             i18.individualDetails
-                        //                 .linkVoucherToIndividual,
-                        //           ),
-                        //         ),
-                        // ),
                       ]),
                 ),
               ],

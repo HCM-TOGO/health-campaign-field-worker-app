@@ -122,6 +122,8 @@ class Common {
 
   String get maxCharsRequired => 'MAX_CHARS_ALLOWED';
 
+  String get coreCommonProceed => 'CORE_COMMON_PROCEED';
+
   String get maxValue => 'MAX_VALUE_ALLOWED';
   String get minValue => 'MIN_VALUE_ALLOWED';
 
@@ -174,6 +176,7 @@ class DeliverIntervention {
   const DeliverIntervention();
 
   String get recordRedoseLabel => 'DELIVER_INTERVENTION_RECORD_REDOSE_LABEL';
+  String get selectTheResourcDeliveredLabel => 'Select the Resource delivered';
   String get reasonForRedoseLabel =>
       'DELIVER_INTERVENTION_REASON_FOR_REDOSE_LABEL';
   String get selectReasonForRedoseLabel =>
@@ -183,7 +186,7 @@ class DeliverIntervention {
   String get dose => 'DELIVER_INTERVENTION_DOSE';
 
   String get quantityAdministratedLabel =>
-      'DELIVER_INTERVENTION_QUANTITY_ADMINISTRATED_LABEL';
+      'QUANTITY_ADMINISTRATED_LABEL';
 
   String get beneficiaryIneligibleDescription => 'BENEFICIARY_INELIGIBLE_DESC';
   String get beneficiaryReferralDescription => 'BENEFICIARY_REFERRAL_DESC';
@@ -192,6 +195,9 @@ class DeliverIntervention {
   String get deliverVASIntervention => 'DELIVER_VAS_INTERVENTION';
   String get recordsmcdeliverdetails => 'RECORD_SMC_DELIVER_DETAILS';
   String get doseadministeredby => 'DOSE_ADMINISTERED_BY';
+  String get proceedToVASLabel => 'PROCEED_TO_VAS_LABEL';
+  String get proceedToVASDescription =>
+      'PROCEED_TO_VAS_DESCRIPTION';
 }
 
 class Checklist {

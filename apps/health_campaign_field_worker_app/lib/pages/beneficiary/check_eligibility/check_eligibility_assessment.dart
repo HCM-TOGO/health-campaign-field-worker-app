@@ -236,20 +236,41 @@ class _EligibilityChecklistViewPage
                               final shouldSubmit = await DigitDialog.show(
                                 context,
                                 options: DigitDialogOptions(
-                                  titleText: localizations.translate(
+                                  titleText: 
+                                  widget.eligibilityAssessmentType == EligibilityAssessmentType.smc ?
+                                  localizations.translate(
                                     i18_local
                                         .checklist.submitButtonDialogLabelText,
+                                  ):
+                                  localizations.translate(
+                                    i18_local
+                                        .deliverIntervention.proceedToVASLabel,
                                   ),
-                                  content: Text(localizations
+                                  content: 
+                                  
+                                  widget.eligibilityAssessmentType == EligibilityAssessmentType.smc ?
+                                  Text(localizations
                                       .translate(
                                         i18_local.checklist
                                             .checklistDialogDynamicDescription,
                                       )
-                                      .replaceFirst('{}', descriptionText)),
+                                      .replaceFirst('{}', descriptionText)):
+                                  Text(localizations
+                                      .translate(
+                                        i18_local.deliverIntervention
+                                            .proceedToVASDescription,
+                                      )),
                                   primaryAction: DigitDialogActions(
-                                    label: localizations.translate(
+                                    label: 
+                                  
+                                  widget.eligibilityAssessmentType == EligibilityAssessmentType.smc ?
+                                    localizations.translate(
                                       i18_local.checklist
                                           .checklistDialogPrimaryAction,
+                                    ):
+                                    localizations.translate(
+                                      i18_local.common
+                                          .coreCommonProceed,
                                     ),
                                     action: (ctx) {
                                       final referenceId = IdGen.i.identifier;
@@ -370,7 +391,9 @@ class _EligibilityChecklistViewPage
                                       ).pop(true);
                                     },
                                   ),
-                                  secondaryAction: DigitDialogActions(
+                                  secondaryAction: 
+                                  widget.eligibilityAssessmentType == EligibilityAssessmentType.smc ?
+                                  DigitDialogActions(
                                     label: localizations.translate(
                                       i18_local.checklist
                                           .checklistDialogSecondaryAction,
@@ -381,7 +404,8 @@ class _EligibilityChecklistViewPage
                                         rootNavigator: true,
                                       ).pop(false);
                                     },
-                                  ),
+                                  ):
+                                  null,
                                 ),
                               );
                               if (shouldSubmit ?? false) {
