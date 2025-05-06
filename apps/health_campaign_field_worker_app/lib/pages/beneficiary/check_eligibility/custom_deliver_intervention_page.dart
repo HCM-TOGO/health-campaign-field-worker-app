@@ -567,12 +567,12 @@ class CustomDeliverInterventionPageState
                                                       LabeledField(
                                                     label:
                                                         localizations.translate(
-                                                      widget.eligibilityAssessmentType ==
-                                                              EligibilityAssessmentType
-                                                                  .smc
-                                                          ? i18.householdDetails
-                                                              .dateOfRegistrationLabel
-                                                          : i18_local
+                                                      // widget.eligibilityAssessmentType ==
+                                                      //         EligibilityAssessmentType
+                                                      //             .smc
+                                                          // ? i18.householdDetails
+                                                          //     .dateOfRegistrationLabel: 
+                                                          i18_local
                                                               .householdDetails
                                                               .dateOfAdministrationLabel,
                                                     ),
