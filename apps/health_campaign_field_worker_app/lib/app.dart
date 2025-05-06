@@ -1,26 +1,21 @@
 import 'package:attendance_management/models/entities/attendance_register.dart';
+import 'package:digit_components/theme/theme.dart';
 import 'package:digit_data_model/data_model.dart';
 import 'package:digit_dss/digit_dss.dart';
 import 'package:digit_scanner/blocs/scanner.dart';
 import 'package:digit_ui_components/services/location_bloc.dart';
-import 'package:digit_ui_components/theme/digit_theme.dart';
 import 'package:dio/dio.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:isar/isar.dart';
 import 'package:location/location.dart';
-import 'package:survey_form/survey_form.dart';
 import 'package:registration_delivery/data/repositories/local/household_global_search.dart';
 import 'package:registration_delivery/data/repositories/local/individual_global_search.dart';
 import 'package:registration_delivery/data/repositories/oplog/oplog.dart';
-import 'package:registration_delivery/models/entities/household.dart';
-import 'package:registration_delivery/models/entities/household_member.dart';
-import 'package:registration_delivery/models/entities/project_beneficiary.dart';
-import 'package:registration_delivery/utils/typedefs.dart';
 import 'package:survey_form/survey_form.dart';
+
 import 'blocs/app_initialization/app_initialization.dart';
 import 'blocs/auth/auth.dart';
-import 'blocs/beneficiary_registration/beneficiary_registration.dart';
 import 'blocs/localization/localization.dart';
 import 'blocs/project/project.dart';
 import 'data/local_store/app_shared_preferences.dart';
@@ -33,7 +28,6 @@ import 'router/app_navigator_observer.dart';
 import 'router/app_router.dart';
 import 'utils/environment_config.dart';
 import 'utils/localization_delegates.dart';
-import 'utils/typedefs.dart';
 import 'utils/utils.dart';
 import 'widgets/network_manager_provider_wrapper.dart';
 
@@ -61,7 +55,7 @@ class MainApplicationState extends State<MainApplication>
     with WidgetsBindingObserver {
   @override
   void initState() {
-    LocalizationParams().setModule('boundary', true);
+    LocalizationParams().setModule(['boundary'], true);
     super.initState();
     requestDisableBatteryOptimization();
   }
@@ -72,6 +66,18 @@ class MainApplicationState extends State<MainApplication>
       providers: [
         RepositoryProvider<LocalSqlDataStore>.value(value: widget.sql),
         RepositoryProvider<Isar>.value(value: widget.isar),
+        RepositoryProvider<IndividualGlobalSearchRepository>(
+          create: (context) => IndividualGlobalSearchRepository(
+            widget.sql,
+            IndividualOpLogManager(widget.isar),
+          ),
+        ),
+        RepositoryProvider<HouseHoldGlobalSearchRepository>(
+          create: (context) => HouseHoldGlobalSearchRepository(
+            widget.sql,
+            HouseholdOpLogManager(widget.isar),
+          ),
+        ),
       ],
       child: BlocProvider(
         create: (context) => AppInitializationBloc(
@@ -88,20 +94,14 @@ class MainApplicationState extends State<MainApplication>
           sql: widget.sql,
           child: MultiBlocProvider(
             providers: [
+              BlocProvider(
+                create: (_) {
+                  return LocationBloc(location: Location())
+                    ..add(const LoadLocationEvent());
+                },
+                lazy: false,
+              ),
               // INFO : Need to add bloc of package Here
-
-              RepositoryProvider<IndividualGlobalSearchRepository>(
-                create: (context) => IndividualGlobalSearchRepository(
-                  widget.sql,
-                  IndividualOpLogManager(widget.isar),
-                ),
-              ),
-              RepositoryProvider<HouseHoldGlobalSearchRepository>(
-                create: (context) => HouseHoldGlobalSearchRepository(
-                  widget.sql,
-                  HouseholdOpLogManager(widget.isar),
-                ),
-              ),
               BlocProvider(
                 create: (_) {
                   return DigitScannerBloc(
@@ -113,33 +113,13 @@ class MainApplicationState extends State<MainApplication>
 
               BlocProvider(
                 create: (_) {
-                  return LocationBloc(location: Location())
-                    ..add(const LoadLocationEvent());
+                  return DigitScannerBloc(
+                    const DigitScannerState(),
+                  );
                 },
                 lazy: false,
               ),
 
-              BlocProvider(
-                create: (_) {
-                  return LocationBloc(location: Location());
-                },
-                lazy: false,
-              ),
-              BlocProvider<BeneficiaryRegistrationBloc>(
-                create: (context) => BeneficiaryRegistrationBloc(
-                  const BeneficiaryRegistrationState.create(),
-                  individualRepository: context
-                      .repository<IndividualModel, IndividualSearchModel>(),
-                  householdRepository: context
-                      .repository<HouseholdModel, HouseholdSearchModel>(),
-                  householdMemberRepository: context.repository<
-                      HouseholdMemberModel, HouseholdMemberSearchModel>(),
-                  projectBeneficiaryRepository: context.repository<
-                      ProjectBeneficiaryModel, ProjectBeneficiarySearchModel>(),
-                  //  taskDataRepository: context.read<TaskDataRepository>(),
-                  beneficiaryType: BeneficiaryType.household, // or .household
-                ),
-              ),
               BlocProvider(
                 create: (context) {
                   return UserBloc(
@@ -162,7 +142,6 @@ class MainApplicationState extends State<MainApplication>
                     ),
                   ),
               ),
-
               BlocProvider(
                 create: (ctx) => BoundaryBloc(
                   const BoundaryState(),
@@ -191,9 +170,11 @@ class MainApplicationState extends State<MainApplication>
                     final localizationModulesList = appConfig.backendInterface;
                     var firstLanguage;
                     firstLanguage = appConfig.languages?.lastOrNull?.value;
+
                     final selectedLocale =
                         AppSharedPreferences().getSelectedLocale ??
                             firstLanguage;
+                    AppSharedPreferences().setSelectedLocale("en_NG");
                     LocalizationParams().setLocale(Locale(selectedLocale));
                     final languages = appConfig.languages;
 
@@ -227,6 +208,7 @@ class MainApplicationState extends State<MainApplication>
                             serviceDefinitionRemoteRepository: ctx.read<
                                 RemoteRepository<ServiceDefinitionModel,
                                     ServiceDefinitionSearchModel>>(),
+                            isar: widget.isar,
                             serviceDefinitionLocalRepository: ctx.read<
                                 LocalRepository<ServiceDefinitionModel,
                                     ServiceDefinitionSearchModel>>(),
@@ -262,7 +244,6 @@ class MainApplicationState extends State<MainApplication>
                             projectRemoteRepository: ctx.read<
                                 RemoteRepository<ProjectModel,
                                     ProjectSearchModel>>(),
-                            isar: widget.isar,
                             boundaryRemoteRepository: ctx.read<
                                 RemoteRepository<BoundaryModel,
                                     BoundarySearchModel>>(),
@@ -375,7 +356,6 @@ class MainApplicationState extends State<MainApplication>
                                 selectedLocale!.split("_").first,
                                 selectedLocale.split("_").last,
                               ),
-                              isar: widget.isar,
                             ),
                             locale: languages != null
                                 ? Locale(
@@ -394,15 +374,8 @@ class MainApplicationState extends State<MainApplication>
                                 orElse: () => [
                                   const UnauthenticatedRouteWrapper(),
                                 ],
-                                authenticated: (
-                                  _,
-                                  __,
-                                  ___,
-                                  ____,
-                                  _____,
-                                  ______,
-                                  ________,
-                                ) =>
+                                authenticated: (_, __, ___, ____, _____, ______,
+                                        _______) =>
                                     [
                                   AuthenticatedRouteWrapper(),
                                 ],
