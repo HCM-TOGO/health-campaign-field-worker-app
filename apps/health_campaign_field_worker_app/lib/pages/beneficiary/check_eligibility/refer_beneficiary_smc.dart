@@ -63,8 +63,8 @@ class CustomReferBeneficiarySMCPageState
   final clickedStatus = ValueNotifier<bool>(false);
   static const referralReasons = "referralReasons";
   static const sideEffectFromCurrentCycle = "DRUG_SE_CC";
-  static const _referralCode = 'referralCode';
-  static const _referralComments = 'referralComments';
+  // static const _referralCode = 'referralCode';
+  // static const _referralComments = 'referralComments';
 
   @override
   void dispose() {
@@ -160,9 +160,9 @@ class CustomReferBeneficiarySMCPageState
                                         .control(_referredToKey)
                                         .value as FacilityModel;
                                     final reason = reasons.first;
-                                    final referralCodeValue = form
-                                        .control(_referralCode)
-                                        .value as String?;
+                                    // final referralCodeValue = form
+                                    //     .control(_referralCode)
+                                    //     .value as String?;
                                     final recipientType = recipient.id == 'APS'
                                         ? 'STAFF'
                                         : 'FACILITY';
@@ -210,11 +210,11 @@ class CustomReferBeneficiarySMCPageState
                                               referralReasons,
                                               reasons.join(","),
                                             ),
-                                            if (referralCodeValue != null)
-                                              AdditionalField(
-                                                _referralCode,
-                                                referralCodeValue,
-                                              )
+                                            // if (referralCodeValue != null)
+                                            //   AdditionalField(
+                                            //     _referralCode,
+                                            //     referralCodeValue,
+                                            //   )
                                           ],
                                         ),
                                       ),
@@ -448,27 +448,27 @@ class CustomReferBeneficiarySMCPageState
                                 form.control(_referredToKey).value = facility;
                               },
                             ),
-                            DigitTextFormField(
-                                formControlName: _referralCode,
-                                label: localizations.translate(
-                                  i18_local.referBeneficiary.referralCodeLabel,
-                                ),
-                                isRequired: true,
-                                validationMessages: {
-                                  'required': (object) =>
-                                      localizations.translate(
-                                        i18_local.common.corecommonRequired,
-                                      ),
-                                  'min2': (object) => localizations
-                                      .translate(
-                                          i18_local.common.min2CharsRequired)
-                                      .replaceAll('{}', ''),
-                                }),
-                            DigitTextFormField(
-                                formControlName: _referralComments,
-                                label: localizations.translate(
-                                  i18_local.referBeneficiary.referralComments,
-                                )),
+                            // DigitTextFormField(
+                            //     formControlName: _referralCode,
+                            //     label: localizations.translate(
+                            //       i18_local.referBeneficiary.referralCodeLabel,
+                            //     ),
+                            //     isRequired: true,
+                            //     validationMessages: {
+                            //       'required': (object) =>
+                            //           localizations.translate(
+                            //             i18_local.common.corecommonRequired,
+                            //           ),
+                            //       'min2': (object) => localizations
+                            //           .translate(
+                            //               i18_local.common.min2CharsRequired)
+                            //           .replaceAll('{}', ''),
+                            //     }),
+                            // DigitTextFormField(
+                            //     formControlName: _referralComments,
+                            //     label: localizations.translate(
+                            //       i18_local.referBeneficiary.referralComments,
+                            //     )),
                           ]),
                         ],
                       ),
@@ -502,11 +502,11 @@ class CustomReferBeneficiarySMCPageState
 
       // _referralReason: FormControl<KeyValue>(value: null),
       // _beneficiaryIdKey: FormControl<String>(validators: [Validators.required]),
-      _referralComments: FormControl<String>(value: null),
-      _referralCode: FormControl<String>(validators: [
-        // Validators.required,
-        // CustomValidator.requiredMin2,
-      ]),
+      // _referralComments: FormControl<String>(value: null),
+      // _referralCode: FormControl<String>(validators: [
+      // Validators.required,
+      // CustomValidator.requiredMin2,
+      // ]),
     });
   }
 

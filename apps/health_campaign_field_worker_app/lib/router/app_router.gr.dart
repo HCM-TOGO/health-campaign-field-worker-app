@@ -102,6 +102,17 @@ abstract class _$AppRouter extends RootStackRouter {
         )),
       );
     },
+    CustomComplaintsDetailsRoute.name: (routeData) {
+      final args = routeData.argsAs<CustomComplaintsDetailsRouteArgs>(
+          orElse: () => const CustomComplaintsDetailsRouteArgs());
+      return AutoRoutePage<dynamic>(
+        routeData: routeData,
+        child: CustomComplaintsDetailsPage(
+          key: args.key,
+          appLocalizations: args.appLocalizations,
+        ),
+      );
+    },
     CustomDeliverInterventionRoute.name: (routeData) {
       final args = routeData.argsAs<CustomDeliverInterventionRouteArgs>();
       return AutoRoutePage<dynamic>(
@@ -788,6 +799,45 @@ class CustomBeneficiaryRegistrationWrapperRouteArgs {
   @override
   String toString() {
     return 'CustomBeneficiaryRegistrationWrapperRouteArgs{key: $key, initialState: $initialState}';
+  }
+}
+
+/// generated route for
+/// [CustomComplaintsDetailsPage]
+class CustomComplaintsDetailsRoute
+    extends PageRouteInfo<CustomComplaintsDetailsRouteArgs> {
+  CustomComplaintsDetailsRoute({
+    Key? key,
+    AppLocalizations? appLocalizations,
+    List<PageRouteInfo>? children,
+  }) : super(
+          CustomComplaintsDetailsRoute.name,
+          args: CustomComplaintsDetailsRouteArgs(
+            key: key,
+            appLocalizations: appLocalizations,
+          ),
+          initialChildren: children,
+        );
+
+  static const String name = 'CustomComplaintsDetailsRoute';
+
+  static const PageInfo<CustomComplaintsDetailsRouteArgs> page =
+      PageInfo<CustomComplaintsDetailsRouteArgs>(name);
+}
+
+class CustomComplaintsDetailsRouteArgs {
+  const CustomComplaintsDetailsRouteArgs({
+    this.key,
+    this.appLocalizations,
+  });
+
+  final Key? key;
+
+  final AppLocalizations? appLocalizations;
+
+  @override
+  String toString() {
+    return 'CustomComplaintsDetailsRouteArgs{key: $key, appLocalizations: $appLocalizations}';
   }
 }
 

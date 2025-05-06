@@ -30,6 +30,7 @@ import '../pages/beneficiary/check_eligibility/household_acknowledgement_smc.dar
 import '../pages/beneficiary/check_eligibility/inventory_facility_selection_smc.dart';
 import '../pages/beneficiary/check_eligibility/refer_beneficiary_smc.dart';
 import '../pages/beneficiary/check_eligibility/refer_beneficiary_vas.dart';
+import '../pages/registration_delivery/custom_complaints_details.dart';
 import '../pages/boundary_selection.dart';
 import '../pages/home.dart';
 import '../pages/inventory_management/custom_manage_stock.dart';
@@ -492,6 +493,14 @@ class AppRouter extends _$AppRouter {
             AutoRoute(
               page: ComplaintsDetailsRoute.page,
               path: 'complaints-details',
+            ),
+            AutoRoute(
+              page: CustomComplaintsDetailsRoute.page,
+              path: 'custom-complaints-details',
+            ),
+            RedirectRoute(
+              path: 'complaints-details',
+              redirectTo: 'custom-complaints-details',
             ),
           ],
         ),

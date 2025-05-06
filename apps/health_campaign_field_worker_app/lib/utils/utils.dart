@@ -82,7 +82,7 @@ class CustomValidator {
 
     if (RegExp(pattern).hasMatch(control.value.toString())) return null;
 
-    if (control.value.toString().length < 10) return {'mobileNumber': true};
+    if (control.value.toString().length < 11) return {'mobileNumber': true};
 
     return {'mobileNumber': true};
   }
@@ -162,8 +162,19 @@ String customFormatAgeRange(String condition) {
       RegExp(r'(\d+)\s*<\s*ageandage\s*<\s*(\d+)', caseSensitive: false);
   final match = regex.firstMatch(condition);
   if (match != null && match.groupCount == 2) {
-    final min = match.group(1);
-    final max = match.group(2);
+    // final min = match.group(1);
+    // final max = match.group(2);
+    int min = int.parse(match.group(1)!);
+    int max = int.parse(match.group(2)!);
+
+    if (min == 11) {
+      max -= 1;
+      min += 1;
+    } else if (max == 12) {
+      min += 1;
+    }
+
+    print('min: $min, max: $max');
     return '$min - $max months';
   }
   return condition;
@@ -656,6 +667,3 @@ class LocalizationParams {
 
   bool? get exclude => _exclude;
 }
-
-
-
