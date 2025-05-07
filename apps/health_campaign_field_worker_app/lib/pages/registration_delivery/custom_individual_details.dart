@@ -35,6 +35,7 @@ import 'package:registration_delivery/utils/extensions/extensions.dart';
 import 'package:registration_delivery/blocs/household_overview/household_overview.dart';
 import 'package:registration_delivery/router/registration_delivery_router.gm.dart';
 import 'package:registration_delivery/utils/i18_key_constants.dart' as i18;
+import '/utils/i18_key_constants.dart' as i18_local;
 import 'package:registration_delivery/utils/utils.dart';
 // import 'package:registration_delivery/widgets/back_navigation_help_header.dart';
 import 'package:registration_delivery/widgets/localized.dart';
@@ -500,6 +501,11 @@ class CustomIndividualDetailsPageState
                                   'maxLength': (object) => localizations
                                       .translate(i18.common.maxCharsRequired)
                                       .replaceAll('{}', maxLength.toString()),
+                                  'onlyAlphabets': (object) =>
+                                      localizations.translate(
+                                        i18_local.individualDetails
+                                            .onlyAlphabetsValidationMessage,
+                                      ),
                                 },
                                 builder: (field) => LabeledField(
                                   label: localizations.translate(
@@ -618,11 +624,11 @@ class CustomIndividualDetailsPageState
                               formControlName: _mobileNumberKey,
                               validationMessages: {
                                 'minLength': (object) =>
-                                    localizations.translate(i18
+                                    localizations.translate(i18_local
                                         .individualDetails
                                         .mobileNumberLengthValidationMessage),
                                 'maxLength': (object) => localizations
-                                    .translate(i18.individualDetails
+                                    .translate(i18_local.individualDetails
                                         .mobileNumberLengthValidationMessage)
                                     .replaceAll('{}', '11'),
                               },
@@ -797,6 +803,7 @@ class CustomIndividualDetailsPageState
           Validators.delegate(
               (validator) => CustomValidator.requiredMin(validator)),
           Validators.maxLength(200),
+          Validators.delegate((control) => onlyAlphabets(control)),
         ],
         value: individual?.name?.givenName ??
             ((RegistrationDeliverySingleton().householdType ==
@@ -840,5 +847,16 @@ class CustomIndividualDetailsPageState
         : null;
 
     return date;
+  }
+
+  static Map<String, dynamic>? onlyAlphabets(AbstractControl<dynamic> control) {
+    final value = control.value?.toString().trim();
+
+    if (value == null || value.isEmpty) return null;
+
+    final pattern = r"^[A-Za-z\s]+$"; // Only A-Z, a-z, and spaces
+    final regExp = RegExp(pattern);
+
+    return regExp.hasMatch(value) ? null : {'onlyAlphabets': true};
   }
 }
