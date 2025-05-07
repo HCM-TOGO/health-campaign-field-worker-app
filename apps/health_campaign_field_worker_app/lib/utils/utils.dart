@@ -1,5 +1,7 @@
 library app_utils;
 
+import 'package:referral_reconciliation/referral_reconciliation.dart'
+    as referral_reconciliation_mappers;
 import 'package:collection/collection.dart';
 import 'package:digit_components/utils/date_utils.dart';
 import 'package:digit_data_model/models/entities/individual.dart';
@@ -612,6 +614,7 @@ initializeAllMappers() async {
     Future(() => inventory_mappers.initializeMappers()),
     Future(() => surveyForm_mappers.initializeMappers()),
     Future(() => complaints_mappers.initializeMappers()),
+    Future(() => referral_reconciliation_mappers.initializeMappers()),
   ];
   await Future.wait(initializations);
 }
@@ -656,6 +659,3 @@ class LocalizationParams {
 
   bool? get exclude => _exclude;
 }
-
-
-

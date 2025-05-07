@@ -157,6 +157,10 @@ class Constants {
         sql,
         AttendanceLogOpLogManager(isar),
       ),
+
+      HFReferralLocalRepository(sql, HFReferralOpLogManager(isar)),
+
+      HFReferralLocalRepository(sql, HFReferralOpLogManager(isar)),
     ];
   }
 
@@ -241,6 +245,10 @@ class Constants {
           AttendanceLogRemoteRepository(dio, actionMap: actions),
         if (value == DataModelType.complaints)
           PgrServiceRemoteRepository(dio, actionMap: actions),
+        if (value == DataModelType.hFReferral)
+          HFReferralRemoteRepository(dio, actionMap: actions),
+        if (value == DataModelType.hFReferral)
+          HFReferralRemoteRepository(dio, actionMap: actions),
       ]);
     }
 
