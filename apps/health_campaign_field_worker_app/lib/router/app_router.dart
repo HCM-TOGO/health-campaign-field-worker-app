@@ -31,6 +31,7 @@ import '../pages/beneficiary/check_eligibility/household_acknowledgement_smc.dar
 import '../pages/beneficiary/check_eligibility/inventory_facility_selection_smc.dart';
 import '../pages/beneficiary/check_eligibility/refer_beneficiary_smc.dart';
 import '../pages/beneficiary/check_eligibility/refer_beneficiary_vas.dart';
+import '../pages/registration_delivery/custom_complaints_details.dart';
 import '../pages/boundary_selection.dart';
 import '../pages/home.dart';
 import '../pages/inventory_management/custom_manage_stock.dart';
@@ -55,6 +56,7 @@ import '../pages/registration_delivery/custom_individual_details.dart';
 import '../pages/registration_delivery/custom_registration_delivery_wrapper.dart';
 import '../pages/registration_delivery/custom_search_beneficiary.dart';
 import '../pages/registration_delivery/custom_summary.dart';
+import '../pages/registration_delivery/custom_complaint_type.dart';
 import '../pages/beneficiary/check_eligibility/record_redose.dart';
 import '../pages/reports/beneficiary/beneficaries_report.dart';
 import '../pages/unauthenticated.dart';
@@ -492,11 +494,20 @@ class AppRouter extends _$AppRouter {
           page: ComplaintsRegistrationWrapperRoute.page,
           path: 'complaints-registration',
           children: [
+            // AutoRoute(
+            //   page: ComplaintTypeRoute.page,
+            //   path: 'complaints-type',
+            //   initial: true,
+            // ),
             AutoRoute(
-              page: ComplaintTypeRoute.page,
-              path: 'complaints-type',
+              page: CustomComplaintTypeRoute.page,
+              path: 'custom-complaints-type',
               initial: true,
             ),
+            // RedirectRoute(
+            //   path: 'complaints-type',
+            //   redirectTo: 'custom-complaints-type',
+            // ),
             AutoRoute(
               page: ComplaintsLocationRoute.page,
               path: 'complaints-location',
@@ -504,6 +515,14 @@ class AppRouter extends _$AppRouter {
             AutoRoute(
               page: ComplaintsDetailsRoute.page,
               path: 'complaints-details',
+            ),
+            AutoRoute(
+              page: CustomComplaintsDetailsRoute.page,
+              path: 'custom-complaints-details',
+            ),
+            RedirectRoute(
+              path: 'complaints-details',
+              redirectTo: 'custom-complaints-details',
             ),
           ],
         ),

@@ -1127,6 +1127,9 @@ class SearchBeneficiary {
 class IndividualDetails {
   const IndividualDetails();
 
+  String get onlyAlphabetsValidationMessage =>
+      'INDIVIDUAL_DETAILS_ONLY_ALPHABETS_VALIDATION_MESSAGE';
+
   String get individualsDetailsLabelText => 'INDIVIDUAL_LABEL_TEXT';
 
   String get nameLabelText => 'INDIVIDUAL_NAME_LABEL_TEXT';
@@ -1157,6 +1160,9 @@ class IndividualDetails {
 
   String get mobileNumberInvalidFormatValidationMessage =>
       'INDIVIDUAL_DETAILS_INVALID_MOBILE_NUMBER';
+
+  String get mobileNumberLengthValidationMessage =>
+      'INDIVIDUAL_DETAILS_MOBILE_NUMBER_LENGTH';
 
   String get yearsHintText => 'YEARS_HINT_TEXT';
   String get monthsHintText => 'MONTHS_HINT_TEXT';

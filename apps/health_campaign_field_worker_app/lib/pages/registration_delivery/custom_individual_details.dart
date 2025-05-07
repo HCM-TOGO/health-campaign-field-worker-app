@@ -2,6 +2,7 @@ import 'package:auto_route/auto_route.dart';
 import 'package:collection/collection.dart';
 import 'package:dart_mappable/dart_mappable.dart';
 import 'package:digit_components/utils/date_utils.dart' as digits;
+import 'package:digit_components/widgets/atoms/digit_toaster.dart';
 import 'package:digit_ui_components/theme/ComponentTheme/checkbox_theme.dart';
 import '../../widgets/custom_back_navigation.dart';
 import 'package:digit_data_model/data_model.dart';
@@ -34,6 +35,7 @@ import 'package:registration_delivery/utils/extensions/extensions.dart';
 import 'package:registration_delivery/blocs/household_overview/household_overview.dart';
 import 'package:registration_delivery/router/registration_delivery_router.gm.dart';
 import 'package:registration_delivery/utils/i18_key_constants.dart' as i18;
+import '/utils/i18_key_constants.dart' as i18_local;
 import 'package:registration_delivery/utils/utils.dart';
 // import 'package:registration_delivery/widgets/back_navigation_help_header.dart';
 import 'package:registration_delivery/widgets/localized.dart';
@@ -44,6 +46,7 @@ import '../../blocs/registration_delivery/custom_beneficairy_registration.dart';
 import '../../blocs/registration_delivery/custom_search_household.dart';
 import '../../models/entities/identifier_types.dart';
 import '../../router/app_router.dart';
+// import '../../utils/utils.dart' as local_utils;
 import '../../utils/registration_delivery/registration_delivery_utils.dart';
 import 'custom_beneficiary_acknowledgement.dart';
 
@@ -232,6 +235,28 @@ class CustomIndividualDetailsPageState
                               if (!form.valid) return;
                               FocusManager.instance.primaryFocus?.unfocus();
 
+                              final age = (form.control(_dobKey).value != null)
+                                  ? digits.DigitDateUtils.calculateAge(
+                                      form.control(_dobKey).value as DateTime,
+                                    )
+                                  : digits.DigitDateUtils.calculateAge(
+                                      DateTime.now(),
+                                    );
+
+                              if (age.years < 18 && widget.isHeadOfHousehold) {
+                                await DigitToast.show(
+                                  context,
+                                  options: DigitToastOptions(
+                                    localizations.translate(i18
+                                        .individualDetails.headAgeValidError),
+                                    true,
+                                    theme,
+                                  ),
+                                );
+
+                                return;
+                              }
+
                               final boundaryBloc =
                                   context.read<BoundaryBloc>().state;
                               final code = boundaryBloc.boundaryList.first.code;
@@ -318,7 +343,6 @@ class CustomIndividualDetailsPageState
                                     // router.push(CustomSummaryRoute());
                                     await onSubmit(
                                         individual.name?.givenName ?? "", true);
-
                                   }
                                 },
                                 editIndividual: (
@@ -460,7 +484,8 @@ class CustomIndividualDetailsPageState
                             i18.individualDetails.individualsDetailsLabelText,
                           ),
                           style: textTheme.headingXl.copyWith(
-                              color: theme.colorTheme.text.primary,),
+                            color: theme.colorTheme.text.primary,
+                          ),
                         ),
                         Column(
                           children: [
@@ -476,6 +501,11 @@ class CustomIndividualDetailsPageState
                                   'maxLength': (object) => localizations
                                       .translate(i18.common.maxCharsRequired)
                                       .replaceAll('{}', maxLength.toString()),
+                                  'onlyAlphabets': (object) =>
+                                      localizations.translate(
+                                        i18_local.individualDetails
+                                            .onlyAlphabetsValidationMessage,
+                                      ),
                                 },
                                 builder: (field) => LabeledField(
                                   label: localizations.translate(
@@ -512,13 +542,14 @@ class CustomIndividualDetailsPageState
                                       ),
                                 value: widget.isHeadOfHousehold,
                                 readOnly: widget.isHeadOfHousehold,
-                                checkboxThemeData: DigitCheckboxThemeData(disabledIconColor: theme.colorTheme.primary.primary1),
+                                checkboxThemeData: DigitCheckboxThemeData(
+                                    disabledIconColor:
+                                        theme.colorTheme.primary.primary1),
                                 onChanged: (_) {},
                               ),
                             ),
                           ],
                         ),
-
                         individualDetailsShowcaseData.dateOfBirth.buildWith(
                           child: CustomDigitDobPicker(
                             datePickerFormControl: _dobKey,
@@ -586,26 +617,26 @@ class CustomIndividualDetailsPageState
                             }
                           },
                         ),
-
                         individualDetailsShowcaseData.mobile.buildWith(
                           child: Offstage(
                             offstage: !widget.isHeadOfHousehold,
                             child: ReactiveWrapperField(
                               formControlName: _mobileNumberKey,
                               validationMessages: {
-                                'maxLength': (object) =>
-                                    localizations.translate(i18
-                                        .individualDetails
-                                        .mobileNumberLengthValidationMessage),
                                 'minLength': (object) =>
-                                    localizations.translate(i18
+                                    localizations.translate(i18_local
                                         .individualDetails
                                         .mobileNumberLengthValidationMessage),
+                                'maxLength': (object) => localizations
+                                    .translate(i18_local.individualDetails
+                                        .mobileNumberLengthValidationMessage)
+                                    .replaceAll('{}', '11'),
                               },
                               builder: (field) => LabeledField(
                                 label: localizations.translate(
                                   i18.individualDetails.mobileNumberLabelText,
                                 ),
+                                isRequired: false,
                                 child: DigitTextFormInput(
                                   keyboardType: TextInputType.number,
                                   maxLength: 11,
@@ -772,6 +803,7 @@ class CustomIndividualDetailsPageState
           Validators.delegate(
               (validator) => CustomValidator.requiredMin(validator)),
           Validators.maxLength(200),
+          Validators.delegate((control) => onlyAlphabets(control)),
         ],
         value: individual?.name?.givenName ??
             ((RegistrationDeliverySingleton().householdType ==
@@ -789,11 +821,13 @@ class CustomIndividualDetailsPageState
       _genderKey: FormControl<String>(value: getGenderOptions(individual)),
       _mobileNumberKey:
           FormControl<String>(value: individual?.mobileNumber, validators: [
+        Validators.delegate(
+            (validator) => CustomValidator.validMobileNumber(validator)),
         // Validators.pattern(Constants.mobileNumberRegExp,
         //     validationMessage:
         //         localizations.translate(i18.common.coreCommonMobileNumber)),
         Validators.minLength(11),
-        Validators.maxLength(11)
+        Validators.maxLength(11),
       ]),
     });
   }
@@ -813,5 +847,16 @@ class CustomIndividualDetailsPageState
         : null;
 
     return date;
+  }
+
+  static Map<String, dynamic>? onlyAlphabets(AbstractControl<dynamic> control) {
+    final value = control.value?.toString().trim();
+
+    if (value == null || value.isEmpty) return null;
+
+    final pattern = r"^[A-Za-z\s]+$"; // Only A-Z, a-z, and spaces
+    final regExp = RegExp(pattern);
+
+    return regExp.hasMatch(value) ? null : {'onlyAlphabets': true};
   }
 }

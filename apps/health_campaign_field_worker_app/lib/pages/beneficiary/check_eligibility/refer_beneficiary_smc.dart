@@ -1,6 +1,9 @@
 import 'package:digit_components/digit_components.dart';
 import 'package:digit_components/widgets/atoms/digit_radio_button_list.dart';
 import 'package:digit_components/widgets/atoms/digit_toaster.dart';
+import 'package:digit_ui_components/enum/app_enums.dart';
+import 'package:digit_ui_components/widgets/atoms/digit_button.dart';
+import 'package:digit_ui_components/widgets/atoms/pop_up_card.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 // import 'package:health_campaign_field_worker_app/pages/pages-SMC/beneficiary/custom_facility_selection_smc.dart';
@@ -22,6 +25,7 @@ import 'package:digit_data_model/data_model.dart';
 import '../../../router/app_router.dart';
 import '../../../utils/environment_config.dart';
 import '../../../utils/i18_key_constants.dart' as i18_local;
+import 'package:registration_delivery/utils/i18_key_constants.dart' as i18;
 import '../../../utils/utils.dart';
 import '../../../widgets/header/back_navigation_help_header.dart';
 
@@ -63,8 +67,8 @@ class CustomReferBeneficiarySMCPageState
   final clickedStatus = ValueNotifier<bool>(false);
   static const referralReasons = "referralReasons";
   static const sideEffectFromCurrentCycle = "DRUG_SE_CC";
-  static const _referralCode = 'referralCode';
-  static const _referralComments = 'referralComments';
+  // static const _referralCode = 'referralCode';
+  // static const _referralComments = 'referralComments';
 
   @override
   void dispose() {
@@ -120,7 +124,7 @@ class CustomReferBeneficiarySMCPageState
           child: Scaffold(
             body: Scaffold(
               body: ReactiveFormBuilder(
-                form: () => buildForm(facilities),
+                form: () => buildForm(healthFacilities),
                 builder: (context, form, child) => ScrollableContent(
                   enableFixedButton: true,
                   header: Column(children: [
@@ -155,14 +159,53 @@ class CustomReferBeneficiarySMCPageState
                                   if (!form.valid) {
                                     return;
                                   } else {
+                                    final submit = await showDialog(
+                                      context: context,
+                                      builder: (ctx) => Popup(
+                                        title: localizations.translate(
+                                          i18.deliverIntervention.dialogTitle,
+                                        ),
+                                        description: localizations.translate(
+                                          i18.deliverIntervention.dialogContent,
+                                        ),
+                                        actions: [
+                                          DigitButton(
+                                              label: localizations.translate(
+                                                i18.common.coreCommonSubmit,
+                                              ),
+                                              onPressed: () {
+                                                clickedStatus.value = true;
+                                                Navigator.of(
+                                                  context,
+                                                  rootNavigator: true,
+                                                ).pop(true);
+                                              },
+                                              type: DigitButtonType.primary,
+                                              size: DigitButtonSize.large),
+                                          DigitButton(
+                                              label: localizations.translate(
+                                                i18.common.coreCommonCancel,
+                                              ),
+                                              onPressed: () => Navigator.of(
+                                                    context,
+                                                    rootNavigator: true,
+                                                  ).pop(false),
+                                              type: DigitButtonType.secondary,
+                                              size: DigitButtonSize.large)
+                                        ],
+                                      ),
+                                    );
+                                    if(submit == null || !submit) {
+                                      return;
+                                    }
                                     clickedStatus.value = true;
                                     final recipient = form
                                         .control(_referredToKey)
                                         .value as FacilityModel;
                                     final reason = reasons.first;
-                                    final referralCodeValue = form
-                                        .control(_referralCode)
-                                        .value as String?;
+                                    // final referralCodeValue = form
+                                    //     .control(_referralCode)
+                                    //     .value as String?;
                                     final recipientType = recipient.id == 'APS'
                                         ? 'STAFF'
                                         : 'FACILITY';
@@ -210,11 +253,11 @@ class CustomReferBeneficiarySMCPageState
                                               referralReasons,
                                               reasons.join(","),
                                             ),
-                                            if (referralCodeValue != null)
-                                              AdditionalField(
-                                                _referralCode,
-                                                referralCodeValue,
-                                              )
+                                            // if (referralCodeValue != null)
+                                            //   AdditionalField(
+                                            //     _referralCode,
+                                            //     referralCodeValue,
+                                            //   )
                                           ],
                                         ),
                                       ),
@@ -448,27 +491,27 @@ class CustomReferBeneficiarySMCPageState
                                 form.control(_referredToKey).value = facility;
                               },
                             ),
-                            DigitTextFormField(
-                                formControlName: _referralCode,
-                                label: localizations.translate(
-                                  i18_local.referBeneficiary.referralCodeLabel,
-                                ),
-                                isRequired: true,
-                                validationMessages: {
-                                  'required': (object) =>
-                                      localizations.translate(
-                                        i18_local.common.corecommonRequired,
-                                      ),
-                                  'min2': (object) => localizations
-                                      .translate(
-                                          i18_local.common.min2CharsRequired)
-                                      .replaceAll('{}', ''),
-                                }),
-                            DigitTextFormField(
-                                formControlName: _referralComments,
-                                label: localizations.translate(
-                                  i18_local.referBeneficiary.referralComments,
-                                )),
+                            // DigitTextFormField(
+                            //     formControlName: _referralCode,
+                            //     label: localizations.translate(
+                            //       i18_local.referBeneficiary.referralCodeLabel,
+                            //     ),
+                            //     isRequired: true,
+                            //     validationMessages: {
+                            //       'required': (object) =>
+                            //           localizations.translate(
+                            //             i18_local.common.corecommonRequired,
+                            //           ),
+                            //       'min2': (object) => localizations
+                            //           .translate(
+                            //               i18_local.common.min2CharsRequired)
+                            //           .replaceAll('{}', ''),
+                            //     }),
+                            // DigitTextFormField(
+                            //     formControlName: _referralComments,
+                            //     label: localizations.translate(
+                            //       i18_local.referBeneficiary.referralComments,
+                            //     )),
                           ]),
                         ],
                       ),
@@ -502,11 +545,11 @@ class CustomReferBeneficiarySMCPageState
 
       // _referralReason: FormControl<KeyValue>(value: null),
       // _beneficiaryIdKey: FormControl<String>(validators: [Validators.required]),
-      _referralComments: FormControl<String>(value: null),
-      _referralCode: FormControl<String>(validators: [
-        // Validators.required,
-        // CustomValidator.requiredMin2,
-      ]),
+      // _referralComments: FormControl<String>(value: null),
+      // _referralCode: FormControl<String>(validators: [
+      // Validators.required,
+      // CustomValidator.requiredMin2,
+      // ]),
     });
   }
 

@@ -54,8 +54,8 @@ class CaregiverConsentPageState extends LocalizedState<CaregiverConsentPage> {
     final bloc = context.read<CustomBeneficiaryRegistrationBloc>();
     final router = context.router;
     var household = householdModel;
-    final  String householdid = await  generateHouseholdId();
-    
+    final String householdid = await generateHouseholdId();
+
     household ??= HouseholdModel(
       tenantId: RegistrationDeliverySingleton().tenantId,
       clientReferenceId:
@@ -121,27 +121,26 @@ class CaregiverConsentPageState extends LocalizedState<CaregiverConsentPage> {
   }
 
   Future<String> generateHouseholdId() async {
-  final userId = RegistrationDeliverySingleton().loggedInUserUuid;
+    final userId = RegistrationDeliverySingleton().loggedInUserUuid;
 
-  final boundaryBloc = context.read<BoundaryBloc>().state;
-  final code = boundaryBloc.boundaryList.first.code;
-  final bname = boundaryBloc.boundaryList.first.name;
+    final boundaryBloc = context.read<BoundaryBloc>().state;
+    final code = boundaryBloc.boundaryList.first.code;
+    final bname = boundaryBloc.boundaryList.first.name;
 
-  final locality = (code == null || bname == null)
-      ? null
-      : LocalityModel(code: code, name: bname);
+    final locality = (code == null || bname == null)
+        ? null
+        : LocalityModel(code: code, name: bname);
 
-  final localityCode = locality!.code;
+    final localityCode = locality!.code;
 
-  final ids = await UniqueIdGeneration().generateUniqueId(
-    localityCode: localityCode,
-    loggedInUserId: userId!,
-    returnCombinedIds: false,
-  );
+    final ids = await UniqueIdGeneration().generateUniqueId(
+      localityCode: localityCode,
+      loggedInUserId: userId!,
+      returnCombinedIds: false,
+    );
 
-  return ids.first;
-}
-
+    return ids.first;
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -171,8 +170,7 @@ class CaregiverConsentPageState extends LocalizedState<CaregiverConsentPage> {
             BlocBuilder<LocationBloc, LocationState>(
               builder: (context, locationState) {
                 return DigitButton(
-                  label:
-                      localizations.translate(i18.householdDetails.actionLabel),
+                  label: localizations.translate(i18.common.coreCommonSubmit),
                   type: DigitButtonType.primary,
                   size: DigitButtonSize.large,
                   mainAxisSize: MainAxisSize.max,
@@ -250,6 +248,10 @@ class CaregiverConsentPageState extends LocalizedState<CaregiverConsentPage> {
                       .copyWith(color: theme.colorTheme.text.primary),
                   description: localizations.translate(
                     i18_local.caregiverConsent.caregiverConsentDescriptionText,
+                  ),
+                  descriptionStyle: textTheme.bodyL.copyWith(
+                    color: theme.colorTheme.text.primary,
+                    fontWeight: FontWeight.bold,
                   ),
                 ),
                 FormField(
