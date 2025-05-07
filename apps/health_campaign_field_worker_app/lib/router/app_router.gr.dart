@@ -262,6 +262,19 @@ abstract class _$AppRouter extends RootStackRouter {
         ),
       );
     },
+    CustomRecordReferralDetailsRoute.name: (routeData) {
+      final args = routeData.argsAs<CustomRecordReferralDetailsRouteArgs>();
+      return AutoRoutePage<dynamic>(
+        routeData: routeData,
+        child: CustomRecordReferralDetailsPage(
+          key: args.key,
+          appLocalizations: args.appLocalizations,
+          isEditing: args.isEditing,
+          projectId: args.projectId,
+          cycles: args.cycles,
+        ),
+      );
+    },
     CustomReferBeneficiarySMCRoute.name: (routeData) {
       final args = routeData.argsAs<CustomReferBeneficiarySMCRouteArgs>();
       return AutoRoutePage<dynamic>(
@@ -308,6 +321,19 @@ abstract class _$AppRouter extends RootStackRouter {
       return AutoRoutePage<dynamic>(
         routeData: routeData,
         child: CustomSearchBeneficiaryPage(
+          key: args.key,
+          appLocalizations: args.appLocalizations,
+        ),
+      );
+    },
+    CustomSearchReferralReconciliationsRoute.name: (routeData) {
+      final args =
+          routeData.argsAs<CustomSearchReferralReconciliationsRouteArgs>(
+              orElse: () =>
+                  const CustomSearchReferralReconciliationsRouteArgs());
+      return AutoRoutePage<dynamic>(
+        routeData: routeData,
+        child: CustomSearchReferralReconciliationsPage(
           key: args.key,
           appLocalizations: args.appLocalizations,
         ),
@@ -1393,6 +1419,60 @@ class CustomManageStocksRouteArgs {
 }
 
 /// generated route for
+/// [CustomRecordReferralDetailsPage]
+class CustomRecordReferralDetailsRoute
+    extends PageRouteInfo<CustomRecordReferralDetailsRouteArgs> {
+  CustomRecordReferralDetailsRoute({
+    Key? key,
+    ReferralReconLocalization? appLocalizations,
+    bool isEditing = false,
+    required String projectId,
+    required List<String> cycles,
+    List<PageRouteInfo>? children,
+  }) : super(
+          CustomRecordReferralDetailsRoute.name,
+          args: CustomRecordReferralDetailsRouteArgs(
+            key: key,
+            appLocalizations: appLocalizations,
+            isEditing: isEditing,
+            projectId: projectId,
+            cycles: cycles,
+          ),
+          initialChildren: children,
+        );
+
+  static const String name = 'CustomRecordReferralDetailsRoute';
+
+  static const PageInfo<CustomRecordReferralDetailsRouteArgs> page =
+      PageInfo<CustomRecordReferralDetailsRouteArgs>(name);
+}
+
+class CustomRecordReferralDetailsRouteArgs {
+  const CustomRecordReferralDetailsRouteArgs({
+    this.key,
+    this.appLocalizations,
+    this.isEditing = false,
+    required this.projectId,
+    required this.cycles,
+  });
+
+  final Key? key;
+
+  final ReferralReconLocalization? appLocalizations;
+
+  final bool isEditing;
+
+  final String projectId;
+
+  final List<String> cycles;
+
+  @override
+  String toString() {
+    return 'CustomRecordReferralDetailsRouteArgs{key: $key, appLocalizations: $appLocalizations, isEditing: $isEditing, projectId: $projectId, cycles: $cycles}';
+  }
+}
+
+/// generated route for
 /// [CustomReferBeneficiarySMCPage]
 class CustomReferBeneficiarySMCRoute
     extends PageRouteInfo<CustomReferBeneficiarySMCRouteArgs> {
@@ -1590,6 +1670,45 @@ class CustomSearchBeneficiaryRouteArgs {
   @override
   String toString() {
     return 'CustomSearchBeneficiaryRouteArgs{key: $key, appLocalizations: $appLocalizations}';
+  }
+}
+
+/// generated route for
+/// [CustomSearchReferralReconciliationsPage]
+class CustomSearchReferralReconciliationsRoute
+    extends PageRouteInfo<CustomSearchReferralReconciliationsRouteArgs> {
+  CustomSearchReferralReconciliationsRoute({
+    Key? key,
+    ReferralReconLocalization? appLocalizations,
+    List<PageRouteInfo>? children,
+  }) : super(
+          CustomSearchReferralReconciliationsRoute.name,
+          args: CustomSearchReferralReconciliationsRouteArgs(
+            key: key,
+            appLocalizations: appLocalizations,
+          ),
+          initialChildren: children,
+        );
+
+  static const String name = 'CustomSearchReferralReconciliationsRoute';
+
+  static const PageInfo<CustomSearchReferralReconciliationsRouteArgs> page =
+      PageInfo<CustomSearchReferralReconciliationsRouteArgs>(name);
+}
+
+class CustomSearchReferralReconciliationsRouteArgs {
+  const CustomSearchReferralReconciliationsRouteArgs({
+    this.key,
+    this.appLocalizations,
+  });
+
+  final Key? key;
+
+  final ReferralReconLocalization? appLocalizations;
+
+  @override
+  String toString() {
+    return 'CustomSearchReferralReconciliationsRouteArgs{key: $key, appLocalizations: $appLocalizations}';
   }
 }
 

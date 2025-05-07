@@ -3,6 +3,7 @@ import 'package:attendance_management/router/attendance_router.gm.dart';
 import 'package:complaints/router/complaints_router.dart';
 import 'package:complaints/router/complaints_router.gm.dart';
 import 'package:health_campaign_field_worker_app/blocs/registration_delivery/custom_beneficairy_registration.dart';
+import 'package:referral_reconciliation/pages/search_referral_reconciliations.dart';
 import 'package:referral_reconciliation/router/referral_reconciliation_router.gm.dart';
 import 'package:referral_reconciliation/router/referral_reconciliation_router.dart';
 import 'package:registration_delivery/blocs/app_localization.dart';
@@ -61,9 +62,11 @@ export 'package:auto_route/auto_route.dart';
 import '../pages/beneficiary/check_eligibility/custom_beneficiary_details_page.dart';
 import '../pages/beneficiary/check_eligibility/custom_deliver_intervention_page.dart';
 import '../pages/beneficiary/check_eligibility/custom_delivery_summary_page.dart';
+import '../pages/referral_reconcillation/custom_search_referral_page.dart';
+import 'package:referral_reconciliation/blocs/app_localization.dart';
+import '../pages/referral_reconcillation/custom_record_referral_details.dart';
 import '../utils/app_enums.dart';
-import 'package:survey_form/router/survey_form_router.dart';
-import 'package:survey_form/router/survey_form_router.gm.dart';
+
 
 part 'app_router.gr.dart';
 
@@ -131,12 +134,25 @@ class AppRouter extends _$AppRouter {
             path: 'hf-referral',
             children: [
               AutoRoute(
+                  page: SearchReferralReconciliationsRoute.page,
+                  path: 'search-referrals'),
+              AutoRoute(
+                  page: CustomSearchReferralReconciliationsRoute.page,
+                  path: 'custom-search-referrals'),
+              RedirectRoute(
+                  path: 'search-referrals',
+                  redirectTo: 'custom-search-referrals'),
+              AutoRoute(
                   page: ReferralFacilityRoute.page,
                   path: 'facility-details',
                   initial: true),
               AutoRoute(
                   page: RecordReferralDetailsRoute.page,
                   path: 'referral-details'),
+                            AutoRoute(
+                  page: CustomRecordReferralDetailsRoute.page,
+                  path: 'custom-referral-details'),
+              RedirectRoute(path: 'referral-details', redirectTo: 'custom-referral-details'),
               AutoRoute(
                 page: ReferralReasonChecklistRoute.page,
                 path: 'referral-checklist-create',
@@ -327,10 +343,6 @@ class AppRouter extends _$AppRouter {
                     page: RecordPastDeliveryDetailsRoute.page,
                     path: 'record-past-delivery-details',
                   ),
-                  // AutoRoute(
-                  //   page: HouseholdAcknowledgementRoute.page,
-                  //   path: 'household-acknowledgement',
-                  // ),
 
                   AutoRoute(
                     page: CustomHouseholdAcknowledgementRoute.page,
