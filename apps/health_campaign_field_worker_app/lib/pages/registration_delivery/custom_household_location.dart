@@ -11,10 +11,10 @@ import 'package:digit_ui_components/widgets/molecules/digit_card.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:health_campaign_field_worker_app/widgets/custom_back_navigation.dart';
 import 'package:reactive_forms/reactive_forms.dart';
 import 'package:registration_delivery/utils/extensions/extensions.dart';
 
-import 'package:registration_delivery/blocs/beneficiary_registration/beneficiary_registration.dart';
 import 'package:registration_delivery/router/registration_delivery_router.gm.dart';
 import 'package:registration_delivery/utils/i18_key_constants.dart' as i18;
 import 'package:registration_delivery/utils/utils.dart';
@@ -22,6 +22,12 @@ import 'package:registration_delivery/widgets/back_navigation_help_header.dart';
 import 'package:registration_delivery/widgets/localized.dart';
 import 'package:registration_delivery/widgets/showcase/config/showcase_constants.dart';
 import 'package:registration_delivery/widgets/showcase/showcase_button.dart';
+
+import '../../blocs/registration_delivery/custom_beneficairy_registration.dart';
+import '../../models/entities/identifier_types.dart';
+import '../../router/app_router.dart';
+import '../../utils/constants.dart';
+import 'caregiver_consent.dart';
 
 @RoutePage()
 class CustomHouseholdLocationPage extends LocalizedStatefulWidget {
@@ -50,7 +56,7 @@ class CustomHouseholdLocationPageState
 
   @override
   void initState() {
-    final regState = context.read<BeneficiaryRegistrationBloc>().state;
+    final regState = context.read<CustomBeneficiaryRegistrationBloc>().state;
     context.read<LocationBloc>().add(const LoadLocationEvent());
     regState.maybeMap(
         orElse: () => false,
@@ -73,13 +79,13 @@ class CustomHouseholdLocationPageState
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
     final textTheme = theme.digitTextTheme(context);
-    final bloc = context.read<BeneficiaryRegistrationBloc>();
+    final bloc = context.read<CustomBeneficiaryRegistrationBloc>();
     final router = context.router;
     final bool isCommunity = RegistrationDeliverySingleton().householdType ==
         HouseholdType.community;
 
     return Scaffold(
-      body: BlocBuilder<BeneficiaryRegistrationBloc,
+      body: BlocBuilder<CustomBeneficiaryRegistrationBloc,
           BeneficiaryRegistrationState>(builder: (context, registrationState) {
         return ReactiveFormBuilder(
           form: () => buildForm(bloc.state),
@@ -116,14 +122,12 @@ class CustomHouseholdLocationPageState
             },
             child: ScrollableContent(
               enableFixedDigitButton: true,
-              header: Column(
+              header: const Column(
                 children: [
                   Padding(
-                    padding: const EdgeInsets.only(bottom: spacer2),
-                    child: BackNavigationHelpHeaderWidget(
-                      showcaseButton: ShowcaseButton(
-                        isCommunity: isCommunity,
-                      ),
+                    padding: EdgeInsets.only(bottom: spacer2),
+                    child: CustomBackNavigationHelpHeaderWidget(
+                      showHelp: true,
                     ),
                   ),
                 ],
@@ -231,7 +235,7 @@ class CustomHouseholdLocationPageState
                                     addressModel,
                                   ),
                                 );
-                                router.push(HouseHoldDetailsRoute());
+                                router.push(CaregiverConsentRoute());
                               },
                               editHousehold: (
                                 address,
@@ -278,7 +282,50 @@ class CustomHouseholdLocationPageState
                                     addressModel,
                                   ),
                                 );
-                                router.push(HouseDetailsRoute());
+                                router.push(CaregiverConsentRoute());
+                              },
+                              addMember: (
+                                address,
+                                householdModel,
+                                loading,
+                              ) {
+                                var addressModel = address.copyWith(
+                                  addressLine1: addressLine1 != null &&
+                                          addressLine1.trim().isNotEmpty
+                                      ? addressLine1
+                                      : null,
+                                  addressLine2: addressLine2 != null &&
+                                          addressLine2.trim().isNotEmpty
+                                      ? addressLine2
+                                      : null,
+                                  landmark: landmark != null &&
+                                          landmark.trim().isNotEmpty
+                                      ? landmark
+                                      : null,
+                                  locality: address.locality,
+                                  pincode: postalCode != null &&
+                                          postalCode.trim().isNotEmpty
+                                      ? postalCode
+                                      : null,
+                                  type: AddressType.correspondence,
+                                  latitude: form.control(_latKey).value,
+                                  longitude: form.control(_lngKey).value,
+                                  buildingName: (RegistrationDeliverySingleton()
+                                              .householdType ==
+                                          HouseholdType.community)
+                                      ? form.control(_buildingNameKey).value
+                                      : null,
+                                  locationAccuracy:
+                                      form.control(_accuracyKey).value,
+                                );
+                                // TODO [Linking of Voucher for Household based project  need to be handled]
+
+                                bloc.add(
+                                  BeneficiaryRegistrationSaveAddressEvent(
+                                    addressModel,
+                                  ),
+                                );
+                                router.push(CaregiverConsentRoute());
                               },
                             );
                           },
@@ -301,15 +348,7 @@ class CustomHouseholdLocationPageState
                                         .householdLocationLabelText,
                                   ),
                             headingStyle: textTheme.headingXl.copyWith(
-                                color: theme.colorTheme.primary.primary2),
-                            description: (RegistrationDeliverySingleton()
-                                        .householdType ==
-                                    HouseholdType.community)
-                                ? null
-                                : localizations.translate(
-                                    i18.householdLocation
-                                        .householdLocationDescriptionText,
-                                  )),
+                                color: theme.colorTheme.text.primary),),
                         householdLocationShowcaseData.administrativeArea
                             .buildWith(
                           child: ReactiveWrapperField(
@@ -321,6 +360,7 @@ class CustomHouseholdLocationPageState
                                   ),
                             },
                             builder: (field) => LabeledField(
+                              isRequired: true,
                               label: localizations.translate(
                                 i18.householdLocation
                                     .administrationAreaFormLabel,
@@ -334,28 +374,6 @@ class CustomHouseholdLocationPageState
                                   form.control(_administrationAreaKey).value =
                                       value;
                                 },
-                              ),
-                            ),
-                          ),
-                        ),
-                        householdLocationShowcaseData.gpsAccuracy.buildWith(
-                          child: ReactiveWrapperField(
-                            formControlName: _accuracyKey,
-                            validationMessages: {
-                              'required': (_) => localizations.translate(
-                                    i18.common.corecommonRequired,
-                                  ),
-                            },
-                            builder: (field) => LabeledField(
-                              label: localizations.translate(
-                                i18.householdLocation.gpsAccuracyLabel,
-                              ),
-                              capitalizedFirstLetter: false,
-                              child: DigitTextFormInput(
-                                readOnly: true,
-                                errorMessage: field.errorText,
-                                initialValue:
-                                    form.control(_accuracyKey).value.toString(),
                               ),
                             ),
                           ),
@@ -390,60 +408,6 @@ class CustomHouseholdLocationPageState
                                             .control(_buildingNameKey)
                                             .value,
                                       )))),
-                        // householdLocationShowcaseData.addressLine1.buildWith(
-                        //   child: ReactiveWrapperField(
-                        //     formControlName: _addressLine1Key,
-                        //     validationMessages: {
-                        //       'required': (_) => localizations.translate(
-                        //             i18.common.min2CharsRequired,
-                        //           ),
-                        //       'maxLength': (object) => localizations
-                        //           .translate(i18.common.maxCharsRequired)
-                        //           .replaceAll('{}', maxLength.toString()),
-                        //     },
-                        //     builder: (field) => LabeledField(
-                        //       label: localizations.translate(
-                        //         i18.householdLocation
-                        //             .householdAddressLine1LabelText,
-                        //       ),
-                        //       child: DigitTextFormInput(
-                        //         errorMessage: field.errorText,
-                        //         onChange: (value) {
-                        //           form.control(_addressLine1Key).value = value;
-                        //         },
-                        //         initialValue:
-                        //             form.control(_addressLine1Key).value,
-                        //       ),
-                        //     ),
-                        //   ),
-                        // ),
-                        // householdLocationShowcaseData.addressLine2.buildWith(
-                        //   child: ReactiveWrapperField(
-                        //     formControlName: _addressLine2Key,
-                        //     validationMessages: {
-                        //       'required': (_) => localizations.translate(
-                        //             i18.common.min2CharsRequired,
-                        //           ),
-                        //       'maxLength': (object) => localizations
-                        //           .translate(i18.common.maxCharsRequired)
-                        //           .replaceAll('{}', maxLength.toString()),
-                        //     },
-                        //     builder: (field) => LabeledField(
-                        //       label: localizations.translate(
-                        //         i18.householdLocation
-                        //             .householdAddressLine2LabelText,
-                        //       ),
-                        //       child: DigitTextFormInput(
-                        //         errorMessage: field.errorText,
-                        //         onChange: (value) {
-                        //           form.control(_addressLine2Key).value = value;
-                        //         },
-                        //         initialValue:
-                        //             form.control(_addressLine2Key).value,
-                        //       ),
-                        //     ),
-                        //   ),
-                        // ),
                         householdLocationShowcaseData.landmark.buildWith(
                           child: ReactiveWrapperField(
                             formControlName: _landmarkKey,
@@ -469,37 +433,6 @@ class CustomHouseholdLocationPageState
                             ),
                           ),
                         ),
-                        // householdLocationShowcaseData.postalCode.buildWith(
-                        //   child: ReactiveWrapperField(
-                        //     formControlName: _postalCodeKey,
-                        //     validationMessages: {
-                        //       'required': (_) => localizations.translate(
-                        //             i18.common.min2CharsRequired,
-                        //           ),
-                        //       'maxLength': (object) => localizations
-                        //           .translate(i18.common.maxCharsRequired)
-                        //           .replaceAll('{}', '6'),
-                        //     },
-                        //     builder: (field) => LabeledField(
-                        //       label: localizations.translate(
-                        //         i18.householdLocation.postalCodeFormLabel,
-                        //       ),
-                        //       child: DigitTextFormInput(
-                        //         keyboardType: TextInputType.number,
-                        //         inputFormatters: [
-                        //           FilteringTextInputFormatter.digitsOnly,
-                        //         ],
-                        //         errorMessage: field.errorText,
-                        //         onChange: (value) {
-                        //           form.control(_postalCodeKey).value = value;
-                        //         },
-                        //         maxLength: 6,
-                        //         initialValue:
-                        //             form.control(_postalCodeKey).value,
-                        //       ),
-                        //     ),
-                        //   ),
-                        // ),
                       ]),
                 ),
               ],

@@ -1,35 +1,34 @@
 import 'package:auto_route/auto_route.dart';
 import 'package:collection/collection.dart';
+import 'package:digit_components/digit_components.dart';
 import 'package:digit_data_model/data_model.dart';
-import 'package:digit_ui_components/digit_components.dart';
-import 'package:digit_ui_components/theme/digit_extended_theme.dart';
-import 'package:digit_ui_components/widgets/scrollable_content.dart';
 import 'package:flutter/material.dart';
-import 'package:health_campaign_field_worker_app/widgets/header/back_navigation_help_header.dart';
+import 'package:health_campaign_field_worker_app/blocs/localization/app_localization.dart';
 import 'package:inventory_management/utils/constants.dart';
 import 'package:inventory_management/widgets/localized.dart';
+import 'package:path/path.dart';
 import 'package:reactive_forms/reactive_forms.dart';
 
-import '../../utils/i18_key_constants.dart' as i18;
-// import '../widgets/back_navigation_help_header.dart';
+import '../../../utils/i18_key_constants.dart' as i18;
+import 'package:inventory_management/widgets/back_navigation_help_header.dart';
 
 @RoutePage()
-class CustomInventoryFacilitySelectionPage extends LocalizedStatefulWidget {
+class CustomFacilitySelectionSMCPage extends LocalizedStatefulWidget {
   final List<FacilityModel> facilities;
 
-  const CustomInventoryFacilitySelectionPage({
+  const CustomFacilitySelectionSMCPage({
     super.key,
     super.appLocalizations,
     required this.facilities,
   });
 
   @override
-  State<CustomInventoryFacilitySelectionPage> createState() =>
-      CustomInventoryFacilitySelectionPageState();
+  State<CustomFacilitySelectionSMCPage> createState() =>
+      CustomFacilitySelectionSMCPageState();
 }
 
-class CustomInventoryFacilitySelectionPageState
-    extends LocalizedState<CustomInventoryFacilitySelectionPage> {
+class CustomFacilitySelectionSMCPageState
+    extends LocalizedState<CustomFacilitySelectionSMCPage> {
   static const _facilityName = 'facilityKey';
   static const _selectedFacility = 'selectedFacilityKey';
 
@@ -40,7 +39,6 @@ class CustomInventoryFacilitySelectionPageState
       color: theme.colorScheme.outline,
       width: 1.0,
     );
-    final textTheme = theme.digitTextTheme(context);
 
     return SafeArea(
       child: ReactiveFormBuilder(
@@ -53,9 +51,10 @@ class CustomInventoryFacilitySelectionPageState
                 final filteredFacilities = widget.facilities.where((element) {
                   final query = form.control(_facilityName).value as String?;
                   if (query == null || query.isEmpty) return true;
-                  final localizedFacilityIdWithPrefix = localizations
-                      .translate('$facilityPrefix${element.id}')
-                      .toLowerCase();
+                  final localizedFacilityIdWithPrefix = element.name ??
+                      localizations
+                          .translate('$facilityPrefix${element.id}')
+                          .toLowerCase();
                   final lowerCaseQuery = query.toLowerCase();
                   return localizedFacilityIdWithPrefix.contains(lowerCaseQuery);
                 }).toList();
@@ -63,39 +62,38 @@ class CustomInventoryFacilitySelectionPageState
                 return ScrollableContent(
                   backgroundColor: Colors.white,
                   header: const BackNavigationHelpHeaderWidget(
-                    showHelp: false,
+                    showHelp: true,
                   ),
                   slivers: [
                     SliverToBoxAdapter(
                       child: Container(
                         color: Colors.white,
                         child: Padding(
-                          padding:
-                              const EdgeInsets.symmetric(horizontal: spacer4),
+                          padding: const EdgeInsets.symmetric(
+                              horizontal: kPadding * 2),
                           child: Column(
                             children: [
                               Padding(
-                                padding: const EdgeInsets.all(spacer2),
+                                padding: const EdgeInsets.all(kPadding),
                                 child: Align(
                                   alignment: Alignment.topLeft,
                                   child: Text(
                                     localizations.translate(
                                       i18.common.facilitySearchHeaderLabel,
                                     ),
-                                    style: textTheme.headingXl,
+                                    style: theme.textTheme.displayMedium,
                                     textAlign: TextAlign.left,
                                   ),
                                 ),
                               ),
-                              ReactiveWrapperField(
-                                  formControlName: _facilityName,
-                                  builder: (field) {
-                                    return DigitSearchFormInput(
-                                      onChange: (value) {
-                                        field.control.value = value;
-                                      },
-                                    );
-                                  }),
+                              const DigitTextFormField(
+                                suffix: Padding(
+                                  padding: EdgeInsets.all(kPadding),
+                                  child: Icon(Icons.search),
+                                ),
+                                label: '',
+                                formControlName: _facilityName,
+                              ),
                             ],
                           ),
                         ),
@@ -108,16 +106,14 @@ class CustomInventoryFacilitySelectionPageState
 
                           return Container(
                             color: Colors.white,
-                            padding:
-                                const EdgeInsets.symmetric(horizontal: spacer2),
+                            padding: const EdgeInsets.symmetric(
+                                horizontal: kPadding),
                             child: Container(
                               margin: const EdgeInsets.symmetric(
-                                  horizontal: spacer2),
+                                  horizontal: kPadding),
                               decoration: BoxDecoration(
-                                color: Theme.of(context)
-                                    .colorTheme
-                                    .paper
-                                    .secondary,
+                                color:
+                                    DigitTheme.instance.colors.alabasterWhite,
                                 border: Border(
                                   top:
                                       index == 0 ? borderSide : BorderSide.none,
@@ -133,12 +129,10 @@ class CustomInventoryFacilitySelectionPageState
                                   Navigator.of(context).pop(facility);
                                 },
                                 child: Container(
-                                  margin: const EdgeInsets.all(spacer2),
+                                  margin: const EdgeInsets.all(kPadding),
                                   decoration: BoxDecoration(
-                                    color: Theme.of(context)
-                                        .colorTheme
-                                        .paper
-                                        .secondary,
+                                    color: DigitTheme
+                                        .instance.colors.alabasterWhite,
                                     border: Border(
                                       bottom: BorderSide(
                                         color: theme.colorScheme.outline,
@@ -147,10 +141,11 @@ class CustomInventoryFacilitySelectionPageState
                                     ),
                                   ),
                                   child: Padding(
-                                    padding: const EdgeInsets.all(spacer4),
+                                    padding: const EdgeInsets.all(kPadding * 2),
                                     child: Text(
-                                      localizations.translate(
-                                          '$facilityPrefix${facility.id}'),
+                                      facility.name ??
+                                          localizations.translate(
+                                              '$facilityPrefix${facility.id}'),
                                     ),
                                   ),
                                 ),
@@ -184,16 +179,23 @@ class CustomInventoryFacilitySelectionPageState
 class FacilityValueAccessor
     extends ControlValueAccessor<FacilityModel, String> {
   final List<FacilityModel> models;
+  BuildContext context;
 
-  FacilityValueAccessor(this.models);
+  FacilityValueAccessor(this.models, this.context);
 
   @override
   String? modelToViewValue(FacilityModel? modelValue) {
-    return modelValue?.id;
+    AppLocalizations localizations = AppLocalizations.of(context);
+
+    return modelValue == null
+        ? ""
+        : modelValue?.name ??
+            localizations.translate('$facilityPrefix${modelValue?.id}');
   }
 
   @override
   FacilityModel? viewToModelValue(String? viewValue) {
-    return models.firstWhereOrNull((element) => element.id == viewValue);
+    return models.firstWhereOrNull(
+        (element) => element.id == viewValue || element.name == viewValue);
   }
 }

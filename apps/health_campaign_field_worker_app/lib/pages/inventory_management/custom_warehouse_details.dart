@@ -10,6 +10,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:health_campaign_field_worker_app/router/app_router.dart';
 import 'package:intl/intl.dart';
+import 'package:inventory_management/pages/facility_selection.dart';
 import 'package:inventory_management/router/inventory_router.gm.dart';
 import 'package:reactive_forms/reactive_forms.dart';
 
@@ -19,7 +20,8 @@ import 'package:inventory_management/blocs/record_stock.dart';
 import 'package:inventory_management/utils/utils.dart';
 import 'package:inventory_management/widgets/back_navigation_help_header.dart';
 import 'package:inventory_management/widgets/inventory/no_facilities_assigned_dialog.dart';
-import 'custom_facility_selection.dart';
+
+import '../../router/app_router.dart';
 
 @RoutePage()
 class CustomWarehouseDetailsPage extends LocalizedStatefulWidget {
@@ -58,7 +60,7 @@ class CustomWarehouseDetailsPageState
         _dateOfEntryKey: FormControl<DateTime>(value: DateTime.now()),
         _administrativeUnitKey: FormControl<String>(
           value: localizations
-              .translate(InventorySingleton().boundary!.name ?? ''),
+              .translate(InventorySingleton().boundary!.code ?? ''),
         ),
         _warehouseKey: FormControl<String>(
           validators: [Validators.required],
@@ -127,7 +129,7 @@ class CustomWarehouseDetailsPageState
 
                           return ScrollableContent(
                             header: const Column(children: [
-                              BackNavigationHelpHeaderWidget(),
+                              BackNavigationHelpHeaderWidget(showHelp: true,),
                             ]),
                             footer: SizedBox(
                               child: DigitCard(
@@ -305,7 +307,7 @@ class CustomWarehouseDetailsPageState
                                             await Navigator.of(context).push(
                                           MaterialPageRoute(
                                             builder: (context) =>
-                                                CustomInventoryFacilitySelectionPage(
+                                                InventoryFacilitySelectionPage(
                                               facilities: facilities,
                                             ),
                                           ),

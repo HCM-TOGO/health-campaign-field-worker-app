@@ -13,11 +13,15 @@ const homeShowcase = HomeShowcase();
 const privacyPolicy = PrivacyPolicy();
 const dashBoard = Dashboard();
 
+const caregiverConsent = CaregiverConsent();
+
 const householdLocationShowcase = HouseholdLocationShowcase();
 const householdLocation = HouseholdLocation();
 const searchBeneficiary = SearchBeneficiary();
 const individualDetails = IndividualDetails();
 const beneficiaryDetails = BeneficiaryDetails();
+const stockDetails = StockDetails();
+const inventoryReportDetails = InventoryReportDetails();
 
 const selectStockShowcase = SelectStockShowcase();
 const warehouseDetailsShowcase = WarehouseDetailsShowcase();
@@ -34,10 +38,18 @@ const complaintsDetailsShowcase = ComplaintsDetailsShowcase();
 const complaintsDetailsViewShowcase = ComplaintsDetailsViewShowcase();
 const complaintsInboxShowcase = ComplaintsInboxShowcase();
 
+const householdOverView = HouseholdOverView();
+const deliverIntervention = DeliverIntervention();
+const checklist = Checklist();
+const referBeneficiary = ReferBeneficiary();
+const householdDetails = HouseholdDetails();
+
 class Common {
   const Common();
 
   String get coreCommonContinue => 'CORE_COMMON_CONTINUE';
+  String get coreCommonWarning => 'CORE_COMMON_WARNING';
+  String get noProjectSelected => 'NO_PROJECT_SELECTED';
 
   String get coreCommonAge => 'CORE_COMMON_AGE';
 
@@ -110,6 +122,8 @@ class Common {
 
   String get maxCharsRequired => 'MAX_CHARS_ALLOWED';
 
+  String get coreCommonProceed => 'CORE_COMMON_PROCEED';
+
   String get maxValue => 'MAX_VALUE_ALLOWED';
   String get minValue => 'MIN_VALUE_ALLOWED';
 
@@ -131,6 +145,191 @@ class Common {
   String get ageInMonths => 'AGE_IN_MONTHS_LABEL';
   String get locationCapturing => 'CAPTURING_LOCATION';
   String get profileUpdateSuccess => 'PROFILE_UPDATE_SUCCESS';
+}
+
+class HouseholdOverView {
+  const HouseholdOverView();
+
+  String get householdOverViewHouseholderHeadLabel =>
+      'HOUSEHOLD_OVER_VIEW_HOUSEHOLDER_HEAD_LABEL';
+
+  String get householdOverViewBeneficiaryRefusedLabel =>
+      'HOUSEHOLD_OVER_VIEW_BENEFICIARY_REFUSED_LABEL';
+
+  String get householdOverViewSMCAssessmentActionText =>
+      'HOUSEHOLD_OVER_VIEW_SMC_ASSESSMENT_ACTION_TEXT';
+
+  String get householdOverViewVASAssessmentActionText =>
+      'HOUSEHOLD_OVER_VIEW_VAS_ASSESSMENT_ACTION_TEXT';
+
+  String get householdOverViewRedoseActionText =>
+      'HOUSEHOLD_OVER_VIEW_REDOSE_ACTION_TEXT';
+
+  String get householdOverViewSMCDeliveredIconLabel =>
+      'HOUSEHOLD_OVER_VIEW_SMC_DELIVERED_ICON_LABEL';
+
+  String get householdOverViewVASDeliveredIconLabel =>
+      'HOUSEHOLD_OVER_VIEW_VAS_DELIVERED_ICON_LABEL';
+
+  String get householdOverViewBeneficiaryReferredSMCLabel =>
+      'HOUSEHOLD_OVER_VIEW_BENEFICIARY_REFERRED_SMC_LABEL';
+
+  String get householdOverViewBeneficiaryReferredVASLabel =>
+      'HOUSEHOLD_OVER_VIEW_BENEFICIARY_REFERRED_VAS_LABEL';
+}
+
+class DeliverIntervention {
+  const DeliverIntervention();
+
+  String get recordRedoseLabel => 'DELIVER_INTERVENTION_RECORD_REDOSE_LABEL';
+  String get selectTheResourcDeliveredLabel => 'Select the Resource delivered';
+  String get reasonForRedoseLabel =>
+      'DELIVER_INTERVENTION_REASON_FOR_REDOSE_LABEL';
+  String get selectReasonForRedoseLabel =>
+      'DELIVER_INTERVENTION_SELECT_REASON_FOR_REDOSE_LABEL';
+  String get redoseQuantityLabel =>
+      'DELIVER_INTERVENTION_REDOSE_QUANTITY_LABEL';
+  String get dose => 'DELIVER_INTERVENTION_DOSE';
+
+  String get quantityAdministratedLabel => 'QUANTITY_ADMINISTRATED_LABEL';
+
+  String get selectTheResourceDeliveredLabel =>
+      'DELIVER_INTERVENTION_SELECT_RESOURCE_DELIVERED_LABEL';
+
+  String get beneficiaryIneligibleDescription => 'BENEFICIARY_INELIGIBLE_DESC';
+  String get beneficiaryReferralDescription => 'BENEFICIARY_REFERRAL_DESC';
+  String get spaqRedirectionScreenDescription => 'SPAQ_REDIRECTED_SCREEN_DESC';
+  String get deliversmcintervention => 'DELIVER_SMC_INTERVENTION';
+  String get deliverVASIntervention => 'DELIVER_VAS_INTERVENTION';
+  String get recordsmcdeliverdetails => 'RECORD_SMC_DELIVER_DETAILS';
+  String get doseadministeredby => 'DOSE_ADMINISTERED_BY';
+  String get proceedToVASLabel => 'PROCEED_TO_VAS_LABEL';
+  String get proceedToVASDescription => 'PROCEED_TO_VAS_DESCRIPTION';
+}
+
+class Checklist {
+  const Checklist();
+
+  String get checklist => 'CHECKLIST';
+
+  String get checklistlabel => 'CHECKLIST_LABEL';
+
+  String get checklistCreateActionLabel => 'CHECKLIST_CREATE_ACTION_LABEL';
+
+  String get checklistViewActionLabel => 'CHECKLIST_VIEW_ACTION_LABEL';
+
+  String get checklistDetailLabel => 'CHECKLIST_DETAILS_LABEL';
+
+  String get checklistDialogLabel => 'CHECKLIST_DIALOG_LABEL';
+
+  String get checklistDialogDescription => 'CHECKLIST_DIALOG_DESCRITPTION';
+
+  String get checklistDialogPrimaryAction => 'CHECKLIST_DIALOG_PRIMARY_ACTION';
+
+  String get submitButtonDialogLabelText => 'CHECKLIST_DETAILS_SUBMIT';
+
+  String get checklistDialogDynamicDescription =>
+      'CHECKLIST_DIALOG_DYNAMIC_DESCRIPTION';
+
+  String get checklistDialogSecondaryAction =>
+      'CHECKLIST_DIALOG_SECONDARY_ACTION';
+
+  String get checklistdate => 'CHECKLIST_DATE';
+
+  String get checklistReasonRequiredError => 'CHECKLIST_REASON_REQUIRED_ERROR';
+
+  String get notSelectedKey => 'NOT_SELECTED';
+
+  String get checklistBackDialogLabel => 'CHECKLIST_BACK_DIALOG_LABEL';
+
+  String get checklistBackDialogDescription =>
+      'CHECKLIST_BACK_DIALOG_DESCRITPTION';
+
+  String get checklistBackDialogPrimaryAction =>
+      'CHECKLIST_BACK_DIALOG_PRIMARY_ACTION';
+
+  String get checklistBackDialogSecondaryAction =>
+      'CHECKLIST_BACK_DIALOG_SECONDARY_ACTION';
+
+  String get noChecklistFound => 'NO_CHECKLISTS_FOUND';
+}
+
+class ReferBeneficiary {
+  const ReferBeneficiary();
+
+  String get dateOfReferralLabel => 'REFER_BENEFICIARY_DATE_OF_REFERRAL_LABEL';
+  String get dateOfEvaluationLabel =>
+      'REFER_BENEFICIARY_DATE_OF_EVALUATION_LABEL';
+  String get administrationUnitFormLabel => 'ADMINISTRATION_UNIT_FORM_LABEL';
+  String get organizationUnitFormLabel => 'ORGANIZATION_UNIT_FORM_LABEL';
+  String get referredByLabel => 'REFERRED_BY_FORM_LABEL';
+  String get referredToLabel => 'REFERRED_TO_FORM_LABEL';
+  String get reasonForReferral => 'REASON_FOR_REFERRAL';
+  String get referralComments => 'REFERRAL_COMMENTS';
+  String get referralDetails => 'REFERRAL_DETAILS_HEADER';
+  String get facilityValidationMessage => 'PLEASE_ENTER_VALID_FACILITY';
+  String get facilityDetails => 'FACILITY_DETAILS_HEADER';
+  String get evaluationFacilityLabel => 'EVALUATION_FACILITY_LABEL';
+  String get nameOfHealthFacilityCoordinatorLabel =>
+      'NAME_OF_HEALTH_FACILITY_COORDINATOR';
+  String get healthFacilityCoordinatorLabel => 'NAME_OF_HF_COORDINATOR_LABEL';
+  String get nameOfTheChildLabel => 'REFERRAL_NAME_OF_CHILD_LABEL';
+  String get beneficiaryIdLabel => 'REFERRAL_BENEFICIARY_ID_LABEL';
+  String get referralCodeLabel => 'REFERRAL_CODE_LABEL';
+  String get reasonForReferralHeader => 'REASON_FOR_REFERRAL_HEADER';
+  String get searchReferralsHeader => 'SEARCH_REFERRALS_HEADER';
+  String get referredByTeamCodeLabel => 'REFERRED_BY_TEAM_CODE_LABEL';
+  String get selectCycle => 'REFERRAL_SELECT_CYCLE';
+  String get createReferralLabel => 'CREATE_REFERRAL_LABEL';
+  String get noChecklistFound => 'NO_CHECKLISTS_FOUND';
+  String get dialogTitle => 'REFERRAL_CONFIRMATION_DIALOG_TITLE';
+  String get dialogContent => 'REFERRAL_CONFIRMATION_DIALOG_CONTENT';
+  String get dialogSuccess => 'REFERRAL_CONFIRMATION_SUCCESS_LABEL';
+  String get dialogCancel => 'REFERRAL_CONFIRMATION_CANCEL_LABEL';
+  String get referredDialogTitle => 'REFERRAL_CONFIRMATION_DIALOG_BOX_TITLE';
+  String get referredDialogContent =>
+      'REFERRAL_CONFIRMATION_DIALOG_BOX_CONTENT';
+  String get referAlertDialogTitle => 'REFERRAL_ALERT_DIALOG_TITLE';
+  String get referAlertDialogContent => 'REFERRAL_ALERT_DIALOG_CONTENT';
+  String get validationForReferralAge => 'REFERRAL_AGE_VALIDATION';
+}
+
+class HouseholdDetails {
+  const HouseholdDetails();
+
+  String get householdDetailsLabel => 'HOUSEHOLD_DETAILS_LABEL';
+  String get actionLabel => 'HOUSEHOLD_ACTION_LABEL';
+  String get dateOfRegistrationLabel =>
+      'HOUSEHOLD_DETAILS_DATE_OF_REGISTRATION_LABEL';
+  String get dateOfAdministrationLabel =>
+      'HOUSEHOLD_DETAILS_DATE_OF_ADMINISTRATION_LABEL';
+  String get noOfMembersCountLabel => 'NO_OF_MEMBERS_COUNT_LABEL';
+  String get viewHouseHoldDetailsActionSMC =>
+      'VIEW_HOUSEHOLD_DETAILS_ACTION_LABEL_SMC';
+
+  String get reasonLabelText => 'REASON_LABEL_TEXT';
+  String get householdDetailsDescriptionSMC =>
+      'HOUSEHOLD_DETAILS_DESCRIPTION_SMC';
+  String get viewHouseHoldDetailsAction =>
+      'VIEW_HOUSEHOLD_DETAILS_ACTION_LABEL';
+  String get cardTitle => 'CONSENT_CARD_TITLE';
+  String get validationForSelection => 'CONSENT_SUBMIT_VALIDATION';
+  String get submitYes => 'SUBMIT_YES';
+  String get submitNo => 'SUBMIT_NO';
+  String get householdConsentLabel => 'HOUSEHOLD_CONSENT_LABEL';
+  String get cardAztTitle => 'HOUSEHOLD_CONSENT_LABELL';
+}
+
+class ForgotPassword {
+  const ForgotPassword();
+
+  String get labelText => 'FORGOT_PASSWORD_LABEL_TEXT';
+
+  String get contentText => 'FORGOT_PASSWORD_CONTENT_TEXT';
+
+  String get primaryActionLabel => 'PRIMARY_ACTION_LABEL';
+
+  String get actionLabel => 'FORGOT_PASSWORD_ACTION_LABEL';
 }
 
 class HomeShowcase {
@@ -207,6 +406,29 @@ class HomeShowcase {
   String get clf {
     return "COMMUNAL_LIVING_FACILITY_SHOWCASE";
   }
+}
+
+class StockDetails {
+  const StockDetails();
+
+  String get batchNumberLabel {
+    return 'STOCK_DETAILS_BATCH_NUMBER';
+  }
+
+  String get quantityUnusedReturnedLabel =>
+      'STOCK_DETAILS_UNUSED_QUANTITY_RETURNED';
+
+  String get quantityPartialReturnedLabel =>
+      'STOCK_DETAILS_PARTIAL_QUANTITY_RETURNED';
+
+  String get quantityReturnedMaxError =>
+      'STOCK_DETAILS_RETURNED_MAX_QUANTITY_ERROR';
+}
+
+class InventoryReportDetails {
+  const InventoryReportDetails();
+  String get partialReturnedQuantityLabel =>
+      "INVENTORY_REPORT_DETAILS_PARTIAL_RETURNED_QUANTITY_LABEL";
 }
 
 class SelectStockShowcase {
@@ -343,6 +565,7 @@ class Login {
 
   String get labelText => 'LOGIN_LABEL_TEXT';
 
+  String get logOutWarningMsg => 'LOG_OUT_WARNING_MESSAGE';
   String get userIdPlaceholder => 'USER_ID_PLACEHOLDER';
 
   String get passwordPlaceholder => 'PASSWORD_PLACEHOLDER';
@@ -350,6 +573,7 @@ class Login {
   String get actionLabel => 'LOGIN_ACTION_LABEL';
 
   String get unableToLoginText => 'UNABLE_TO_LOGIN';
+  String get noInternetError => 'ERR_NOT_CONNECTED_TO_INTERNET';
 }
 
 class SelectSurveyFormShowcase {
@@ -390,6 +614,18 @@ class ComplaintTypeShowcase {
   String get complaintTypeNext {
     return 'COMPLAINT_TYPE_SHOWCASE_COMPLAINT_TYPE_NEXT';
   }
+}
+
+class CaregiverConsent {
+  const CaregiverConsent();
+
+  String get caregiverConsentLabelText => 'CARE_GIVER_CONSENT_LABEL_TEXT';
+
+  String get caregiverConsentDescriptionText =>
+      'CARE_GIVER_CONSENT_DESCRIPTION_TEXT';
+
+  String get caregiverConsentActionLabelText =>
+      'CARE_GIVER_CONSENT_ACTION_LABEL_TEXT';
 }
 
 class ComplaintsDetailsShowcase {
@@ -516,22 +752,25 @@ class ComplaintsInboxShowcase {
   }
 }
 
-class ForgotPassword {
-  const ForgotPassword();
+// class ForgotPassword {
+//   const ForgotPassword();
 
-  String get labelText => 'FORGOT_PASSWORD_LABEL_TEXT';
+//   String get labelText => 'FORGOT_PASSWORD_LABEL_TEXT';
 
-  String get contentText => 'FORGOT_PASSWORD_CONTENT_TEXT';
+//   String get contentText => 'FORGOT_PASSWORD_CONTENT_TEXT';
 
-  String get primaryActionLabel => 'PRIMARY_ACTION_LABEL';
+//   String get primaryActionLabel => 'PRIMARY_ACTION_LABEL';
 
-  String get actionLabel => 'FORGOT_PASSWORD_ACTION_LABEL';
-}
+//   String get actionLabel => 'FORGOT_PASSWORD_ACTION_LABEL';
+// }
 
 class Home {
   const Home();
 
   String get beneficiaryLabel => 'HOME_BENEFICIARY_LABEL';
+
+  String get beneficiaryDistributionLabel =>
+      'HOME_BENEFICIARY_DISTRIBUTION_LABEL';
 
   String get manageStockLabel => 'HOME_MANAGE_STOCK_LABEL';
 
@@ -583,6 +822,8 @@ class AcknowledgementSuccess {
   String get goToHome => 'GO_TO_HOME_SCREEN';
   String get downloadmoredata => 'DOWNLOAD_MORE_DATA';
   String get dataDownloadedSuccessLabel => 'DATA_DOWNLOADED_SUCCESS_LABEL';
+  String get referAcknowledgementLabelText =>
+      'REFER_ACKNOWLEDGEMENT_SUCCESS_LABEL_TEXT';
 }
 
 class ProjectSelection {
@@ -931,6 +1172,15 @@ class IndividualDetails {
 
 class BeneficiaryDetails {
   const BeneficiaryDetails();
+  String get insufficientStockHeading => 'INSUFFICIENT_STOCK_HEADING';
+  String get insufficientAZTStockMessage => 'INSUFFICIENT_AZT_STOCK_MESSAGE';
+  String get insufficientAZTStockMessageDelivery =>
+      'INSUFFICIENT_AZT_STOCK_MESSAGE_DELIVERY';
+
+  String get householdId => 'HOUSEHOLD_ID';
+  String get beneficiaryId => 'BENEFICIARY_ID';
+  String get backToHouseholdDetails => 'BACK_TO_HOUSEHOLD_DETAILS';
+  String get beneficiaryDoseUnit => 'BENEFICIARY_DETAILS_DOSE_UNIT';
 
   String get beneficiarysDetailsLabelText => 'BENEFICIARY_DETAILS_LABEL_TEXT';
   String get beneficiarysDetailsEditIconLabelText =>

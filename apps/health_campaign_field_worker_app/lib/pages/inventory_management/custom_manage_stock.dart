@@ -4,13 +4,14 @@ import 'package:digit_ui_components/theme/digit_extended_theme.dart';
 import 'package:digit_ui_components/widgets/atoms/menu_card.dart';
 import 'package:digit_ui_components/widgets/scrollable_content.dart';
 import 'package:flutter/material.dart';
+import 'package:inventory_management/router/inventory_router.gm.dart';
 
 import 'package:inventory_management/utils/i18_key_constants.dart' as i18;
 import 'package:inventory_management/widgets/localized.dart';
 import 'package:inventory_management/blocs/record_stock.dart';
-import 'package:health_campaign_field_worker_app/widgets/header/back_navigation_help_header.dart';
+import 'package:inventory_management/widgets/back_navigation_help_header.dart';
 
-import '../../router/app_router.dart';
+import '../../utils/utils.dart';
 
 @RoutePage()
 class CustomManageStocksPage extends LocalizedStatefulWidget {
@@ -37,7 +38,7 @@ class CustomManageStocksPageState
 
     return Scaffold(
       body: ScrollableContent(
-        header: const BackNavigationHelpHeaderWidget(),
+        header: const BackNavigationHelpHeaderWidget(showHelp: true,),
         children: [
           Column(
             crossAxisAlignment: CrossAxisAlignment.start,
@@ -66,30 +67,33 @@ class CustomManageStocksPageState
                     icon: Icons.file_download_outlined,
                     onTap: () {
                       context.router.push(
-                        CustomRecordStockWrapperRoute(
+                        RecordStockWrapperRoute(
                           type: StockRecordEntryType.receipt,
                         ),
                       );
                     },
                   ),
                 ),
-                const SizedBox(
-                  height: spacer4,
-                ),
-                Padding(
-                  padding: const EdgeInsets.only(left: spacer2, right: spacer2),
-                  child: MenuCard(
-                      heading: localizations
-                          .translate(i18.manageStock.recordStockIssuedLabel),
-                      description: localizations.translate(
-                          i18.manageStock.recordStockIssuedDescription),
-                      icon: Icons.file_upload_outlined,
-                      onTap: () => context.router.push(
-                            CustomRecordStockWrapperRoute(
-                              type: StockRecordEntryType.dispatch,
-                            ),
-                          )),
-                ),
+                if (!context.isCDD)
+                  const SizedBox(
+                    height: spacer4,
+                  ),
+                if (!context.isCDD)
+                  Padding(
+                    padding:
+                        const EdgeInsets.only(left: spacer2, right: spacer2),
+                    child: MenuCard(
+                        heading: localizations
+                            .translate(i18.manageStock.recordStockIssuedLabel),
+                        description: localizations.translate(
+                            i18.manageStock.recordStockIssuedDescription),
+                        icon: Icons.file_upload_outlined,
+                        onTap: () => context.router.push(
+                              RecordStockWrapperRoute(
+                                type: StockRecordEntryType.dispatch,
+                              ),
+                            )),
+                  ),
                 const SizedBox(
                   height: spacer4,
                 ),
@@ -103,47 +107,47 @@ class CustomManageStocksPageState
                       ),
                       icon: Icons.settings_backup_restore,
                       onTap: () => context.router.push(
-                            CustomRecordStockWrapperRoute(
+                            RecordStockWrapperRoute(
                               type: StockRecordEntryType.returned,
                             ),
                           )),
                 ),
-                const SizedBox(
-                  height: spacer4,
-                ),
-                Padding(
-                  padding: const EdgeInsets.only(left: spacer2, right: spacer2),
-                  child: MenuCard(
-                      heading: localizations
-                          .translate(i18.manageStock.recordStockDamagedLabel),
-                      description: localizations.translate(
-                        i18.manageStock.recordStockDamagedDescription,
-                      ),
-                      icon: Icons.store,
-                      onTap: () => context.router.push(
-                            CustomRecordStockWrapperRoute(
-                              type: StockRecordEntryType.damaged,
-                            ),
-                          )),
-                ),
-                const SizedBox(
-                  height: spacer4,
-                ),
-                Padding(
-                  padding: const EdgeInsets.only(left: spacer2, right: spacer2),
-                  child: MenuCard(
-                      heading: localizations
-                          .translate(i18.manageStock.recordStockLossLabel),
-                      description: localizations.translate(
-                        i18.manageStock.recordStockDamagedDescription,
-                      ),
-                      icon: Icons.store,
-                      onTap: () => context.router.push(
-                            CustomRecordStockWrapperRoute(
-                              type: StockRecordEntryType.loss,
-                            ),
-                          )),
-                ),
+                // const SizedBox(
+                //   height: spacer4,
+                // ),
+                // Padding(
+                //   padding: const EdgeInsets.only(left: spacer2, right: spacer2),
+                //   child: MenuCard(
+                //       heading: localizations
+                //           .translate(i18.manageStock.recordStockDamagedLabel),
+                //       description: localizations.translate(
+                //         i18.manageStock.recordStockDamagedDescription,
+                //       ),
+                //       icon: Icons.store,
+                //       onTap: () => context.router.push(
+                //             RecordStockWrapperRoute(
+                //               type: StockRecordEntryType.damaged,
+                //             ),
+                //           )),
+                // ),
+                // const SizedBox(
+                //   height: spacer4,
+                // ),
+                // Padding(
+                //   padding: const EdgeInsets.only(left: spacer2, right: spacer2),
+                //   child: MenuCard(
+                //       heading: localizations
+                //           .translate(i18.manageStock.recordStockLossLabel),
+                //       description: localizations.translate(
+                //         i18.manageStock.recordStockDamagedDescription,
+                //       ),
+                //       icon: Icons.store,
+                //       onTap: () => context.router.push(
+                //             RecordStockWrapperRoute(
+                //               type: StockRecordEntryType.loss,
+                //             ),
+                //           )),
+                // ),
               ]),
               const SizedBox(height: spacer4),
             ],

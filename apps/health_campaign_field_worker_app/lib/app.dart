@@ -1,15 +1,17 @@
-// import 'package:checklist/checklist.dart';
 import 'package:attendance_management/models/entities/attendance_register.dart';
+import 'package:digit_components/theme/theme.dart';
 import 'package:digit_data_model/data_model.dart';
 import 'package:digit_dss/digit_dss.dart';
 import 'package:digit_scanner/blocs/scanner.dart';
 import 'package:digit_ui_components/services/location_bloc.dart';
-import 'package:digit_ui_components/theme/digit_theme.dart';
 import 'package:dio/dio.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:isar/isar.dart';
 import 'package:location/location.dart';
+import 'package:registration_delivery/data/repositories/local/household_global_search.dart';
+import 'package:registration_delivery/data/repositories/local/individual_global_search.dart';
+import 'package:registration_delivery/data/repositories/oplog/oplog.dart';
 import 'package:survey_form/survey_form.dart';
 
 import 'blocs/app_initialization/app_initialization.dart';
@@ -53,7 +55,7 @@ class MainApplicationState extends State<MainApplication>
     with WidgetsBindingObserver {
   @override
   void initState() {
-    LocalizationParams().setModule('boundary', true);
+    LocalizationParams().setModule(['boundary'], true);
     super.initState();
     requestDisableBatteryOptimization();
   }
@@ -64,6 +66,18 @@ class MainApplicationState extends State<MainApplication>
       providers: [
         RepositoryProvider<LocalSqlDataStore>.value(value: widget.sql),
         RepositoryProvider<Isar>.value(value: widget.isar),
+        RepositoryProvider<IndividualGlobalSearchRepository>(
+          create: (context) => IndividualGlobalSearchRepository(
+            widget.sql,
+            IndividualOpLogManager(widget.isar),
+          ),
+        ),
+        RepositoryProvider<HouseHoldGlobalSearchRepository>(
+          create: (context) => HouseHoldGlobalSearchRepository(
+            widget.sql,
+            HouseholdOpLogManager(widget.isar),
+          ),
+        ),
       ],
       child: BlocProvider(
         create: (context) => AppInitializationBloc(
@@ -80,6 +94,13 @@ class MainApplicationState extends State<MainApplication>
           sql: widget.sql,
           child: MultiBlocProvider(
             providers: [
+              BlocProvider(
+                create: (_) {
+                  return LocationBloc(location: Location())
+                    ..add(const LoadLocationEvent());
+                },
+                lazy: false,
+              ),
               // INFO : Need to add bloc of package Here
               BlocProvider(
                 create: (_) {
@@ -99,30 +120,6 @@ class MainApplicationState extends State<MainApplication>
                 lazy: false,
               ),
 
-              BlocProvider(
-                create: (_) {
-                  return DigitScannerBloc(
-                    const DigitScannerState(),
-                  );
-                },
-                lazy: false,
-              ),
-
-              BlocProvider(
-                create: (_) {
-                  return LocationBloc(location: Location())
-                    ..add(const LoadLocationEvent());
-                },
-                lazy: false,
-              ),
-              BlocProvider(
-                create: (_) {
-                  return DigitScannerBloc(
-                    const DigitScannerState(),
-                  );
-                },
-                lazy: false,
-              ),
               BlocProvider(
                 create: (context) {
                   return UserBloc(
@@ -172,12 +169,12 @@ class MainApplicationState extends State<MainApplication>
 
                     final localizationModulesList = appConfig.backendInterface;
                     var firstLanguage;
-                    firstLanguage = 'en_NG';
-                    final selectedLocale = 'en_NG';
-                    AppSharedPreferences().setSelectedLocale(selectedLocale);
-                    // AppSharedPreferences().getSelectedLocale ??
-                    //     firstLanguage;
+                    firstLanguage = appConfig.languages?.lastOrNull?.value;
 
+                    final selectedLocale =
+                        AppSharedPreferences().getSelectedLocale ??
+                            firstLanguage;
+                    AppSharedPreferences().setSelectedLocale("en_NG");
                     LocalizationParams().setLocale(Locale(selectedLocale));
                     final languages = appConfig.languages;
 
@@ -211,6 +208,7 @@ class MainApplicationState extends State<MainApplication>
                             serviceDefinitionRemoteRepository: ctx.read<
                                 RemoteRepository<ServiceDefinitionModel,
                                     ServiceDefinitionSearchModel>>(),
+                            isar: widget.isar,
                             serviceDefinitionLocalRepository: ctx.read<
                                 LocalRepository<ServiceDefinitionModel,
                                     ServiceDefinitionSearchModel>>(),
@@ -246,7 +244,6 @@ class MainApplicationState extends State<MainApplication>
                             projectRemoteRepository: ctx.read<
                                 RemoteRepository<ProjectModel,
                                     ProjectSearchModel>>(),
-                            isar: widget.isar,
                             boundaryRemoteRepository: ctx.read<
                                 RemoteRepository<BoundaryModel,
                                     BoundarySearchModel>>(),
@@ -353,13 +350,13 @@ class MainApplicationState extends State<MainApplication>
                                   })
                                 : [firstLanguage],
                             localizationsDelegates: getAppLocalizationDelegates(
-                                sql: widget.sql,
-                                appConfig: appConfig,
-                                selectedLocale: Locale(
-                                  selectedLocale!.split("_").first,
-                                  selectedLocale.split("_").last,
-                                ),
-                                isar: widget.isar),
+                              sql: widget.sql,
+                              appConfig: appConfig,
+                              selectedLocale: Locale(
+                                selectedLocale!.split("_").first,
+                                selectedLocale.split("_").last,
+                              ),
+                            ),
                             locale: languages != null
                                 ? Locale(
                                     selectedLocale!.split("_").first,
@@ -377,7 +374,9 @@ class MainApplicationState extends State<MainApplication>
                                 orElse: () => [
                                   const UnauthenticatedRouteWrapper(),
                                 ],
-                                authenticated: (_, __, ___, ____, _____) => [
+                                authenticated: (_, __, ___, ____, _____, ______,
+                                        _______) =>
+                                    [
                                   AuthenticatedRouteWrapper(),
                                 ],
                               ),
