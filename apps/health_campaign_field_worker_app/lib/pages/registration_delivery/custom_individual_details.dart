@@ -247,7 +247,7 @@ class CustomIndividualDetailsPageState
                                 await DigitToast.show(
                                   context,
                                   options: DigitToastOptions(
-                                    localizations.translate(i18
+                                    localizations.translate(i18_local
                                         .individualDetails.headAgeValidError),
                                     true,
                                     theme,
