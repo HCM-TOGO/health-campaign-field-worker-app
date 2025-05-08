@@ -562,7 +562,7 @@ class _HomePageState extends LocalizedState<HomePage> {
 
     if ((envConfig.variables.envType == EnvType.demo && kReleaseMode) ||
         envConfig.variables.envType == EnvType.uat) {
-      // filteredLabels.remove(i18.home.db);
+      filteredLabels.remove(i18.home.db);
     }
 
     final List<Widget> widgetList =
