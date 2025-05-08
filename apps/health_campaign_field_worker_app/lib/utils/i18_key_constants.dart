@@ -1129,6 +1129,7 @@ class IndividualDetails {
 
   String get onlyAlphabetsValidationMessage =>
       'INDIVIDUAL_DETAILS_ONLY_ALPHABETS_VALIDATION_MESSAGE';
+  String get headAgeValidError => "HEAD_AGE_VALID_ERROR";
 
   String get individualsDetailsLabelText => 'INDIVIDUAL_LABEL_TEXT';
 
