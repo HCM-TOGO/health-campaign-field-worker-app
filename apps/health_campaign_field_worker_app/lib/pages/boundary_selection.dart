@@ -466,7 +466,9 @@ class _BoundarySelectionPageState
                                             size: DigitButtonSize.large,
                                             onPressed: () async {
                                               if (!form.valid ||
-                                                  validateAllBoundarySelection()) {
+                                                  validateAllBoundarySelection(
+                                                    context.isDistributor,
+                                                  )) {
                                                 clickedStatus.value = false;
                                                 Toast.showToast(
                                                   context,
@@ -769,22 +771,25 @@ class _BoundarySelectionPageState
     return fb.group(formControls);
   }
 
-  bool validateAllBoundarySelection() {
-    // Iterate through the map entries
-    for (final entry in formControls.entries) {
-      // Access the form control
-      final formControl = entry.value;
+  bool validateAllBoundarySelection(bool mandateAllBoundarySelection) {
+    if (mandateAllBoundarySelection) {
+      // Iterate through the map entries
+      for (final entry in formControls.entries) {
+        // Access the form control
+        final formControl = entry.value;
 
-      // Check if the form control value is null
-      if (formControl.value == null) {
-        formControl.setErrors({'': true});
+        // Check if the form control value is null
+        if (formControl.value == null) {
+          formControl.setErrors({'': true});
 
-        // Return true if any form control has a null value
-        return true;
+          // Return true if any form control has a null value
+          return true;
+        }
       }
-    }
 
-    // Return false if none of the form controls have a null value
+      // Return false if none of the form controls have a null value
+      return false;
+    }
     return false;
   }
 

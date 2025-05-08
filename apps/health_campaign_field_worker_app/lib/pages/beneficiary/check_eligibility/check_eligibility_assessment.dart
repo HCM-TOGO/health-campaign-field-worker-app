@@ -256,7 +256,11 @@ class _EligibilityChecklistViewPage
                                                 .checklistDialogDynamicDescription,
                                           )
                                           .replaceFirst('{}', descriptionText))
-                                      : Text(localizations.translate(
+                                      // : Text(localizations.translate(i18_local
+                                      //     .deliverIntervention
+                                      //     .proceedToVASDescription)),
+                                      : getHighlightedText(
+                                          localizations.translate(
                                           i18_local.deliverIntervention
                                               .proceedToVASDescription,
                                         )),
@@ -954,6 +958,41 @@ class _EligibilityChecklistViewPage
     } else {
       return const SizedBox.shrink();
     }
+  }
+
+  Widget getHighlightedText(String description) {
+    // Find the position of the word "Proceed"
+    int startIndex = description.indexOf('Proceed');
+    int endIndex = startIndex + 'Proceed'.length;
+
+    // Split the description into parts
+    String partBefore = description.substring(0, startIndex);
+    String partHighlighted = description.substring(startIndex, endIndex);
+    String partAfter = description.substring(endIndex);
+
+    TextTheme textTheme = Theme.of(context).textTheme;
+    TextStyle normalTextStyle =
+        textTheme.titleMedium ?? TextStyle(color: Colors.black);
+
+    // Use RichText to style the word "Proceed"
+    return RichText(
+      text: TextSpan(
+        children: [
+          TextSpan(
+            text: partBefore,
+            style: normalTextStyle,
+          ),
+          TextSpan(
+            text: partHighlighted,
+            style: normalTextStyle.copyWith(fontWeight: FontWeight.bold),
+          ),
+          TextSpan(
+            text: partAfter,
+            style: normalTextStyle,
+          ),
+        ],
+      ),
+    );
   }
 
   List<bool> isIneligible(

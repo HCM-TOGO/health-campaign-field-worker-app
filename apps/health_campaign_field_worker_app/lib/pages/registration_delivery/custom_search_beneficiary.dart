@@ -21,6 +21,7 @@ import 'package:registration_delivery/blocs/search_households/search_households.
     as registration_delivery;
 
 import 'package:registration_delivery/utils/i18_key_constants.dart' as i18;
+import '../../utils/i18_key_constants.dart' as i18_local;
 import 'package:registration_delivery/models/entities/status.dart';
 import 'package:registration_delivery/router/registration_delivery_router.gm.dart';
 // import 'package:registration_delivery/utils/global_search_parameters.dart';
@@ -95,7 +96,9 @@ class _CustomSearchBeneficiaryPageState
             builder: (context, searchHouseholdsState) {
               return ScrollableContent(
                 header: const Column(children: [
-                  CustomBackNavigationHelpHeaderWidget(showHelp:true,),
+                  CustomBackNavigationHelpHeaderWidget(
+                    showHelp: true,
+                  ),
                 ]),
                 slivers: [
                   SliverToBoxAdapter(
@@ -292,7 +295,7 @@ class _CustomSearchBeneficiaryPageState
                                     ? localizations.translate(
                                         i18.searchBeneficiary.clfInfoTitle)
                                     : localizations.translate(
-                                        i18.searchBeneficiary
+                                        i18_local.searchBeneficiary
                                             .beneficiaryInfoDescription,
                                       ),
                                 title: localizations.translate(

@@ -102,6 +102,28 @@ abstract class _$AppRouter extends RootStackRouter {
         )),
       );
     },
+    CustomComplaintTypeRoute.name: (routeData) {
+      final args = routeData.argsAs<CustomComplaintTypeRouteArgs>(
+          orElse: () => const CustomComplaintTypeRouteArgs());
+      return AutoRoutePage<dynamic>(
+        routeData: routeData,
+        child: CustomComplaintTypePage(
+          key: args.key,
+          appLocalizations: args.appLocalizations,
+        ),
+      );
+    },
+    CustomComplaintsDetailsRoute.name: (routeData) {
+      final args = routeData.argsAs<CustomComplaintsDetailsRouteArgs>(
+          orElse: () => const CustomComplaintsDetailsRouteArgs());
+      return AutoRoutePage<dynamic>(
+        routeData: routeData,
+        child: CustomComplaintsDetailsPage(
+          key: args.key,
+          appLocalizations: args.appLocalizations,
+        ),
+      );
+    },
     CustomDeliverInterventionRoute.name: (routeData) {
       final args = routeData.argsAs<CustomDeliverInterventionRouteArgs>();
       return AutoRoutePage<dynamic>(
@@ -262,6 +284,19 @@ abstract class _$AppRouter extends RootStackRouter {
         ),
       );
     },
+    CustomRecordReferralDetailsRoute.name: (routeData) {
+      final args = routeData.argsAs<CustomRecordReferralDetailsRouteArgs>();
+      return AutoRoutePage<dynamic>(
+        routeData: routeData,
+        child: CustomRecordReferralDetailsPage(
+          key: args.key,
+          appLocalizations: args.appLocalizations,
+          isEditing: args.isEditing,
+          projectId: args.projectId,
+          cycles: args.cycles,
+        ),
+      );
+    },
     CustomReferBeneficiarySMCRoute.name: (routeData) {
       final args = routeData.argsAs<CustomReferBeneficiarySMCRouteArgs>();
       return AutoRoutePage<dynamic>(
@@ -308,6 +343,19 @@ abstract class _$AppRouter extends RootStackRouter {
       return AutoRoutePage<dynamic>(
         routeData: routeData,
         child: CustomSearchBeneficiaryPage(
+          key: args.key,
+          appLocalizations: args.appLocalizations,
+        ),
+      );
+    },
+    CustomSearchReferralReconciliationsRoute.name: (routeData) {
+      final args =
+          routeData.argsAs<CustomSearchReferralReconciliationsRouteArgs>(
+              orElse: () =>
+                  const CustomSearchReferralReconciliationsRouteArgs());
+      return AutoRoutePage<dynamic>(
+        routeData: routeData,
+        child: CustomSearchReferralReconciliationsPage(
           key: args.key,
           appLocalizations: args.appLocalizations,
         ),
@@ -788,6 +836,84 @@ class CustomBeneficiaryRegistrationWrapperRouteArgs {
   @override
   String toString() {
     return 'CustomBeneficiaryRegistrationWrapperRouteArgs{key: $key, initialState: $initialState}';
+  }
+}
+
+/// generated route for
+/// [CustomComplaintTypePage]
+class CustomComplaintTypeRoute
+    extends PageRouteInfo<CustomComplaintTypeRouteArgs> {
+  CustomComplaintTypeRoute({
+    Key? key,
+    AppLocalizations? appLocalizations,
+    List<PageRouteInfo>? children,
+  }) : super(
+          CustomComplaintTypeRoute.name,
+          args: CustomComplaintTypeRouteArgs(
+            key: key,
+            appLocalizations: appLocalizations,
+          ),
+          initialChildren: children,
+        );
+
+  static const String name = 'CustomComplaintTypeRoute';
+
+  static const PageInfo<CustomComplaintTypeRouteArgs> page =
+      PageInfo<CustomComplaintTypeRouteArgs>(name);
+}
+
+class CustomComplaintTypeRouteArgs {
+  const CustomComplaintTypeRouteArgs({
+    this.key,
+    this.appLocalizations,
+  });
+
+  final Key? key;
+
+  final AppLocalizations? appLocalizations;
+
+  @override
+  String toString() {
+    return 'CustomComplaintTypeRouteArgs{key: $key, appLocalizations: $appLocalizations}';
+  }
+}
+
+/// generated route for
+/// [CustomComplaintsDetailsPage]
+class CustomComplaintsDetailsRoute
+    extends PageRouteInfo<CustomComplaintsDetailsRouteArgs> {
+  CustomComplaintsDetailsRoute({
+    Key? key,
+    AppLocalizations? appLocalizations,
+    List<PageRouteInfo>? children,
+  }) : super(
+          CustomComplaintsDetailsRoute.name,
+          args: CustomComplaintsDetailsRouteArgs(
+            key: key,
+            appLocalizations: appLocalizations,
+          ),
+          initialChildren: children,
+        );
+
+  static const String name = 'CustomComplaintsDetailsRoute';
+
+  static const PageInfo<CustomComplaintsDetailsRouteArgs> page =
+      PageInfo<CustomComplaintsDetailsRouteArgs>(name);
+}
+
+class CustomComplaintsDetailsRouteArgs {
+  const CustomComplaintsDetailsRouteArgs({
+    this.key,
+    this.appLocalizations,
+  });
+
+  final Key? key;
+
+  final AppLocalizations? appLocalizations;
+
+  @override
+  String toString() {
+    return 'CustomComplaintsDetailsRouteArgs{key: $key, appLocalizations: $appLocalizations}';
   }
 }
 
@@ -1393,6 +1519,60 @@ class CustomManageStocksRouteArgs {
 }
 
 /// generated route for
+/// [CustomRecordReferralDetailsPage]
+class CustomRecordReferralDetailsRoute
+    extends PageRouteInfo<CustomRecordReferralDetailsRouteArgs> {
+  CustomRecordReferralDetailsRoute({
+    Key? key,
+    ReferralReconLocalization? appLocalizations,
+    bool isEditing = false,
+    required String projectId,
+    required List<String> cycles,
+    List<PageRouteInfo>? children,
+  }) : super(
+          CustomRecordReferralDetailsRoute.name,
+          args: CustomRecordReferralDetailsRouteArgs(
+            key: key,
+            appLocalizations: appLocalizations,
+            isEditing: isEditing,
+            projectId: projectId,
+            cycles: cycles,
+          ),
+          initialChildren: children,
+        );
+
+  static const String name = 'CustomRecordReferralDetailsRoute';
+
+  static const PageInfo<CustomRecordReferralDetailsRouteArgs> page =
+      PageInfo<CustomRecordReferralDetailsRouteArgs>(name);
+}
+
+class CustomRecordReferralDetailsRouteArgs {
+  const CustomRecordReferralDetailsRouteArgs({
+    this.key,
+    this.appLocalizations,
+    this.isEditing = false,
+    required this.projectId,
+    required this.cycles,
+  });
+
+  final Key? key;
+
+  final ReferralReconLocalization? appLocalizations;
+
+  final bool isEditing;
+
+  final String projectId;
+
+  final List<String> cycles;
+
+  @override
+  String toString() {
+    return 'CustomRecordReferralDetailsRouteArgs{key: $key, appLocalizations: $appLocalizations, isEditing: $isEditing, projectId: $projectId, cycles: $cycles}';
+  }
+}
+
+/// generated route for
 /// [CustomReferBeneficiarySMCPage]
 class CustomReferBeneficiarySMCRoute
     extends PageRouteInfo<CustomReferBeneficiarySMCRouteArgs> {
@@ -1590,6 +1770,45 @@ class CustomSearchBeneficiaryRouteArgs {
   @override
   String toString() {
     return 'CustomSearchBeneficiaryRouteArgs{key: $key, appLocalizations: $appLocalizations}';
+  }
+}
+
+/// generated route for
+/// [CustomSearchReferralReconciliationsPage]
+class CustomSearchReferralReconciliationsRoute
+    extends PageRouteInfo<CustomSearchReferralReconciliationsRouteArgs> {
+  CustomSearchReferralReconciliationsRoute({
+    Key? key,
+    ReferralReconLocalization? appLocalizations,
+    List<PageRouteInfo>? children,
+  }) : super(
+          CustomSearchReferralReconciliationsRoute.name,
+          args: CustomSearchReferralReconciliationsRouteArgs(
+            key: key,
+            appLocalizations: appLocalizations,
+          ),
+          initialChildren: children,
+        );
+
+  static const String name = 'CustomSearchReferralReconciliationsRoute';
+
+  static const PageInfo<CustomSearchReferralReconciliationsRouteArgs> page =
+      PageInfo<CustomSearchReferralReconciliationsRouteArgs>(name);
+}
+
+class CustomSearchReferralReconciliationsRouteArgs {
+  const CustomSearchReferralReconciliationsRouteArgs({
+    this.key,
+    this.appLocalizations,
+  });
+
+  final Key? key;
+
+  final ReferralReconLocalization? appLocalizations;
+
+  @override
+  String toString() {
+    return 'CustomSearchReferralReconciliationsRouteArgs{key: $key, appLocalizations: $appLocalizations}';
   }
 }
 
