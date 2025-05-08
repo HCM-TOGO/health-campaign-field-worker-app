@@ -86,6 +86,29 @@ class CustomValidator {
 
     return {'mobileNumber': true};
   }
+
+  static Map<String, dynamic>? onlyAlphabets(AbstractControl<dynamic> control) {
+    final value = control.value?.toString().trim();
+
+    if (value == null || value.isEmpty) return null;
+
+    final pattern = r"^[A-Za-z\s]+$"; // Only A-Z, a-z, and spaces
+    final regExp = RegExp(pattern);
+
+    return regExp.hasMatch(value) ? null : {'onlyAlphabets': true};
+  }
+
+  static Map<String, dynamic>? onlyAlphabetsAndDigits(
+      AbstractControl<dynamic> control) {
+    final value = control.value?.toString().trim();
+
+    if (value == null || value.isEmpty) return null;
+
+    final pattern = r'^[A-Za-z0-9\s]+$'; // Allows A-Z, a-z, 0-9, and spaces
+    final regExp = RegExp(pattern);
+
+    return regExp.hasMatch(value) ? null : {'onlyAlphabetsAndDigits': true};
+  }
 }
 
 Future<void> requestDisableBatteryOptimization() async {
