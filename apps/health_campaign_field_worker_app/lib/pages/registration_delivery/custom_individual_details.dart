@@ -35,7 +35,7 @@ import 'package:registration_delivery/utils/extensions/extensions.dart';
 import 'package:registration_delivery/blocs/household_overview/household_overview.dart';
 import 'package:registration_delivery/router/registration_delivery_router.gm.dart';
 import 'package:registration_delivery/utils/i18_key_constants.dart' as i18;
-import '/utils/i18_key_constants.dart' as i18_local;
+import '../../utils/i18_key_constants.dart' as i18_local;
 import 'package:registration_delivery/utils/utils.dart';
 // import 'package:registration_delivery/widgets/back_navigation_help_header.dart';
 import 'package:registration_delivery/widgets/localized.dart';
@@ -623,6 +623,9 @@ class CustomIndividualDetailsPageState
                             child: ReactiveWrapperField(
                               formControlName: _mobileNumberKey,
                               validationMessages: {
+                                'required': (_) => localizations.translate(
+                                      i18.common.corecommonRequired,
+                                    ),
                                 'minLength': (object) =>
                                     localizations.translate(i18_local
                                         .individualDetails
@@ -636,7 +639,7 @@ class CustomIndividualDetailsPageState
                                 label: localizations.translate(
                                   i18.individualDetails.mobileNumberLabelText,
                                 ),
-                                isRequired: false,
+                                isRequired: widget.isHeadOfHousehold,
                                 child: DigitTextFormInput(
                                   keyboardType: TextInputType.number,
                                   maxLength: 11,
@@ -828,6 +831,8 @@ class CustomIndividualDetailsPageState
         //         localizations.translate(i18.common.coreCommonMobileNumber)),
         Validators.minLength(11),
         Validators.maxLength(11),
+        if (widget.isHeadOfHousehold) Validators.required,
+        // Validators.required,
       ]),
     });
   }
