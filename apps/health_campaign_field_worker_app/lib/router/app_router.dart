@@ -40,6 +40,7 @@ import '../pages/inventory_management/custom_stock_details.dart';
 import '../pages/inventory_management/custom_stock_reconciliation.dart';
 import '../pages/inventory_management/custom_warehouse_details.dart';
 import '../pages/inventory_management/custom_inventory_report_details.dart';
+import '../pages/inventory_management/custom_min_number.dart';
 import '../pages/language_selection.dart';
 import '../pages/login.dart';
 import '../pages/profile.dart';
@@ -139,14 +140,18 @@ class AppRouter extends _$AppRouter {
             page: CustomSearchReferralReconciliationsRoute.page,
             path: 'custom-search-referrals'),
 
+        AutoRoute(
+          page: CustomMinNumberRoute.page,
+          path: 'custom-min-number',
+        ),
+
         // Referral Reconciliation Route
         AutoRoute(
             page: CustomHFCreateReferralWrapperRoute.page,
             path: 'hf-referral',
             children: [
               AutoRoute(
-                  page: ReferralFacilityRoute.page,
-                  path: 'facility-details'),
+                  page: ReferralFacilityRoute.page, path: 'facility-details'),
               AutoRoute(
                   page: CustomReferralFacilityRoute.page,
                   path: 'custom-facility-details',
