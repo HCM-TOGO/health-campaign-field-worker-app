@@ -621,6 +621,18 @@ class _RecordRedosePageState extends LocalizedState<RecordRedosePage> {
                                                               deliveryCommentOptions
                                                                   .firstOrNull
                                                                   ?.name,
+                                                          onChanged: (value) {
+                                                            if (value != null) {
+                                                              if (value ==
+                                                                  "Others") {
+                                                                otherDeliveryComment =
+                                                                    true;
+                                                              } else {
+                                                                otherDeliveryComment =
+                                                                    false;
+                                                              }
+                                                            }
+                                                          },
                                                           menuItems:
                                                               deliveryCommentOptions
                                                                   .map((e) {
