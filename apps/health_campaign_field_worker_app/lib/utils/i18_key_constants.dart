@@ -174,6 +174,11 @@ class HouseholdOverView {
   String get householdOverViewBeneficiaryReferredSMCLabel =>
       'HOUSEHOLD_OVER_VIEW_BENEFICIARY_REFERRED_SMC_LABEL';
 
+  String get householdOverViewBeneficiaryInEligibleSMCLabel =>
+      'HOUSEHOLD_OVER_VIEW_BENEFICIARY_INELIGIBLE_SMC_LABEL';
+  String get householdOverViewBeneficiaryInEligibleVASLabel =>
+      'HOUSEHOLD_OVER_VIEW_BENEFICIARY_INELIGIBLE_VAS_LABEL';
+
   String get householdOverViewBeneficiaryReferredVASLabel =>
       'HOUSEHOLD_OVER_VIEW_BENEFICIARY_REFERRED_VAS_LABEL';
 }
@@ -181,6 +186,10 @@ class HouseholdOverView {
 class DeliverIntervention {
   const DeliverIntervention();
 
+  String get otherReasonLabel =>
+      'DELIVER_INTERVENTION_OTHER_REASON_FOR_REDOSE_LABEL';
+  String get deliverInterventionSMCLabel => 'DELIVER_INTERVENTION_SMC_LABEL';
+  String get deliverInterventionVASLabel => 'DELIVER_INTERVENTION_VAS_LABEL';
   String get recordRedoseLabel => 'DELIVER_INTERVENTION_RECORD_REDOSE_LABEL';
   String get selectTheResourcDeliveredLabel => 'Select the Resource delivered';
   String get reasonForRedoseLabel =>
@@ -1109,7 +1118,7 @@ class SearchBeneficiary {
   String get beneficiaryIndividualSearchHintText =>
       'BENEFICIARY_INDIVIDUAL_SEARCH_HINT_TEXT';
 
-  String get beneficiaryInfoDescription => 'BENEFICIARY_INFO_DESCRIPTION';
+  String get beneficiaryInfoDescription => 'BENEFICIARY_INFO_DESCRIPTION_TEXT';
 
   String get beneficiaryInfoTitle => 'BENEFICIARY_INFO_TITLE';
 
@@ -1126,6 +1135,9 @@ class SearchBeneficiary {
 
 class IndividualDetails {
   const IndividualDetails();
+
+  String get landmarkValidationMessage =>
+      'INDIVIDUAL_DETAILS_LANDMARK_VALIDATION_MESSAGE';
 
   String get onlyAlphabetsValidationMessage =>
       'INDIVIDUAL_DETAILS_ONLY_ALPHABETS_VALIDATION_MESSAGE';
