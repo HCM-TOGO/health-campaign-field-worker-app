@@ -1200,7 +1200,7 @@ class BeneficiaryDetails {
   String get insufficientStockHeading => 'INSUFFICIENT_STOCK_HEADING';
   String get insufficientAZTStockMessage => 'INSUFFICIENT_AZT_STOCK_MESSAGE';
   String get insufficientAZTStockMessageDelivery =>
-      'INSUFFICIENT_AZT_STOCK_MESSAGE_DELIVERY';
+      'INSUFFICIENT_STOCK_MESSAGE_ADMINISTRATION';
 
   String get householdId => 'HOUSEHOLD_ID_TEXT';
   String get beneficiaryId => 'BENEFICIARY_ID_TEXT';
