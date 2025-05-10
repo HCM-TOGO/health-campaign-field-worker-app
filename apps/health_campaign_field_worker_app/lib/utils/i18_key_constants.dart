@@ -196,6 +196,12 @@ class DeliverIntervention {
       'DELIVER_INTERVENTION_REASON_FOR_REDOSE_LABEL';
   String get selectReasonForRedoseLabel =>
       'DELIVER_INTERVENTION_SELECT_REASON_FOR_REDOSE_LABEL';
+  String get enterReasonForRedoseLabel =>
+      'DELIVER_INTERVENTION_ENTER_REASON_FOR_REDOSE_LABEL';
+  String get enterReasonForRedoseLabelMinLength =>
+      'DELIVER_INTERVENTION_ENTER_REASON_FOR_REDOSE_LABEL_MIN_LENGTH';
+  String get enterReasonForRedoseLabelMaxLength =>
+      'DELIVER_INTERVENTION_ENTER_REASON_FOR_REDOSE_LABEL_MAX_LENGTH';
   String get redoseQuantityLabel =>
       'DELIVER_INTERVENTION_REDOSE_QUANTITY_LABEL';
   String get dose => 'DELIVER_INTERVENTION_DOSE';
