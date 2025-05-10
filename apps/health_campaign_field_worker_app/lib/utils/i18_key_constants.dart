@@ -217,7 +217,7 @@ class DeliverIntervention {
   String get deliversmcintervention => 'DELIVER_SMC_INTERVENTION';
   String get deliverVASIntervention => 'DELIVER_VAS_INTERVENTION';
   String get recordsmcdeliverdetails => 'RECORD_SMC_DELIVER_DETAILS';
-  String get doseadministeredby => 'DOSE_ADMINISTERED_BY';
+  String get doseadministeredby => 'DOSE_ADMINISTERED_BY_LABEL';
   String get proceedToVASLabel => 'PROCEED_TO_VAS_LABEL';
   String get proceedToVASDescription => 'PROCEED_TO_VAS_DESCRIPTION';
 }
@@ -1202,8 +1202,8 @@ class BeneficiaryDetails {
   String get insufficientAZTStockMessageDelivery =>
       'INSUFFICIENT_AZT_STOCK_MESSAGE_DELIVERY';
 
-  String get householdId => 'HOUSEHOLD_ID';
-  String get beneficiaryId => 'BENEFICIARY_ID';
+  String get householdId => 'HOUSEHOLD_ID_TEXT';
+  String get beneficiaryId => 'BENEFICIARY_ID_TEXT';
   String get backToHouseholdDetails => 'BACK_TO_HOUSEHOLD_DETAILS';
   String get beneficiaryDoseUnit => 'BENEFICIARY_DETAILS_DOSE_UNIT';
 
