@@ -86,6 +86,12 @@ class _RecordRedosePageState extends LocalizedState<RecordRedosePage> {
     });
   }
 
+  void checkOtherDeliveryComment(bool newValue) {
+    setState(() {
+      otherDeliveryComment = newValue;
+    });
+  }
+
 // Initialize the currentStep variable to keep track of the current step in a process.
   int currentStep = 0;
 
@@ -186,6 +192,36 @@ class _RecordRedosePageState extends LocalizedState<RecordRedosePage> {
                                                   if (!form.valid) {
                                                     return;
                                                   }
+                                                  if (form
+                                                              .control(
+                                                                  _deliveryCommentKey)
+                                                              .value ==
+                                                          "Others" &&
+                                                      (form
+                                                                  .control(
+                                                                      _otherDeliveryCommentKey)
+                                                                  .value ==
+                                                              null ||
+                                                          form
+                                                                  .control(
+                                                                      _otherDeliveryCommentKey)
+                                                                  .value ==
+                                                              "")) {
+                                                    await DigitToast.show(
+                                                      context,
+                                                      options:
+                                                          DigitToastOptions(
+                                                        localizations.translate(
+                                                            i18_local
+                                                                .deliverIntervention
+                                                                .enterReasonForRedoseLabel),
+                                                        true,
+                                                        theme,
+                                                      ),
+                                                    );
+                                                    return;
+                                                  }
+
                                                   if (((form.control(
                                                     _resourceDeliveredKey,
                                                   ) as FormArray)
@@ -625,11 +661,11 @@ class _RecordRedosePageState extends LocalizedState<RecordRedosePage> {
                                                             if (value != null) {
                                                               if (value ==
                                                                   "Others") {
-                                                                otherDeliveryComment =
-                                                                    true;
+                                                                checkOtherDeliveryComment(
+                                                                    true);
                                                               } else {
-                                                                otherDeliveryComment =
-                                                                    false;
+                                                                checkOtherDeliveryComment(
+                                                                    false);
                                                               }
                                                             }
                                                           },
@@ -653,8 +689,6 @@ class _RecordRedosePageState extends LocalizedState<RecordRedosePage> {
                                                                 control.value;
                                                             if (value ==
                                                                 'Others') {
-                                                              otherDeliveryComment =
-                                                                  true;
                                                               return Padding(
                                                                   padding:
                                                                       const EdgeInsets
@@ -666,10 +700,21 @@ class _RecordRedosePageState extends LocalizedState<RecordRedosePage> {
                                                                           String>(
                                                                     formControlName:
                                                                         _otherDeliveryCommentKey,
+                                                                    showErrors: (control) =>
+                                                                        control
+                                                                            .touched ||
+                                                                        control
+                                                                            .invalid,
                                                                     validationMessages: {
                                                                       'required': (object) => localizations.translate(i18_local
                                                                           .deliverIntervention
-                                                                          .selectReasonForRedoseLabel),
+                                                                          .enterReasonForRedoseLabel),
+                                                                      'minLength': (object) => localizations.translate(i18_local
+                                                                          .deliverIntervention
+                                                                          .enterReasonForRedoseLabelMinLength),
+                                                                      'maxLength': (object) => localizations.translate(i18_local
+                                                                          .deliverIntervention
+                                                                          .enterReasonForRedoseLabelMaxLength),
                                                                     },
                                                                     builder:
                                                                         (field) {
@@ -693,13 +738,13 @@ class _RecordRedosePageState extends LocalizedState<RecordRedosePage> {
                                                                                 _otherDeliveryCommentKey,
                                                                               )
                                                                               .value = val,
+                                                                          errorMessage:
+                                                                              field.errorText,
                                                                         ),
                                                                       );
                                                                     },
                                                                   ));
                                                             } else {
-                                                              otherDeliveryComment =
-                                                                  false;
                                                               return const SizedBox
                                                                   .shrink();
                                                             }
@@ -951,8 +996,13 @@ class _RecordRedosePageState extends LocalizedState<RecordRedosePage> {
       ),
       _otherDeliveryCommentKey: FormControl<String>(
         validators: [
-          if (otherDeliveryComment) Validators.required,
+          // if (otherDeliveryComment) ...[
+          Validators.required,
+          Validators.minLength(3),
+          Validators.maxLength(100),
+          // ],
         ],
+        disabled: otherDeliveryComment,
       ),
       _doseAdministeredByKey: FormControl<String>(
         validators: [],

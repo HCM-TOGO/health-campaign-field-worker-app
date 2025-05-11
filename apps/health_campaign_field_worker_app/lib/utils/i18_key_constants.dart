@@ -196,6 +196,12 @@ class DeliverIntervention {
       'DELIVER_INTERVENTION_REASON_FOR_REDOSE_LABEL';
   String get selectReasonForRedoseLabel =>
       'DELIVER_INTERVENTION_SELECT_REASON_FOR_REDOSE_LABEL';
+  String get enterReasonForRedoseLabel =>
+      'DELIVER_INTERVENTION_ENTER_REASON_FOR_REDOSE_LABEL';
+  String get enterReasonForRedoseLabelMinLength =>
+      'DELIVER_INTERVENTION_ENTER_REASON_FOR_REDOSE_LABEL_MIN_LENGTH';
+  String get enterReasonForRedoseLabelMaxLength =>
+      'DELIVER_INTERVENTION_ENTER_REASON_FOR_REDOSE_LABEL_MAX_LENGTH';
   String get redoseQuantityLabel =>
       'DELIVER_INTERVENTION_REDOSE_QUANTITY_LABEL';
   String get dose => 'DELIVER_INTERVENTION_DOSE';
@@ -211,7 +217,7 @@ class DeliverIntervention {
   String get deliversmcintervention => 'DELIVER_SMC_INTERVENTION';
   String get deliverVASIntervention => 'DELIVER_VAS_INTERVENTION';
   String get recordsmcdeliverdetails => 'RECORD_SMC_DELIVER_DETAILS';
-  String get doseadministeredby => 'DOSE_ADMINISTERED_BY';
+  String get doseadministeredby => 'DOSE_ADMINISTERED_BY_LABEL';
   String get proceedToVASLabel => 'PROCEED_TO_VAS_LABEL';
   String get proceedToVASDescription => 'PROCEED_TO_VAS_DESCRIPTION';
 }
@@ -1194,10 +1200,10 @@ class BeneficiaryDetails {
   String get insufficientStockHeading => 'INSUFFICIENT_STOCK_HEADING';
   String get insufficientAZTStockMessage => 'INSUFFICIENT_AZT_STOCK_MESSAGE';
   String get insufficientAZTStockMessageDelivery =>
-      'INSUFFICIENT_AZT_STOCK_MESSAGE_DELIVERY';
+      'INSUFFICIENT_STOCK_MESSAGE_ADMINISTRATION';
 
-  String get householdId => 'HOUSEHOLD_ID';
-  String get beneficiaryId => 'BENEFICIARY_ID';
+  String get householdId => 'HOUSEHOLD_ID_TEXT';
+  String get beneficiaryId => 'BENEFICIARY_ID_TEXT';
   String get backToHouseholdDetails => 'BACK_TO_HOUSEHOLD_DETAILS';
   String get beneficiaryDoseUnit => 'BENEFICIARY_DETAILS_DOSE_UNIT';
 
