@@ -100,6 +100,15 @@ class CustomMinNumberPageState extends LocalizedState<CustomMinNumberPage> {
                       return Padding(
                         padding: const EdgeInsets.all(8.0),
                         child: MinNumberCard(
+                          data: const {
+                            'minNumber': 'MIN-123456',
+                            'cddCode': 'CDD-9876',
+                            'date': '2025-05-11',
+                            'items': const [
+                              {'name': 'Gloves', 'quantity': '10'},
+                              {'name': 'Masks', 'quantity': '5'},
+                            ],
+                          },
                           minNumber: item['minNumber'],
                           qrImagePath: item['qrImagePath'],
                           cddCode: item['cddCode'],

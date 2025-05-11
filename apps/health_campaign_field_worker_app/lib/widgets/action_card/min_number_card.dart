@@ -3,6 +3,7 @@ import 'package:digit_ui_components/theme/digit_extended_theme.dart';
 import 'package:flutter/material.dart';
 
 import 'package:inventory_management/utils/i18_key_constants.dart' as i18;
+import 'package:qr_flutter/qr_flutter.dart';
 
 class MinNumberCard extends StatelessWidget {
   final String minNumber;
@@ -10,6 +11,7 @@ class MinNumberCard extends StatelessWidget {
   final String cddCode;
   final String date;
   final List<Map<String, String>> items;
+  final Map<String, dynamic> data;
 
   const MinNumberCard({
     super.key,
@@ -18,6 +20,7 @@ class MinNumberCard extends StatelessWidget {
     required this.cddCode,
     required this.date,
     required this.items,
+    required this.data,
   });
 
   @override
@@ -61,11 +64,15 @@ class MinNumberCard extends StatelessWidget {
               ),
             ),
             const SizedBox(height: 8.0), // Replace spacer2
-            Image.asset(
-              qrImagePath,
-              fit: BoxFit.cover,
-              height: 100,
-              width: 100,
+            Container(
+              height: 155,
+              width: 155,
+              alignment: Alignment.center,
+              child: QrImageView(
+                data: data.toString(),
+                version: QrVersions.auto,
+                size: 150.0,
+              ),
             ),
             const SizedBox(height: 8.0), // Replace spacer2
             Text(cddCode),
