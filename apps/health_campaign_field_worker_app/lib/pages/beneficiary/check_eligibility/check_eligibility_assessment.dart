@@ -241,8 +241,11 @@ class _EligibilityChecklistViewPage
                               final shouldSubmit = await DigitDialog.show(
                                 context,
                                 options: DigitDialogOptions(
-                                  titleText: widget.eligibilityAssessmentType ==
-                                          EligibilityAssessmentType.smc
+                                  titleText: (widget
+                                                  .eligibilityAssessmentType ==
+                                              EligibilityAssessmentType.smc ||
+                                          ifIneligible ||
+                                          ifReferral)
                                       ? localizations.translate(
                                           i18_local.checklist
                                               .submitButtonDialogLabelText,
@@ -259,14 +262,20 @@ class _EligibilityChecklistViewPage
                                                 .checklistDialogDynamicDescription,
                                           )
                                           .replaceFirst('{}', descriptionText))
-                                      // : Text(localizations.translate(i18_local
-                                      //     .deliverIntervention
-                                      //     .proceedToVASDescription)),
-                                      : getHighlightedText(
-                                          localizations.translate(
-                                          i18_local.deliverIntervention
-                                              .proceedToVASDescription,
-                                        )),
+                                      : (ifIneligible || ifReferral)
+                                          ? getHighlightedText(localizations
+                                              .translate(
+                                                i18_local.checklist
+                                                    .checklistDialogDynamicDescription,
+                                              )
+                                              .replaceFirst(
+                                                  '{}', descriptionText))
+                                          : getHighlightedText(
+                                              localizations.translate(
+                                                i18_local.deliverIntervention
+                                                    .proceedToVASDescription,
+                                              ),
+                                            ),
                                   primaryAction: DigitDialogActions(
                                     label: widget.eligibilityAssessmentType ==
                                             EligibilityAssessmentType.smc
@@ -981,6 +990,11 @@ class _EligibilityChecklistViewPage
     // Find the position of the word "Proceed"
     int startIndex = description.indexOf('Proceed');
     int endIndex = startIndex + 'Proceed'.length;
+
+    if (startIndex == -1) {
+      // If "Proceed" is not found, return the original description
+      return Text(description);
+    }
 
     // Split the description into parts
     String partBefore = description.substring(0, startIndex);
