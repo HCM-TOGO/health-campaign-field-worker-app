@@ -189,9 +189,7 @@ class _RecordRedosePageState extends LocalizedState<RecordRedosePage> {
                                               DigitElevatedButton(
                                                 onPressed: () async {
                                                   form.markAllAsTouched();
-                                                  if (!form.valid) {
-                                                    return;
-                                                  }
+
                                                   if (form
                                                               .control(
                                                                   _deliveryCommentKey)
@@ -221,7 +219,9 @@ class _RecordRedosePageState extends LocalizedState<RecordRedosePage> {
                                                     );
                                                     return;
                                                   }
-
+                                                  if (!form.valid) {
+                                                    return;
+                                                  }
                                                   if (((form.control(
                                                     _resourceDeliveredKey,
                                                   ) as FormArray)
@@ -677,79 +677,81 @@ class _RecordRedosePageState extends LocalizedState<RecordRedosePage> {
                                                           formControlName:
                                                               _deliveryCommentKey,
                                                         ),
-
-                                                        /// Show input if "Other" is selected
-                                                        ReactiveValueListenableBuilder<
-                                                            String>(
-                                                          formControlName:
-                                                              _deliveryCommentKey,
-                                                          builder: (context,
-                                                              control, _) {
-                                                            final value =
-                                                                control.value;
-                                                            if (value ==
-                                                                'Others') {
-                                                              return Padding(
-                                                                  padding:
-                                                                      const EdgeInsets
-                                                                          .only(
-                                                                          top:
-                                                                              12.0),
-                                                                  child:
-                                                                      ReactiveWrapperField<
-                                                                          String>(
-                                                                    formControlName:
-                                                                        _otherDeliveryCommentKey,
-                                                                    showErrors: (control) =>
-                                                                        control
-                                                                            .touched ||
-                                                                        control
-                                                                            .invalid,
-                                                                    validationMessages: {
-                                                                      'required': (object) => localizations.translate(i18_local
-                                                                          .deliverIntervention
-                                                                          .enterReasonForRedoseLabel),
-                                                                      'minLength': (object) => localizations.translate(i18_local
-                                                                          .deliverIntervention
-                                                                          .enterReasonForRedoseLabelMinLength),
-                                                                      'maxLength': (object) => localizations.translate(i18_local
-                                                                          .deliverIntervention
-                                                                          .enterReasonForRedoseLabelMaxLength),
-                                                                    },
-                                                                    builder:
-                                                                        (field) {
-                                                                      return LabeledField(
+                                                        Offstage(
+                                                            offstage:
+                                                                !otherDeliveryComment,
+                                                            child: Padding(
+                                                                padding:
+                                                                    const EdgeInsets
+                                                                        .only(
+                                                                        top:
+                                                                            12.0),
+                                                                child:
+                                                                    ReactiveWrapperField<
+                                                                        String>(
+                                                                  formControlName:
+                                                                      _otherDeliveryCommentKey,
+                                                                  showErrors: (control) =>
+                                                                      control
+                                                                          .touched ||
+                                                                      control
+                                                                          .invalid,
+                                                                  validationMessages: {
+                                                                    'required': (object) =>
+                                                                        localizations.translate(i18_local
+                                                                            .deliverIntervention
+                                                                            .enterReasonForRedoseLabel),
+                                                                    'minLength': (object) =>
+                                                                        localizations.translate(i18_local
+                                                                            .deliverIntervention
+                                                                            .enterReasonForRedoseLabelMinLength),
+                                                                    'maxLength': (object) =>
+                                                                        localizations.translate(i18_local
+                                                                            .deliverIntervention
+                                                                            .enterReasonForRedoseLabelMaxLength),
+                                                                  },
+                                                                  builder:
+                                                                      (field) {
+                                                                    return LabeledField(
+                                                                      isRequired:
+                                                                          true,
+                                                                      label: localizations
+                                                                          .translate(
+                                                                        i18_local
+                                                                            .deliverIntervention
+                                                                            .otherReasonLabel,
+                                                                      ),
+                                                                      child:
+                                                                          DigitTextFormInput(
                                                                         isRequired:
                                                                             true,
-                                                                        label: localizations
-                                                                            .translate(
-                                                                          i18_local
-                                                                              .deliverIntervention
-                                                                              .otherReasonLabel,
-                                                                        ),
-                                                                        child:
-                                                                            DigitTextFormInput(
-                                                                          isRequired:
-                                                                              true,
-                                                                          readOnly:
-                                                                              false,
-                                                                          onChange: (val) => form
+                                                                        readOnly:
+                                                                            false,
+                                                                        onChange:
+                                                                            (val) =>
+                                                                                {
+                                                                          form
+                                                                              .control(
+                                                                                _otherDeliveryCommentKey,
+                                                                              )
+                                                                              .markAllAsTouched(),
+                                                                          form
                                                                               .control(
                                                                                 _otherDeliveryCommentKey,
                                                                               )
                                                                               .value = val,
-                                                                          errorMessage:
-                                                                              field.errorText,
-                                                                        ),
-                                                                      );
-                                                                    },
-                                                                  ));
-                                                            } else {
-                                                              return const SizedBox
-                                                                  .shrink();
-                                                            }
-                                                          },
-                                                        ),
+                                                                        },
+                                                                        initialValue: form
+                                                                            .control(
+                                                                              _otherDeliveryCommentKey,
+                                                                            )
+                                                                            .value,
+                                                                        errorMessage:
+                                                                            field.errorText,
+                                                                      ),
+                                                                    );
+                                                                  },
+                                                                ))),
                                                       ],
                                                     );
                                                   },
@@ -995,14 +997,13 @@ class _RecordRedosePageState extends LocalizedState<RecordRedosePage> {
         ],
       ),
       _otherDeliveryCommentKey: FormControl<String>(
-        validators: [
-          // if (otherDeliveryComment) ...[
-          Validators.required,
-          Validators.minLength(3),
-          Validators.maxLength(100),
-          // ],
-        ],
-        disabled: otherDeliveryComment,
+        validators: otherDeliveryComment
+            ? [
+                Validators.required,
+                Validators.minLength(3),
+                Validators.maxLength(100),
+              ]
+            : [],
       ),
       _doseAdministeredByKey: FormControl<String>(
         validators: [],
