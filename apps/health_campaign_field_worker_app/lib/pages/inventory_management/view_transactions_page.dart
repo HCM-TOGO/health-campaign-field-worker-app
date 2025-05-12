@@ -3,8 +3,10 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 
 import '../../blocs/inventory_management/stock_bloc.dart';
+import '../../router/app_router.dart';
 import 'view_stock_records.dart'; // Import your view stock page
 
+@RoutePage()
 class ViewTransactionsScreen extends StatelessWidget {
   const ViewTransactionsScreen({super.key});
 
