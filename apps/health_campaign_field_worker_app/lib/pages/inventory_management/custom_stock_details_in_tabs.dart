@@ -17,6 +17,7 @@ import 'package:health_campaign_field_worker_app/pages/inventory_management/cust
 import 'package:inventory_management/blocs/record_stock.dart';
 import 'package:inventory_management/models/entities/inventory_transport_type.dart';
 import 'package:inventory_management/models/entities/stock.dart';
+import 'package:inventory_management/models/entities/transaction_type.dart';
 import 'package:inventory_management/utils/utils.dart';
 import 'package:inventory_management/widgets/localized.dart';
 import 'package:reactive_forms/reactive_forms.dart';
@@ -150,34 +151,44 @@ class _DynamicTabsPageState extends LocalizedState<DynamicTabsPage>
           _forms[productSku]?.control(_waybillNumberKey)?.value?.toString(),
       transactionReason:
           _forms[productSku]?.control(_transactionReasonKey)?.value?.toString(),
-      clientReferenceId: DateTime.now().millisecondsSinceEpoch.toString(),
+      clientReferenceId: IdGen.i.identifier,
       additionalFields: StockAdditionalFields(
         version: 1,
         fields: [
           AdditionalField('productName', product.sku),
           AdditionalField('variation', product.variation),
           AdditionalField('materialNoteNumber', _sharedMRN),
-          if (_forms[productSku] != null) ...[
-            AdditionalField('batchNumber',
-                _forms[productSku]!.control(_batchNumberKey).value),
-            AdditionalField(
-                'expiryDate', _forms[productSku]!.control(_expiry).value),
-            AdditionalField(
-                'comments', _forms[productSku]!.control(_commentsKey).value),
-          ],
+          // if (_forms[productSku] != null) ...[
+          //   AdditionalField('batchNumber',
+          //       _forms[productSku]!.control(_batchNumberKey).value),
+          //   AdditionalField(
+          //       'expiryDate', _forms[productSku]!.control(_expiry).value),
+          //   AdditionalField(
+          //       'comments', _forms[productSku]!.control(_commentsKey).value),
+          // ],
         ],
       ),
-      referenceId: null,
-      referenceIdType: null,
+      referenceId: context.projectId,
+      referenceIdType: 'PROJECT',
       transactingPartyId: null,
       transactingPartyType: null,
-      receiverId: null,
-      receiverType: null,
-      senderId: null,
-      senderType: null,
+      receiverId: receivedFrom,
+      receiverType: "WAREHOUSE",
+      senderId: receivedFrom,
+      senderType: "WAREHOUSE",
       nonRecoverableError: false,
       rowVersion: null,
-      transactionType: null,
+      transactionType: TransactionType.received.toValue(),
+      auditDetails: AuditDetails(
+        createdBy: InventorySingleton().loggedInUserUuid,
+        createdTime: context.millisecondsSinceEpoch(),
+      ),
+      clientAuditDetails: ClientAuditDetails(
+        createdBy: InventorySingleton().loggedInUserUuid,
+        createdTime: context.millisecondsSinceEpoch(),
+        lastModifiedBy: InventorySingleton().loggedInUserUuid,
+        lastModifiedTime: context.millisecondsSinceEpoch(),
+      ),
     );
   }
 
@@ -383,9 +394,12 @@ class _DynamicTabsPageState extends LocalizedState<DynamicTabsPage>
       additionalFields: currentStock.additionalFields?.copyWith(
         fields: [
           ...(currentStock.additionalFields?.fields ?? []),
-          AdditionalField('batchNumber', form.control(_batchNumberKey).value),
-          AdditionalField('expiryDate', form.control(_expiry).value),
-          AdditionalField('comments', form.control(_commentsKey).value),
+          if (form.control(_batchNumberKey).value != null)
+            AdditionalField('batchNumber', form.control(_batchNumberKey).value),
+          if (form.control(_batchNumberKey).value != null)
+            AdditionalField('_expiry', form.control(_expiry).value),
+          if (form.control(_commentsKey).value != null)
+            AdditionalField('comments', form.control(_commentsKey).value),
         ],
       ),
     );
@@ -412,14 +426,7 @@ class _DynamicTabsPageState extends LocalizedState<DynamicTabsPage>
               i18.common.coreCommonSubmit,
             ),
             onPressed: () {
-              Navigator.of(context).push(
-                MaterialPageRoute(
-                  builder: (context) => CustomAcknowledgementPage(
-                    mrnNumber: _sharedMRN,
-                    stockRecords: _tabStocks.values.toList(),
-                  ),
-                ),
-              );
+              Navigator.of(context, rootNavigator: true).pop(true);
             },
             type: DigitButtonType.primary,
             size: DigitButtonSize.large,
@@ -449,8 +456,19 @@ class _DynamicTabsPageState extends LocalizedState<DynamicTabsPage>
                 stockModel: stockModel,
               ),
             );
+        context.read<RecordStockBloc>().add(
+              const RecordStockCreateStockEntryEvent(),
+            );
       }
-      Navigator.of(context).pop();
+      // Navigator.of(context).pop();
+      Navigator.of(context).push(
+        MaterialPageRoute(
+          builder: (context) => CustomAcknowledgementPage(
+            mrnNumber: _sharedMRN,
+            stockRecords: _tabStocks.values.toList(),
+          ),
+        ),
+      );
     }
   }
 

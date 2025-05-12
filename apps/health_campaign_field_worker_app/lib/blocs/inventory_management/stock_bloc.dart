@@ -1,3 +1,4 @@
+import 'package:digit_data_model/data_model.dart';
 import 'package:digit_data_model/models/entities/product_variant.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:inventory_management/models/entities/stock.dart';
@@ -49,4 +50,34 @@ class StockBloc extends Bloc<StockEvent, StockState> {
       emit(StockSubmittedState(event.stockModels));
     });
   }
+}
+
+// In your StockBloc
+class StockLoadedState extends StockState {
+  final Map<String, List<StockModel>> groupedStocks;
+
+  StockLoadedState(this.groupedStocks);
+
+  @override
+  List<Object?> get props => [groupedStocks];
+}
+
+// In your repository or where you fetch stocks
+Map<String, List<StockModel>> groupStocksByMRN(List<StockModel> stocks) {
+  final grouped = <String, List<StockModel>>{};
+
+  for (final stock in stocks) {
+    final mrn = stock.additionalFields?.fields
+            .firstWhere(
+              (field) => field.key == 'materialNoteNumber',
+              orElse: () => AdditionalField('materialNoteNumber', ''),
+            )
+            .value
+            ?.toString() ??
+        'unclassified';
+
+    grouped.putIfAbsent(mrn, () => []).add(stock);
+  }
+
+  return grouped;
 }

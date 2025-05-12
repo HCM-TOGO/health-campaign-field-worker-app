@@ -144,7 +144,7 @@ class CustomManageStocksPageState
                                           ),
                                           const SizedBox(width: 8),
                                           Text(
-                                            "View Create Transaction",
+                                            "View Created Transaction",
                                             style: TextStyle(
                                               fontSize: 20,
                                               color: Colors.orange[800],
