@@ -337,12 +337,29 @@ class CustomMemberCard extends StatelessWidget {
                     .lastOrNull;
                 if (redosePendingStatus) {
                   final spaq1 = context.spaq1;
+                  final spaq2 = context.spaq2;
 
-                  int doseCount = double.parse(
-                    successfulTask?.resources?.first.quantity ?? "0",
+                  // int doseCount = double.parse(
+                  //   successfulTask?.resources?.first.quantity ?? "0",
+                  // ).round();
+
+                  int doseCountSpaq1 = double.parse(
+                    (successfulTask?.resources?.first.productVariantId ==
+                            "PVAR-2025-04-15-000001")
+                        ? successfulTask?.resources?.first.quantity ?? "0"
+                        : "0",
                   ).round();
 
-                  if (successfulTask != null && spaq1 >= doseCount) {
+                  int doseCountSpaq2 = double.parse(
+                    (successfulTask?.resources?.first.productVariantId ==
+                            "PVAR-2025-04-15-000002")
+                        ? successfulTask?.resources?.first.quantity ?? "0"
+                        : "0",
+                  ).round();
+
+                  if (successfulTask != null &&
+                      spaq1 >= doseCountSpaq1 &&
+                      spaq2 >= doseCountSpaq2) {
                     context.router.push(
                       RecordRedoseRoute(
                         tasks: [successfulTask],
@@ -359,12 +376,19 @@ class CustomMemberCard extends StatelessWidget {
                           Icons.warning,
                           color: DigitTheme.instance.colorScheme.error,
                         ),
-                        contentText: "${localizations.translate(
-                          i18_local.beneficiaryDetails
-                              .insufficientAZTStockMessageDelivery,
-                        )}=$spaq1${localizations.translate(
-                          i18_local.beneficiaryDetails.beneficiaryDoseUnit,
-                        )}",
+                        contentText: (spaq1 < doseCountSpaq1)
+                            ? "${localizations.translate(
+                                i18_local.beneficiaryDetails
+                                    .insufficientAZTStockMessageDelivery,
+                              )} \n ${localizations.translate(
+                                i18_local.beneficiaryDetails.spaq1DoseUnit,
+                              )}"
+                            : "${localizations.translate(
+                                i18_local.beneficiaryDetails
+                                    .insufficientAZTStockMessageDelivery,
+                              )} \n ${localizations.translate(
+                                i18_local.beneficiaryDetails.spaq2DoseUnit,
+                              )}",
                         primaryAction: DigitDialogActions(
                           label: localizations.translate(i18_local
                               .beneficiaryDetails.backToHouseholdDetails),
