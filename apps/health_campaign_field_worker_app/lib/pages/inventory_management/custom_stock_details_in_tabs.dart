@@ -426,7 +426,15 @@ class _DynamicTabsPageState extends LocalizedState<DynamicTabsPage>
               i18.common.coreCommonSubmit,
             ),
             onPressed: () {
-              Navigator.of(context, rootNavigator: true).pop(true);
+//               Navigator.of(context, rootNavigator: true).pop(true);
+              Navigator.of(context).push(
+                MaterialPageRoute(
+                  builder: (context) => CustomAcknowledgementPage(
+                    mrnNumber: _sharedMRN,
+                    stockRecords: _tabStocks.values.toList(),
+                  ),
+                ),
+              );
             },
             type: DigitButtonType.primary,
             size: DigitButtonSize.large,
@@ -461,14 +469,14 @@ class _DynamicTabsPageState extends LocalizedState<DynamicTabsPage>
             );
       }
       // Navigator.of(context).pop();
-      Navigator.of(context).push(
-        MaterialPageRoute(
-          builder: (context) => CustomAcknowledgementPage(
-            mrnNumber: _sharedMRN,
-            stockRecords: _tabStocks.values.toList(),
-          ),
-        ),
-      );
+//       Navigator.of(context).push(
+//         MaterialPageRoute(
+//           builder: (context) => CustomAcknowledgementPage(
+//             mrnNumber: _sharedMRN,
+//             stockRecords: _tabStocks.values.toList(),
+//           ),
+//         ),
+//       );
     }
   }
 
