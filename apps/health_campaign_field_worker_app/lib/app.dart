@@ -16,6 +16,7 @@ import 'package:survey_form/survey_form.dart';
 
 import 'blocs/app_initialization/app_initialization.dart';
 import 'blocs/auth/auth.dart';
+import 'blocs/inventory_management/stock_bloc.dart';
 import 'blocs/localization/localization.dart';
 import 'blocs/project/project.dart';
 import 'data/local_store/app_shared_preferences.dart';
@@ -120,6 +121,12 @@ class MainApplicationState extends State<MainApplication>
                 lazy: false,
               ),
 
+              BlocProvider(
+                create: (_) {
+                  return StockBloc();
+                },
+                lazy: false,
+              ),
               BlocProvider(
                 create: (context) {
                   return UserBloc(

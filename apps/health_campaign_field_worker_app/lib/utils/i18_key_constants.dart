@@ -824,6 +824,10 @@ class AcknowledgementSuccess {
   String get dataDownloadedSuccessLabel => 'DATA_DOWNLOADED_SUCCESS_LABEL';
   String get referAcknowledgementLabelText =>
       'REFER_ACKNOWLEDGEMENT_SUCCESS_LABEL_TEXT';
+
+  String get createNewTransactions => 'CREATE_NEW_TRANSACTION';
+
+  String get viewtransactions => 'VIEW_TRANSACTIONS';
 }
 
 class ProjectSelection {
@@ -1046,6 +1050,10 @@ class StockDetailsReturnedShowcase {
 
   String get comments {
     return 'STOCK_DETAILS_RETURNED_SHOWCASE_COMMENT';
+  }
+
+  String get expiry {
+    return 'EXPIRY';
   }
 }
 
