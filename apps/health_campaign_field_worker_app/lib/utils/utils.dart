@@ -192,12 +192,8 @@ String customFormatAgeRange(String condition) {
     int min = int.parse(match.group(1)!);
     int max = int.parse(match.group(2)!);
 
-    if (min == 11) {
-      max -= 1;
-      min += 1;
-    } else if (max == 12) {
-      min += 1;
-    }
+    max -= 1;
+    min += 1;
 
     print('min: $min, max: $max');
     return '$min - $max months';
