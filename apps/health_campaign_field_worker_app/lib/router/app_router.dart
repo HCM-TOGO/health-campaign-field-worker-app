@@ -38,6 +38,7 @@ import '../pages/inventory_management/custom_stock_details.dart';
 import '../pages/inventory_management/custom_stock_reconciliation.dart';
 import '../pages/inventory_management/custom_warehouse_details.dart';
 import '../pages/inventory_management/custom_inventory_report_details.dart';
+import '../pages/inventory_management/view_transactions_page.dart';
 import '../pages/inventory_management/custom_stock_details_in_tabs.dart';
 import '../pages/inventory_management/custom_acknowledgement.dart';
 import '../pages/inventory_management/view_stock_records.dart';
@@ -109,7 +110,10 @@ class AppRouter extends _$AppRouter {
           page: BeneficiariesReportRoute.page,
           path: 'beneficiary-downsync-report',
         ),
-
+        AutoRoute(
+          page: ViewTransactionsRoute.page,
+          path: 'beneficiary-downsync-report',
+        ),
         // INFO : Need to add Router of package Here
         // Attendance Route
         AutoRoute(

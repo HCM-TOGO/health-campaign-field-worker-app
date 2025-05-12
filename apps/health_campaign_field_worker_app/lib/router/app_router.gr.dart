@@ -497,6 +497,12 @@ abstract class _$AppRouter extends RootStackRouter {
         ),
       );
     },
+    ViewTransactionsRoute.name: (routeData) {
+      return AutoRoutePage<dynamic>(
+        routeData: routeData,
+        child: const ViewTransactionsScreen(),
+      );
+    },
     ...InventoryRoute().pagesMap,
     ...RegistrationDeliveryRoute().pagesMap,
     ...ReferralReconciliationRoute().pagesMap,
@@ -2279,4 +2285,18 @@ class ViewStockRecordsRouteArgs {
   String toString() {
     return 'ViewStockRecordsRouteArgs{key: $key, appLocalizations: $appLocalizations, mrnNumber: $mrnNumber, stockRecords: $stockRecords}';
   }
+}
+
+/// generated route for
+/// [ViewTransactionsScreen]
+class ViewTransactionsRoute extends PageRouteInfo<void> {
+  const ViewTransactionsRoute({List<PageRouteInfo>? children})
+      : super(
+          ViewTransactionsRoute.name,
+          initialChildren: children,
+        );
+
+  static const String name = 'ViewTransactionsRoute';
+
+  static const PageInfo<void> page = PageInfo<void>(name);
 }
