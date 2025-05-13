@@ -552,8 +552,8 @@ class CustomMemberCard extends StatelessWidget {
                           null &&
                       !isSMCDelivered &&
                       !isVASDelivered &&
-                      !isNotEligibleSMC &&
-                      !isNotEligibleVAS &&
+                      // !isNotEligibleSMC &&
+                      // !isNotEligibleVAS &&
                       !isBeneficiaryIneligible &&
                       !isBeneficiaryReferred)
                   ? Positioned(
