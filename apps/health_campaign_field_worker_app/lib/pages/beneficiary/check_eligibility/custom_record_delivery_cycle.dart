@@ -33,7 +33,8 @@ class CustomRecordDeliveryCycle extends LocalizedStatefulWidget {
   State<CustomRecordDeliveryCycle> createState() => RecordDeliveryCycleState();
 }
 
-class RecordDeliveryCycleState extends LocalizedState<CustomRecordDeliveryCycle> {
+class RecordDeliveryCycleState
+    extends LocalizedState<CustomRecordDeliveryCycle> {
   bool isExpanded = false;
   bool isDivider = false;
 

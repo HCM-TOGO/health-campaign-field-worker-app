@@ -1,5 +1,7 @@
 library app_utils;
 
+import 'package:referral_reconciliation/referral_reconciliation.dart'
+    as referral_reconciliation_mappers;
 import 'package:collection/collection.dart';
 import 'package:digit_components/utils/date_utils.dart';
 import 'package:digit_data_model/models/entities/individual.dart';
@@ -82,9 +84,32 @@ class CustomValidator {
 
     if (RegExp(pattern).hasMatch(control.value.toString())) return null;
 
-    if (control.value.toString().length < 10) return {'mobileNumber': true};
+    if (control.value.toString().length < 11) return {'mobileNumber': true};
 
     return {'mobileNumber': true};
+  }
+
+  static Map<String, dynamic>? onlyAlphabets(AbstractControl<dynamic> control) {
+    final value = control.value?.toString().trim();
+
+    if (value == null || value.isEmpty) return null;
+
+    final pattern = r"^[A-Za-z\s]+$"; // Only A-Z, a-z, and spaces
+    final regExp = RegExp(pattern);
+
+    return regExp.hasMatch(value) ? null : {'onlyAlphabets': true};
+  }
+
+  static Map<String, dynamic>? onlyAlphabetsAndDigits(
+      AbstractControl<dynamic> control) {
+    final value = control.value?.toString().trim();
+
+    if (value == null || value.isEmpty) return null;
+
+    final pattern = r'^[A-Za-z0-9\s]+$'; // Allows A-Z, a-z, 0-9, and spaces
+    final regExp = RegExp(pattern);
+
+    return regExp.hasMatch(value) ? null : {'onlyAlphabetsAndDigits': true};
   }
 }
 
@@ -171,8 +196,19 @@ String customFormatAgeRange(String condition) {
       RegExp(r'(\d+)\s*<\s*ageandage\s*<\s*(\d+)', caseSensitive: false);
   final match = regex.firstMatch(condition);
   if (match != null && match.groupCount == 2) {
-    final min = match.group(1);
-    final max = match.group(2);
+    // final min = match.group(1);
+    // final max = match.group(2);
+    int min = int.parse(match.group(1)!);
+    int max = int.parse(match.group(2)!);
+
+    if (min == 11) {
+      max -= 1;
+      min += 1;
+    } else if (max == 12) {
+      min += 1;
+    }
+
+    print('min: $min, max: $max');
     return '$min - $max months';
   }
   return condition;
@@ -621,6 +657,7 @@ initializeAllMappers() async {
     Future(() => inventory_mappers.initializeMappers()),
     Future(() => surveyForm_mappers.initializeMappers()),
     Future(() => complaints_mappers.initializeMappers()),
+    Future(() => referral_reconciliation_mappers.initializeMappers()),
   ];
   await Future.wait(initializations);
 }

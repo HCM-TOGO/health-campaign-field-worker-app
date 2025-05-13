@@ -1,11 +1,16 @@
+import 'package:referral_reconciliation/referral_reconciliation.dart';
+import 'package:referral_reconciliation/router/referral_reconciliation_router.gm.dart';
+
+import 'package:referral_reconciliation/blocs/search_referral_reconciliations.dart';
+import 'package:referral_reconciliation/referral_reconciliation.dart';
+import 'package:referral_reconciliation/router/referral_reconciliation_router.gm.dart';
+
 import 'package:attendance_management/attendance_management.dart';
 import 'package:attendance_management/router/attendance_router.gm.dart';
 import 'package:complaints/complaints.dart';
 
 import 'package:complaints/models/pgr_complaints.dart';
 import 'package:complaints/router/complaints_router.gm.dart';
-import 'package:referral_reconciliation/referral_reconciliation.dart';
-import 'package:referral_reconciliation/router/referral_reconciliation_router.gm.dart';
 
 import 'package:digit_data_model/models/entities/household_type.dart';
 import 'package:registration_delivery/registration_delivery.dart';
@@ -54,6 +59,9 @@ import '../widgets/localized.dart';
 import '../widgets/registration_delivery/custom_beneficiary_progress.dart';
 import '../widgets/showcase/config/showcase_constants.dart';
 import '../widgets/showcase/showcase_button.dart';
+// import 'package:referral_reconciliation/blocs/search_referral_reconciliations.dart';
+// import 'package:referral_reconciliation/router/referral_reconciliation_router.gm.dart';
+// import 'package:referral_reconciliation/pages/search_referral_reconciliations.dart';
 
 @RoutePage()
 class HomePage extends LocalizedStatefulWidget {
@@ -352,12 +360,19 @@ class _HomePageState extends LocalizedState<HomePage> {
           },
         ),
       ),
-      i18.home.beneficiaryReferralLabel: HomeItemCard(
-        icon: Icons.supervised_user_circle_rounded,
-        label: i18.home.beneficiaryReferralLabel,
-        onPressed: () async {
-          await context.router.push(SearchReferralReconciliationsRoute());
-        },
+      i18.home.beneficiaryReferralLabel:
+          homeShowcaseData.hfBeneficiaryReferral.buildWith(
+        child: HomeItemCard(
+          icon: Icons.supervised_user_circle_rounded,
+          label: i18.home.beneficiaryReferralLabel,
+          onPressed: () async {
+            if (isTriggerLocalisation) {
+              triggerLocalization();
+              isTriggerLocalisation = false;
+            }
+            context.router.push(CustomSearchReferralReconciliationsRoute());
+          },
+        ),
       ),
       i18.home.manageStockLabel:
           homeShowcaseData.warehouseManagerManageStock.buildWith(
@@ -396,6 +411,13 @@ class _HomePageState extends LocalizedState<HomePage> {
             context.router.push(CustomInventoryReportSelectionRoute());
           },
         ),
+      ),
+      i18.home.beneficiaryReferralLabel: HomeItemCard(
+        icon: Icons.supervised_user_circle_rounded,
+        label: i18.home.beneficiaryReferralLabel,
+        onPressed: () async {
+          await context.router.push(CustomSearchReferralReconciliationsRoute());
+        },
       ),
       i18.home.syncDataLabel: homeShowcaseData.distributorSyncData.buildWith(
         child: StreamBuilder<Map<String, dynamic>?>(
@@ -463,6 +485,21 @@ class _HomePageState extends LocalizedState<HomePage> {
               isTriggerLocalisation = false;
             }
             context.router.push(const ComplaintsInboxWrapperRoute());
+          },
+        ),
+      ),
+      i18.home.manageAttendanceLabel:
+          homeShowcaseData.manageAttendance.buildWith(
+        child: HomeItemCard(
+          icon: Icons.fingerprint_outlined,
+          label: i18.home.manageAttendanceLabel,
+          onPressed: () {
+            if (isTriggerLocalisation) {
+              triggerLocalization();
+              isTriggerLocalisation = false;
+            }
+            ;
+            context.router.push(const ManageAttendanceRoute());
           },
         ),
       ),
@@ -547,6 +584,12 @@ class _HomePageState extends LocalizedState<HomePage> {
               localRepositories: [
                 // INFO : Need to add local repo of package Here
                 context.read<
+                    LocalRepository<HFReferralModel, HFReferralSearchModel>>(),
+
+                context.read<
+                    LocalRepository<HFReferralModel, HFReferralSearchModel>>(),
+
+                context.read<
                     LocalRepository<AttendanceLogModel,
                         AttendanceLogSearchModel>>(),
 
@@ -584,6 +627,12 @@ class _HomePageState extends LocalizedState<HomePage> {
               ],
               remoteRepositories: [
                 // INFO : Need to add repo repo of package Here
+                context.read<
+                    RemoteRepository<HFReferralModel, HFReferralSearchModel>>(),
+
+                context.read<
+                    RemoteRepository<HFReferralModel, HFReferralSearchModel>>(),
+
                 context.read<
                     RemoteRepository<AttendanceLogModel,
                         AttendanceLogSearchModel>>(),
@@ -676,7 +725,7 @@ void setPackagesSingleton(BuildContext context) {
           userUUid: context.loggedInUserUuid,
           projectId: context.selectedProject.id,
           projectName: context.selectedProject.name,
-          roleCode: RolesType.healthFacilityWorker.toValue(),
+          roleCode: RolesType.healthFacilitySupervisor.toValue(),
           appVersion: Constants().version,
           tenantId: envConfig.variables.tenantId,
           validIndividualAgeForCampaign: ValidIndividualAgeForCampaign(

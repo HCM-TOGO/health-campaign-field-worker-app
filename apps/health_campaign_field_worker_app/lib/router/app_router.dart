@@ -3,6 +3,7 @@ import 'package:attendance_management/router/attendance_router.gm.dart';
 import 'package:complaints/router/complaints_router.dart';
 import 'package:complaints/router/complaints_router.gm.dart';
 import 'package:health_campaign_field_worker_app/blocs/registration_delivery/custom_beneficairy_registration.dart';
+import 'package:referral_reconciliation/pages/search_referral_reconciliations.dart';
 import 'package:referral_reconciliation/router/referral_reconciliation_router.gm.dart';
 import 'package:referral_reconciliation/router/referral_reconciliation_router.dart';
 import 'package:registration_delivery/blocs/app_localization.dart';
@@ -30,9 +31,11 @@ import '../pages/beneficiary/check_eligibility/household_acknowledgement_smc.dar
 import '../pages/beneficiary/check_eligibility/inventory_facility_selection_smc.dart';
 import '../pages/beneficiary/check_eligibility/refer_beneficiary_smc.dart';
 import '../pages/beneficiary/check_eligibility/refer_beneficiary_vas.dart';
+import '../pages/registration_delivery/custom_complaints_details.dart';
 import '../pages/boundary_selection.dart';
 import '../pages/home.dart';
 import '../pages/inventory_management/custom_manage_stock.dart';
+import '../pages/inventory_management/custom_transactional_details.dart';
 import '../pages/inventory_management/custom_inventory_report_selection.dart';
 import '../pages/inventory_management/custom_stock_details.dart';
 import '../pages/inventory_management/custom_stock_reconciliation.dart';
@@ -44,6 +47,7 @@ import '../pages/inventory_management/custom_stock_details_in_tabs.dart';
 import '../pages/inventory_management/custom_acknowledgement.dart';
 import '../pages/inventory_management/view_stock_records.dart';
 import 'package:inventory_management/models/entities/stock.dart';
+import '../pages/inventory_management/custom_min_number.dart';
 import '../pages/language_selection.dart';
 import '../pages/login.dart';
 import '../pages/profile.dart';
@@ -60,6 +64,7 @@ import '../pages/registration_delivery/custom_individual_details.dart';
 import '../pages/registration_delivery/custom_registration_delivery_wrapper.dart';
 import '../pages/registration_delivery/custom_search_beneficiary.dart';
 import '../pages/registration_delivery/custom_summary.dart';
+import '../pages/registration_delivery/custom_complaint_type.dart';
 import '../pages/beneficiary/check_eligibility/record_redose.dart';
 import '../pages/reports/beneficiary/beneficaries_report.dart';
 import '../pages/unauthenticated.dart';
@@ -67,6 +72,16 @@ export 'package:auto_route/auto_route.dart';
 import '../pages/beneficiary/check_eligibility/custom_beneficiary_details_page.dart';
 import '../pages/beneficiary/check_eligibility/custom_deliver_intervention_page.dart';
 import '../pages/beneficiary/check_eligibility/custom_delivery_summary_page.dart';
+import '../pages/referral_reconcillation/custom_search_referral_page.dart';
+import 'package:referral_reconciliation/blocs/app_localization.dart';
+import '../pages/referral_reconcillation/custom_record_referral_details.dart';
+import '../pages/referral_reconcillation/custom_hf_referral_wrapper_page.dart';
+import '../pages/referral_reconcillation/custom_record_facility_page.dart';
+import '../pages/referral_reconcillation/custom_record_referral_details.dart';
+import '../pages/referral_reconcillation/custom_referral_reason_checklist_page.dart';
+import '../pages/referral_reconcillation/custom_referral_reason_checklist_preview_page.dart';
+import '../pages/referral_reconcillation/custom_referral_facility_selection_page.dart';
+import 'package:referral_reconciliation/models/entities/hf_referral.dart';
 import '../utils/app_enums.dart';
 import 'package:survey_form/router/survey_form_router.dart';
 import 'package:survey_form/router/survey_form_router.gm.dart';
@@ -137,27 +152,60 @@ class AppRouter extends _$AppRouter {
           page: AttendanceAcknowledgementRoute.page,
           path: 'attendance-acknowledgement',
         ),
+        AutoRoute(
+            page: CustomSearchReferralReconciliationsRoute.page,
+            path: 'custom-search-referrals'),
+
+        AutoRoute(
+          page: CustomMinNumberRoute.page,
+          path: 'custom-min-number',
+        ),
 
         // Referral Reconciliation Route
         AutoRoute(
-            page: HFCreateReferralWrapperRoute.page,
+            page: CustomHFCreateReferralWrapperRoute.page,
             path: 'hf-referral',
             children: [
               AutoRoute(
-                  page: ReferralFacilityRoute.page,
-                  path: 'facility-details',
+                  page: ReferralFacilityRoute.page, path: 'facility-details'),
+              AutoRoute(
+                  page: CustomReferralFacilityRoute.page,
+                  path: 'custom-facility-details',
                   initial: true),
+              RedirectRoute(
+                  path: 'facility-details',
+                  redirectTo: 'custom-facility-details'),
               AutoRoute(
                   page: RecordReferralDetailsRoute.page,
                   path: 'referral-details'),
+              AutoRoute(
+                  page: CustomRecordReferralDetailsRoute.page,
+                  path: 'custom-referral-details'),
+              RedirectRoute(
+                  path: 'referral-details',
+                  redirectTo: 'custom-referral-details'),
               AutoRoute(
                 page: ReferralReasonChecklistRoute.page,
                 path: 'referral-checklist-create',
               ),
               AutoRoute(
+                page: CustomReferralReasonChecklistRoute.page,
+                path: 'custom-referral-checklist-create',
+              ),
+              RedirectRoute(
+                  path: 'referral-checklist-create',
+                  redirectTo: 'custom-referral-checklist-create'),
+              AutoRoute(
                 page: ReferralReasonChecklistPreviewRoute.page,
                 path: 'referral-checklist-view',
               ),
+              AutoRoute(
+                page: CustomReferralReasonChecklistPreviewRoute.page,
+                path: 'custom-referral-checklist-view',
+              ),
+              RedirectRoute(
+                  path: 'referral-checklist-view',
+                  redirectTo: 'custom-referral-checklist-view'),
             ]),
         AutoRoute(
           page: ReferralReconAcknowledgementRoute.page,
@@ -340,10 +388,6 @@ class AppRouter extends _$AppRouter {
                     page: RecordPastDeliveryDetailsRoute.page,
                     path: 'record-past-delivery-details',
                   ),
-                  // AutoRoute(
-                  //   page: HouseholdAcknowledgementRoute.page,
-                  //   path: 'household-acknowledgement',
-                  // ),
 
                   AutoRoute(
                     page: CustomHouseholdAcknowledgementRoute.page,
@@ -437,10 +481,10 @@ class AppRouter extends _$AppRouter {
               path: 'details',
               redirectTo: 'custom-details',
             ),
-            // AutoRoute(
-            //   page: DynamicTabsRoute.page,
-            //   path: 'stock-tabs',
-            // ),
+            AutoRoute(
+              page: CustomTransactionalDetailsRoute.page,
+              path: 'custom-transaction-details',
+            ),
           ],
         ),
 
@@ -505,11 +549,20 @@ class AppRouter extends _$AppRouter {
           page: ComplaintsRegistrationWrapperRoute.page,
           path: 'complaints-registration',
           children: [
+            // AutoRoute(
+            //   page: ComplaintTypeRoute.page,
+            //   path: 'complaints-type',
+            //   initial: true,
+            // ),
             AutoRoute(
-              page: ComplaintTypeRoute.page,
-              path: 'complaints-type',
+              page: CustomComplaintTypeRoute.page,
+              path: 'custom-complaints-type',
               initial: true,
             ),
+            // RedirectRoute(
+            //   path: 'complaints-type',
+            //   redirectTo: 'custom-complaints-type',
+            // ),
             AutoRoute(
               page: ComplaintsLocationRoute.page,
               path: 'complaints-location',
@@ -517,6 +570,14 @@ class AppRouter extends _$AppRouter {
             AutoRoute(
               page: ComplaintsDetailsRoute.page,
               path: 'complaints-details',
+            ),
+            AutoRoute(
+              page: CustomComplaintsDetailsRoute.page,
+              path: 'custom-complaints-details',
+            ),
+            RedirectRoute(
+              path: 'complaints-details',
+              redirectTo: 'custom-complaints-details',
             ),
           ],
         ),

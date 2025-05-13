@@ -15,6 +15,7 @@ import 'package:inventory_management/widgets/localized.dart';
 import 'package:inventory_management/blocs/record_stock.dart';
 import 'package:inventory_management/widgets/back_navigation_help_header.dart';
 
+import '../../router/app_router.dart';
 import '../../utils/utils.dart';
 
 @RoutePage()

@@ -445,7 +445,7 @@ class CustomDeliverInterventionPageState
                                                                 label: localizations
                                                                     .translate(
                                                                   i18.common
-                                                                      .coreCommonCancel,
+                                                                      .coreCommonGoback,
                                                                 ),
                                                                 action: (ctx) {
                                                                   Navigator.of(
@@ -507,10 +507,19 @@ class CustomDeliverInterventionPageState
                                                   const EdgeInsets.all(spacer2),
                                               children: [
                                                 Text(
-                                                  localizations.translate(
-                                                    i18.deliverIntervention
-                                                        .deliverInterventionLabel,
-                                                  ),
+                                                  widget.eligibilityAssessmentType ==
+                                                          EligibilityAssessmentType
+                                                              .smc
+                                                      ? localizations.translate(
+                                                          i18_local
+                                                              .deliverIntervention
+                                                              .deliverInterventionSMCLabel,
+                                                        )
+                                                      : localizations.translate(
+                                                          i18_local
+                                                              .deliverIntervention
+                                                              .deliverInterventionVASLabel,
+                                                        ),
                                                   style: textTheme.headingXl
                                                       .copyWith(
                                                           color: theme
@@ -567,14 +576,13 @@ class CustomDeliverInterventionPageState
                                                       LabeledField(
                                                     label:
                                                         localizations.translate(
-                                                      widget.eligibilityAssessmentType ==
-                                                              EligibilityAssessmentType
-                                                                  .smc
-                                                          ? i18.householdDetails
-                                                              .dateOfRegistrationLabel
-                                                          : i18_local
-                                                              .householdDetails
-                                                              .dateOfAdministrationLabel,
+                                                      // widget.eligibilityAssessmentType ==
+                                                      //         EligibilityAssessmentType
+                                                      //             .smc
+                                                      // ? i18.householdDetails
+                                                      //     .dateOfRegistrationLabel:
+                                                      i18_local.householdDetails
+                                                          .dateOfAdministrationLabel,
                                                     ),
                                                     child: DigitDateFormInput(
                                                       readOnly: true,
@@ -995,14 +1003,18 @@ class CustomResourceBeneficiaryCardState
                       isDisabled: true,
                       readOnly: true,
                       selectedOption: DropdownItem(
-                          code: (selectedVariant?.sku ?? selectedVariant?.id)
-                              as String,
-                          name: (selectedVariant?.sku ?? selectedVariant?.id)
-                              as String),
+                        code: getFormattedSku(
+                            selectedVariant?.sku ?? selectedVariant!.id),
+                        name: getFormattedSku(
+                            selectedVariant?.sku ?? selectedVariant!.id),
+                      ),
                       items: productVariants
                           .map((variant) => DropdownItem(
-                              code: variant.sku ?? variant.id,
-                              name: variant.sku ?? variant.id))
+                                code:
+                                    getFormattedSku(variant.sku ?? variant.id),
+                                name:
+                                    getFormattedSku(variant.sku ?? variant.id),
+                              ))
                           .toList(),
                     ),
                   ),
@@ -1036,5 +1048,14 @@ class CustomResourceBeneficiaryCardState
         },
       ),
     ]);
+  }
+
+  String getFormattedSku(String sku) {
+    if (sku == 'Red VAS') {
+      return 'VAS - Red Capsule';
+    } else if (sku == 'Blue VAS') {
+      return 'VAS - Blue Capsule';
+    }
+    return sku; // Fallback to original if no match
   }
 }

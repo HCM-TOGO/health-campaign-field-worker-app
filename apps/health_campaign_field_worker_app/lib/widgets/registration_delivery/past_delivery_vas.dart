@@ -135,7 +135,12 @@ Widget buildTableContentVAS(
                         : DigitTableData('', cellKey: ''),
                     // Display the SKU value in the second column.
                     DigitTableData(
-                      value ?? "",
+                      (localizations.translate(value.toString()) == 'Blue VAS')
+                          ? 'VAS - Blue Capsule'
+                          : (localizations.translate(value.toString()) ==
+                                  'Red VAS')
+                              ? 'VAS - Red Capsule'
+                              : localizations.translate(value.toString()),
                       cellKey: 'resources',
                     ),
                   ]);

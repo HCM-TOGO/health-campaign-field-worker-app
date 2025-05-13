@@ -30,6 +30,8 @@ import '../../../widgets/localized.dart';
 import '../../../models/entities/assessment_checklist/status.dart'
     as status_local;
 import 'package:digit_ui_components/services/location_bloc.dart' as location;
+import '../../../models/entities/additional_fields_type.dart'
+    as additional_fields_local;
 
 @RoutePage()
 class EligibilityChecklistViewPage extends LocalizedStatefulWidget {
@@ -152,6 +154,7 @@ class _EligibilityChecklistViewPage
                               kPadding, 0, kPadding, 0),
                           child: DigitElevatedButton(
                             onPressed: () async {
+                              submitTriggered = true;
                               final isValid =
                                   checklistFormKey.currentState?.validate();
                               if (!isValid!) {
@@ -256,7 +259,11 @@ class _EligibilityChecklistViewPage
                                                 .checklistDialogDynamicDescription,
                                           )
                                           .replaceFirst('{}', descriptionText))
-                                      : Text(localizations.translate(
+                                      // : Text(localizations.translate(i18_local
+                                      //     .deliverIntervention
+                                      //     .proceedToVASDescription)),
+                                      : getHighlightedText(
+                                          localizations.translate(
                                           i18_local.deliverIntervention
                                               .proceedToVASDescription,
                                         )),
@@ -454,13 +461,27 @@ class _EligibilityChecklistViewPage
                                                   fields: [
                                                     // AdditionalField(
                                                     //   'taskStatus',
-                                                    //   Status.beneficiaryInEligible
+                                                    //   status_local.Status
+                                                    //       .beneficiaryInEligible
                                                     //       .toValue(),
                                                     // ),
                                                     AdditionalField(
                                                       'ineligibleReasons',
                                                       ineligibilityReasons
                                                           .join(","),
+                                                    ),
+                                                    AdditionalField(
+                                                      additional_fields_local
+                                                          .AdditionalFieldsType
+                                                          .deliveryType
+                                                          .toValue(),
+                                                      (widget.eligibilityAssessmentType ==
+                                                              EligibilityAssessmentType
+                                                                  .smc)
+                                                          ? EligibilityAssessmentStatus
+                                                              .smcDone.name
+                                                          : EligibilityAssessmentStatus
+                                                              .vasDone.name,
                                                     ),
                                                   ],
                                                 ),
@@ -954,6 +975,41 @@ class _EligibilityChecklistViewPage
     } else {
       return const SizedBox.shrink();
     }
+  }
+
+  Widget getHighlightedText(String description) {
+    // Find the position of the word "Proceed"
+    int startIndex = description.indexOf('Proceed');
+    int endIndex = startIndex + 'Proceed'.length;
+
+    // Split the description into parts
+    String partBefore = description.substring(0, startIndex);
+    String partHighlighted = description.substring(startIndex, endIndex);
+    String partAfter = description.substring(endIndex);
+
+    TextTheme textTheme = Theme.of(context).textTheme;
+    TextStyle normalTextStyle =
+        textTheme.titleMedium ?? TextStyle(color: Colors.black);
+
+    // Use RichText to style the word "Proceed"
+    return RichText(
+      text: TextSpan(
+        children: [
+          TextSpan(
+            text: partBefore,
+            style: normalTextStyle,
+          ),
+          TextSpan(
+            text: partHighlighted,
+            style: normalTextStyle.copyWith(fontWeight: FontWeight.bold),
+          ),
+          TextSpan(
+            text: partAfter,
+            style: normalTextStyle,
+          ),
+        ],
+      ),
+    );
   }
 
   List<bool> isIneligible(

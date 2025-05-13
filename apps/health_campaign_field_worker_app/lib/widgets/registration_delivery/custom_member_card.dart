@@ -110,6 +110,10 @@ class CustomMemberCard extends StatelessWidget {
     List<TaskModel>? vasTasks = _getVACStatusData();
     bool isBeneficiaryReferredSMC = checkBeneficiaryReferredSMC(smcTasks);
     bool isBeneficiaryReferredVAS = checkBeneficiaryReferredVAS(vasTasks);
+
+    bool isBeneficiaryInEligibleSMC = checkBeneficiaryInEligibleSMC(smcTasks);
+    bool isBeneficiaryInEligibleVAS = checkBeneficiaryInEligibleVAS(vasTasks);
+
     final theme = Theme.of(context);
     if (isHead) {
       return Align(
@@ -127,49 +131,65 @@ class CustomMemberCard extends StatelessWidget {
     if ((isSMCDelivered ||
         isVASDelivered ||
         isBeneficiaryReferredSMC ||
-        isBeneficiaryReferredVAS)) {
+        isBeneficiaryReferredVAS ||
+        isBeneficiaryInEligibleVAS ||
+        isBeneficiaryInEligibleSMC)) {
       return Column(
         children: [
-          if (isSMCDelivered || isBeneficiaryReferredSMC)
+          if (isSMCDelivered ||
+              isBeneficiaryReferredSMC ||
+              isBeneficiaryInEligibleSMC)
             Align(
               alignment: Alignment.centerLeft,
               child: DigitIconButton(
                 icon: Icons.check_circle,
                 iconText: localizations.translate(
-                  isBeneficiaryReferredSMC
+                  isBeneficiaryInEligibleSMC
                       ? i18_local.householdOverView
-                          .householdOverViewBeneficiaryReferredSMCLabel
-                      : i18_local.householdOverView
-                          .householdOverViewSMCDeliveredIconLabel,
+                          .householdOverViewBeneficiaryInEligibleSMCLabel
+                      : isBeneficiaryReferredSMC
+                          ? i18_local.householdOverView
+                              .householdOverViewBeneficiaryReferredSMCLabel
+                          : i18_local.householdOverView
+                              .householdOverViewSMCDeliveredIconLabel,
                 ),
                 iconSize: 20,
-                iconTextColor: isBeneficiaryReferredSMC
-                    ? DigitTheme.instance.colorScheme.error
-                    : DigitTheme.instance.colorScheme.onSurfaceVariant,
-                iconColor: isBeneficiaryReferredSMC
-                    ? DigitTheme.instance.colorScheme.error
-                    : DigitTheme.instance.colorScheme.onSurfaceVariant,
+                iconTextColor:
+                    (isBeneficiaryReferredSMC || isBeneficiaryInEligibleSMC)
+                        ? DigitTheme.instance.colorScheme.error
+                        : DigitTheme.instance.colorScheme.onSurfaceVariant,
+                iconColor:
+                    (isBeneficiaryReferredSMC || isBeneficiaryInEligibleSMC)
+                        ? DigitTheme.instance.colorScheme.error
+                        : DigitTheme.instance.colorScheme.onSurfaceVariant,
               ),
             ),
-          if (isVASDelivered || isBeneficiaryReferredVAS)
+          if (isVASDelivered ||
+              isBeneficiaryReferredVAS ||
+              isBeneficiaryInEligibleVAS)
             Align(
               alignment: Alignment.centerLeft,
               child: DigitIconButton(
                 icon: Icons.check_circle,
                 iconText: localizations.translate(
-                  isBeneficiaryReferredVAS
+                  isBeneficiaryInEligibleVAS
                       ? i18_local.householdOverView
-                          .householdOverViewBeneficiaryReferredVASLabel
-                      : i18_local.householdOverView
-                          .householdOverViewVASDeliveredIconLabel,
+                          .householdOverViewBeneficiaryInEligibleVASLabel
+                      : isBeneficiaryReferredVAS
+                          ? i18_local.householdOverView
+                              .householdOverViewBeneficiaryReferredVASLabel
+                          : i18_local.householdOverView
+                              .householdOverViewVASDeliveredIconLabel,
                 ),
                 iconSize: 20,
-                iconTextColor: isBeneficiaryReferredVAS
-                    ? DigitTheme.instance.colorScheme.error
-                    : DigitTheme.instance.colorScheme.onSurfaceVariant,
-                iconColor: isBeneficiaryReferredVAS
-                    ? DigitTheme.instance.colorScheme.error
-                    : DigitTheme.instance.colorScheme.onSurfaceVariant,
+                iconTextColor:
+                    (isBeneficiaryReferredVAS || isBeneficiaryInEligibleVAS)
+                        ? DigitTheme.instance.colorScheme.error
+                        : DigitTheme.instance.colorScheme.onSurfaceVariant,
+                iconColor:
+                    (isBeneficiaryReferredVAS || isBeneficiaryInEligibleVAS)
+                        ? DigitTheme.instance.colorScheme.error
+                        : DigitTheme.instance.colorScheme.onSurfaceVariant,
               ),
             ),
         ],
@@ -241,6 +261,10 @@ class CustomMemberCard extends StatelessWidget {
     bool vasAssessmentPendingStatus = assessmentVASPending(vasTasks);
     bool isBeneficiaryReferredSMC = checkBeneficiaryReferredSMC(smcTasks);
     bool isBeneficiaryReferredVAS = checkBeneficiaryReferredVAS(vasTasks);
+
+    bool isBeneficiaryInEligibleSMC = checkBeneficiaryInEligibleSMC(smcTasks);
+    bool isBeneficiaryInEligibleVAS = checkBeneficiaryInEligibleVAS(vasTasks);
+
     final redosePendingStatus = smcAssessmentPendingStatus
         ? true
         : redosePending(smcTasks, context.selectedCycle);
@@ -252,7 +276,9 @@ class CustomMemberCard extends StatelessWidget {
     }
     return Column(
       children: [
-        if (smcAssessmentPendingStatus && !isBeneficiaryReferredSMC)
+        if (smcAssessmentPendingStatus &&
+            !isBeneficiaryReferredSMC &&
+            !isBeneficiaryInEligibleSMC)
           DigitElevatedButton(
             child: Center(
               child: Text(
@@ -356,9 +382,12 @@ class CustomMemberCard extends StatelessWidget {
               }
             },
           ),
-        if ((!smcAssessmentPendingStatus || isBeneficiaryReferredSMC) &&
+        if ((!smcAssessmentPendingStatus ||
+                isBeneficiaryReferredSMC ||
+                isBeneficiaryInEligibleSMC) &&
             vasAssessmentPendingStatus &&
             !isBeneficiaryReferredVAS &&
+            !isBeneficiaryInEligibleVAS &&
             !isNotEligibleVAS)
           DigitElevatedButton(
             child: Center(
@@ -483,40 +512,40 @@ class CustomMemberCard extends StatelessWidget {
                   ),
                 ],
               ),
-              // (tasks ?? [])
-              //             .where(
-              //               (element) =>
-              //                   element.status ==
-              //                   Status.administeredSuccess.toValue(),
-              //             )
-              //             .lastOrNull ==
-              //         null
-              //     ? Positioned(
-              //         child: Align(
-              //           alignment: Alignment.topRight,
-              //           child: DigitIconButton(
-              //             onPressed: () => DigitActionDialog.show(
-              //               context,
-              //               widget: ActionCard(
-              //                 items: [
-              //                   ActionCardModel(
-              //                     icon: Icons.edit,
-              //                     label: localizations.translate(
-              //                       i18.memberCard.editIndividualDetails,
-              //                     ),
-              //                     action: editMemberAction,
-              //                   ),
-              //                 ],
-              //               ),
-              //             ),
-              //             iconText: localizations.translate(
-              //               i18.memberCard.editDetails,
-              //             ),
-              //             icon: Icons.edit,
-              //           ),
-              //         ),
-              //       )
-              //     : const Offstage(),
+              (tasks ?? [])
+                          .where(
+                            (element) =>
+                                element.status ==
+                                Status.administeredSuccess.toValue(),
+                          )
+                          .lastOrNull ==
+                      null
+                  ? Positioned(
+                      child: Align(
+                        alignment: Alignment.topRight,
+                        child: DigitIconButton(
+                          onPressed: () => DigitActionDialog.show(
+                            context,
+                            widget: ActionCard(
+                              items: [
+                                ActionCardModel(
+                                  icon: Icons.edit,
+                                  label: localizations.translate(
+                                    i18.memberCard.editIndividualDetails,
+                                  ),
+                                  action: editMemberAction,
+                                ),
+                              ],
+                            ),
+                          ),
+                          iconText: localizations.translate(
+                            i18.memberCard.editDetails,
+                          ),
+                          icon: Icons.edit,
+                        ),
+                      ),
+                    )
+                  : const Offstage(),
             ],
           ),
           SizedBox(
