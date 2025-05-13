@@ -49,8 +49,9 @@ class _DynamicTabsPageState extends LocalizedState<DynamicTabsPage>
   static const _productVariantKey = 'productVariant';
   static const _secondaryPartyKey = 'secondaryParty';
   static const _transactionReasonKey = 'transactionReason';
+  static const _transactionQuantityKey = 'quantity';
   static const _waybillNumberKey = 'waybillNumber';
-  static const _waybillQuantityKey = 'waybillQuantity';
+  // static const _waybillQuantityKey = 'waybillQuantity';
   static const _batchNumberKey = 'batchNumberKey';
   static const _vehicleNumberKey = 'vehicleNumber';
   static const _typeOfTransportKey = 'typeOfTransport';
@@ -121,8 +122,14 @@ class _DynamicTabsPageState extends LocalizedState<DynamicTabsPage>
               Validators.required
             ],
           ),
-          _waybillQuantityKey:
-              FormControl<String>(validators: [Validators.required]),
+          _transactionQuantityKey: FormControl<int>(validators: [
+            Validators.number(),
+            Validators.required,
+            Validators.min(0),
+            Validators.max(10000),
+          ]),
+          // _waybillQuantityKey:
+          //     FormControl<String>(validators: [Validators.required]),
           _batchNumberKey: FormControl<String>(),
           _commentsKey: FormControl<String>(),
         }),
@@ -155,16 +162,48 @@ class _DynamicTabsPageState extends LocalizedState<DynamicTabsPage>
       transactionReason,
     );
 
-    setSenderReceiverIdAndType(
-        entryType, senderId, senderType, receiverId, receiverType);
+    // setSenderReceiverIdAndType(
+    //     entryType, senderId, senderType, receiverId, receiverType);
+    final secondartParty = receivedFrom.contains(("FAC_"))
+        ? receivedFrom.replaceFirst("FAC_", "")
+        : receivedFrom;
+
+    final primaryType = BlocProvider.of<RecordStockBloc>(
+      context,
+    ).state.primaryType;
+
+    final primaryId = BlocProvider.of<RecordStockBloc>(
+      context,
+    ).state.primaryId;
+
+    switch (entryType) {
+      case StockRecordEntryType.receipt:
+      case StockRecordEntryType.loss:
+      case StockRecordEntryType.damaged:
+      case StockRecordEntryType.returned:
+        senderId = secondartParty;
+        senderType = "WAREHOUSE";
+        receiverId = primaryId;
+        receiverType = primaryType;
+
+        break;
+      case StockRecordEntryType.dispatch:
+        receiverId = secondartParty;
+        receiverType = "WAREHOUSE";
+        senderId = primaryId;
+        senderType = primaryType;
+        break;
+    }
 
     return StockModel(
       id: null,
       facilityId: receivedFrom,
       productVariantId: product.id,
-      quantity:
-          _forms[productSku]?.control(_waybillQuantityKey)?.value?.toString() ??
-              '0',
+      quantity: _forms[productSku]
+              ?.control(_transactionQuantityKey)
+              ?.value
+              ?.toString() ??
+          '0',
       wayBillNumber:
           _forms[productSku]?.control(_waybillNumberKey)?.value?.toString(),
       transactionReason:
@@ -202,11 +241,8 @@ class _DynamicTabsPageState extends LocalizedState<DynamicTabsPage>
     );
   }
 
-  void setTransactionTypeAndReason(
-    StockRecordEntryType entryType,
-    String? transactionType,
-    String? transactionReason,
-  ) {
+  void setTransactionTypeAndReason(StockRecordEntryType entryType,
+      String? transactionType, String? transactionReason) {
     // todo set the reasons , for othe entryType (can capture from field once added)
 
     switch (entryType) {
@@ -287,6 +323,29 @@ class _DynamicTabsPageState extends LocalizedState<DynamicTabsPage>
     final form = _forms[productName]!;
     StockRecordEntryType entryType = stockState.entryType;
     bool isLastTab = _tabController.index == _tabController.length - 1;
+    String quantityCountLabel;
+
+    switch (entryType) {
+      case StockRecordEntryType.receipt:
+        quantityCountLabel = i18.stockDetails.quantityReceivedLabel;
+
+        break;
+      case StockRecordEntryType.dispatch:
+        quantityCountLabel = i18.stockDetails.quantitySentLabel;
+
+        break;
+      case StockRecordEntryType.returned:
+        quantityCountLabel = i18.stockDetails.quantityReturnedLabel;
+
+        break;
+      case StockRecordEntryType.loss:
+        quantityCountLabel = i18.stockDetails.quantityLostLabel;
+
+        break;
+      case StockRecordEntryType.damaged:
+        quantityCountLabel = i18.stockDetails.quantityDamagedLabel;
+        break;
+    }
 
     return _KeepAliveTabContent(
       child: ReactiveForm(
@@ -374,23 +433,65 @@ class _DynamicTabsPageState extends LocalizedState<DynamicTabsPage>
                           }),
                     const SizedBox(height: 16),
                     ReactiveWrapperField(
-                      formControlName: _waybillQuantityKey,
-                      builder: (field) {
-                        return InputField(
-                          type: InputType.text,
-                          label: 'Quantity of Blisters Received',
-                          errorMessage: field.errorText,
-                          onChange: (val) {
-                            if (val == '') {
-                              field.control.value = '0';
-                            } else {
-                              field.control.value = val;
-                            }
-                          },
-                          isRequired: true,
-                        );
-                      },
-                    ),
+                        formControlName: _transactionQuantityKey,
+                        validationMessages: {
+                          "number": (object) => localizations.translate(
+                                '${quantityCountLabel}_ERROR',
+                              ),
+                          "max": (object) => localizations.translate(
+                                '${quantityCountLabel}_MAX_ERROR',
+                              ),
+                          "min": (object) => localizations.translate(
+                                '${quantityCountLabel}_MIN_ERROR',
+                              ),
+                        },
+                        showErrors: (control) =>
+                            control.invalid && control.touched,
+                        builder: (field) {
+                          return LabeledField(
+                            label: localizations.translate(
+                              quantityCountLabel,
+                            ),
+                            isRequired: true,
+                            child: BaseDigitFormInput(
+                              errorMessage: field.errorText,
+                              keyboardType:
+                                  const TextInputType.numberWithOptions(
+                                decimal: true,
+                              ),
+                              onChange: (val) {
+                                field.control.markAsTouched();
+                                if (int.parse(val) > 10000000000) {
+                                  field.control.value = 10000;
+                                } else {
+                                  if (val != '') {
+                                    field.control.value = int.parse(val);
+                                  } else {
+                                    field.control.value = null;
+                                  }
+                                }
+                              },
+                            ),
+                          );
+                        }),
+                    // ReactiveWrapperField(
+                    //   formControlName: _waybillQuantityKey,
+                    //   builder: (field) {
+                    //     return InputField(
+                    //       type: InputType.text,
+                    //       label: 'Quantity of Blisters' + ,
+                    //       errorMessage: field.errorText,
+                    //       onChange: (val) {
+                    //         if (val == '') {
+                    //           field.control.value = '0';
+                    //         } else {
+                    //           field.control.value = val;
+                    //         }
+                    //       },
+                    //       isRequired: true,
+                    //     );
+                    //   },
+                    // ),
                     const SizedBox(height: 16),
                     ReactiveWrapperField(
                       formControlName: _commentsKey,
@@ -416,6 +517,7 @@ class _DynamicTabsPageState extends LocalizedState<DynamicTabsPage>
                 DigitButton(
                   size: DigitButtonSize.large,
                   type: DigitButtonType.primary,
+                  // isDisabled: !form.valid,
                   onPressed: () async {
                     if (form.valid) {
                       await _saveCurrentTabData(productName);
@@ -457,7 +559,7 @@ class _DynamicTabsPageState extends LocalizedState<DynamicTabsPage>
     final currentStock = _tabStocks[productName]!;
 
     _tabStocks[productName] = currentStock.copyWith(
-      quantity: form.control(_waybillQuantityKey).value?.toString(),
+      quantity: form.control(_transactionQuantityKey).value?.toString(),
       wayBillNumber: form.control(_waybillNumberKey).value?.toString(),
       transactionReason: form.control(_transactionReasonKey).value?.toString(),
       additionalFields: currentStock.additionalFields?.copyWith(
@@ -494,14 +596,14 @@ class _DynamicTabsPageState extends LocalizedState<DynamicTabsPage>
             ),
             onPressed: () {
 //               Navigator.of(context, rootNavigator: true).pop(true);
-              Navigator.of(context).push(
-                MaterialPageRoute(
-                  builder: (context) => CustomAcknowledgementPage(
-                    mrnNumber: _sharedMRN,
-                    stockRecords: _tabStocks.values.toList(),
-                  ),
-                ),
-              );
+              // Navigator.of(context).push(
+              //   MaterialPageRoute(
+              //     builder: (context) => CustomAcknowledgementPage(
+              //       mrnNumber: _sharedMRN,
+              //       stockRecords: _tabStocks.values.toList(),
+              //     ),
+              //   ),
+              // );
               // todo : correct the routing here to show , page where we can see transactions
               Navigator.of(
                 context,
@@ -541,14 +643,14 @@ class _DynamicTabsPageState extends LocalizedState<DynamicTabsPage>
             );
       }
       // Navigator.of(context).pop();
-      // Navigator.of(context).push(
-      //   MaterialPageRoute(
-      //     builder: (context) => CustomAcknowledgementPage(
-      //       mrnNumber: _sharedMRN,
-      //       stockRecords: _tabStocks.values.toList(),
-      //     ),
-      //   ),
-      // );
+      Navigator.of(context).push(
+        MaterialPageRoute(
+          builder: (context) => CustomAcknowledgementPage(
+            mrnNumber: _sharedMRN,
+            stockRecords: _tabStocks.values.toList(),
+          ),
+        ),
+      );
     }
   }
 
@@ -588,8 +690,8 @@ class _DynamicTabsPageState extends LocalizedState<DynamicTabsPage>
   }
 
   String? wastageQuantity(FormGroup form, BuildContext context) {
-    final quantity = form.control(_waybillQuantityKey).value;
-    final partialBlisters = form.control(_waybillQuantityKey).value;
+    final quantity = form.control(_transactionQuantityKey).value;
+    final partialBlisters = form.control(_transactionQuantityKey).value;
 
     if (quantity == null || partialBlisters == null) {
       return null;
