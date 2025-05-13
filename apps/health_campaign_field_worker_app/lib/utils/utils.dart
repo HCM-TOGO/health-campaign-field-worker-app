@@ -170,6 +170,32 @@ performBackgroundService({
   }
 }
 
+String formatDateFromMillis(int millis) {
+  final date = DateTime.fromMillisecondsSinceEpoch(millis);
+  final day = date.day.toString().padLeft(2, '0');
+  final month = _monthShort(date.month);
+  final year = date.year;
+  return '$day $month $year';
+}
+
+String _monthShort(int month) {
+  const months = [
+    'Jan',
+    'Feb',
+    'Mar',
+    'Apr',
+    'May',
+    'Jun',
+    'Jul',
+    'Aug',
+    'Sep',
+    'Oct',
+    'Nov',
+    'Dec'
+  ];
+  return months[month - 1];
+}
+
 String formatAgeRange(String condition) {
   final regex =
       RegExp(r'(\d+)\s*<=\s*ageandage\s*<\s*(\d+)', caseSensitive: false);
