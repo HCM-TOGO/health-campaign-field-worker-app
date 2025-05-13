@@ -17,6 +17,7 @@ import 'package:health_campaign_field_worker_app/pages/inventory_management/cust
 import 'package:inventory_management/blocs/record_stock.dart';
 import 'package:inventory_management/models/entities/inventory_transport_type.dart';
 import 'package:inventory_management/models/entities/stock.dart';
+import 'package:inventory_management/models/entities/transaction_reason.dart';
 import 'package:inventory_management/models/entities/transaction_type.dart';
 import 'package:inventory_management/utils/utils.dart';
 import 'package:inventory_management/widgets/localized.dart';
@@ -139,6 +140,26 @@ class _DynamicTabsPageState extends LocalizedState<DynamicTabsPage>
 
   Future<StockModel> _createEmptyStock(ProductVariantModel product) async {
     final productSku = product.sku ?? '';
+    final state = context.read<RecordStockBloc>().state;
+    StockRecordEntryType entryType = state.entryType;
+
+    String? senderId;
+    String? senderType;
+    String? receiverId;
+    String? receiverType;
+    String? transactionType;
+    String? transactionReason;
+
+    // info setting the transaction related info here for the stock the model
+
+    setTransactionTypeAndReason(
+      entryType,
+      transactionType,
+      transactionReason,
+    );
+
+    setSenderReceiverIdAndType(
+        entryType, senderId, senderType, receiverId, receiverType);
 
     return StockModel(
       id: null,
@@ -172,13 +193,13 @@ class _DynamicTabsPageState extends LocalizedState<DynamicTabsPage>
       referenceIdType: 'PROJECT',
       transactingPartyId: null,
       transactingPartyType: null,
-      receiverId: receivedFrom,
-      receiverType: "WAREHOUSE",
-      senderId: receivedFrom,
-      senderType: "WAREHOUSE",
+      receiverId: receiverId,
+      receiverType: receiverType,
+      senderId: senderId,
+      senderType: senderType,
       nonRecoverableError: false,
       rowVersion: null,
-      transactionType: TransactionType.received.toValue(),
+      transactionType: transactionType,
       auditDetails: AuditDetails(
         createdBy: InventorySingleton().loggedInUserUuid,
         createdTime: context.millisecondsSinceEpoch(),
@@ -190,6 +211,80 @@ class _DynamicTabsPageState extends LocalizedState<DynamicTabsPage>
         lastModifiedTime: context.millisecondsSinceEpoch(),
       ),
     );
+  }
+
+  void setTransactionTypeAndReason(
+    StockRecordEntryType entryType,
+    String? transactionType,
+    String? transactionReason,
+  ) {
+    // todo set the reasons , for othe entryType (can capture from field once added)
+
+    switch (entryType) {
+      case StockRecordEntryType.receipt:
+        transactionType = TransactionType.received.toValue();
+        transactionReason = TransactionReason.received.toValue();
+
+        break;
+      case StockRecordEntryType.dispatch:
+        transactionType = TransactionType.dispatched.toValue();
+
+        break;
+      case StockRecordEntryType.returned:
+        transactionType = TransactionType.received.toValue();
+        transactionReason = TransactionReason.returned.toValue();
+
+        break;
+      case StockRecordEntryType.loss:
+        transactionType = TransactionType.dispatched.toValue();
+
+        break;
+      case StockRecordEntryType.damaged:
+        transactionType = TransactionType.dispatched.toValue();
+        break;
+    }
+  }
+
+  void setSenderReceiverIdAndType(
+    StockRecordEntryType entryType,
+    String? senderId,
+    String? senderType,
+    String? receiverId,
+    String? receiverType,
+  ) {
+    // info captured on the transaction details , secondaryParty
+    // additionalCheck to correct this ,(TODO :correct this at stock detail page )
+
+    final secondartParty = receivedFrom.contains(("FAC_"))
+        ? receivedFrom.replaceFirst("FAC_", "")
+        : receivedFrom;
+
+    final primaryType = BlocProvider.of<RecordStockBloc>(
+      context,
+    ).state.primaryType;
+
+    final primaryId = BlocProvider.of<RecordStockBloc>(
+      context,
+    ).state.primaryId;
+
+    switch (entryType) {
+      case StockRecordEntryType.receipt:
+      case StockRecordEntryType.loss:
+      case StockRecordEntryType.damaged:
+      case StockRecordEntryType.returned:
+        senderId = secondartParty;
+        senderType = "WAREHOUSE";
+        receiverId = primaryId;
+        receiverType = primaryType;
+
+        break;
+      case StockRecordEntryType.dispatch:
+        receiverId = secondartParty;
+        receiverType = "WAREHOUSE";
+        senderId = primaryId;
+        senderType = primaryType;
+        break;
+    }
   }
 
   Widget _buildTabContent(
@@ -435,6 +530,11 @@ class _DynamicTabsPageState extends LocalizedState<DynamicTabsPage>
                   ),
                 ),
               );
+              // todo : uncomment this and add proper routing
+              // Navigator.of(
+              //   context,
+              //   rootNavigator: true,
+              // ).pop(true);
             },
             type: DigitButtonType.primary,
             size: DigitButtonSize.large,
@@ -469,14 +569,14 @@ class _DynamicTabsPageState extends LocalizedState<DynamicTabsPage>
             );
       }
       // Navigator.of(context).pop();
-//       Navigator.of(context).push(
-//         MaterialPageRoute(
-//           builder: (context) => CustomAcknowledgementPage(
-//             mrnNumber: _sharedMRN,
-//             stockRecords: _tabStocks.values.toList(),
-//           ),
-//         ),
-//       );
+      // Navigator.of(context).push(
+      //   MaterialPageRoute(
+      //     builder: (context) => CustomAcknowledgementPage(
+      //       mrnNumber: _sharedMRN,
+      //       stockRecords: _tabStocks.values.toList(),
+      //     ),
+      //   ),
+      // );
     }
   }
 
