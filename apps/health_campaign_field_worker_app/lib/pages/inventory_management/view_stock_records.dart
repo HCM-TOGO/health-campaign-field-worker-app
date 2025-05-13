@@ -174,8 +174,8 @@ class _ViewStockRecordsPageState extends LocalizedState<ViewStockRecordsPage>
                     label: 'Expiry Date',
                     initialValue: stock.additionalFields?.fields
                             .firstWhere(
-                              (field) => field.key == 'expiryDate',
-                              orElse: () => AdditionalField('expiryDate', ''),
+                              (field) => field.key == '_expiry',
+                              orElse: () => AdditionalField('_expiry', ''),
                             )
                             .value
                             ?.toString() ??

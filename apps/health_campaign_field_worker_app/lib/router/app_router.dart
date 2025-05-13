@@ -449,8 +449,8 @@ class AppRouter extends _$AppRouter {
         ),
 
         AutoRoute(
-          page: CustomAcknowledgementRoute.page,
-        ),
+            page: CustomAcknowledgementRoute.page,
+            path: 'custom-acknowledgement-stock'),
         AutoRoute(
           page: ViewStockRecordsRoute.page,
         ),

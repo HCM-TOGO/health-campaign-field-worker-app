@@ -138,9 +138,10 @@ class CustomStockDetailsPageState
                 stockState.mapOrNull(
                   persisted: (value) {
                     final parent = context.router.parent() as StackRouter;
-                    parent.replace(
-                      InventoryAcknowledgementRoute(),
-                    );
+                    // todo : verify this , not needed now as routing done from stock details tab page
+                    // parent.replace(
+                    //   InventoryAcknowledgementRoute(),
+                    // );
                   },
                 );
               },
