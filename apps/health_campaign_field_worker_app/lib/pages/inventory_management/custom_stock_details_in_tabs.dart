@@ -493,20 +493,14 @@ class _DynamicTabsPageState extends LocalizedState<DynamicTabsPage>
               i18.common.coreCommonSubmit,
             ),
             onPressed: () {
-//               Navigator.of(context, rootNavigator: true).pop(true);
-              Navigator.of(context).push(
-                MaterialPageRoute(
-                  builder: (context) => CustomAcknowledgementPage(
-                    mrnNumber: _sharedMRN,
-                    stockRecords: _tabStocks.values.toList(),
-                  ),
-                ),
-              );
-              // todo : correct the routing here to show , page where we can see transactions
               Navigator.of(
-                context,
-                rootNavigator: true,
+                popupContext,
               ).pop(true);
+              (context.router.parent() as StackRouter).maybePop();
+              context.router.push(CustomAcknowledgementRoute(
+                mrnNumber: _sharedMRN,
+                stockRecords: _tabStocks.values.toList(),
+              ));
             },
             type: DigitButtonType.primary,
             size: DigitButtonSize.large,
@@ -518,7 +512,6 @@ class _DynamicTabsPageState extends LocalizedState<DynamicTabsPage>
             onPressed: () {
               Navigator.of(
                 popupContext,
-                rootNavigator: true,
               ).pop(false);
             },
             type: DigitButtonType.secondary,
@@ -528,7 +521,7 @@ class _DynamicTabsPageState extends LocalizedState<DynamicTabsPage>
       ),
     ) as bool;
 
-    if (submit == true) {
+    if (submit && context.mounted) {
       // Loop through all stocks and dispatch individual events
       for (final stockModel in _tabStocks.values) {
         context.read<RecordStockBloc>().add(
@@ -540,15 +533,6 @@ class _DynamicTabsPageState extends LocalizedState<DynamicTabsPage>
               const RecordStockCreateStockEntryEvent(),
             );
       }
-      // Navigator.of(context).pop();
-      // Navigator.of(context).push(
-      //   MaterialPageRoute(
-      //     builder: (context) => CustomAcknowledgementPage(
-      //       mrnNumber: _sharedMRN,
-      //       stockRecords: _tabStocks.values.toList(),
-      //     ),
-      //   ),
-      // );
     }
   }
 
