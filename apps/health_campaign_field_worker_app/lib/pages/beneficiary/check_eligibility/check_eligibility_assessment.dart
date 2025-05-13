@@ -1035,13 +1035,13 @@ class _EligibilityChecklistViewPage
     var q3Key = "KBEA3";
     var q5Key = "KBEA4";
     var q6Key = "KBEA5";
-    // var q7Key = "KBEA6";
+    var q7Key = "KBEA6";
 
     Map<String, String> keyVsReason = {
       q3Key: "NOT_ADMINISTERED_IN_PREVIOUS_CYCLE",
       q5Key: "CHILD_ON_MEDICATION_1",
       q6Key: "RESPIRATORY_INFECTION",
-      // q7Key: "TAKEN_VITAMIN_A",
+      q7Key: "TAKEN_VITAMIN_A",
     };
     final individualModel = widget.individual;
 
@@ -1102,7 +1102,8 @@ class _EligibilityChecklistViewPage
     var q2Key = "KBEA2";
     var q4Key = "KBEA3.NO.ADT1";
     var q6Key = "KBEA5";
-    // var q7Key = "KBEA6";
+    var q7Key = "KBEA6";
+    // var q8Key = "KBEA7";
     // var q3Key = "KBEA3";
     Map<String, String> referralKeysVsCode = {
       q1Key: "SICK",
@@ -1110,7 +1111,8 @@ class _EligibilityChecklistViewPage
       q4Key: "DRUG_SE_PC",
       q6Key: "RESPIRATORY_INFECTION",
       // q7Key: "TAKEN_VITAMIN_A",
-      // q3Key: "DRUG_SE_PC",
+      // q8Key: "SIDE_EFFECTS_TO_VITAMIN_A",
+      q7Key: "DRUG_SE_PC",
     };
     // TODO Configure the reasons ,verify hardcoded strings
 
@@ -1135,6 +1137,10 @@ class _EligibilityChecklistViewPage
             ? true
             : false;
       }
+      if (!isReferral &&
+          (responses.containsKey(q7Key) && responses[q7Key]!.isNotEmpty)) {
+        isReferral = responses[q7Key] == yes ? true : false;
+      }
     }
     if (isReferral) {
       for (var entry in referralKeysVsCode.entries) {
@@ -1156,12 +1162,14 @@ class _EligibilityChecklistViewPage
   ) {
     var isReferral = false;
     var q1Key = "KBEA5";
-    // var q2Key = "KBEA6";
+    var q2Key = "KBEA6";
     // var q3Key = "KBEA3";
+    // var q4Key = "KBEA7";
     Map<String, String> referralKeysVsCode = {
       q1Key: "RESPIRATORY_INFECTION",
       // q2Key: "TAKEN_VITAMIN_A",
-      // q3Key: "DRUG_SE_PC",
+      q2Key: "DRUG_SE_PC",
+      // qKey: "SIDE_EFFECTS_TO_VITAMIN_A",
     };
     // TODO Configure the reasons ,verify hardcoded strings
 
@@ -1169,10 +1177,10 @@ class _EligibilityChecklistViewPage
       if (responses.containsKey(q1Key) && responses[q1Key]!.isNotEmpty) {
         isReferral = responses[q1Key] == yes ? true : false;
       }
-      // if (!isReferral &&
-      //     (responses.containsKey(q2Key) && responses[q2Key]!.isNotEmpty)) {
-      //   isReferral = responses[q2Key] == yes ? true : false;
-      // }
+      if (!isReferral &&
+          (responses.containsKey(q2Key) && responses[q2Key]!.isNotEmpty)) {
+        isReferral = responses[q2Key] == yes ? true : false;
+      }
     }
     if (isReferral) {
       for (var entry in referralKeysVsCode.entries) {
@@ -1190,7 +1198,7 @@ class _EligibilityChecklistViewPage
 
   bool isDelivery(Map<String?, String> responses) {
     var isDeliver = true;
-    var q1Key = "KBEA6";
+    var q1Key = "KBEA7";
 
     for (var entry in responses.entries) {
       if (entry.key == q1Key) {
