@@ -10,6 +10,7 @@ class MinNumberCard extends StatelessWidget {
   final String date;
   final List<Map<String, String>> items;
   final Map<String, dynamic> data;
+  final String waybillNumber;
 
   const MinNumberCard({
     super.key,
@@ -18,6 +19,7 @@ class MinNumberCard extends StatelessWidget {
     required this.date,
     required this.items,
     required this.data,
+    required this.waybillNumber,
   });
 
   @override
@@ -98,6 +100,8 @@ class MinNumberCard extends StatelessWidget {
                 ),
               );
             }).toList(),
+            const SizedBox(height: 8.0), // Replace spacer2
+            Text(waybillNumber),
           ],
         ),
       ),

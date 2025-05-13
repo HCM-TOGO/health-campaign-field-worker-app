@@ -94,7 +94,7 @@ class CustomMinNumberPageState extends LocalizedState<CustomMinNumberPage> {
                     children: [
                       const SizedBox(height: 16.0),
                       Text(
-                        "Select the MIN number",
+                        "Select the MRN number",
                         style: textTheme.headingL,
                       ),
                       const SizedBox(height: 16.0),
@@ -109,12 +109,15 @@ class CustomMinNumberPageState extends LocalizedState<CustomMinNumberPage> {
                               padding: const EdgeInsets.all(8.0),
                               child: MinNumberCard(
                                 data: {
-                                  'minNumber': item.referenceId,
+                                  'minNumber':
+                                      '${item.additionalFields?.fields.firstWhere((field) => field.key == 'materialNoteNumber', orElse: () => AdditionalField('materialNoteNumber', '')).value?.toString() ?? 'N/A'}',
                                   'cddCode': item.boundaryCode,
                                   'date': item.dateOfEntry,
                                   'items': item,
+                                  'waybillNumber': item.wayBillNumber,
                                 },
-                                minNumber: item.referenceId ?? "",
+                                minNumber:
+                                    '${item.additionalFields?.fields.firstWhere((field) => field.key == 'materialNoteNumber', orElse: () => AdditionalField('materialNoteNumber', '')).value?.toString() ?? 'N/A'}',
                                 cddCode: item.boundaryCode ?? "",
                                 date: "${item.dateOfEntry}",
                                 items: [
@@ -124,6 +127,7 @@ class CustomMinNumberPageState extends LocalizedState<CustomMinNumberPage> {
                                     'quantity': '${item.quantity}'
                                   },
                                 ],
+                                waybillNumber: item.wayBillNumber ?? "",
                               ),
                             );
                           },
