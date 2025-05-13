@@ -1,4 +1,5 @@
 import 'package:digit_ui_components/theme/digit_extended_theme.dart';
+import 'package:digit_ui_components/theme/spacers.dart';
 
 import 'package:flutter/material.dart';
 
@@ -93,7 +94,7 @@ class MinNumberCard extends StatelessWidget {
                     ),
                     const SizedBox(width: 8.0), // Replace spacer2
                     Text(
-                      item['quantity']!,
+                      "${item['quantity']!} Blisters",
                       style: textTheme.bodyL,
                     ),
                   ],
@@ -101,7 +102,18 @@ class MinNumberCard extends StatelessWidget {
               );
             }).toList(),
             const SizedBox(height: 8.0), // Replace spacer2
-            Text(waybillNumber),
+            Row(
+              children: [
+                Text("Waybill",
+                    style: textTheme.bodyL.copyWith(
+                      fontWeight: FontWeight.bold,
+                    )),
+                const SizedBox(
+                  width: spacer4,
+                ), // Replace spacer2
+                Text(waybillNumber),
+              ],
+            ),
           ],
         ),
       ),
