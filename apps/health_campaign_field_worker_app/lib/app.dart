@@ -11,16 +11,19 @@ import 'package:isar/isar.dart';
 import 'package:location/location.dart';
 import 'package:registration_delivery/data/repositories/local/household_global_search.dart';
 import 'package:registration_delivery/data/repositories/local/individual_global_search.dart';
-import 'package:registration_delivery/data/repositories/oplog/oplog.dart';
+import 'package:registration_delivery/registration_delivery.dart';
 import 'package:survey_form/survey_form.dart';
 
 import 'blocs/app_initialization/app_initialization.dart';
 import 'blocs/auth/auth.dart';
 import 'blocs/localization/localization.dart';
 import 'blocs/project/project.dart';
+import 'blocs/search/individual_global_search_smc.dart';
+import 'blocs/search/search_households_smc.dart';
 import 'data/local_store/app_shared_preferences.dart';
 import 'data/network_manager.dart';
 import 'data/remote_client.dart';
+import 'data/repositories/local/search/individual_global_search_smc.dart';
 import 'data/repositories/remote/bandwidth_check.dart';
 import 'data/repositories/remote/localization.dart';
 import 'data/repositories/remote/mdms.dart';
@@ -78,6 +81,12 @@ class MainApplicationState extends State<MainApplication>
             HouseholdOpLogManager(widget.isar),
           ),
         ),
+        RepositoryProvider<IndividualGlobalSearchSMCRepository>(
+          create: (context) => IndividualGlobalSearchSMCRepository(
+            widget.sql,
+            IndividualOpLogManager(widget.isar),
+          ),
+        ),
       ],
       child: BlocProvider(
         create: (context) => AppInitializationBloc(
@@ -118,6 +127,37 @@ class MainApplicationState extends State<MainApplication>
                   );
                 },
                 lazy: false,
+              ),
+              BlocProvider(
+                create: (context) {
+                  return SearchHouseholdsSMCBloc(
+                      beneficiaryType:
+                          RegistrationDeliverySingleton().beneficiaryType!,
+                      userUid:
+                          RegistrationDeliverySingleton().loggedInUserUuid!,
+                      projectId: RegistrationDeliverySingleton().projectId!,
+                      addressRepository:
+                          context.read<RegistrationDeliveryAddressRepo>(),
+                      projectBeneficiary: context.repository<
+                          ProjectBeneficiaryModel,
+                          ProjectBeneficiarySearchModel>(),
+                      householdMember: context.repository<HouseholdMemberModel,
+                          HouseholdMemberSearchModel>(),
+                      household: context
+                          .repository<HouseholdModel, HouseholdSearchModel>(),
+                      individual: context
+                          .repository<IndividualModel, IndividualSearchModel>(),
+                      taskDataRepository:
+                          context.repository<TaskModel, TaskSearchModel>(),
+                      sideEffectDataRepository: context
+                          .repository<SideEffectModel, SideEffectSearchModel>(),
+                      referralDataRepository: context
+                          .repository<ReferralModel, ReferralSearchModel>(),
+                      individualGlobalSearchSMCRepository:
+                          context.read<IndividualGlobalSearchSMCRepository>(),
+                      houseHoldGlobalSearchRepository:
+                          context.read<HouseHoldGlobalSearchRepository>());
+                },
               ),
 
               BlocProvider(
@@ -178,8 +218,49 @@ class MainApplicationState extends State<MainApplication>
                     LocalizationParams().setLocale(Locale(selectedLocale));
                     final languages = appConfig.languages;
 
+                    final task =
+                        context.repository<TaskModel, TaskSearchModel>();
+                    final individual = context
+                        .repository<IndividualModel, IndividualSearchModel>();
+
+                    final household = context
+                        .repository<HouseholdModel, HouseholdSearchModel>();
+
+                    final householdMember = context.repository<
+                        HouseholdMemberModel, HouseholdMemberSearchModel>();
+
+                    final projectBeneficiary = context.repository<
+                        ProjectBeneficiaryModel,
+                        ProjectBeneficiarySearchModel>();
+                    final referral = context
+                        .repository<ReferralModel, ReferralSearchModel>();
+                    final sideEffect = context
+                        .repository<SideEffectModel, SideEffectSearchModel>();
+
                     return MultiBlocProvider(
                       providers: [
+                        BlocProvider(
+                            create: (_) => IndividualGlobalSearchSMCBloc(
+                                userUid: RegistrationDeliverySingleton()
+                                    .loggedInUserUuid!,
+                                projectId:
+                                    RegistrationDeliverySingleton().projectId!,
+                                individual: individual,
+                                householdMember: householdMember,
+                                household: household,
+                                projectBeneficiary: projectBeneficiary,
+                                taskDataRepository: task,
+                                beneficiaryType: RegistrationDeliverySingleton()
+                                    .beneficiaryType!,
+                                sideEffectDataRepository: sideEffect,
+                                addressRepository: context
+                                    .read<RegistrationDeliveryAddressRepo>(),
+                                referralDataRepository: referral,
+                                individualGlobalSearchSMCRepository:
+                                    context.read<
+                                        IndividualGlobalSearchSMCRepository>(),
+                                houseHoldGlobalSearchRepository: context
+                                    .read<HouseHoldGlobalSearchRepository>())),
                         BlocProvider(
                           create: (localizationModulesList != null &&
                                   firstLanguage != null)
