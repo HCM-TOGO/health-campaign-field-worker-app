@@ -94,8 +94,9 @@ class Constants {
   static const String reAdministeredKey = "reAdministered";
   static const String reDoseQuantityKey = 'reDoseQuantity';
   static const String healthFacility = 'Health Facility';
-
+  static const String lgaBoundaryLevel = 'LGA';
   static const int mlPerBottle = 30;
+  static const int apiCallLimit = 1000;
 
   // todo enable before cycle2
   static const bool isDownSyncEnabled = false;

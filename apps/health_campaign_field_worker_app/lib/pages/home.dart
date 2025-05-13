@@ -352,6 +352,13 @@ class _HomePageState extends LocalizedState<HomePage> {
           },
         ),
       ),
+      i18.home.beneficiaryReferralLabel: HomeItemCard(
+        icon: Icons.supervised_user_circle_rounded,
+        label: i18.home.beneficiaryReferralLabel,
+        onPressed: () async {
+          await context.router.push(SearchReferralReconciliationsRoute());
+        },
+      ),
       i18.home.manageStockLabel:
           homeShowcaseData.warehouseManagerManageStock.buildWith(
         child: HomeItemCard(
@@ -516,7 +523,8 @@ class _HomePageState extends LocalizedState<HomePage> {
         .map((label) => homeItemsShowcaseMap[label]!)
         .toList();
 
-    if ((envConfig.variables.envType == EnvType.demo && kReleaseMode) || envConfig.variables.envType == EnvType.uat) {
+    if ((envConfig.variables.envType == EnvType.demo && kReleaseMode) ||
+        envConfig.variables.envType == EnvType.uat) {
       filteredLabels.remove(i18.home.db);
     }
 
