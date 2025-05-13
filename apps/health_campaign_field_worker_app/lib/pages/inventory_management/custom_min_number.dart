@@ -52,20 +52,6 @@ class CustomMinNumberPageState extends LocalizedState<CustomMinNumberPage> {
 
   @override
   Widget build(BuildContext context) {
-    final List<Map<String, dynamic>> data = [
-      {
-        "minNumber": "8976543210",
-        "qrImagePath": "assets/images/qr_code_test.png",
-        "cddCode": "CDD123",
-        "date": "13 Feb 2024",
-        "items": [
-          {"name": "SPAQ1", "quantity": "50 blister"},
-          {"name": "SPAQ2", "quantity": "50 blister"},
-          {"name": "Bednet", "quantity": "50 blister"},
-        ],
-      },
-      // Add more items here
-    ];
     final theme = Theme.of(context);
     final textTheme = theme.digitTextTheme(context);
 
@@ -101,31 +87,49 @@ class CustomMinNumberPageState extends LocalizedState<CustomMinNumberPage> {
                   borderRadius: BorderRadius.circular(spacer2),
                 ),
                 margin: const EdgeInsets.all(spacer2),
-                child: Container(
-                  height: MediaQuery.of(context).size.height * 0.7,
-                  child: ListView.builder(
-                    itemCount: stockList.length,
-                    itemBuilder: (context, index) {
-                      final item = stockList[index];
-                      return Padding(
-                        padding: const EdgeInsets.all(8.0),
-                        child: MinNumberCard(
-                          data: {
-                            'minNumber': item.referenceId,
-                            'cddCode': item.boundaryCode,
-                            'date': item.dateOfEntry,
-                            'items': item,
+                child: Padding(
+                  padding: const EdgeInsets.all(8.0),
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      const SizedBox(height: 16.0),
+                      Text(
+                        "Select the MIN number",
+                        style: textTheme.headingL,
+                      ),
+                      const SizedBox(height: 16.0),
+                      SizedBox(
+                        height: MediaQuery.of(context).size.height * 0.7,
+                        child: ListView.builder(
+                          itemCount: stockList.length,
+                          itemBuilder: (context, index) {
+                            final item = stockList[index];
+
+                            return Padding(
+                              padding: const EdgeInsets.all(8.0),
+                              child: MinNumberCard(
+                                data: {
+                                  'minNumber': item.referenceId,
+                                  'cddCode': item.boundaryCode,
+                                  'date': item.dateOfEntry,
+                                  'items': item,
+                                },
+                                minNumber: item.referenceId ?? "",
+                                cddCode: item.boundaryCode ?? "",
+                                date: "${item.dateOfEntry}",
+                                items: [
+                                  {
+                                    'name':
+                                        '${item.additionalFields?.fields.firstWhere((field) => field.key == 'productName', orElse: () => AdditionalField('productName', '')).value?.toString() ?? 'N/A'}',
+                                    'quantity': '${item.quantity}'
+                                  },
+                                ],
+                              ),
+                            );
                           },
-                          minNumber: item.referenceId ?? "",
-                          cddCode: item.boundaryCode ?? "",
-                          date: "${item.dateOfEntry}",
-                          items: [
-                            {'name': 'Gloves', 'quantity': '10'},
-                            {'name': 'Masks', 'quantity': '5'},
-                          ],
                         ),
-                      );
-                    },
+                      ),
+                    ],
                   ),
                 ),
               ),

@@ -128,7 +128,7 @@ class CustomManageStocksPageState
                                   GestureDetector(
                                     onTap: () {
                                       context.router.push(
-                                        const ViewTransactionsRoute(),
+                                        CustomMinNumberRoute(),
                                       );
                                       Navigator.of(context).pop();
                                     },
@@ -244,7 +244,7 @@ class CustomManageStocksPageState
                                       GestureDetector(
                                         onTap: () {
                                           context.router.push(
-                                            const ViewTransactionsRoute(),
+                                            CustomMinNumberRoute(),
                                           );
                                           Navigator.of(context).pop();
                                         },
@@ -355,7 +355,7 @@ class CustomManageStocksPageState
                                     GestureDetector(
                                       onTap: () {
                                         context.router.push(
-                                          const ViewTransactionsRoute(),
+                                          CustomMinNumberRoute(),
                                         );
                                         Navigator.of(context).pop();
                                       },
