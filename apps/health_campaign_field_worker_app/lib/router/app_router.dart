@@ -38,6 +38,7 @@ import '../pages/inventory_management/custom_stock_details.dart';
 import '../pages/inventory_management/custom_stock_reconciliation.dart';
 import '../pages/inventory_management/custom_warehouse_details.dart';
 import '../pages/inventory_management/custom_inventory_report_details.dart';
+import '../pages/inventory_management/custom_min_number.dart';
 import '../pages/inventory_management/view_transactions_page.dart';
 import '../pages/inventory_management/custom_stock_details_in_tabs.dart';
 import '../pages/inventory_management/custom_acknowledgement.dart';
@@ -106,6 +107,10 @@ class AppRouter extends _$AppRouter {
         AutoRoute(page: HomeRoute.page, path: 'home'),
         AutoRoute(page: ProfileRoute.page, path: 'profile'),
         AutoRoute(page: UserQRDetailsRoute.page, path: 'user-qr-code'),
+        AutoRoute(
+          page: CustomMinNumberRoute.page,
+          path: 'custom-min-number',
+        ),
         AutoRoute(
           page: BeneficiariesReportRoute.page,
           path: 'beneficiary-downsync-report',

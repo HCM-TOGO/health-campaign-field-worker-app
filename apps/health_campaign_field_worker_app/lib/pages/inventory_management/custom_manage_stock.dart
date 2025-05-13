@@ -86,6 +86,7 @@ class CustomManageStocksPageState
                                           type: StockRecordEntryType.receipt,
                                         ),
                                       );
+
                                       Navigator.of(context).pop();
                                     },
                                     child: Container(
@@ -111,7 +112,7 @@ class CustomManageStocksPageState
                                             Text(
                                               "Create New Transaction",
                                               style: TextStyle(
-                                                fontSize: 20,
+                                                fontSize: 16,
                                                 color: Colors.orange[800],
                                                 fontWeight: FontWeight.bold,
                                               ),
@@ -154,7 +155,7 @@ class CustomManageStocksPageState
                                             Text(
                                               "View Created Transaction",
                                               style: TextStyle(
-                                                fontSize: 20,
+                                                fontSize: 16,
                                                 color: Colors.orange[800],
                                                 fontWeight: FontWeight.bold,
                                               ),
@@ -271,7 +272,7 @@ class CustomManageStocksPageState
                                                 Text(
                                                   "View Created Transaction",
                                                   style: TextStyle(
-                                                    fontSize: 20,
+                                                    fontSize: 16,
                                                     color: Colors.orange[800],
                                                     fontWeight: FontWeight.bold,
                                                   ),
@@ -340,7 +341,7 @@ class CustomManageStocksPageState
                                               Text(
                                                 "Create New Transaction",
                                                 style: TextStyle(
-                                                  fontSize: 20,
+                                                  fontSize: 16,
                                                   color: Colors.orange[800],
                                                   fontWeight: FontWeight.bold,
                                                 ),
@@ -382,7 +383,7 @@ class CustomManageStocksPageState
                                               Text(
                                                 "View Created Transaction",
                                                 style: TextStyle(
-                                                  fontSize: 20,
+                                                  fontSize: 16,
                                                   color: Colors.orange[800],
                                                   fontWeight: FontWeight.bold,
                                                 ),
