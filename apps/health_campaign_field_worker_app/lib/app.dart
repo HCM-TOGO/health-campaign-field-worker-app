@@ -7,6 +7,7 @@ import 'package:digit_ui_components/services/location_bloc.dart';
 import 'package:dio/dio.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:inventory_management/models/entities/stock.dart';
 import 'package:isar/isar.dart';
 import 'package:location/location.dart';
 import 'package:registration_delivery/data/repositories/local/household_global_search.dart';
@@ -275,6 +276,12 @@ class MainApplicationState extends State<MainApplication>
                             individualRemoteRepository: ctx.read<
                                 RemoteRepository<IndividualModel,
                                     IndividualSearchModel>>(),
+                            stockLocalRepository: ctx.read<
+                                LocalRepository<StockModel,
+                                    StockSearchModel>>(),
+                            stockRemoteRepository: ctx.read<
+                                RemoteRepository<StockModel,
+                                    StockSearchModel>>(),
                             context: context,
                           ),
                         ),
