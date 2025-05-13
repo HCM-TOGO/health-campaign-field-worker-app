@@ -39,11 +39,7 @@ class MinNumberCard extends StatelessWidget {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            Text(
-              "Select the MIN number",
-              style: textTheme.headingL,
-            ),
-            const SizedBox(height: 16.0), // Replace spacer4 with 16.0
+            // Replace spacer4 with 16.0
             Container(
               width: double.infinity,
               decoration: BoxDecoration(
