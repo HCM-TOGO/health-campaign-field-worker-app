@@ -378,9 +378,7 @@ class _DynamicTabsPageState extends LocalizedState<DynamicTabsPage>
                       builder: (field) {
                         return InputField(
                           type: InputType.text,
-                          label: localizations.translate(
-                            i18.stockDetails.quantityReceivedLabel,
-                          ),
+                          label: 'Quantity of Blisters Received',
                           errorMessage: field.errorText,
                           onChange: (val) {
                             if (val == '') {
