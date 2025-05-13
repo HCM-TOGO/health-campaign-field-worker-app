@@ -55,7 +55,6 @@ class _DynamicTabsPageState extends LocalizedState<DynamicTabsPage>
   static const _vehicleNumberKey = 'vehicleNumber';
   static const _typeOfTransportKey = 'typeOfTransport';
   static const _commentsKey = 'comments';
-  static const _expiry = 'expiry';
   static const _deliveryTeamKey = 'deliveryTeam';
   List<InventoryTransportTypes> transportTypes = [];
 
@@ -122,11 +121,9 @@ class _DynamicTabsPageState extends LocalizedState<DynamicTabsPage>
               Validators.required
             ],
           ),
-          _waybillQuantityKey: FormControl<String>(validators: []),
-          _batchNumberKey: FormControl<String>(
-            validators: [Validators.required],
-          ),
-          'expiry': FormControl<String>(validators: [Validators.required]),
+          _waybillQuantityKey:
+              FormControl<String>(validators: [Validators.required]),
+          _batchNumberKey: FormControl<String>(),
           _commentsKey: FormControl<String>(),
         }),
     });
@@ -179,14 +176,6 @@ class _DynamicTabsPageState extends LocalizedState<DynamicTabsPage>
           AdditionalField('productName', product.sku),
           AdditionalField('variation', product.variation),
           AdditionalField('materialNoteNumber', _sharedMRN),
-          // if (_forms[productSku] != null) ...[
-          //   AdditionalField('batchNumber',
-          //       _forms[productSku]!.control(_batchNumberKey).value),
-          //   AdditionalField(
-          //       'expiryDate', _forms[productSku]!.control(_expiry).value),
-          //   AdditionalField(
-          //       'comments', _forms[productSku]!.control(_commentsKey).value),
-          // ],
         ],
       ),
       referenceId: context.projectId,
@@ -356,6 +345,7 @@ class _DynamicTabsPageState extends LocalizedState<DynamicTabsPage>
                               label: localizations.translate(
                                 i18.stockDetails.waybillNumberLabel,
                               ),
+                              errorMessage: field.errorText,
                               onChange: (val) {
                                 field.control.value = val;
                               },
@@ -369,10 +359,10 @@ class _DynamicTabsPageState extends LocalizedState<DynamicTabsPage>
                           builder: (field) {
                             return InputField(
                               type: InputType.text,
-                              isRequired: true,
                               label: localizations.translate(
                                 i18_local.stockDetails.batchNumberLabel,
                               ),
+                              errorMessage: field.errorText,
                               onChange: (val) {
                                 if (val == '') {
                                   field.control.value = '0';
@@ -382,20 +372,6 @@ class _DynamicTabsPageState extends LocalizedState<DynamicTabsPage>
                               },
                             );
                           }),
-                    ReactiveWrapperField(
-                      formControlName: _expiry,
-                      builder: (field) {
-                        return InputField(
-                          type: InputType.date,
-                          label: localizations.translate(
-                            i18_local.StockDetailsReturnedShowcase().expiry,
-                          ),
-                          errorMessage: field.errorText,
-                          onChange: (val) => field.control.value = val,
-                          isRequired: true,
-                        );
-                      },
-                    ),
                     const SizedBox(height: 16),
                     ReactiveWrapperField(
                       formControlName: _waybillQuantityKey,
@@ -491,8 +467,6 @@ class _DynamicTabsPageState extends LocalizedState<DynamicTabsPage>
           ...(currentStock.additionalFields?.fields ?? []),
           if (form.control(_batchNumberKey).value != null)
             AdditionalField('batchNumber', form.control(_batchNumberKey).value),
-          if (form.control(_batchNumberKey).value != null)
-            AdditionalField('_expiry', form.control(_expiry).value),
           if (form.control(_commentsKey).value != null)
             AdditionalField('comments', form.control(_commentsKey).value),
         ],
@@ -591,6 +565,7 @@ class _DynamicTabsPageState extends LocalizedState<DynamicTabsPage>
 
     return Scaffold(
       appBar: AppBar(
+        // backgroundColor: Colors.white,
         bottom: TabBar(
           controller: _tabController,
           isScrollable: true,
