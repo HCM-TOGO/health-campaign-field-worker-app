@@ -530,11 +530,11 @@ class _DynamicTabsPageState extends LocalizedState<DynamicTabsPage>
                   ),
                 ),
               );
-              // todo : uncomment this and add proper routing
-              // Navigator.of(
-              //   context,
-              //   rootNavigator: true,
-              // ).pop(true);
+              // todo : correct the routing here to show , page where we can see transactions
+              Navigator.of(
+                context,
+                rootNavigator: true,
+              ).pop(true);
             },
             type: DigitButtonType.primary,
             size: DigitButtonSize.large,
