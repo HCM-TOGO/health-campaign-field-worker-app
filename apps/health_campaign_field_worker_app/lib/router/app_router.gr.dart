@@ -274,6 +274,17 @@ abstract class _$AppRouter extends RootStackRouter {
         ),
       );
     },
+    CustomMinNumberRoute.name: (routeData) {
+      final args = routeData.argsAs<CustomMinNumberRouteArgs>(
+          orElse: () => const CustomMinNumberRouteArgs());
+      return AutoRoutePage<dynamic>(
+        routeData: routeData,
+        child: CustomMinNumberPage(
+          key: args.key,
+          appLocalizations: args.appLocalizations,
+        ),
+      );
+    },
     CustomReferBeneficiarySMCRoute.name: (routeData) {
       final args = routeData.argsAs<CustomReferBeneficiarySMCRouteArgs>();
       return AutoRoutePage<dynamic>(
@@ -1468,6 +1479,44 @@ class CustomManageStocksRouteArgs {
   @override
   String toString() {
     return 'CustomManageStocksRouteArgs{key: $key, appLocalizations: $appLocalizations}';
+  }
+}
+
+/// generated route for
+/// [CustomMinNumberPage]
+class CustomMinNumberRoute extends PageRouteInfo<CustomMinNumberRouteArgs> {
+  CustomMinNumberRoute({
+    Key? key,
+    InventoryLocalization? appLocalizations,
+    List<PageRouteInfo>? children,
+  }) : super(
+          CustomMinNumberRoute.name,
+          args: CustomMinNumberRouteArgs(
+            key: key,
+            appLocalizations: appLocalizations,
+          ),
+          initialChildren: children,
+        );
+
+  static const String name = 'CustomMinNumberRoute';
+
+  static const PageInfo<CustomMinNumberRouteArgs> page =
+      PageInfo<CustomMinNumberRouteArgs>(name);
+}
+
+class CustomMinNumberRouteArgs {
+  const CustomMinNumberRouteArgs({
+    this.key,
+    this.appLocalizations,
+  });
+
+  final Key? key;
+
+  final InventoryLocalization? appLocalizations;
+
+  @override
+  String toString() {
+    return 'CustomMinNumberRouteArgs{key: $key, appLocalizations: $appLocalizations}';
   }
 }
 
