@@ -623,7 +623,8 @@ class ProjectBloc extends Bloc<ProjectEvent, ProjectState> {
       List<ProjectFacilityModel> projectFacilities) async {
     final userObject = await localSecureStore.userRequestModel;
     final userRoles = userObject!.roles.map((e) => e.code);
-    // String? boundaryLevel = context.boundary.boundaryType;
+
+    // info : assumption both roles will not be assigned to user
 
     if (userRoles.contains(RolesType.healthFacilitySupervisor.toValue())) {
       final useruuid = userObject.uuid;
@@ -635,7 +636,7 @@ class ProjectBloc extends Bloc<ProjectEvent, ProjectState> {
           await downloadStockEntries(stockSearchModel);
       // info : create entries in the local repository
 
-      createStockDownloadedEntries(stockEntriesDownloaded);
+      await createStockDownloadedEntries(stockEntriesDownloaded);
     } else if (userRoles.contains(RolesType.warehouseManager.toValue())) {
       final receiverIds = projectFacilities.map((e) => e.facilityId).toList();
       final stockSearchModel = StockSearchModel(
