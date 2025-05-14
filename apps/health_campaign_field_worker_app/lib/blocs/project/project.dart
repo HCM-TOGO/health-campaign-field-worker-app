@@ -2,6 +2,8 @@
 import 'dart:async';
 import 'dart:core';
 
+import 'package:attendance_management/models/entities/attendance_log.dart';
+import 'package:attendance_management/models/entities/attendance_register.dart';
 import 'package:connectivity_plus/connectivity_plus.dart';
 import 'package:digit_data_model/data_model.dart';
 import 'package:digit_dss/digit_dss.dart';
@@ -21,6 +23,7 @@ import '../../data/repositories/remote/bandwidth_check.dart';
 import '../../data/repositories/remote/mdms.dart';
 import '../../models/app_config/app_config_model.dart';
 import '../../models/auth/auth_model.dart';
+import '../../models/entities/roles_type.dart';
 import '../../utils/background_service.dart';
 import '../../utils/environment_config.dart';
 import '../../utils/least_level_boundary_singleton.dart';
@@ -84,6 +87,16 @@ class ProjectBloc extends Bloc<ProjectEvent, ProjectState> {
   final LocalRepository<ProjectResourceModel, ProjectResourceSearchModel>
       projectResourceLocalRepository;
 
+  /// Attendance Repositories
+  final RemoteRepository<AttendanceRegisterModel, AttendanceRegisterSearchModel>
+      attendanceRemoteRepository;
+  final LocalRepository<AttendanceRegisterModel, AttendanceRegisterSearchModel>
+      attendanceLocalRepository;
+  final LocalRepository<AttendanceLogModel, AttendanceLogSearchModel>
+      attendanceLogLocalRepository;
+  final RemoteRepository<AttendanceLogModel, AttendanceLogSearchModel>
+      attendanceLogRemoteRepository;
+
   /// Product Variant Repositories
   final RemoteRepository<ProductVariantModel, ProductVariantSearchModel>
       productVariantRemoteRepository;
@@ -116,6 +129,10 @@ class ProjectBloc extends Bloc<ProjectEvent, ProjectState> {
     required this.individualLocalRepository,
     required this.individualRemoteRepository,
     required this.dashboardRemoteRepository,
+    required this.attendanceRemoteRepository,
+    required this.attendanceLocalRepository,
+    required this.attendanceLogLocalRepository,
+    required this.attendanceLogRemoteRepository,
     required this.context,
   })  : localSecureStore = localSecureStore ?? LocalSecureStore.instance,
         super(const ProjectState()) {
@@ -199,6 +216,7 @@ class ProjectBloc extends Bloc<ProjectEvent, ProjectState> {
       );
 
       List<ProjectModel> staffProjects;
+
       try {
         staffProjects = await projectRemoteRepository.search(
           ProjectSearchModel(
@@ -427,6 +445,50 @@ class ProjectBloc extends Bloc<ProjectEvent, ProjectState> {
 
     List<BoundaryModel> boundaries;
     try {
+      if (context.loggedInUserRoles
+          .where(
+            (role) =>
+                role.code == RolesType.districtSupervisor.toValue() ||
+                role.code == RolesType.attendanceStaff.toValue(),
+          )
+          .toList()
+          .isNotEmpty) {
+        final attendanceRegisters = await attendanceRemoteRepository.search(
+          AttendanceRegisterSearchModel(
+            staffId: context.loggedInIndividualId,
+            referenceId: event.model.id,
+            localityCode: event.model.address?.boundary,
+          ),
+        );
+        await attendanceLocalRepository.bulkCreate(attendanceRegisters);
+
+        for (final register in attendanceRegisters) {
+          if (register.attendees != null &&
+              (register.attendees ?? []).isNotEmpty) {
+            try {
+              final individuals = await individualRemoteRepository.search(
+                IndividualSearchModel(
+                  id: register.attendees!.map((e) => e.individualId!).toList(),
+                ),
+              );
+              await individualLocalRepository.bulkCreate(individuals);
+              final logs = await attendanceLogRemoteRepository.search(
+                AttendanceLogSearchModel(
+                  registerId: register.id,
+                ),
+              );
+              await attendanceLogLocalRepository.bulkCreate(logs);
+            } catch (_) {
+              emit(state.copyWith(
+                loading: false,
+                syncError: ProjectSyncErrorType.project,
+              ));
+
+              return;
+            }
+          }
+        }
+      }
       final configResult = await mdmsRepository.searchAppConfig(
         envConfig.variables.mdmsApiPath,
         MdmsRequestModel(
