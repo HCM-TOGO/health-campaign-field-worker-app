@@ -627,9 +627,9 @@ class ProjectBloc extends Bloc<ProjectEvent, ProjectState> {
     // info : assumption both roles will not be assigned to user
 
     if (userRoles.contains(RolesType.healthFacilitySupervisor.toValue())) {
-      final useruuid = userObject.uuid;
+      final receiverIds = projectFacilities.map((e) => e.facilityId).toList();
       final stockSearchModel = StockSearchModel(
-        receiverId: [useruuid],
+        receiverId: receiverIds,
         transactionType: [TransactionType.dispatched.toValue()],
       );
       final stockEntriesDownloaded =
