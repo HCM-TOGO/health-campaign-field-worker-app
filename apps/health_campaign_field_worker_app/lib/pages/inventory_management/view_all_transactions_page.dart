@@ -45,7 +45,7 @@ class _ViewAllTransactionsScreenState extends State<ViewAllTransactionsScreen> {
       result = await repository.search(StockSearchModel(
           transactionType: [TransactionType.dispatched.toValue()],
           transactionReason: [],
-          receiverId: [warehouseId]));
+          receiverId: warehouseId == null ? [] : [warehouseId]));
     } else {
       result = await repository.search(StockSearchModel(
           transactionType: [TransactionType.received.toValue()],

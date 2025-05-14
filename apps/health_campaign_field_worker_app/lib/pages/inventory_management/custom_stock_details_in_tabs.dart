@@ -752,45 +752,46 @@ class _DynamicTabsPageState extends LocalizedState<DynamicTabsPage>
         //     const RecordStockCreateStockEntryEvent(),
         //   );
       } else {
-        final totalQty = ss;
+        // TODO: commenting as it is not required to store for warehousemanager
+        // final totalQty = ss;
 
-        int spaq1Count = context.spaq1;
-        int spaq2Count = context.spaq2;
+        // int spaq1Count = context.spaq1;
+        // int spaq2Count = context.spaq2;
 
-        int blueVasCount = context.blueVas;
-        int redVasCount = context.redVas;
+        // int blueVasCount = context.blueVas;
+        // int redVasCount = context.redVas;
 
-        // Custom logic based on productName
-        if (productName == Constants.spaq1) {
-          spaq1Count = totalQty;
-          spaq2Count = 0;
-          redVasCount = 0;
-          blueVasCount = 0;
-        } else if (productName == Constants.spaq2) {
-          spaq2Count = totalQty;
-          spaq1Count = 0;
-          redVasCount = 0;
-          blueVasCount = 0;
-        } else if (productName == Constants.blueVAS) {
-          blueVasCount = totalQty;
-          spaq1Count = 0;
-          spaq2Count = 0;
-          redVasCount = 0;
-        } else {
-          blueVasCount = 0;
-          spaq1Count = 0;
-          spaq2Count = 0;
-          redVasCount = totalQty;
-        }
-        context.read<AuthBloc>().add(
-              AuthAddSpaqCountsEvent(
-                spaq1Count: spaq1Count,
-                spaq2Count: spaq2Count,
-                blueVasCount: blueVasCount,
-                redVasCount: redVasCount,
-              ),
-            );
-        _tabController.animateTo(_tabController.index + 1);
+        // // Custom logic based on productName
+        // if (productName == Constants.spaq1) {
+        //   spaq1Count = totalQty;
+        //   spaq2Count = 0;
+        //   redVasCount = 0;
+        //   blueVasCount = 0;
+        // } else if (productName == Constants.spaq2) {
+        //   spaq2Count = totalQty;
+        //   spaq1Count = 0;
+        //   redVasCount = 0;
+        //   blueVasCount = 0;
+        // } else if (productName == Constants.blueVAS) {
+        //   blueVasCount = totalQty;
+        //   spaq1Count = 0;
+        //   spaq2Count = 0;
+        //   redVasCount = 0;
+        // } else {
+        //   blueVasCount = 0;
+        //   spaq1Count = 0;
+        //   spaq2Count = 0;
+        //   redVasCount = totalQty;
+        // }
+        // context.read<AuthBloc>().add(
+        //       AuthAddSpaqCountsEvent(
+        //         spaq1Count: spaq1Count,
+        //         spaq2Count: spaq2Count,
+        //         blueVasCount: blueVasCount,
+        //         redVasCount: redVasCount,
+        //       ),
+        //     );
+        // _tabController.animateTo(_tabController.index + 1);
       }
     } else {
       return;
