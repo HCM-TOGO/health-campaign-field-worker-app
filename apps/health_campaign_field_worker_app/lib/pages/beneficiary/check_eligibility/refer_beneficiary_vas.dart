@@ -92,7 +92,9 @@ class CustomReferBeneficiaryVASPageState
                     .where((e) => e.usage == Constants.healthFacility)
                     .toList();
 
-                return projectFacilities.isEmpty ? allFacilities : projectFacilities;
+                return projectFacilities.isEmpty
+                    ? allFacilities
+                    : projectFacilities;
               },
             ) ??
             [];
@@ -372,39 +374,39 @@ class CustomReferBeneficiaryVASPageState
                               },
                               isRequired: true,
                             ),
-                            DigitTextFormField(
-                              valueAccessor: FacilityValueAccessor(
-                                facilities,
-                              ),
-                              label: localizations.translate(
-                                i18_local.referBeneficiary.referredToLabel,
-                              ),
-                              isRequired: true,
-                              suffix: const Padding(
-                                padding: EdgeInsets.all(8.0),
-                                child: Icon(Icons.search),
-                              ),
-                              formControlName: _referredToKey,
-                              readOnly: false,
-                              validationMessages: {
-                                'required': (_) => localizations.translate(
-                                      i18_local.referBeneficiary
-                                          .facilityValidationMessage,
-                                    ),
-                              },
-                              onTap: () async {
-                                final parent =
-                                    context.router.parent() as StackRouter;
-                                final facility = await parent.push(
-                                  CustomInventoryFacilitySelectionSMCRoute(
-                                    facilities: facilities,
-                                  ),
-                                );
+                            // DigitTextFormField(
+                            //   valueAccessor: FacilityValueAccessor(
+                            //     facilities,
+                            //   ),
+                            //   label: localizations.translate(
+                            //     i18_local.referBeneficiary.referredToLabel,
+                            //   ),
+                            //   isRequired: true,
+                            //   suffix: const Padding(
+                            //     padding: EdgeInsets.all(8.0),
+                            //     child: Icon(Icons.search),
+                            //   ),
+                            //   formControlName: _referredToKey,
+                            //   readOnly: false,
+                            //   validationMessages: {
+                            //     'required': (_) => localizations.translate(
+                            //           i18_local.referBeneficiary
+                            //               .facilityValidationMessage,
+                            //         ),
+                            //   },
+                            //   onTap: () async {
+                            //     final parent =
+                            //         context.router.parent() as StackRouter;
+                            //     final facility = await parent.push(
+                            //       CustomInventoryFacilitySelectionSMCRoute(
+                            //         facilities: facilities,
+                            //       ),
+                            //     );
 
-                                if (facility == null) return;
-                                form.control(_referredToKey).value = facility;
-                              },
-                            ),
+                            //     // if (facility == null) return;
+                            //     // form.control(_referredToKey).value = facility;
+                            //   },
+                            // ),
                             DigitTextFormField(
                               formControlName: _referredToKey,
                               readOnly: true,
@@ -442,8 +444,12 @@ class CustomReferBeneficiaryVASPageState
         validators: [Validators.required],
       ),
       _referredToKey: FormControl<String>(
-        value:
-            healthFacilities.where((e) => e.boundaryCode == context.loggedInUserModel?.boundaryCode).first.id.toString(),
+        value: healthFacilities
+            .where((e) =>
+                e.boundaryCode == context.loggedInUserModel?.boundaryCode)
+            .first
+            .id
+            .toString(),
         validators: [
           Validators.required,
         ],
