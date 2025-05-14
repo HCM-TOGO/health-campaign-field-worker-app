@@ -6,10 +6,10 @@ import 'package:inventory_management/models/entities/stock.dart';
 import 'package:inventory_management/models/entities/transaction_reason.dart';
 import 'package:inventory_management/models/entities/transaction_type.dart';
 // import 'package:logger/logger.dart';
-
 import '../../blocs/inventory_management/stock_bloc.dart';
 import '../../router/app_router.dart';
 import '../../utils/utils.dart';
+import '../../widgets/action_card/all_transactions_card.dart';
 import 'view_stock_records.dart'; // Import your view stock page
 
 @RoutePage()
@@ -93,104 +93,128 @@ class _ViewAllTransactionsScreenState extends State<ViewAllTransactionsScreen> {
             itemBuilder: (context, index) {
               final firstStock = filteredStock[index];
 
-              return Card(
-                margin: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
-                elevation: 2,
-                child: InkWell(
-                  onTap: () {
-                    Navigator.push(
-                      context,
-                      MaterialPageRoute(
-                        builder: (context) => ViewStockRecordsPage(
-                          mrnNumber: firstStock.additionalFields?.fields
-                                  .firstWhere(
-                                    (field) =>
-                                        field.key == 'materialNoteNumber',
-                                    orElse: () => AdditionalField(
-                                        'materialNoteNumber', ''),
-                                  )
-                                  .value
-                                  ?.toString() ??
-                              'N/A',
-                          stockRecords: [firstStock],
-                        ),
-                      ),
-                    );
-                  },
-                  child: Padding(
-                    padding: const EdgeInsets.all(16.0),
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        // Header with MRN and Date
-                        Row(
-                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                          children: [
-                            Text(
-                              'MRN: ${firstStock.additionalFields?.fields.firstWhere(
-                                    (field) =>
-                                        field.key == 'materialNoteNumber',
-                                    orElse: () => AdditionalField(
-                                        'materialNoteNumber', ''),
-                                  ).value?.toString() ?? 'N/A'}',
-                              style: const TextStyle(
-                                fontWeight: FontWeight.bold,
-                                fontSize: 16,
-                              ),
-                            ),
-                            Text(
-                              'Date: ${firstStock.dateOfEntryTime?.toLocal().toString().split(' ')[0] ?? 'N/A'}',
-                              style: const TextStyle(color: Colors.grey),
-                            ),
-                          ],
-                        ),
-                        const SizedBox(height: 8),
-                        Text(
-                          'From: ${firstStock.senderId ?? firstStock.facilityId ?? 'N/A'}',
-                          style: const TextStyle(color: Colors.grey),
-                        ),
-                        const SizedBox(height: 12),
+              return TransactionsCard(
+                  minNumber: firstStock.additionalFields?.fields
+                          .firstWhere(
+                            (field) => field.key == 'materialNoteNumber',
+                            orElse: () =>
+                                const AdditionalField('materialNoteNumber', ''),
+                          )
+                          .value
+                          ?.toString() ??
+                      'N/A',
+                  cddCode: firstStock.additionalFields?.fields
+                          .firstWhere(
+                            (field) => field.key == 'productName',
+                            orElse: () => AdditionalField('productName', 'N/A'),
+                          )
+                          .value
+                          ?.toString() ??
+                      'N/A',
+                  date:
+                      'Date: ${firstStock.dateOfEntryTime?.toLocal().toString().split(' ')[0] ?? 'N/A'}',
+                  items: [],
+                  data: {},
+                  waybillNumber: ' ${firstStock.wayBillNumber ?? 'N/A'}');
 
-                        const Divider(),
-                        const Text(
-                          'Commodities Received:',
-                          style: TextStyle(fontWeight: FontWeight.bold),
-                        ),
-                        const SizedBox(height: 8),
-                        Padding(
-                          padding: const EdgeInsets.symmetric(vertical: 4),
-                          child: Row(
-                            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                            children: [
-                              Text(
-                                firstStock.additionalFields?.fields
-                                        .firstWhere(
-                                          (field) => field.key == 'productName',
-                                          orElse: () => AdditionalField(
-                                              'productName', 'N/A'),
-                                        )
-                                        .value
-                                        ?.toString() ??
-                                    'N/A',
-                              ),
-                              Text(
-                                'Qty: ${firstStock.quantity ?? 'N/A'}',
-                                style: const TextStyle(
-                                    fontWeight: FontWeight.bold),
-                              ),
-                            ],
-                          ),
-                        ),
-                        const Divider(),
-                        Text(
-                          'Waybill: ${firstStock.wayBillNumber ?? 'N/A'}',
-                          style: const TextStyle(fontStyle: FontStyle.italic),
-                        ),
-                      ],
-                    ),
-                  ),
-                ),
-              );
+              // return Card(
+              //   margin: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
+              //   elevation: 2,
+              //   child: InkWell(
+              //     onTap: () {
+              //       Navigator.push(
+              //         context,
+              //         MaterialPageRoute(
+              //           builder: (context) => ViewStockRecordsPage(
+              //             mrnNumber: firstStock.additionalFields?.fields
+              //                     .firstWhere(
+              //                       (field) =>
+              //                           field.key == 'materialNoteNumber',
+              //                       orElse: () => AdditionalField(
+              //                           'materialNoteNumber', ''),
+              //                     )
+              //                     .value
+              //                     ?.toString() ??
+              //                 'N/A',
+              //             stockRecords: [firstStock],
+              //           ),
+              //         ),
+              //       );
+              //     },
+              //     child: Padding(
+              //       padding: const EdgeInsets.all(16.0),
+              //       child: Column(
+              //         crossAxisAlignment: CrossAxisAlignment.start,
+              //         children: [
+              //           // Header with MRN and Date
+              //           Row(
+              //             mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              //             children: [
+              //               Text(
+              //                 'MRN: ${firstStock.additionalFields?.fields.firstWhere(
+              //                       (field) =>
+              //                           field.key == 'materialNoteNumber',
+              //                       orElse: () => AdditionalField(
+              //                           'materialNoteNumber', ''),
+              //                     ).value?.toString() ?? 'N/A'}',
+              //                 style: const TextStyle(
+              //                   fontWeight: FontWeight.bold,
+              //                   fontSize: 16,
+              //                 ),
+              //               ),
+              //               Text(
+              //                 'Date: ${firstStock.dateOfEntryTime?.toLocal().toString().split(' ')[0] ?? 'N/A'}',
+              //                 style: const TextStyle(color: Colors.grey),
+              //               ),
+              //             ],
+              //           ),
+              //           const SizedBox(height: 8),
+              //           Text(
+              //             'From: ${firstStock.senderId ?? firstStock.facilityId ?? 'N/A'}',
+              //             style: const TextStyle(color: Colors.grey),
+              //           ),
+              //           const SizedBox(height: 12),
+
+              //           const Divider(),
+              //           const Text(
+              //             'Commodities Received:',
+              //             style: TextStyle(fontWeight: FontWeight.bold),
+              //           ),
+              //           const SizedBox(height: 8),
+              //           Padding(
+              //             padding: const EdgeInsets.symmetric(vertical: 4),
+              //             child: Row(
+              //               mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              //               children: [
+              //                 Text(
+              //                   firstStock.additionalFields?.fields
+              //                           .firstWhere(
+              //                             (field) => field.key == 'productName',
+              //                             orElse: () => AdditionalField(
+              //                                 'productName', 'N/A'),
+              //                           )
+              //                           .value
+              //                           ?.toString() ??
+              //                       'N/A',
+              //                 ),
+              //                 Text(
+              //                   'Qty: ${firstStock.quantity ?? 'N/A'}',
+              //                   style: const TextStyle(
+              //                       fontWeight: FontWeight.bold),
+              //                 ),
+              //               ],
+              //             ),
+              //           ),
+              //           const Divider(),
+              //           Text(
+              //             'Waybill: ${firstStock.wayBillNumber ?? 'N/A'}',
+              //             style: const TextStyle(fontStyle: FontStyle.italic),
+              //           ),
+              //         ],
+              //       ),
+              //     ),
+              //   ),
+              // );
             },
           );
         },
