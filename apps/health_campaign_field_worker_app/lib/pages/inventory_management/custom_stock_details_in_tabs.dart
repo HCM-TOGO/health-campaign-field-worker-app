@@ -354,16 +354,27 @@ class _DynamicTabsPageState extends LocalizedState<DynamicTabsPage>
 
     switch (entryType) {
       case StockRecordEntryType.receipt:
-        quantityCountLabel = i18.stockDetails.quantityReceivedLabel;
-
+        if (productName == "Blue VAS" || productName == "Red VAS") {
+          quantityCountLabel =
+              i18_local.stockDetails.quantityCapsuleReceivedLabel;
+        } else {
+          quantityCountLabel = i18.stockDetails.quantityReceivedLabel;
+        }
         break;
       case StockRecordEntryType.dispatch:
-        quantityCountLabel = i18.stockDetails.quantitySentLabel;
-
+        if (productName == "Blue VAS" || productName == "Red VAS") {
+          quantityCountLabel = i18_local.stockDetails.quantityCapsuleSentLabel;
+        } else {
+          quantityCountLabel = i18.stockDetails.quantitySentLabel;
+        }
         break;
       case StockRecordEntryType.returned:
-        quantityCountLabel = i18.stockDetails.quantityReturnedLabel;
-
+        if (productName == "Blue VAS" || productName == "Red VAS") {
+          quantityCountLabel =
+              i18_local.stockDetails.quantityCapsuleReturnedLabel;
+        } else {
+          quantityCountLabel = i18.stockDetails.quantityReturnedLabel;
+        }
         break;
       case StockRecordEntryType.loss:
         quantityCountLabel = i18.stockDetails.quantityLostLabel;
@@ -607,8 +618,8 @@ class _DynamicTabsPageState extends LocalizedState<DynamicTabsPage>
 
     final isDistributor = context.isDistributor;
 
-    final ss =
-        int.parse(form.control(_transactionQuantityKey).value?.toString() ?? "0");
+    final ss = int.parse(
+        form.control(_transactionQuantityKey).value?.toString() ?? "0");
 
     if ((ss > context.spaq1 ||
             ss > context.spaq2 ||
