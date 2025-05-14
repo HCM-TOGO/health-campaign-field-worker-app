@@ -310,13 +310,13 @@ abstract class _$AppRouter extends RootStackRouter {
       );
     },
     CustomMinNumberRoute.name: (routeData) {
-      final args = routeData.argsAs<CustomMinNumberRouteArgs>(
-          orElse: () => const CustomMinNumberRouteArgs());
+      final args = routeData.argsAs<CustomMinNumberRouteArgs>();
       return AutoRoutePage<dynamic>(
         routeData: routeData,
         child: CustomMinNumberPage(
           key: args.key,
           appLocalizations: args.appLocalizations,
+          type: args.type,
         ),
       );
     },
@@ -1751,12 +1751,14 @@ class CustomMinNumberRoute extends PageRouteInfo<CustomMinNumberRouteArgs> {
   CustomMinNumberRoute({
     Key? key,
     InventoryLocalization? appLocalizations,
+    required dynamic type,
     List<PageRouteInfo>? children,
   }) : super(
           CustomMinNumberRoute.name,
           args: CustomMinNumberRouteArgs(
             key: key,
             appLocalizations: appLocalizations,
+            type: type,
           ),
           initialChildren: children,
         );
@@ -1771,15 +1773,18 @@ class CustomMinNumberRouteArgs {
   const CustomMinNumberRouteArgs({
     this.key,
     this.appLocalizations,
+    required this.type,
   });
 
   final Key? key;
 
   final InventoryLocalization? appLocalizations;
 
+  final dynamic type;
+
   @override
   String toString() {
-    return 'CustomMinNumberRouteArgs{key: $key, appLocalizations: $appLocalizations}';
+    return 'CustomMinNumberRouteArgs{key: $key, appLocalizations: $appLocalizations, type: $type}';
   }
 }
 
