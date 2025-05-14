@@ -320,17 +320,6 @@ abstract class _$AppRouter extends RootStackRouter {
         ),
       );
     },
-    CustomMinNumberRoute.name: (routeData) {
-      final args = routeData.argsAs<CustomMinNumberRouteArgs>(
-          orElse: () => const CustomMinNumberRouteArgs());
-      return AutoRoutePage<dynamic>(
-        routeData: routeData,
-        child: CustomMinNumberPage(
-          key: args.key,
-          appLocalizations: args.appLocalizations,
-        ),
-      );
-    },
     CustomRecordReferralDetailsRoute.name: (routeData) {
       final args = routeData.argsAs<CustomRecordReferralDetailsRouteArgs>();
       return AutoRoutePage<dynamic>(
@@ -1781,6 +1770,60 @@ class CustomMinNumberRouteArgs {
   @override
   String toString() {
     return 'CustomMinNumberRouteArgs{key: $key, appLocalizations: $appLocalizations}';
+  }
+}
+
+/// generated route for
+/// [CustomRecordReferralDetailsPage]
+class CustomRecordReferralDetailsRoute
+    extends PageRouteInfo<CustomRecordReferralDetailsRouteArgs> {
+  CustomRecordReferralDetailsRoute({
+    Key? key,
+    ReferralReconLocalization? appLocalizations,
+    bool isEditing = false,
+    required String projectId,
+    required List<String> cycles,
+    List<PageRouteInfo>? children,
+  }) : super(
+          CustomRecordReferralDetailsRoute.name,
+          args: CustomRecordReferralDetailsRouteArgs(
+            key: key,
+            appLocalizations: appLocalizations,
+            isEditing: isEditing,
+            projectId: projectId,
+            cycles: cycles,
+          ),
+          initialChildren: children,
+        );
+
+  static const String name = 'CustomRecordReferralDetailsRoute';
+
+  static const PageInfo<CustomRecordReferralDetailsRouteArgs> page =
+      PageInfo<CustomRecordReferralDetailsRouteArgs>(name);
+}
+
+class CustomRecordReferralDetailsRouteArgs {
+  const CustomRecordReferralDetailsRouteArgs({
+    this.key,
+    this.appLocalizations,
+    this.isEditing = false,
+    required this.projectId,
+    required this.cycles,
+  });
+
+  final Key? key;
+
+  final ReferralReconLocalization? appLocalizations;
+
+  final bool isEditing;
+
+  final String projectId;
+
+  final List<String> cycles;
+
+  @override
+  String toString() {
+    return 'CustomRecordReferralDetailsRouteArgs{key: $key, appLocalizations: $appLocalizations, isEditing: $isEditing, projectId: $projectId, cycles: $cycles}';
   }
 }
 

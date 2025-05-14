@@ -737,6 +737,8 @@ class CustomTransactionalDetailsPageState
                                                       AuthAddSpaqCountsEvent(
                                                         spaq1Count: spaq1,
                                                         spaq2Count: spaq2,
+                                                        blueVasCount: 0,
+                                                        redVasCount: 0
                                                       ),
                                                     );
                                               }
