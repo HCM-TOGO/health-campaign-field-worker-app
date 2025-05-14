@@ -2,6 +2,7 @@ import 'package:digit_ui_components/theme/digit_extended_theme.dart';
 import 'package:digit_ui_components/theme/spacers.dart';
 
 import 'package:flutter/material.dart';
+import 'package:inventory_management/utils/utils.dart';
 
 import 'package:qr_flutter/qr_flutter.dart';
 
@@ -59,18 +60,19 @@ class MinNumberCard extends StatelessWidget {
                 ),
               ),
             ),
-
-            Container(
-              height: 155,
-              width: 155,
-              alignment: Alignment.center,
-              child: QrImageView(
-                data: data.toString(),
-                version: QrVersions.auto,
-                size: 150.0,
+            if (!InventorySingleton().isWareHouseMgr)
+              Container(
+                height: 155,
+                width: 155,
+                alignment: Alignment.center,
+                child: QrImageView(
+                  data: data.toString(),
+                  version: QrVersions.auto,
+                  size: 150.0,
+                ),
               ),
-            ),
-            const SizedBox(height: 8.0), // Replace spacer2
+            if (!InventorySingleton().isWareHouseMgr)
+              const SizedBox(height: 8.0), // Replace spacer2
             Text(cddCode),
             const SizedBox(height: 8.0), // Replace spacer2
             Text(

@@ -22,6 +22,7 @@ import 'package:inventory_management/widgets/back_navigation_help_header.dart';
 import 'package:inventory_management/widgets/inventory/no_facilities_assigned_dialog.dart';
 
 import '../../router/app_router.dart';
+import '../../utils/utils.dart';
 
 @RoutePage()
 class CustomWarehouseDetailsPage extends LocalizedStatefulWidget {
@@ -90,18 +91,70 @@ class CustomWarehouseDetailsPageState
             },
             builder: (ctx, facilityState) {
               final facilities = facilityState.whenOrNull(
-                    fetched: (facilities, allFacilities) {
+                    //   fetched: (facilities, allFacilities) {
+                    //     final teamFacilities = [
+                    //       FacilityModel(
+                    //         id: 'Delivery Team',
+                    //       ),
+                    //     ];
+                    //     teamFacilities.addAll(
+                    //       facilities,
+                    //     );
+
+                    //     return InventorySingleton().isDistributor! &&
+                    //             !InventorySingleton().isWareHouseMgr!
+                    //         ? teamFacilities
+                    //         : facilities;
+                    //   },
+                    // ) ??
+                    // [];
+
+                    fetched: (facilities, allfacilities) {
+                      if (ctx.selectedProject.address?.boundaryType ==
+                          Constants.stateBoundaryLevel) {
+                        List<FacilityModel> filteredFacilities = facilities
+                            .where(
+                              (element) =>
+                                  element.usage == Constants.stateFacility,
+                            )
+                            .toList();
+                        facilities = filteredFacilities.isEmpty
+                            ? facilities
+                            : filteredFacilities;
+                      } else if (ctx.selectedProject.address?.boundaryType ==
+                          Constants.lgaBoundaryLevel) {
+                        List<FacilityModel> filteredFacilities = facilities
+                            .where(
+                              (element) =>
+                                  element.usage == Constants.lgaFacility,
+                            )
+                            .toList();
+                        facilities = filteredFacilities.isEmpty
+                            ? facilities
+                            : filteredFacilities;
+                      } else {
+                        List<FacilityModel> filteredFacilities = facilities
+                            .where(
+                              (element) =>
+                                  element.usage == Constants.healthFacility,
+                            )
+                            .toList();
+                        facilities = filteredFacilities.isEmpty
+                            ? facilities
+                            : filteredFacilities;
+                      }
                       final teamFacilities = [
                         FacilityModel(
                           id: 'Delivery Team',
+                          name: 'Delivery Team',
                         ),
                       ];
                       teamFacilities.addAll(
                         facilities,
                       );
 
-                      return InventorySingleton().isDistributor! &&
-                              !InventorySingleton().isWareHouseMgr!
+                      return context.isDistributor &&
+                              !InventorySingleton().isWareHouseMgr
                           ? teamFacilities
                           : facilities;
                     },
@@ -129,7 +182,9 @@ class CustomWarehouseDetailsPageState
 
                           return ScrollableContent(
                             header: const Column(children: [
-                              BackNavigationHelpHeaderWidget(showHelp: true,),
+                              BackNavigationHelpHeaderWidget(
+                                showHelp: true,
+                              ),
                             ]),
                             footer: SizedBox(
                               child: DigitCard(
@@ -236,9 +291,22 @@ class CustomWarehouseDetailsPageState
                                                             : "WAREHOUSE",
                                                       ),
                                                     );
-                                                    context.router.push(
-                                                      CustomStockDetailsRoute(),
-                                                    );
+                                                    if (InventorySingleton()
+                                                            .isWareHouseMgr &&
+                                                        !isLGAUser() &&
+                                                        !isHFUser(context) &&
+                                                        !context.isCDD) {
+                                                      context.router.push(
+                                                        CustomStockDetailsRoute(),
+                                                      );
+                                                    } else {
+                                                      context.router.push(
+                                                          ViewAllTransactionsRoute(
+                                                              warehouseId: form
+                                                                  .control(
+                                                                      _warehouseKey)
+                                                                  .value));
+                                                    }
                                                   }
                                                 },
                                         );

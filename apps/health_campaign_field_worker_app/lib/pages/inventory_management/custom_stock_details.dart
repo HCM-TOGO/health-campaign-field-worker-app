@@ -113,6 +113,7 @@ class CustomStockDetailsPageState
     final theme = Theme.of(context);
     final textTheme = theme.digitTextTheme(context);
     final isDistributor = context.isDistributor;
+    final isHealthFacilitySupervisor = context.isHealthFacilitySupervisor;
 
     bool isWareHouseMgr = InventorySingleton().isWareHouseMgr;
 
@@ -986,73 +987,6 @@ class CustomStockDetailsPageState
                                             //     setState(() {});
                                             //   },
                                             // ),
-
-                                            // child: MultiSelectBottomSheetField<
-                                            //     ProductVariantModel>(
-                                            //   initialChildSize: 0.7,
-                                            //   maxChildSize: 0.95,
-                                            //   title: Text(
-                                            //       "Select Product Variants"),
-                                            //   buttonText:
-                                            //       Text("Select Variants"),
-                                            //   searchable: true,
-                                            //   items: productVariants
-                                            //       .map((variant) {
-                                            //     return MultiSelectItem<
-                                            //         ProductVariantModel>(
-                                            //       variant,
-                                            //       localizations.translate(
-                                            //           variant.sku ??
-                                            //               variant.id),
-                                            //     );
-                                            //   }).toList(),
-                                            //   selectedColor: Colors.blueAccent,
-                                            //   decoration: BoxDecoration(
-                                            //     border: Border.all(
-                                            //         color: Colors.grey),
-                                            //     borderRadius:
-                                            //         BorderRadius.circular(5),
-                                            //   ),
-                                            //   initialValue: (form
-                                            //               .control(
-                                            //                   _productVariantKey)
-                                            //               .value
-                                            //           as List<
-                                            //               ProductVariantModel>?) ??
-                                            //       [],
-                                            //   onConfirm:
-                                            //       (List<ProductVariantModel?>?
-                                            //           selectedValues) {
-                                            //     // Safely convert to a non-nullable list if needed
-                                            //     final selected = selectedValues
-                                            //             ?.whereType<
-                                            //                 ProductVariantModel>()
-                                            //             .toList() ??
-                                            //         [];
-
-                                            //     // Update your form control
-                                            //     field.control.value = selected;
-                                            //   },
-                                            //   chipDisplay:
-                                            //       MultiSelectChipDisplay(
-                                            //     onTap: (item) {
-                                            //       final currentValues = List<
-                                            //               ProductVariantModel>.from(
-                                            //           field.control.value ??
-                                            //               []);
-                                            //       currentValues.remove(item);
-                                            //       field.control.value =
-                                            //           currentValues;
-                                            //     },
-                                            //   ),
-                                            //   validator: (values) {
-                                            //     if (values == null ||
-                                            //         values.isEmpty) {
-                                            //       return "Please select at least one product.";
-                                            //     }
-                                            //     return null;
-                                            //   },
-                                            // ),
                                           );
                                         },
                                       );
@@ -1114,7 +1048,6 @@ class CustomStockDetailsPageState
                               //     },
                               //   ),
 
-                              // todo nik move to next page
                               BlocBuilder<FacilityBloc, FacilityState>(
                                 builder: (context, state) {
                                   return state.maybeWhen(
@@ -1123,6 +1056,77 @@ class CustomStockDetailsPageState
                                             child: CircularProgressIndicator(),
                                           ),
                                       fetched: (facilities, allFacilities) {
+                                        List<FacilityModel> filteredFacilities =
+                                            [];
+
+                                        if (context.selectedProject.address
+                                                ?.boundaryType ==
+                                            Constants.stateBoundaryLevel) {
+                                          filteredFacilities = entryType ==
+                                                  StockRecordEntryType.receipt
+                                              ? facilities
+                                                  .where((element) =>
+                                                      element.usage ==
+                                                      Constants.centralFacility)
+                                                  .toList()
+                                              : facilities
+                                                  .where((element) =>
+                                                      element.usage ==
+                                                      Constants.lgaFacility)
+                                                  .toList();
+                                        } else if (context.selectedProject
+                                                .address?.boundaryType ==
+                                            Constants.lgaBoundaryLevel) {
+                                          filteredFacilities = entryType ==
+                                                  StockRecordEntryType.receipt
+                                              ? allFacilities
+                                                  .where((element) =>
+                                                      element.usage ==
+                                                      Constants.stateFacility)
+                                                  .toList()
+                                              : facilities
+                                                  .where((element) =>
+                                                      element.usage ==
+                                                      Constants.healthFacility)
+                                                  .toList();
+                                        } else {
+                                          filteredFacilities = context
+                                                  .isDistributor
+                                              ? facilities
+                                                  .where((element) =>
+                                                      element.usage ==
+                                                      Constants.healthFacility)
+                                                  .toList()
+                                              : entryType ==
+                                                      StockRecordEntryType
+                                                          .receipt
+                                                  ? facilities
+                                                      .where((element) =>
+                                                          element.usage ==
+                                                          Constants.lgaFacility)
+                                                      .toList()
+                                                  : [];
+                                        }
+
+                                        facilities =
+                                            context.isHealthFacilitySupervisor &&
+                                                    entryType !=
+                                                        StockRecordEntryType
+                                                            .receipt
+                                                ? []
+                                                : filteredFacilities.isEmpty
+                                                    ? facilities
+                                                    : filteredFacilities;
+
+                                        final teamFacilities = [
+                                          FacilityModel(
+                                            id: 'Delivery Team',
+                                            name: 'CDD Team',
+                                          ),
+                                        ];
+                                        teamFacilities.addAll(
+                                          facilities,
+                                        );
                                         return Column(
                                           children: [
                                             const SizedBox(
@@ -1137,10 +1141,15 @@ class CustomStockDetailsPageState
 
                                                 final facility =
                                                     await context.router.push(
-                                                            InventoryFacilitySelectionRoute(
-                                                                facilities:
-                                                                    facilities))
-                                                        as FacilityModel?;
+                                                        InventoryFacilitySelectionRoute(
+                                                  facilities:
+                                                      (isHealthFacilitySupervisor &&
+                                                              entryType !=
+                                                                  StockRecordEntryType
+                                                                      .receipt)
+                                                          ? teamFacilities
+                                                          : facilities,
+                                                )) as FacilityModel?;
 
                                                 if (facility == null) return;
                                                 form

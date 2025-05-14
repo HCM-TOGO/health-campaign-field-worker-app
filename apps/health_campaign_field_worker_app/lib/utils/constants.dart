@@ -95,6 +95,11 @@ class Constants {
   static const String reDoseQuantityKey = 'reDoseQuantity';
   static const String healthFacility = 'Health Facility';
   static const String lgaBoundaryLevel = 'LGA';
+  static const String provincialBoundaryLevel = 'Provincia';
+  static const String centralFacility = 'Central Facility';
+  static const String stateBoundaryLevel = 'State';
+  static const String stateFacility = 'State Facility';
+  static const String lgaFacility = 'LGA Facility';
   static const int mlPerBottle = 30;
   static const int apiCallLimit = 1000;
 

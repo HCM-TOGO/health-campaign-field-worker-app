@@ -48,6 +48,7 @@ import '../pages/inventory_management/custom_acknowledgement.dart';
 import '../pages/inventory_management/view_stock_records.dart';
 import 'package:inventory_management/models/entities/stock.dart';
 import '../pages/inventory_management/custom_min_number.dart';
+import '../pages/inventory_management/view_all_transactions_page.dart';
 import '../pages/language_selection.dart';
 import '../pages/login.dart';
 import '../pages/profile.dart';
@@ -159,6 +160,11 @@ class AppRouter extends _$AppRouter {
         AutoRoute(
           page: CustomMinNumberRoute.page,
           path: 'custom-min-number',
+        ),
+
+        AutoRoute(
+          page: ViewAllTransactionsRoute.page,
+          path: 'custom-all-transactions',
         ),
 
         // Referral Reconciliation Route

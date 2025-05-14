@@ -156,11 +156,35 @@ class _DynamicTabsPageState extends LocalizedState<DynamicTabsPage>
 
     // info setting the transaction related info here for the stock the model
 
-    setTransactionTypeAndReason(
-      entryType,
-      transactionType,
-      transactionReason,
-    );
+    // setTransactionTypeAndReason(
+    //   entryType,
+    //   transactionType,
+    //   transactionReason,
+    // );
+
+    switch (entryType) {
+      case StockRecordEntryType.receipt:
+        transactionType = TransactionType.received.toValue();
+        transactionReason = TransactionReason.received.toValue();
+
+        break;
+      case StockRecordEntryType.dispatch:
+        transactionType = TransactionType.dispatched.toValue();
+
+        break;
+      case StockRecordEntryType.returned:
+        transactionType = TransactionType.received.toValue();
+        transactionReason = TransactionReason.returned.toValue();
+
+        break;
+      case StockRecordEntryType.loss:
+        transactionType = TransactionType.dispatched.toValue();
+
+        break;
+      case StockRecordEntryType.damaged:
+        transactionType = TransactionType.dispatched.toValue();
+        break;
+    }
 
     // setSenderReceiverIdAndType(
     //     entryType, senderId, senderType, receiverId, receiverType);

@@ -49,10 +49,17 @@ class _ViewStockRecordsPageState extends LocalizedState<ViewStockRecordsPage>
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text(localizations.translate(
-          i18.stockDetails.dialogTitle,
-        )),
         bottom: TabBar(
+          labelColor: Colors.white,
+          indicator: BoxDecoration(
+            border: Border(
+              left: BorderSide(color: Colors.orange),
+              right: BorderSide(color: Colors.orange),
+              bottom: BorderSide(color: Colors.orange),
+              top: BorderSide(color: Colors.orange),
+            ),
+          ),
+          indicatorPadding: EdgeInsets.fromLTRB(0.1, 0, 0.1, 0.1),
           controller: _tabController,
           isScrollable: true,
           tabs: widget.stockRecords
@@ -168,22 +175,7 @@ class _ViewStockRecordsPageState extends LocalizedState<ViewStockRecordsPage>
                     readOnly: true,
                   ),
                   const SizedBox(height: 12),
-                  // Expiry Date
-                  InputField(
-                    type: InputType.date,
-                    label: 'Expiry Date',
-                    initialValue: stock.additionalFields?.fields
-                            .firstWhere(
-                              (field) => field.key == '_expiry',
-                              orElse: () => AdditionalField('_expiry', ''),
-                            )
-                            .value
-                            ?.toString() ??
-                        '',
-                    isDisabled: true,
-                    readOnly: true,
-                  ),
-                  const SizedBox(height: 12),
+
                   // Quantity
                   InputField(
                     type: InputType.text,
@@ -215,7 +207,7 @@ class _ViewStockRecordsPageState extends LocalizedState<ViewStockRecordsPage>
 
           const SizedBox(height: 24),
           DigitButton(
-            label: localizations.translate(i18.common.coreCommonBack),
+            label: localizations.translate(i18.common.corecommonclose),
             onPressed: () => context.router.pop(),
             type: DigitButtonType.secondary,
             size: DigitButtonSize.large,
