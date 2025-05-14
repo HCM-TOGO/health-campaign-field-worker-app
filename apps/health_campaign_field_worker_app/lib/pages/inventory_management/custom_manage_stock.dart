@@ -129,7 +129,9 @@ class CustomManageStocksPageState
                                   GestureDetector(
                                     onTap: () {
                                       context.router.push(
-                                        CustomMinNumberRoute(),
+                                        CustomMinNumberRoute(
+                                          type: StockRecordEntryType.receipt,
+                                        ),
                                       );
                                       Navigator.of(context).pop();
                                     },
@@ -245,7 +247,10 @@ class CustomManageStocksPageState
                                       GestureDetector(
                                         onTap: () {
                                           context.router.push(
-                                            CustomMinNumberRoute(),
+                                            CustomMinNumberRoute(
+                                              type:
+                                                  StockRecordEntryType.dispatch,
+                                            ),
                                           );
                                           Navigator.of(context).pop();
                                         },
@@ -356,7 +361,9 @@ class CustomManageStocksPageState
                                     GestureDetector(
                                       onTap: () {
                                         context.router.push(
-                                          CustomMinNumberRoute(),
+                                          CustomMinNumberRoute(
+                                            type: StockRecordEntryType.returned,
+                                          ),
                                         );
                                         Navigator.of(context).pop();
                                       },
