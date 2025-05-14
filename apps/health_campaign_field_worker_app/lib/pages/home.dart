@@ -151,12 +151,9 @@ class _HomePageState extends LocalizedState<HomePage> {
           ],
           header: Column(
             children: [
-              BackNavigationHelpHeaderWidget(
+              const BackNavigationHelpHeaderWidget(
                 showBackNavigation: false,
                 showHelp: false,
-                showcaseButton: ShowcaseButton(
-                  showcaseFor: showcaseKeys.toSet().toList(),
-                ),
               ),
               skipProgressBar
                   ? const SizedBox.shrink()
