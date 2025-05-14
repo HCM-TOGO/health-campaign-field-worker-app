@@ -173,7 +173,7 @@ class _CustomRecordReferralDetailsPageState
                                                           ServiceSearchEvent(
                                                             serviceSearchModel:
                                                                 ServiceSearchModel(
-                                                              clientId:
+                                                              relatedClientReferenceId:
                                                                   recordState
                                                                       .mapOrNull(
                                                                 create: (value) => value
@@ -469,7 +469,7 @@ class _CustomRecordReferralDetailsPageState
                                                               ServiceSearchEvent(
                                                                 serviceSearchModel:
                                                                     ServiceSearchModel(
-                                                                  clientId:
+                                                                  relatedClientReferenceId:
                                                                       recordState
                                                                           .mapOrNull(
                                                                     create: (value) => value
@@ -675,9 +675,9 @@ class _CustomRecordReferralDetailsPageState
                                                                     dateOfEvaluation,
                                                                   ),
                                                                 if (nameOfChild
-                                                                        .toString()
-                                                                        .trim()
-                                                                        .isNotEmpty)
+                                                                    .toString()
+                                                                    .trim()
+                                                                    .isNotEmpty)
                                                                   AdditionalField(
                                                                     ReferralReconEnums
                                                                         .nameOfReferral
@@ -685,9 +685,9 @@ class _CustomRecordReferralDetailsPageState
                                                                     nameOfChild,
                                                                   ),
                                                                 if (age
-                                                                        .toString()
-                                                                        .trim()
-                                                                        .isNotEmpty)
+                                                                    .toString()
+                                                                    .trim()
+                                                                    .isNotEmpty)
                                                                   AdditionalField(
                                                                     ReferralReconEnums
                                                                         .age
@@ -695,9 +695,9 @@ class _CustomRecordReferralDetailsPageState
                                                                     age,
                                                                   ),
                                                                 if (gender
-                                                                        .toString()
-                                                                        .trim()
-                                                                        .isNotEmpty)
+                                                                    .toString()
+                                                                    .trim()
+                                                                    .isNotEmpty)
                                                                   AdditionalField(
                                                                     ReferralReconEnums
                                                                         .gender
@@ -986,7 +986,8 @@ class _CustomRecordReferralDetailsPageState
                                           }),
                                     ]),
                                 StatefulBuilder(builder: (context, set) {
-                                  print("Current referral reason: ${ReferralReconSingleton().referralReasons}");
+                                  print(
+                                      "Current referral reason: ${ReferralReconSingleton().referralReasons}");
                                   form.control(_referralReason).value =
                                       recordState.mapOrNull(
                                     create: (value) => value.viewOnly
