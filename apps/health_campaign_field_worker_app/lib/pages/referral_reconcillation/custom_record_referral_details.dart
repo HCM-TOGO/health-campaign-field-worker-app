@@ -801,6 +801,7 @@ class _CustomRecordReferralDetailsPageState
                                           formControlName: _beneficiaryIdKey,
                                           builder: (field) {
                                             return LabeledField(
+                                              isRequired: true,
                                               label: localizations.translate(
                                                 i18.referralReconciliation
                                                     .beneficiaryIdLabel,

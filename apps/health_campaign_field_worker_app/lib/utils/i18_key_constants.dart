@@ -1213,7 +1213,7 @@ class BeneficiaryDetails {
       'INSUFFICIENT_STOCK_MESSAGE_ADMINISTRATION';
 
   String get householdId => 'HOUSEHOLD_ID_TEXT';
-  String get beneficiaryId => 'BENEFICIARY_ID_TEXT';
+  String get beneficiaryId => 'BENEFICIARY_ID';
   String get backToHouseholdDetails => 'BACK_TO_HOUSEHOLD_DETAILS';
   String get beneficiaryDoseUnit => 'BENEFICIARY_DETAILS_DOSE_UNIT';
   String get spaq1DoseUnit => 'SPAQ1_STOCK_ZERO';

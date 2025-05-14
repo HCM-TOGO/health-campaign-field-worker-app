@@ -1004,9 +1004,9 @@ class CustomResourceBeneficiaryCardState
                       readOnly: true,
                       selectedOption: DropdownItem(
                         code: getFormattedSku(
-                            selectedVariant?.sku ?? selectedVariant!.id),
+                            selectedVariant?.sku ?? selectedVariant?.id ?? ''),
                         name: getFormattedSku(
-                            selectedVariant?.sku ?? selectedVariant!.id),
+                            selectedVariant?.sku ?? selectedVariant?.id ?? ''),
                       ),
                       items: productVariants
                           .map((variant) => DropdownItem(

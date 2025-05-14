@@ -207,7 +207,7 @@ class _CustomReferralReasonChecklistPageState
                                                       tenantId: value
                                                           .selectedServiceDefinition!
                                                           .tenantId,
-                                                      clientId: referenceId,
+                                                      clientId: widget.referralClientRefId!,
                                                       serviceDefId: value
                                                           .selectedServiceDefinition
                                                           ?.id,
@@ -568,36 +568,12 @@ class _CustomReferralReasonChecklistPageState
                                 ),
                               );
                           setState(() {
-                            // Clear child controllers and update visibility
-                            for (final matchingChildItem in childItems) {
-                              final childIndex =
-                                  initialAttributes?.indexOf(matchingChildItem);
-                              if (childIndex != null) {
-                                controller[childIndex].clear();
-                                visibleChecklistIndexes
-                                    .removeWhere((v) => v == childIndex);
-                              }
-                            }
-
-                            // Update the current controller's value
                             controller[index].value =
                                 TextEditingController.fromValue(
                               TextEditingValue(
                                 text: selectedValue.code,
                               ),
                             ).value;
-
-                            if (excludedIndexes.isNotEmpty) {
-                              for (int i = 0; i < excludedIndexes.length; i++) {
-                                // Clear excluded child controllers
-                                controller[excludedIndexes[i]].value =
-                                    TextEditingController.fromValue(
-                                  const TextEditingValue(
-                                    text: '',
-                                  ),
-                                ).value;
-                              }
-                            }
                           });
                         },
                         isDisabled: false, // Set this based on your logic
