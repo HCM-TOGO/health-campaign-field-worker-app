@@ -40,6 +40,12 @@ import '../pages/inventory_management/custom_stock_details.dart';
 import '../pages/inventory_management/custom_stock_reconciliation.dart';
 import '../pages/inventory_management/custom_warehouse_details.dart';
 import '../pages/inventory_management/custom_inventory_report_details.dart';
+import '../pages/inventory_management/custom_min_number.dart';
+import '../pages/inventory_management/view_transactions_page.dart';
+import '../pages/inventory_management/custom_stock_details_in_tabs.dart';
+import '../pages/inventory_management/custom_acknowledgement.dart';
+import '../pages/inventory_management/view_stock_records.dart';
+import 'package:inventory_management/models/entities/stock.dart';
 import '../pages/language_selection.dart';
 import '../pages/login.dart';
 import '../pages/profile.dart';
@@ -113,10 +119,17 @@ class AppRouter extends _$AppRouter {
         AutoRoute(page: ProfileRoute.page, path: 'profile'),
         AutoRoute(page: UserQRDetailsRoute.page, path: 'user-qr-code'),
         AutoRoute(
+          page: CustomMinNumberRoute.page,
+          path: 'custom-min-number',
+        ),
+        AutoRoute(
           page: BeneficiariesReportRoute.page,
           path: 'beneficiary-downsync-report',
         ),
-
+        AutoRoute(
+          page: ViewTransactionsRoute.page,
+          path: 'beneficiary-downsync-report',
+        ),
         // INFO : Need to add Router of package Here
         // Attendance Route
         AutoRoute(
@@ -426,6 +439,14 @@ class AppRouter extends _$AppRouter {
           page: CustomManageStocksRoute.page,
           path: 'custom-manage-stocks',
         ),
+
+        AutoRoute(
+          page: CustomAcknowledgementRoute.page,
+        ),
+        AutoRoute(
+          page: ViewStockRecordsRoute.page,
+        ),
+
         AutoRoute(
           page: RecordStockWrapperRoute.page,
           path: 'record-stock',
@@ -452,6 +473,10 @@ class AppRouter extends _$AppRouter {
               path: 'details',
               redirectTo: 'custom-details',
             ),
+            // AutoRoute(
+            //   page: DynamicTabsRoute.page,
+            //   path: 'stock-tabs',
+            // ),
           ],
         ),
 

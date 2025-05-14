@@ -66,6 +66,18 @@ abstract class _$AppRouter extends RootStackRouter {
         ),
       );
     },
+    CustomAcknowledgementRoute.name: (routeData) {
+      final args = routeData.argsAs<CustomAcknowledgementRouteArgs>();
+      return AutoRoutePage<dynamic>(
+        routeData: routeData,
+        child: CustomAcknowledgementPage(
+          key: args.key,
+          appLocalizations: args.appLocalizations,
+          mrnNumber: args.mrnNumber,
+          stockRecords: args.stockRecords,
+        ),
+      );
+    },
     CustomBeneficiaryAcknowledgementRoute.name: (routeData) {
       final args =
           routeData.argsAs<CustomBeneficiaryAcknowledgementRouteArgs>();
@@ -292,6 +304,17 @@ abstract class _$AppRouter extends RootStackRouter {
       return AutoRoutePage<dynamic>(
         routeData: routeData,
         child: CustomManageStocksPage(
+          key: args.key,
+          appLocalizations: args.appLocalizations,
+        ),
+      );
+    },
+    CustomMinNumberRoute.name: (routeData) {
+      final args = routeData.argsAs<CustomMinNumberRouteArgs>(
+          orElse: () => const CustomMinNumberRouteArgs());
+      return AutoRoutePage<dynamic>(
+        routeData: routeData,
+        child: CustomMinNumberPage(
           key: args.key,
           appLocalizations: args.appLocalizations,
         ),
@@ -583,6 +606,24 @@ abstract class _$AppRouter extends RootStackRouter {
         ),
       );
     },
+    ViewStockRecordsRoute.name: (routeData) {
+      final args = routeData.argsAs<ViewStockRecordsRouteArgs>();
+      return AutoRoutePage<dynamic>(
+        routeData: routeData,
+        child: ViewStockRecordsPage(
+          key: args.key,
+          appLocalizations: args.appLocalizations,
+          mrnNumber: args.mrnNumber,
+          stockRecords: args.stockRecords,
+        ),
+      );
+    },
+    ViewTransactionsRoute.name: (routeData) {
+      return AutoRoutePage<dynamic>(
+        routeData: routeData,
+        child: const ViewTransactionsScreen(),
+      );
+    },
     ...InventoryRoute().pagesMap,
     ...RegistrationDeliveryRoute().pagesMap,
     ...ReferralReconciliationRoute().pagesMap,
@@ -766,6 +807,55 @@ class CaregiverConsentRouteArgs {
   @override
   String toString() {
     return 'CaregiverConsentRouteArgs{key: $key, appLocalizations: $appLocalizations}';
+  }
+}
+
+/// generated route for
+/// [CustomAcknowledgementPage]
+class CustomAcknowledgementRoute
+    extends PageRouteInfo<CustomAcknowledgementRouteArgs> {
+  CustomAcknowledgementRoute({
+    Key? key,
+    RegistrationDeliveryLocalization? appLocalizations,
+    required String mrnNumber,
+    required List<StockModel> stockRecords,
+    List<PageRouteInfo>? children,
+  }) : super(
+          CustomAcknowledgementRoute.name,
+          args: CustomAcknowledgementRouteArgs(
+            key: key,
+            appLocalizations: appLocalizations,
+            mrnNumber: mrnNumber,
+            stockRecords: stockRecords,
+          ),
+          initialChildren: children,
+        );
+
+  static const String name = 'CustomAcknowledgementRoute';
+
+  static const PageInfo<CustomAcknowledgementRouteArgs> page =
+      PageInfo<CustomAcknowledgementRouteArgs>(name);
+}
+
+class CustomAcknowledgementRouteArgs {
+  const CustomAcknowledgementRouteArgs({
+    this.key,
+    this.appLocalizations,
+    required this.mrnNumber,
+    required this.stockRecords,
+  });
+
+  final Key? key;
+
+  final RegistrationDeliveryLocalization? appLocalizations;
+
+  final String mrnNumber;
+
+  final List<StockModel> stockRecords;
+
+  @override
+  String toString() {
+    return 'CustomAcknowledgementRouteArgs{key: $key, appLocalizations: $appLocalizations, mrnNumber: $mrnNumber, stockRecords: $stockRecords}';
   }
 }
 
@@ -1685,6 +1775,44 @@ class CustomRecordReferralDetailsRouteArgs {
   @override
   String toString() {
     return 'CustomRecordReferralDetailsRouteArgs{key: $key, appLocalizations: $appLocalizations, isEditing: $isEditing, projectId: $projectId, cycles: $cycles}';
+  }
+}
+
+/// generated route for
+/// [CustomMinNumberPage]
+class CustomMinNumberRoute extends PageRouteInfo<CustomMinNumberRouteArgs> {
+  CustomMinNumberRoute({
+    Key? key,
+    InventoryLocalization? appLocalizations,
+    List<PageRouteInfo>? children,
+  }) : super(
+          CustomMinNumberRoute.name,
+          args: CustomMinNumberRouteArgs(
+            key: key,
+            appLocalizations: appLocalizations,
+          ),
+          initialChildren: children,
+        );
+
+  static const String name = 'CustomMinNumberRoute';
+
+  static const PageInfo<CustomMinNumberRouteArgs> page =
+      PageInfo<CustomMinNumberRouteArgs>(name);
+}
+
+class CustomMinNumberRouteArgs {
+  const CustomMinNumberRouteArgs({
+    this.key,
+    this.appLocalizations,
+  });
+
+  final Key? key;
+
+  final InventoryLocalization? appLocalizations;
+
+  @override
+  String toString() {
+    return 'CustomMinNumberRouteArgs{key: $key, appLocalizations: $appLocalizations}';
   }
 }
 
@@ -2665,4 +2793,66 @@ class UserQRDetailsRouteArgs {
   String toString() {
     return 'UserQRDetailsRouteArgs{key: $key, appLocalizations: $appLocalizations}';
   }
+}
+
+/// generated route for
+/// [ViewStockRecordsPage]
+class ViewStockRecordsRoute extends PageRouteInfo<ViewStockRecordsRouteArgs> {
+  ViewStockRecordsRoute({
+    Key? key,
+    RegistrationDeliveryLocalization? appLocalizations,
+    required String mrnNumber,
+    required List<StockModel> stockRecords,
+    List<PageRouteInfo>? children,
+  }) : super(
+          ViewStockRecordsRoute.name,
+          args: ViewStockRecordsRouteArgs(
+            key: key,
+            appLocalizations: appLocalizations,
+            mrnNumber: mrnNumber,
+            stockRecords: stockRecords,
+          ),
+          initialChildren: children,
+        );
+
+  static const String name = 'ViewStockRecordsRoute';
+
+  static const PageInfo<ViewStockRecordsRouteArgs> page =
+      PageInfo<ViewStockRecordsRouteArgs>(name);
+}
+
+class ViewStockRecordsRouteArgs {
+  const ViewStockRecordsRouteArgs({
+    this.key,
+    this.appLocalizations,
+    required this.mrnNumber,
+    required this.stockRecords,
+  });
+
+  final Key? key;
+
+  final RegistrationDeliveryLocalization? appLocalizations;
+
+  final String mrnNumber;
+
+  final List<StockModel> stockRecords;
+
+  @override
+  String toString() {
+    return 'ViewStockRecordsRouteArgs{key: $key, appLocalizations: $appLocalizations, mrnNumber: $mrnNumber, stockRecords: $stockRecords}';
+  }
+}
+
+/// generated route for
+/// [ViewTransactionsScreen]
+class ViewTransactionsRoute extends PageRouteInfo<void> {
+  const ViewTransactionsRoute({List<PageRouteInfo>? children})
+      : super(
+          ViewTransactionsRoute.name,
+          initialChildren: children,
+        );
+
+  static const String name = 'ViewTransactionsRoute';
+
+  static const PageInfo<void> page = PageInfo<void>(name);
 }

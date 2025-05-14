@@ -182,6 +182,15 @@ String formatAgeRange(String condition) {
   return condition;
 }
 
+bool validateStockSubmission({
+  required num availableBalance,
+  required num stockReturned,
+  required num stockWasted,
+}) {
+  final total = stockReturned + stockWasted;
+  return total <= availableBalance;
+}
+
 String customFormatAgeRange(String condition) {
   final regex =
       RegExp(r'(\d+)\s*<\s*ageandage\s*<\s*(\d+)', caseSensitive: false);

@@ -94,8 +94,9 @@ class Constants {
   static const String reAdministeredKey = "reAdministered";
   static const String reDoseQuantityKey = 'reDoseQuantity';
   static const String healthFacility = 'Health Facility';
-
+  static const String lgaBoundaryLevel = 'LGA';
   static const int mlPerBottle = 30;
+  static const int apiCallLimit = 1000;
 
   // todo enable before cycle2
   static const bool isDownSyncEnabled = false;
@@ -171,16 +172,16 @@ class Constants {
     final appConfigs = await isar.appConfigurations.where().findAll();
     final config = appConfigs.firstOrNull;
 
-    final enableCrashlytics =
-        config?.firebaseConfig?.enableCrashlytics ?? false;
-    if (enableCrashlytics) {
-      firebase_services.initialize(
-        options: DefaultFirebaseOptions.currentPlatform,
-        onErrorMessage: (value) {
-          AppLogger.instance.error(title: 'CRASHLYTICS', message: value);
-        },
-      );
-    }
+    final enableCrashlytics = false;
+    // config?.firebaseConfig?.enableCrashlytics ?? false;
+    // if (enableCrashlytics) {
+    //   firebase_services.initialize(
+    //     options: DefaultFirebaseOptions.currentPlatform,
+    //     onErrorMessage: (value) {
+    //       AppLogger.instance.error(title: 'CRASHLYTICS', message: value);
+    //     },
+    //   );
+    // }
 
     _version = version;
   }
