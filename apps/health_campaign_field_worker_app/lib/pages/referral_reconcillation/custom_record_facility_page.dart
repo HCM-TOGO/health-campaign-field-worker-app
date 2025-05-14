@@ -28,10 +28,12 @@ class CustomReferralFacilityPage extends LocalizedStatefulWidget {
       {super.key, super.appLocalizations, this.isEditing = false});
 
   @override
-  State<CustomReferralFacilityPage> createState() => _CustomReferralFacilityPageState();
+  State<CustomReferralFacilityPage> createState() =>
+      _CustomReferralFacilityPageState();
 }
 
-class _CustomReferralFacilityPageState extends LocalizedState<CustomReferralFacilityPage> {
+class _CustomReferralFacilityPageState
+    extends LocalizedState<CustomReferralFacilityPage> {
   static const _dateOfEvaluationKey = 'dateOfEvaluation';
   static const _administrativeUnitKey = 'administrativeUnit';
   static const _hfCoordinatorKey = 'healthFacilityCoordinatorKey';

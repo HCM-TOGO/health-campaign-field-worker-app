@@ -200,7 +200,7 @@ class CustomManageStocksPageState
                                           context.router.push(
                                             RecordStockWrapperRoute(
                                               type:
-                                                  StockRecordEntryType.receipt,
+                                                  StockRecordEntryType.dispatch,
                                             ),
                                           );
                                           Navigator.of(context).pop();
@@ -313,7 +313,7 @@ class CustomManageStocksPageState
                                       onTap: () {
                                         context.router.push(
                                           RecordStockWrapperRoute(
-                                            type: StockRecordEntryType.receipt,
+                                            type: StockRecordEntryType.returned,
                                           ),
                                         );
                                         Navigator.of(context).pop();

@@ -138,9 +138,10 @@ class CustomStockDetailsPageState
                 stockState.mapOrNull(
                   persisted: (value) {
                     final parent = context.router.parent() as StackRouter;
-                    parent.replace(
-                      InventoryAcknowledgementRoute(),
-                    );
+                    // todo : verify this , not needed now as routing done from stock details tab page
+                    // parent.replace(
+                    //   InventoryAcknowledgementRoute(),
+                    // );
                   },
                 );
               },
@@ -149,6 +150,7 @@ class CustomStockDetailsPageState
 
                 const module = i18.stockDetails;
 
+                String pageTitleMain = module.transactionDetailsLabel;
                 String pageTitle;
                 String quantityCountLabel;
                 String? quantityPartialCountLabel;
@@ -160,21 +162,21 @@ class CustomStockDetailsPageState
 
                 switch (entryType) {
                   case StockRecordEntryType.receipt:
-                    pageTitle = module.transactionDetailsLabel;
+                    pageTitle = module.receivedPageTitle;
                     quantityCountLabel =
                         i18.inventoryReportDetails.receiptQuantityLabel;
                     transactionType = TransactionType.received.toValue();
 
                     break;
                   case StockRecordEntryType.dispatch:
-                    pageTitle = module.transactionDetailsLabel;
+                    pageTitle = module.issuedPageTitle;
                     quantityCountLabel =
                         i18.inventoryReportDetails.dispatchQuantityLabel;
                     transactionType = TransactionType.dispatched.toValue();
 
                     break;
                   case StockRecordEntryType.returned:
-                    pageTitle = module.transactionDetailsLabel;
+                    pageTitle = module.returnedPageTitle;
                     quantityCountLabel =
                         i18.inventoryReportDetails.returnedQuantityLabel;
                     quantityPartialCountLabel = i18_local
@@ -183,7 +185,7 @@ class CustomStockDetailsPageState
 
                     break;
                   case StockRecordEntryType.loss:
-                    pageTitle = module.transactionDetailsLabel;
+                    pageTitle = module.lostPageTitle;
                     quantityCountLabel = module.quantityLostLabel;
                     transactionReasonLabel = module.transactionReasonLost;
                     transactionType = TransactionType.dispatched.toValue();
@@ -194,7 +196,7 @@ class CustomStockDetailsPageState
                     ];
                     break;
                   case StockRecordEntryType.damaged:
-                    pageTitle = module.transactionDetailsLabel;
+                    pageTitle = module.damagedPageTitle;
                     quantityCountLabel = module.quantityDamagedLabel;
                     transactionReasonLabel = module.transactionReasonDamaged;
                     transactionType = TransactionType.dispatched.toValue();
@@ -809,7 +811,7 @@ class CustomStockDetailsPageState
                             margin: const EdgeInsets.all(spacer2),
                             children: [
                               Text(
-                                localizations.translate(pageTitle),
+                                localizations.translate(pageTitleMain),
                                 style: textTheme.headingXl,
                               ),
                               BlocBuilder<InventoryProductVariantBloc,

@@ -6,6 +6,7 @@ import 'package:digit_ui_components/widgets/molecules/digit_card.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:health_campaign_field_worker_app/data/repositories/local/inventory_management/custom_stock.dart';
+import 'package:health_campaign_field_worker_app/utils/utils.dart';
 import 'package:health_campaign_field_worker_app/widgets/action_card/min_number_card.dart';
 import 'package:inventory_management/models/entities/stock.dart';
 
@@ -107,27 +108,78 @@ class CustomMinNumberPageState extends LocalizedState<CustomMinNumberPage> {
 
                             return Padding(
                               padding: const EdgeInsets.all(8.0),
-                              child: MinNumberCard(
-                                data: {
-                                  'minNumber':
-                                      '${item.additionalFields?.fields.firstWhere((field) => field.key == 'materialNoteNumber', orElse: () => AdditionalField('materialNoteNumber', '')).value?.toString() ?? 'N/A'}',
-                                  'cddCode': item.boundaryCode,
-                                  'date': item.dateOfEntry,
-                                  'items': item,
-                                  'waybillNumber': item.wayBillNumber,
+                              child: GestureDetector(
+                                onTap: () {
+                                  context.router.push(
+                                    ViewStockRecordsRoute(
+                                      mrnNumber: item.additionalFields?.fields
+                                              .firstWhere(
+                                                  (field) =>
+                                                      field.key ==
+                                                      'materialNoteNumber',
+                                                  orElse: () =>
+                                                      const AdditionalField(
+                                                          'materialNoteNumber',
+                                                          ''))
+                                              .value
+                                              ?.toString() ??
+                                          'N/A',
+                                      stockRecords: stockList,
+                                    ),
+                                  );
                                 },
-                                minNumber:
-                                    '${item.additionalFields?.fields.firstWhere((field) => field.key == 'materialNoteNumber', orElse: () => AdditionalField('materialNoteNumber', '')).value?.toString() ?? 'N/A'}',
-                                cddCode: item.boundaryCode ?? "",
-                                date: "${item.dateOfEntry}",
-                                items: [
-                                  {
-                                    'name':
-                                        '${item.additionalFields?.fields.firstWhere((field) => field.key == 'productName', orElse: () => AdditionalField('productName', '')).value?.toString() ?? 'N/A'}',
-                                    'quantity': '${item.quantity}'
+                                child: MinNumberCard(
+                                  data: {
+                                    'minNumber': item.additionalFields?.fields
+                                            .firstWhere(
+                                                (field) =>
+                                                    field.key ==
+                                                    'materialNoteNumber',
+                                                orElse: () =>
+                                                    const AdditionalField(
+                                                        'materialNoteNumber',
+                                                        ''))
+                                            .value
+                                            ?.toString() ??
+                                        'N/A',
+                                    'cddCode': item.boundaryCode,
+                                    'date': formatDateFromMillis(
+                                        item.auditDetails?.createdTime ?? 0),
+                                    'items': item,
+                                    'waybillNumber': item.wayBillNumber,
                                   },
-                                ],
-                                waybillNumber: item.wayBillNumber ?? "",
+                                  minNumber: item.additionalFields?.fields
+                                          .firstWhere(
+                                              (field) =>
+                                                  field.key ==
+                                                  'materialNoteNumber',
+                                              orElse: () =>
+                                                  const AdditionalField(
+                                                      'materialNoteNumber', ''))
+                                          .value
+                                          ?.toString() ??
+                                      'N/A',
+                                  cddCode: item.boundaryCode ?? "",
+                                  date: formatDateFromMillis(
+                                      item.auditDetails?.createdTime ?? 0),
+                                  items: [
+                                    {
+                                      'name': item.additionalFields?.fields
+                                              .firstWhere(
+                                                  (field) =>
+                                                      field.key ==
+                                                      'productName',
+                                                  orElse: () =>
+                                                      const AdditionalField(
+                                                          'productName', ''))
+                                              .value
+                                              ?.toString() ??
+                                          'N/A',
+                                      'quantity': '${item.quantity}'
+                                    },
+                                  ],
+                                  waybillNumber: item.wayBillNumber ?? "",
+                                ),
                               ),
                             );
                           },
