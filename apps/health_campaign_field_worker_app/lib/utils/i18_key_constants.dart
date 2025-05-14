@@ -1205,6 +1205,15 @@ class IndividualDetails {
 
 class BeneficiaryDetails {
   const BeneficiaryDetails();
+
+String get validationForExcessStock => "ERROR_VALIDATIN_FOR_EXCESS_STOCK_DISPATCH";
+String get errorHeader => "ERROR_VALIDATION_HEADER";
+String get goToHome => "GO_BACK_HOME";
+  String get insufficientStockMessage => 'INSUFFICIENT_AZT_STOCK_MESSAGE';
+  String get insufficientStockMessageDelivery =>
+      'INSUFFICIENT_SMC_STOCK_MESSAGE_DELIVERY';
+
+
   String get insufficientStockHeading => 'INSUFFICIENT_STOCK_HEADING';
   String get insufficientAZTStockMessage => 'INSUFFICIENT_AZT_STOCK_MESSAGE';
   String get insufficientAZTStockMessageDelivery =>

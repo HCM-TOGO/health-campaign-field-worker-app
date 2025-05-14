@@ -31,6 +31,7 @@ import 'package:registration_delivery/models/entities/status.dart';
 import 'package:registration_delivery/router/registration_delivery_router.gm.dart';
 import 'package:registration_delivery/utils/i18_key_constants.dart' as i18;
 import 'package:registration_delivery/utils/utils.dart';
+import '../../utils/extensions/extensions.dart';
 import '../../widgets/custom_back_navigation.dart';
 import 'package:registration_delivery/widgets/localized.dart';
 import 'package:registration_delivery/widgets/member_card/member_card.dart';
@@ -40,6 +41,7 @@ import '../../router/app_router.dart';
 import '../../utils/app_enums.dart';
 import '../../utils/registration_delivery/utils_smc.dart';
 import '../../widgets/registration_delivery/custom_member_card.dart';
+import '../../utils/i18_key_constants.dart' as i18_local;
 
 @RoutePage()
 class CustomHouseholdOverviewPage extends LocalizedStatefulWidget {
@@ -1024,10 +1026,50 @@ class _CustomHouseholdOverviewPageState
                                 ),
                                 DigitButton(
                                   mainAxisSize: MainAxisSize.max,
-                                  onPressed: () => addIndividual(
-                                    context,
-                                    state.householdMemberWrapper.household,
-                                  ),
+                                  onPressed: () => (context.spaq1 > 0 ||
+                                          context.spaq2 > 0 ||
+                                          context.blueVas > 0 ||
+                                          context.redVas > 0)
+                                      ? addIndividual(
+                                          context,
+                                          state
+                                              .householdMemberWrapper.household,
+                                        )
+                                      : showCustomPopup(
+                                          context: context,
+                                          builder: (popupContext) => Popup(
+                                            title: localizations.translate(
+                                                i18_local.beneficiaryDetails
+                                                    .insufficientStockHeading),
+                                            onOutsideTap: () {
+                                              Navigator.of(popupContext)
+                                                  .pop(false);
+                                            },
+                                            description:
+                                                localizations.translate(
+                                              i18_local.beneficiaryDetails
+                                                  .insufficientStockMessage,
+                                            ),
+                                            type: PopUpType.simple,
+                                            actions: [
+                                              DigitButton(
+                                                label: localizations.translate(
+                                                  i18_local.beneficiaryDetails
+                                                      .goToHome,
+                                                ),
+                                                onPressed: () {
+                                                  Navigator.of(
+                                                    popupContext,
+                                                    rootNavigator: true,
+                                                  ).pop();
+//
+                                                },
+                                                type: DigitButtonType.primary,
+                                                size: DigitButtonSize.large,
+                                              ),
+                                            ],
+                                          ),
+                                        ),
                                   label: localizations.translate(
                                     i18.householdOverView
                                         .householdOverViewAddActionText,

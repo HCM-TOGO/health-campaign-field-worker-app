@@ -11,6 +11,7 @@ import 'package:digit_ui_components/widgets/atoms/digit_search_bar.dart';
 import 'package:digit_ui_components/widgets/atoms/pop_up_card.dart';
 import 'package:digit_ui_components/widgets/atoms/switch.dart';
 import 'package:digit_ui_components/widgets/molecules/digit_card.dart';
+import 'package:digit_ui_components/widgets/molecules/show_pop_up.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_keyboard_visibility/flutter_keyboard_visibility.dart';
@@ -21,6 +22,7 @@ import 'package:registration_delivery/blocs/search_households/search_households.
     as registration_delivery;
 
 import 'package:registration_delivery/utils/i18_key_constants.dart' as i18;
+import '../../utils/extensions/extensions.dart';
 import '../../utils/i18_key_constants.dart' as i18_local;
 import 'package:registration_delivery/models/entities/status.dart';
 import 'package:registration_delivery/router/registration_delivery_router.gm.dart';
@@ -33,6 +35,7 @@ import 'package:registration_delivery/widgets/status_filter/status_filter.dart';
 
 import '../../blocs/registration_delivery/custom_search_household.dart';
 import '../../router/app_router.dart';
+import '../../../utils/i18_key_constants.dart' as i18_local;
 
 @RoutePage()
 class CustomSearchBeneficiaryPage extends LocalizedStatefulWidget {
@@ -476,21 +479,64 @@ class _CustomSearchBeneficiaryPageState
                       size: DigitButtonSize.large,
                       isDisabled: false,
                       onPressed: () {
-                        FocusManager.instance.primaryFocus?.unfocus();
-                        context.read<DigitScannerBloc>().add(
-                              const DigitScannerEvent.handleScanner(),
-                            );
-                        context.router
-                            .push(CustomBeneficiaryRegistrationWrapperRoute(
-                          initialState: BeneficiaryRegistrationCreateState(
-                            searchQuery: searchHouseholdsState.searchQuery,
-                          ),
-                        ));
-                        searchController.clear();
-                        selectedFilters = [];
-                        customSearchHouseholdsBloc.add(
-                          const SearchHouseholdsClearEvent(),
-                        );
+                        int spaq1 = context.spaq1;
+                        int spaq2 = context.spaq2;
+                        int blueVas = context.blueVas;
+                        int redVas = context.redVas;
+
+                        if ((spaq1 > 0 ||
+                            spaq2 > 0 ||
+                            blueVas > 0 ||
+                            redVas > 0)) {
+                          FocusManager.instance.primaryFocus?.unfocus();
+                          context.read<DigitScannerBloc>().add(
+                                const DigitScannerEvent.handleScanner(),
+                              );
+                          context.router
+                              .push(CustomBeneficiaryRegistrationWrapperRoute(
+                            initialState: BeneficiaryRegistrationCreateState(
+                              searchQuery: searchHouseholdsState.searchQuery,
+                            ),
+                          ));
+                          searchController.clear();
+                          selectedFilters = [];
+                          customSearchHouseholdsBloc.add(
+                            const SearchHouseholdsClearEvent(),
+                          );
+                        } else {
+                          showCustomPopup(
+                            context: context,
+                            builder: (popupContext) => Popup(
+                              title: localizations.translate(i18_local
+                                  .beneficiaryDetails.insufficientStockHeading),
+                              onOutsideTap: () {
+                                Navigator.of(popupContext).pop(false);
+                              },
+                              description: localizations.translate(
+                                i18_local.beneficiaryDetails
+                                    .insufficientStockMessage,
+                              ),
+                              type: PopUpType.simple,
+                              actions: [
+                                DigitButton(
+                                  label: localizations.translate(
+                                    i18_local.beneficiaryDetails.goToHome,
+                                  ),
+                                  onPressed: () {
+                                    Navigator.of(
+                                      popupContext,
+                                      rootNavigator: true,
+                                    ).pop();
+//
+                                    
+                                  },
+                                  type: DigitButtonType.primary,
+                                  size: DigitButtonSize.large,
+                                ),
+                              ],
+                            ),
+                          ) ;
+                        }
                       },
                     );
                   },
