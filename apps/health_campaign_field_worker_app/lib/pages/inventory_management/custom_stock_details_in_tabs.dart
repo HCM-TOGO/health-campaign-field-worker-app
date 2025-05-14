@@ -1,6 +1,7 @@
 import 'dart:async';
 
 import 'package:auto_route/auto_route.dart';
+import 'package:digit_components/widgets/atoms/digit_toaster.dart';
 import 'package:digit_data_model/data_model.dart';
 import 'package:digit_data_model/models/entities/product_variant.dart';
 import 'package:digit_scanner/blocs/scanner.dart';
@@ -23,7 +24,9 @@ import 'package:inventory_management/utils/utils.dart';
 import 'package:inventory_management/widgets/localized.dart';
 import 'package:reactive_forms/reactive_forms.dart';
 import 'package:inventory_management/utils/i18_key_constants.dart' as i18;
+import '../../blocs/auth/auth.dart';
 import '../../blocs/inventory_management/stock_bloc.dart';
+import '../../data/repositories/local/inventory_management/custom_stock.dart';
 import '../../router/app_router.dart';
 import '../../utils/i18_key_constants.dart' as i18_local;
 import '../../utils/constants.dart';
@@ -545,11 +548,11 @@ class _DynamicTabsPageState extends LocalizedState<DynamicTabsPage>
                     if (form.valid) {
                       await _saveCurrentTabData(productName);
 
-                      if (_tabController.index < products.length - 1) {
-                        _tabController.animateTo(_tabController.index + 1);
-                      } else {
-                        await _handleFinalSubmission(context);
-                      }
+                      // if (_tabController.index < products.length - 1) {
+                      //   _tabController.animateTo(_tabController.index + 1);
+                      // } else {
+                      //   await _handleFinalSubmission(context);
+                      // }
                     } else {
                       form.markAllAsTouched();
                     }
@@ -595,6 +598,203 @@ class _DynamicTabsPageState extends LocalizedState<DynamicTabsPage>
         ],
       ),
     );
+    final recordStock = context.read<RecordStockBloc>().state;
+    context.read<RecordStockBloc>().add(
+          RecordStockSaveStockDetailsEvent(
+            stockModel: currentStock,
+          ),
+        );
+
+    final isDistributor = context.isDistributor;
+
+    final ss =
+        int.parse(form.control(_transactionQuantityKey).value?.toString() ?? "0");
+
+    if ((ss > context.spaq1 ||
+            ss > context.spaq2 ||
+            ss > context.blueVas ||
+            ss > context.redVas) &&
+        context.isDistributor &&
+        recordStock.entryType == StockRecordEntryType.dispatch) {
+      showCustomPopup(
+        context: context,
+        builder: (popupContext) => Popup(
+          title:
+              localizations.translate(i18_local.beneficiaryDetails.errorHeader),
+          onOutsideTap: () {
+            Navigator.of(popupContext).pop(false);
+          },
+          description: localizations.translate(
+            i18_local.beneficiaryDetails.validationForExcessStock,
+          ),
+          type: PopUpType.simple,
+          actions: [
+            DigitButton(
+              label: localizations.translate(
+                i18_local.common.coreCommonCancel,
+              ),
+              onPressed: () {
+                Navigator.of(
+                  popupContext,
+                  rootNavigator: true,
+                ).pop();
+//
+              },
+              type: DigitButtonType.primary,
+              size: DigitButtonSize.large,
+            ),
+          ],
+        ),
+      );
+
+      return;
+    }
+    bool submit = false;
+    if (_tabController.index == _tabController.length - 1) {
+      submit = await showCustomPopup(
+        context: context,
+        builder: (popupContext) => Popup(
+          title: localizations.translate(i18.stockDetails.dialogTitle),
+          onOutsideTap: () {
+            Navigator.of(popupContext).pop(false);
+          },
+          description: localizations.translate(
+            i18.stockDetails.dialogContent,
+          ),
+          type: PopUpType.simple,
+          actions: [
+            DigitButton(
+              label: localizations.translate(
+                i18.common.coreCommonSubmit,
+              ),
+              onPressed: () {
+                Navigator.of(
+                  popupContext,
+                  rootNavigator: true,
+                ).pop(true);
+//               Navigator.of(context, rootNavigator: true).pop(true);
+                Navigator.of(context).push(
+                  MaterialPageRoute(
+                    builder: (context) => CustomAcknowledgementPage(
+                      mrnNumber: _sharedMRN,
+                      stockRecords: _tabStocks.values.toList(),
+                    ),
+                  ),
+                );
+                // todo : correct the routing here to show , page where we can see transactions
+              },
+              type: DigitButtonType.primary,
+              size: DigitButtonSize.large,
+            ),
+            DigitButton(
+              label: localizations.translate(
+                i18.common.coreCommonCancel,
+              ),
+              onPressed: () {
+                Navigator.of(
+                  popupContext,
+                  rootNavigator: true,
+                ).pop(false);
+              },
+              type: DigitButtonType.secondary,
+              size: DigitButtonSize.large,
+            ),
+          ],
+        ),
+      ) as bool;
+    }
+
+    if (submit || _tabController.index < _tabController.length - 1) {
+      if (isDistributor) {
+        final totalQty = recordStock.entryType == StockRecordEntryType.dispatch
+            ? ss * -1
+            : ss;
+
+        int spaq1Count = context.spaq1;
+        int spaq2Count = context.spaq2;
+
+        int blueVasCount = context.blueVas;
+        int redVasCount = context.redVas;
+
+        // Custom logic based on productName
+        if (productName == Constants.spaq1) {
+          spaq1Count = totalQty;
+          spaq2Count = 0;
+          redVasCount = 0;
+          blueVasCount = 0;
+        } else if (productName == Constants.spaq2) {
+          spaq2Count = totalQty;
+          spaq1Count = 0;
+          redVasCount = 0;
+          blueVasCount = 0;
+        } else if (productName == Constants.blueVAS) {
+          blueVasCount = totalQty;
+          spaq1Count = 0;
+          spaq2Count = 0;
+          redVasCount = 0;
+        } else {
+          blueVasCount = 0;
+          spaq1Count = 0;
+          spaq2Count = 0;
+          redVasCount = totalQty;
+        }
+        context.read<AuthBloc>().add(
+              AuthAddSpaqCountsEvent(
+                spaq1Count: spaq1Count,
+                spaq2Count: spaq2Count,
+                blueVasCount: blueVasCount,
+                redVasCount: redVasCount,
+              ),
+            );
+        _tabController.animateTo(_tabController.index + 1);
+
+        //  context.read<RecordStockBloc>().add(
+        //     const RecordStockCreateStockEntryEvent(),
+        //   );
+      } else {
+        final totalQty = ss;
+
+        int spaq1Count = context.spaq1;
+        int spaq2Count = context.spaq2;
+
+        int blueVasCount = context.blueVas;
+        int redVasCount = context.redVas;
+
+        // Custom logic based on productName
+        if (productName == Constants.spaq1) {
+          spaq1Count = totalQty;
+          spaq2Count = 0;
+          redVasCount = 0;
+          blueVasCount = 0;
+        } else if (productName == Constants.spaq2) {
+          spaq2Count = totalQty;
+          spaq1Count = 0;
+          redVasCount = 0;
+          blueVasCount = 0;
+        } else if (productName == Constants.blueVAS) {
+          blueVasCount = totalQty;
+          spaq1Count = 0;
+          spaq2Count = 0;
+          redVasCount = 0;
+        } else {
+          blueVasCount = 0;
+          spaq1Count = 0;
+          spaq2Count = 0;
+          redVasCount = totalQty;
+        }
+        context.read<AuthBloc>().add(
+              AuthAddSpaqCountsEvent(
+                spaq1Count: spaq1Count,
+                spaq2Count: spaq2Count,
+                blueVasCount: blueVasCount,
+                redVasCount: redVasCount,
+              ),
+            );
+        _tabController.animateTo(_tabController.index + 1);
+      }
+    } else {
+      return;
+    }
   }
 
   Future<void> _handleFinalSubmission(BuildContext context) async {

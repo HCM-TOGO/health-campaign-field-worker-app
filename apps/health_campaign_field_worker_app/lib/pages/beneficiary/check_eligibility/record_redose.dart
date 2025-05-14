@@ -355,6 +355,8 @@ class _RecordRedosePageState extends LocalizedState<RecordRedosePage> {
                                                         if (context.mounted) {
                                                           int spaq1 = 0;
                                                           int spaq2 = 0;
+                                                          int blueVas = 0;
+                                                          int redVas = 0;
 
                                                           var productVariantId =
                                                               updatedTask
@@ -385,12 +387,48 @@ class _RecordRedosePageState extends LocalizedState<RecordRedosePage> {
                                                                   .split(
                                                                       " ")[0];
 
-                                                          spaq1 = quantity !=
-                                                                  'null'
-                                                              ? int.parse(quantity
-                                                                      .toString()) *
-                                                                  -1
-                                                              : 0;
+                                                          if (productVariant!
+                                                                  ?.sku! ==
+                                                              'SPAQ 1') {
+                                                            spaq1 = quantity !=
+                                                                    'null'
+                                                                ? int.parse(quantity
+                                                                        .toString()) *
+                                                                    -1
+                                                                : 0;
+                                                          } else if (productVariant
+                                                                  ?.sku! ==
+                                                              'SPAQ 2') {
+                                                            spaq2 = quantity !=
+                                                                    'null'
+                                                                ? int.parse(quantity
+                                                                        .toString()) *
+                                                                    -1
+                                                                : 0;
+                                                          } else if (productVariant
+                                                                  ?.sku! ==
+                                                              'Blue VAS') {
+                                                            blueVas = quantity !=
+                                                                    'null'
+                                                                ? int.parse(quantity
+                                                                        .toString()) *
+                                                                    -1
+                                                                : 0;
+                                                          } else {
+                                                            redVas = quantity !=
+                                                                    'null'
+                                                                ? int.parse(quantity
+                                                                        .toString()) *
+                                                                    -1
+                                                                : 0;
+                                                          }
+
+                                                          // spaq1 = quantity !=
+                                                          //         'null'
+                                                          //     ? int.parse(quantity
+                                                          //             .toString()) *
+                                                          //         -1
+                                                          //     : 0;
 
                                                           context
                                                               .read<AuthBloc>()
@@ -400,6 +438,11 @@ class _RecordRedosePageState extends LocalizedState<RecordRedosePage> {
                                                                       spaq1,
                                                                   spaq2Count:
                                                                       spaq2,
+                                                                  // TODO: need to work here [pitabash]
+                                                                  blueVasCount:
+                                                                      blueVas,
+                                                                  redVasCount:
+                                                                      redVas,
                                                                 ),
                                                               );
                                                           final reloadState =
