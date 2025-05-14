@@ -52,19 +52,19 @@ class CustomMinNumberPageState extends LocalizedState<CustomMinNumberPage> {
     String? transactionReason;
 
     if (widget.type == StockRecordEntryType.returned) {
-      transactionType = 'RECEIPT';
+      transactionType = 'RECEIVED';
       transactionReason = 'RETURNED';
     } else if (widget.type == StockRecordEntryType.receipt) {
-      transactionType = 'RECEIPT';
-      transactionReason = 'RECEIPT';
+      transactionType = 'RECEIVED';
     } else if (widget.type == StockRecordEntryType.dispatch) {
-      transactionType = 'DISPATCH';
+      transactionType = 'DISPATCHED';
     }
 
     final filteredResult = result.where((stock) {
       if (transactionType == null) return false;
 
-      if (widget.type == StockRecordEntryType.dispatch) {
+      if ((widget.type == StockRecordEntryType.dispatch) ||
+          (widget.type == StockRecordEntryType.receipt)) {
         return stock.transactionType == transactionType;
       } else {
         return stock.transactionType == transactionType &&
