@@ -291,11 +291,20 @@ class CustomWarehouseDetailsPageState
                                                             : "WAREHOUSE",
                                                       ),
                                                     );
-                                                    if (InventorySingleton()
-                                                            .isWareHouseMgr &&
-                                                        !isLGAUser() &&
-                                                        !isHFUser(context) &&
-                                                        !context.isCDD) {
+                                                    if ((InventorySingleton()
+                                                                .isWareHouseMgr &&
+                                                            !isLGAUser() &&
+                                                            !isHFUser(
+                                                                context) &&
+                                                            !context.isCDD) ||
+                                                        (recordStockBloc.state
+                                                                .entryType ==
+                                                            StockRecordEntryType
+                                                                .dispatch) ||
+                                                        (recordStockBloc.state
+                                                                .entryType ==
+                                                            StockRecordEntryType
+                                                                .returned)) {
                                                       context.router.push(
                                                         CustomStockDetailsRoute(),
                                                       );
