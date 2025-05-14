@@ -9,11 +9,9 @@ import 'package:health_campaign_field_worker_app/data/repositories/local/invento
 import 'package:health_campaign_field_worker_app/utils/utils.dart';
 import 'package:health_campaign_field_worker_app/widgets/action_card/min_number_card.dart';
 import 'package:inventory_management/models/entities/stock.dart';
-
 import 'package:inventory_management/utils/i18_key_constants.dart' as i18;
 import 'package:inventory_management/widgets/localized.dart';
 import 'package:inventory_management/widgets/back_navigation_help_header.dart';
-
 import '../../router/app_router.dart';
 import 'package:logger/logger.dart';
 
@@ -29,13 +27,13 @@ class CustomMinNumberPage extends LocalizedStatefulWidget {
 }
 
 class CustomMinNumberPageState extends LocalizedState<CustomMinNumberPage> {
+  List<StockModel> stockList = [];
+
   @override
   void initState() {
     super.initState();
     loadLocalStockData();
   }
-
-  List<StockModel> stockList = [];
 
   Future<void> loadLocalStockData() async {
     final repository =
@@ -56,141 +54,142 @@ class CustomMinNumberPageState extends LocalizedState<CustomMinNumberPage> {
     final theme = Theme.of(context);
     final textTheme = theme.digitTextTheme(context);
 
+    // Group stockList by materialNoteNumber
+    final Map<String, List<StockModel>> groupedStock = {};
+    for (final stock in stockList) {
+      final mrn = stock.additionalFields?.fields
+          .firstWhere((f) => f.key == 'materialNoteNumber',
+              orElse: () => const AdditionalField('', ''))
+          .value;
+
+      if (mrn == null || mrn.isEmpty) continue;
+
+      groupedStock.putIfAbsent(mrn, () => []);
+      groupedStock[mrn]!.add(stock);
+    }
+
+    final groupedEntries = groupedStock.entries.toList();
+
     return Scaffold(
       body: GestureDetector(
-          onTap: () {
-            FocusScope.of(context).unfocus();
-          },
-          child: ScrollableContent(
-            header: const Column(children: [
-              BackNavigationHelpHeaderWidget(
-                showHelp: true,
-              ),
-            ]),
-            footer: SizedBox(
-              child: DigitCard(
-                  margin: const EdgeInsets.fromLTRB(0, spacer2, 0, 0),
-                  children: [
-                    DigitButton(
-                        type: DigitButtonType.primary,
-                        mainAxisSize: MainAxisSize.max,
-                        size: DigitButtonSize.large,
-                        label: localizations.translate(
-                          i18.householdDetails.actionLabel,
-                        ),
-                        onPressed: () {}),
-                  ]),
-            ),
+        onTap: () => FocusScope.of(context).unfocus(),
+        child: ScrollableContent(
+          header: const Column(
             children: [
-              Container(
-                decoration: BoxDecoration(
-                  color: Colors.white,
-                  borderRadius: BorderRadius.circular(spacer2),
+              BackNavigationHelpHeaderWidget(showHelp: true),
+            ],
+          ),
+          footer: SizedBox(
+            child: DigitCard(
+              margin: const EdgeInsets.fromLTRB(0, spacer2, 0, 0),
+              children: [
+                DigitButton(
+                  type: DigitButtonType.primary,
+                  mainAxisSize: MainAxisSize.max,
+                  size: DigitButtonSize.large,
+                  label: localizations.translate(
+                    i18.householdDetails.actionLabel,
+                  ),
+                  onPressed: () {},
                 ),
-                margin: const EdgeInsets.all(spacer2),
-                child: Padding(
-                  padding: const EdgeInsets.all(8.0),
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      const SizedBox(height: 16.0),
-                      Text(
-                        "Select the MRN number",
-                        style: textTheme.headingL,
-                      ),
-                      const SizedBox(height: 16.0),
-                      SizedBox(
-                        height: MediaQuery.of(context).size.height * 0.7,
-                        child: ListView.builder(
-                          itemCount: stockList.length,
-                          itemBuilder: (context, index) {
-                            final item = stockList[index];
+              ],
+            ),
+          ),
+          children: [
+            Container(
+              decoration: BoxDecoration(
+                color: Colors.white,
+                borderRadius: BorderRadius.circular(spacer2),
+              ),
+              margin: const EdgeInsets.all(spacer2),
+              child: Padding(
+                padding: const EdgeInsets.all(8.0),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    const SizedBox(height: 16.0),
+                    Text("Select the MRN number", style: textTheme.headingL),
+                    const SizedBox(height: 16.0),
+                    SizedBox(
+                      height: MediaQuery.of(context).size.height * 0.7,
+                      child: ListView.builder(
+                        itemCount: groupedEntries.length,
+                        itemBuilder: (context, index) {
+                          final mrn = groupedEntries[index].key;
+                          final stocks = groupedEntries[index].value;
 
-                            return Padding(
-                              padding: const EdgeInsets.all(8.0),
-                              child: GestureDetector(
-                                onTap: () {
-                                  context.router.push(
-                                    ViewStockRecordsRoute(
-                                      mrnNumber: item.additionalFields?.fields
-                                              .firstWhere(
-                                                  (field) =>
-                                                      field.key ==
-                                                      'materialNoteNumber',
-                                                  orElse: () =>
-                                                      const AdditionalField(
-                                                          'materialNoteNumber',
-                                                          ''))
-                                              .value
-                                              ?.toString() ??
-                                          'N/A',
-                                      stockRecords: stockList,
-                                    ),
-                                  );
-                                },
-                                child: MinNumberCard(
-                                  data: {
-                                    'minNumber': item.additionalFields?.fields
+                          return Padding(
+                            padding: const EdgeInsets.all(8.0),
+                            child: GestureDetector(
+                              onTap: () {
+                                context.router.push(
+                                  ViewStockRecordsRoute(
+                                    mrnNumber: mrn,
+                                    stockRecords: stocks,
+                                  ),
+                                );
+                              },
+                              child: MinNumberCard(
+                                data: {
+                                  'minNumber': mrn,
+                                  'cddCode': stocks.first.boundaryCode,
+                                  'date': formatDateFromMillis(
+                                      stocks.first.auditDetails?.createdTime ??
+                                          0),
+                                  'items': stocks.map((s) {
+                                    final name = s.additionalFields?.fields
                                             .firstWhere(
-                                                (field) =>
-                                                    field.key ==
-                                                    'materialNoteNumber',
+                                                (f) => f.key == 'productName',
                                                 orElse: () =>
                                                     const AdditionalField(
-                                                        'materialNoteNumber',
-                                                        ''))
-                                            .value
-                                            ?.toString() ??
-                                        'N/A',
-                                    'cddCode': item.boundaryCode,
-                                    'date': formatDateFromMillis(
-                                        item.auditDetails?.createdTime ?? 0),
-                                    'items': item,
-                                    'waybillNumber': item.wayBillNumber,
-                                  },
-                                  minNumber: item.additionalFields?.fields
-                                          .firstWhere(
-                                              (field) =>
-                                                  field.key ==
-                                                  'materialNoteNumber',
-                                              orElse: () =>
-                                                  const AdditionalField(
-                                                      'materialNoteNumber', ''))
-                                          .value
-                                          ?.toString() ??
-                                      'N/A',
-                                  cddCode: item.boundaryCode ?? "",
-                                  date: formatDateFromMillis(
-                                      item.auditDetails?.createdTime ?? 0),
-                                  items: [
-                                    {
-                                      'name': item.additionalFields?.fields
+                                                        '', ''))
+                                            .value ??
+                                        'N/A';
+                                    return {
+                                      'name': name.toString(),
+                                      'quantity': (s.quantity ?? 0).toString(),
+                                    };
+                                  }).toList(),
+                                  'waybillNumber':
+                                      stocks.first.wayBillNumber ?? '',
+                                },
+                                minNumber: mrn,
+                                cddCode: stocks.first.boundaryCode ?? "",
+                                date: formatDateFromMillis(
+                                    stocks.first.auditDetails?.createdTime ??
+                                        0),
+                                items: stocks.map((s) {
+                                  final name = (s.additionalFields?.fields
                                               .firstWhere(
-                                                  (field) =>
-                                                      field.key ==
-                                                      'productName',
+                                                  (f) => f.key == 'productName',
                                                   orElse: () =>
                                                       const AdditionalField(
-                                                          'productName', ''))
-                                              .value
-                                              ?.toString() ??
-                                          'N/A',
-                                      'quantity': '${item.quantity}'
-                                    },
-                                  ],
-                                  waybillNumber: item.wayBillNumber ?? "",
-                                ),
+                                                          '', ''))
+                                              .value ??
+                                          'N/A')
+                                      .toString();
+
+                                  final quantity = (s.quantity ?? 0).toString();
+
+                                  return {
+                                    'name': name,
+                                    'quantity': quantity,
+                                  };
+                                }).toList(),
+                                waybillNumber: stocks.first.wayBillNumber ?? "",
                               ),
-                            );
-                          },
-                        ),
+                            ),
+                          );
+                        },
                       ),
-                    ],
-                  ),
+                    ),
+                  ],
                 ),
               ),
-            ],
-          )),
+            ),
+          ],
+        ),
+      ),
     );
   }
 }
