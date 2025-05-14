@@ -559,11 +559,11 @@ class _DynamicTabsPageState extends LocalizedState<DynamicTabsPage>
                     if (form.valid) {
                       await _saveCurrentTabData(productName);
 
-                      // if (_tabController.index < products.length - 1) {
-                      //   _tabController.animateTo(_tabController.index + 1);
-                      // } else {
-                      //   await _handleFinalSubmission(context);
-                      // }
+                      if (_tabController.index < products.length - 1) {
+                        _tabController.animateTo(_tabController.index + 1);
+                      } else {
+                        await _handleFinalSubmission(context);
+                      }
                     } else {
                       form.markAllAsTouched();
                     }
@@ -621,101 +621,101 @@ class _DynamicTabsPageState extends LocalizedState<DynamicTabsPage>
     final ss = int.parse(
         form.control(_transactionQuantityKey).value?.toString() ?? "0");
 
-    if ((ss > context.spaq1 ||
-            ss > context.spaq2 ||
-            ss > context.blueVas ||
-            ss > context.redVas) &&
-        context.isDistributor &&
-        recordStock.entryType == StockRecordEntryType.dispatch) {
-      showCustomPopup(
-        context: context,
-        builder: (popupContext) => Popup(
-          title:
-              localizations.translate(i18_local.beneficiaryDetails.errorHeader),
-          onOutsideTap: () {
-            Navigator.of(popupContext).pop(false);
-          },
-          description: localizations.translate(
-            i18_local.beneficiaryDetails.validationForExcessStock,
-          ),
-          type: PopUpType.simple,
-          actions: [
-            DigitButton(
-              label: localizations.translate(
-                i18_local.common.coreCommonCancel,
-              ),
-              onPressed: () {
-                Navigator.of(
-                  popupContext,
-                  rootNavigator: true,
-                ).pop();
-//
-              },
-              type: DigitButtonType.primary,
-              size: DigitButtonSize.large,
-            ),
-          ],
-        ),
-      );
+//     if ((ss > context.spaq1 ||
+//             ss > context.spaq2 ||
+//             ss > context.blueVas ||
+//             ss > context.redVas) &&
+//         context.isDistributor &&
+//         recordStock.entryType == StockRecordEntryType.dispatch) {
+// //       showCustomPopup(
+// //         context: context,
+// //         builder: (popupContext) => Popup(
+// //           title:
+// //               localizations.translate(i18_local.beneficiaryDetails.errorHeader),
+// //           onOutsideTap: () {
+// //             Navigator.of(popupContext).pop(false);
+// //           },
+// //           description: localizations.translate(
+// //             i18_local.beneficiaryDetails.validationForExcessStock,
+// //           ),
+// //           type: PopUpType.simple,
+// //           actions: [
+// //             DigitButton(
+// //               label: localizations.translate(
+// //                 i18_local.common.coreCommonCancel,
+// //               ),
+// //               onPressed: () {
+// //                 Navigator.of(
+// //                   popupContext,
+// //                   rootNavigator: true,
+// //                 ).pop();
+// // //
+// //               },
+// //               type: DigitButtonType.primary,
+// //               size: DigitButtonSize.large,
+// //             ),
+// //           ],
+// //         ),
+// //       );
 
-      return;
-    }
-    bool submit = false;
-    if (_tabController.index == _tabController.length - 1) {
-      submit = await showCustomPopup(
-        context: context,
-        builder: (popupContext) => Popup(
-          title: localizations.translate(i18.stockDetails.dialogTitle),
-          onOutsideTap: () {
-            Navigator.of(popupContext).pop(false);
-          },
-          description: localizations.translate(
-            i18.stockDetails.dialogContent,
-          ),
-          type: PopUpType.simple,
-          actions: [
-            DigitButton(
-              label: localizations.translate(
-                i18.common.coreCommonSubmit,
-              ),
-              onPressed: () {
-                Navigator.of(
-                  popupContext,
-                  rootNavigator: true,
-                ).pop(true);
-//               Navigator.of(context, rootNavigator: true).pop(true);
-                Navigator.of(context).push(
-                  MaterialPageRoute(
-                    builder: (context) => CustomAcknowledgementPage(
-                      mrnNumber: _sharedMRN,
-                      stockRecords: _tabStocks.values.toList(),
-                    ),
-                  ),
-                );
-                // todo : correct the routing here to show , page where we can see transactions
-              },
-              type: DigitButtonType.primary,
-              size: DigitButtonSize.large,
-            ),
-            DigitButton(
-              label: localizations.translate(
-                i18.common.coreCommonCancel,
-              ),
-              onPressed: () {
-                Navigator.of(
-                  popupContext,
-                  rootNavigator: true,
-                ).pop(false);
-              },
-              type: DigitButtonType.secondary,
-              size: DigitButtonSize.large,
-            ),
-          ],
-        ),
-      ) as bool;
-    }
+//       return;
+//     }
+    // bool submit = false;
+    // if (_tabController.index == _tabController.length - 1) {
+    //   submit = await showCustomPopup(
+    //     context: context,
+    //     builder: (popupContext) => Popup(
+    //       title: localizations.translate(i18.stockDetails.dialogTitle),
+    //       onOutsideTap: () {
+    //         Navigator.of(popupContext).pop(false);
+    //       },
+    //       description: localizations.translate(
+    //         i18.stockDetails.dialogContent,
+    //       ),
+    //       type: PopUpType.simple,
+    //       actions: [
+    //         DigitButton(
+    //           label: localizations.translate(
+    //             i18.common.coreCommonSubmit,
+    //           ),
+    //           onPressed: () {
+    //             Navigator.of(
+    //               popupContext,
+    //               rootNavigator: true,
+    //             ).pop(true);
+    //             Navigator.of(context, rootNavigator: true).pop(true);
+    //             Navigator.of(context).push(
+    //               MaterialPageRoute(
+    //                 builder: (context) => CustomAcknowledgementPage(
+    //                   mrnNumber: _sharedMRN,
+    //                   stockRecords: _tabStocks.values.toList(),
+    //                 ),
+    //               ),
+    //             );
+    //             // todo : correct the routing here to show , page where we can see transactions
+    //           },
+    //           type: DigitButtonType.primary,
+    //           size: DigitButtonSize.large,
+    //         ),
+    //         DigitButton(
+    //           label: localizations.translate(
+    //             i18.common.coreCommonCancel,
+    //           ),
+    //           onPressed: () {
+    //             Navigator.of(
+    //               popupContext,
+    //               rootNavigator: true,
+    //             ).pop(false);
+    //           },
+    //           type: DigitButtonType.secondary,
+    //           size: DigitButtonSize.large,
+    //         ),
+    //       ],
+    //     ),
+    //   ) as bool;
+    // }
 
-    if (submit || _tabController.index < _tabController.length - 1) {
+    if (_tabController.index < _tabController.length - 1) {
       if (isDistributor) {
         final totalQty = recordStock.entryType == StockRecordEntryType.dispatch
             ? ss * -1
@@ -757,11 +757,11 @@ class _DynamicTabsPageState extends LocalizedState<DynamicTabsPage>
                 redVasCount: redVasCount,
               ),
             );
-        _tabController.animateTo(_tabController.index + 1);
+        // _tabController.animateTo(_tabController.index + 1);
 
-        //  context.read<RecordStockBloc>().add(
-        //     const RecordStockCreateStockEntryEvent(),
-        //   );
+        context.read<RecordStockBloc>().add(
+              const RecordStockCreateStockEntryEvent(),
+            );
       } else {
         // TODO: commenting as it is not required to store for warehousemanager
         // final totalQty = ss;
@@ -811,7 +811,6 @@ class _DynamicTabsPageState extends LocalizedState<DynamicTabsPage>
 
   Future<void> _handleFinalSubmission(BuildContext context) async {
     final lastProduct = products.last.sku ?? '';
-    await _saveCurrentTabData(lastProduct);
 
     final submit = await showCustomPopup(
       context: context,
@@ -870,15 +869,15 @@ class _DynamicTabsPageState extends LocalizedState<DynamicTabsPage>
               const RecordStockCreateStockEntryEvent(),
             );
       }
-      // Navigator.of(context).pop();
-      // Navigator.of(context).push(
-      //   MaterialPageRoute(
-      //     builder: (context) => CustomAcknowledgementPage(
-      //       mrnNumber: _sharedMRN,
-      //       stockRecords: _tabStocks.values.toList(),
+
+      //   Navigator.of(context).push(
+      //     MaterialPageRoute(
+      //       builder: (context) => CustomAcknowledgementPage(
+      //         mrnNumber: _sharedMRN,
+      //         stockRecords: _tabStocks.values.toList(),
+      //       ),
       //     ),
-      //   ),
-      // );
+      //   );
     }
   }
 

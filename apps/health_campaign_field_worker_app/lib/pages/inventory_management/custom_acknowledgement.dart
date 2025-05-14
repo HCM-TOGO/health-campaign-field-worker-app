@@ -42,11 +42,13 @@ class CustomAcknowledgementPageState
           child: PanelCard(
             type: PanelType.success,
             description: localizations.translate(
-              i18.acknowledgementSuccess.acknowledgementDescriptionText,
+              i18_local.acknowledgementSuccess
+                  .transactionAcknowledgementDescriptionText,
               // variables: {'mrnNumber': widget.mrnNumber},
             ),
             title: localizations.translate(
-              i18.acknowledgementSuccess.acknowledgementLabelText,
+              i18_local.acknowledgementSuccess
+                  .transactionAcknowledgementDescriptionText,
             ),
             actions: [
               DigitButton(

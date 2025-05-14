@@ -851,6 +851,9 @@ class AcknowledgementSuccess {
   String get createNewTransactions => 'CREATE_NEW_TRANSACTION';
 
   String get viewtransactions => 'VIEW_TRANSACTIONS';
+
+  String get transactionAcknowledgementDescriptionText =>
+      'MATERIAL_RECEIPT_CREATED_SUCCESSFULLY';
 }
 
 class ProjectSelection {
