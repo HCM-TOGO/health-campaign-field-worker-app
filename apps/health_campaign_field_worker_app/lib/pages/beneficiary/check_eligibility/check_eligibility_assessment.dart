@@ -262,7 +262,7 @@ class _EligibilityChecklistViewPage
                                                 .checklistDialogDynamicDescription,
                                           )
                                           .replaceFirst('{}', descriptionText))
-                                      : (ifIneligible || ifReferral)
+                                      : (ifReferral || ifIneligible)
                                           ? getHighlightedText(localizations
                                               .translate(
                                                 i18_local.checklist
@@ -1035,7 +1035,7 @@ class _EligibilityChecklistViewPage
     var q3Key = "KBEA3";
     var q5Key = "KBEA4";
     var q6Key = "KBEA5";
-    var q7Key = "KBEA6";
+    var q7Key = "KBEA7";
 
     Map<String, String> keyVsReason = {
       q3Key: "NOT_ADMINISTERED_IN_PREVIOUS_CYCLE",
@@ -1074,10 +1074,10 @@ class _EligibilityChecklistViewPage
       //     (responses.containsKey(q6Key) && responses[q6Key]!.isNotEmpty)) {
       //   isIneligible = responses[q6Key] == yes ? true : false;
       // }
-      //       if (!isIneligible &&
-      //     (responses.containsKey(q7Key) && responses[q7Key]!.isNotEmpty)) {
-      //   isIneligible = responses[q7Key] == yes ? true : false;
-      // }
+      if (!isIneligible &&
+          (responses.containsKey(q7Key) && responses[q7Key]!.isNotEmpty)) {
+        isIneligible = responses[q7Key] == yes ? true : false;
+      }
       // passing all the reasons which have response as true
       if (isIneligible) {
         for (var entry in responses.entries) {
