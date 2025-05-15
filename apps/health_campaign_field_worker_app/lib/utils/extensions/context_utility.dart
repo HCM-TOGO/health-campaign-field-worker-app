@@ -118,6 +118,7 @@ extension ContextUtilityExtensions on BuildContext {
         .setBoundaryName(boundaryName: selectedBoundary.code!);
     InventorySingleton().setBoundaryName(boundaryName: selectedBoundary.code!);
     ComplaintsSingleton().setBoundary(boundary: selectedBoundary);
+    SurveyFormSingleton().setBoundary(boundary: selectedBoundary);
     return selectedBoundary;
   }
 
@@ -199,9 +200,8 @@ extension ContextUtilityExtensions on BuildContext {
         individualId,
         spaq1,
         spaq2,
-         blueVas,
+        blueVas,
         redVas,
-        
       ) {
         return userModel.roles;
       },
@@ -225,7 +225,7 @@ extension ContextUtilityExtensions on BuildContext {
         individualId,
         spaq1,
         spaq2,
-         blueVas,
+        blueVas,
         redVas,
       ) {
         return individualId;
@@ -267,7 +267,7 @@ extension ContextUtilityExtensions on BuildContext {
         individualId,
         spaq1,
         spaq2,
-         blueVas,
+        blueVas,
         redVas,
       ) {
         return userModel;
@@ -314,7 +314,7 @@ extension ContextUtilityExtensions on BuildContext {
         individualId,
         spaq1,
         spaq2,
-         blueVas,
+        blueVas,
         redVas,
       ) {
         return spaq1;
@@ -355,7 +355,7 @@ extension ContextUtilityExtensions on BuildContext {
 
 //vas
 
-int get blueVas {
+  int get blueVas {
     final authBloc = _get<AuthBloc>();
     final blueVas = authBloc.state.whenOrNull(
       authenticated: (
@@ -366,7 +366,7 @@ int get blueVas {
         individualId,
         spaq1,
         spaq2,
-         blueVas,
+        blueVas,
         redVas,
       ) {
         return blueVas;
@@ -404,8 +404,6 @@ int get blueVas {
 
     return redVas;
   }
-
-
 
   bool get isCommunityDistributor {
     try {
