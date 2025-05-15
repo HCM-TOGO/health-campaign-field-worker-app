@@ -207,7 +207,11 @@ class _CustomReferralReasonChecklistPageState
                                                       tenantId: value
                                                           .selectedServiceDefinition!
                                                           .tenantId,
-                                                      clientId: widget.referralClientRefId!,
+                                                      clientId: widget
+                                                          .referralClientRefId!,
+                                                      relatedClientReferenceId:
+                                                          widget
+                                                              .referralClientRefId,
                                                       serviceDefId: value
                                                           .selectedServiceDefinition
                                                           ?.id,
