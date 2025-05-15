@@ -84,6 +84,8 @@ class _ViewStockRecordsPageState extends LocalizedState<ViewStockRecordsPage>
   }
 
   Widget _buildStockRecordTab(StockModel stock) {
+    final senderIdToShowOnTab = stock.senderId;
+
     return SingleChildScrollView(
       padding: const EdgeInsets.all(16),
       child: Column(
@@ -129,7 +131,9 @@ class _ViewStockRecordsPageState extends LocalizedState<ViewStockRecordsPage>
                   Row(
                     children: [
                       const Expanded(child: Text('Received From')),
-                      Expanded(child: Text(stock.facilityId ?? '')),
+                      Expanded(
+                          child: Text(localizations
+                              .translate('FAC_$senderIdToShowOnTab'))),
                     ],
                   ),
                 ],

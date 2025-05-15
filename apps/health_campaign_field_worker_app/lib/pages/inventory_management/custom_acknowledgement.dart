@@ -77,7 +77,8 @@ class CustomAcknowledgementPageState
                   // context
                   //     .read<RecordStockBloc>()
                   //     .add(const RecordStockEvent.reset());
-                  context.router.popUntilRoot();
+                  context.router
+                      .popUntilRouteWithName(CustomManageStocksRoute.name);
                 },
                 type: DigitButtonType.secondary,
                 size: DigitButtonSize.large,
