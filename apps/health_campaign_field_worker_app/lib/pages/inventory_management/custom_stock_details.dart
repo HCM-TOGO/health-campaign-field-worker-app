@@ -1222,7 +1222,7 @@ class CustomStockDetailsPageState
                                     formControlName: _deliveryTeamKey,
                                     builder: (field) {
                                       return InputField(
-                                        type: InputType.text,
+                                        type: InputType.search,
                                         label: localizations.translate(
                                           i18.stockReconciliationDetails
                                               .teamCodeLabel,
