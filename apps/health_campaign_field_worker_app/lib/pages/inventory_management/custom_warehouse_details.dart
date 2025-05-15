@@ -15,6 +15,7 @@ import 'package:inventory_management/router/inventory_router.gm.dart';
 import 'package:reactive_forms/reactive_forms.dart';
 
 import 'package:inventory_management/utils/i18_key_constants.dart' as i18;
+import '../../utils/i18_key_constants.dart' as i18_local;
 import 'package:inventory_management/widgets/localized.dart';
 import 'package:inventory_management/blocs/record_stock.dart';
 import 'package:inventory_management/utils/utils.dart';
@@ -197,7 +198,7 @@ class CustomWarehouseDetailsPageState
                                           type: DigitButtonType.primary,
                                           mainAxisSize: MainAxisSize.max,
                                           size: DigitButtonSize.large,
-                                          isDisabled: !form.valid,
+                                          // isDisabled: !form.valid,
                                           label: localizations.translate(
                                             i18.householdDetails.actionLabel,
                                           ),
@@ -426,8 +427,9 @@ class CustomWarehouseDetailsPageState
                                               return InputField(
                                                 type: InputType.search,
                                                 label: localizations.translate(
-                                                  i18.stockReconciliationDetails
-                                                      .facilityLabel,
+                                                  i18_local
+                                                      .stockReconciliationShowcase
+                                                      .warehouseLabel,
                                                 ),
                                                 controller: controller1,
                                                 isRequired: true,

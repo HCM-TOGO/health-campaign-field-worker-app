@@ -800,9 +800,9 @@ class CustomStockDetailsPageState
                                           });
                                         }
                                       },
-                                isDisabled: !form.valid,
+                                // isDisabled: !form.valid,
                                 label: localizations
-                                    .translate(i18.common.coreCommonSubmit),
+                                    .translate(i18.common.coreCommonNext),
                               );
                             })
                           ],
@@ -1195,10 +1195,17 @@ class CustomStockDetailsPageState
                                                       return InputField(
                                                         type: InputType.search,
                                                         isRequired: true,
-                                                        label: localizations
-                                                            .translate(
-                                                          '${pageTitle}_${i18.stockReconciliationDetails.stockLabel}',
-                                                        ),
+                                                        label: (entryType ==
+                                                                StockRecordEntryType
+                                                                    .returned)
+                                                            ? localizations
+                                                                .translate(i18
+                                                                    .stockDetails
+                                                                    .selectTransactingPartyReturned)
+                                                            : localizations
+                                                                .translate(
+                                                                '${pageTitle}_${i18.stockReconciliationDetails.stockLabel}',
+                                                              ),
                                                         onChange: (value) {
                                                           field.control
                                                               .markAsTouched();
@@ -1471,7 +1478,7 @@ class CustomStockDetailsPageState
                                         builder: (field) {
                                           return LabeledField(
                                             label: localizations.translate(
-                                              i18.stockDetails
+                                              i18_local.stockDetails
                                                   .transportTypeLabel,
                                             ),
                                             child: DigitDropdown(
