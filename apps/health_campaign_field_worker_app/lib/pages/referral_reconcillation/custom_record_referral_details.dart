@@ -798,7 +798,16 @@ class _CustomRecordReferralDetailsPageState
                                             );
                                           }),
                                       ReactiveWrapperField<String>(
+                                        validationMessages: {
+                                            'required': (_) =>
+                                                localizations.translate(
+                                                  i18.common.corecommonRequired,
+                                                ),
+                                          },
                                           formControlName: _beneficiaryIdKey,
+                                          showErrors: (control) =>
+                                              control.invalid &&
+                                              control.touched,
                                           builder: (field) {
                                             return LabeledField(
                                               isRequired: true,
