@@ -32,6 +32,7 @@ import '../pages/beneficiary/check_eligibility/household_acknowledgement_smc.dar
 import '../pages/beneficiary/check_eligibility/inventory_facility_selection_smc.dart';
 import '../pages/beneficiary/check_eligibility/refer_beneficiary_smc.dart';
 import '../pages/beneficiary/check_eligibility/refer_beneficiary_vas.dart';
+import '../pages/inventory_management/view_record_lga.dart';
 import '../pages/registration_delivery/custom_complaints_details.dart';
 import '../pages/boundary_selection.dart';
 import '../pages/home.dart';
@@ -460,6 +461,12 @@ class AppRouter extends _$AppRouter {
             path: 'custom-acknowledgement-stock'),
         AutoRoute(
           page: ViewStockRecordsRoute.page,
+          path: 'custom-stock-record-view',
+        ),
+
+        AutoRoute(
+          page: ViewStockRecordsLGARoute.page,
+          path: 'custom-stock-view-lga',
         ),
 
         AutoRoute(

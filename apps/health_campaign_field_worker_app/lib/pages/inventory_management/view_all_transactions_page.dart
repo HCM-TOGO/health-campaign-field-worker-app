@@ -14,7 +14,6 @@ import '../../router/app_router.dart';
 import '../../utils/utils.dart';
 import '../../widgets/action_card/all_transactions_card.dart';
 import 'view_record_lga.dart';
-import 'view_stock_records.dart';
 
 @RoutePage()
 class ViewAllTransactionsScreen extends StatefulWidget {
@@ -34,7 +33,6 @@ class _ViewAllTransactionsScreenState extends State<ViewAllTransactionsScreen> {
   }
 
   List<StockModel> stockList = [];
-  StockModel? selectedStock;
 
   Future<void> loadLocalStockData() async {
     final repository =
@@ -81,16 +79,8 @@ class _ViewAllTransactionsScreenState extends State<ViewAllTransactionsScreen> {
     return filtered;
   }
 
-  void _handleCardSelection(StockModel stock) {
-    setState(() {
-      selectedStock = stock;
-    });
-  }
-
-  void _handleNextButtonPressed() {
-    if (selectedStock == null) return;
-
-    final mrnNumber = selectedStock!.additionalFields?.fields
+  void _navigateToDetails(StockModel stock) {
+    final mrnNumber = stock.additionalFields?.fields
             .firstWhere(
               (field) => field.key == 'materialNoteNumber',
               orElse: () => AdditionalField('materialNoteNumber', ''),
@@ -100,8 +90,8 @@ class _ViewAllTransactionsScreenState extends State<ViewAllTransactionsScreen> {
         'N/A';
 
     // Filter stocks with the same MRN number
-    final List<StockModel> sameMrnStocks = stockList.where((stock) {
-      final currentMrn = stock.additionalFields?.fields
+    final List<StockModel> sameMrnStocks = stockList.where((s) {
+      final currentMrn = s.additionalFields?.fields
               .firstWhere(
                 (field) => field.key == 'materialNoteNumber',
                 orElse: () => AdditionalField('materialNoteNumber', ''),
@@ -129,128 +119,97 @@ class _ViewAllTransactionsScreenState extends State<ViewAllTransactionsScreen> {
     List<StockModel> filteredStock = groupStockByMrn(stockList);
 
     return Scaffold(
-      body: Column(
-        children: [
-          Expanded(
-            child: GestureDetector(
-              onTap: () => FocusScope.of(context).unfocus(),
-              child: ScrollableContent(
-                header: const Column(
-                  children: [
-                    BackNavigationHelpHeaderWidget(showHelp: true),
-                  ],
-                ),
-                children: [
-                  if (filteredStock.isEmpty)
-                    const Center(child: Text('No transactions available.'))
-                  else
-                    Container(
-                      decoration: BoxDecoration(
-                        color: Colors.white,
-                        borderRadius: BorderRadius.circular(spacer2),
-                      ),
-                      margin: const EdgeInsets.all(spacer2),
-                      child: Padding(
-                        padding: const EdgeInsets.all(8.0),
-                        child: Column(
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          children: [
-                            const SizedBox(height: 16.0),
-                            Text("Select the Material Issue number",
-                                style: textTheme.headingL),
-                            const SizedBox(height: 16.0),
-                            SizedBox(
-                              height: MediaQuery.of(context).size.height * 0.6,
-                              child: BlocBuilder<StockBloc, StockState>(
-                                builder: (context, state) {
-                                  return ListView.builder(
-                                    itemCount: filteredStock.length,
-                                    itemBuilder: (context, index) {
-                                      final stock = filteredStock[index];
-                                      final isSelected = selectedStock == stock;
-
-                                      return GestureDetector(
-                                        onTap: () =>
-                                            _handleCardSelection(stock),
-                                        child: Container(
-                                          margin:
-                                              const EdgeInsets.only(bottom: 8),
-                                          decoration: BoxDecoration(
-                                            border: Border.all(
-                                              color: isSelected
-                                                  ? Colors.orange
-                                                  : Colors.grey,
-                                              width: isSelected ? 2 : 1,
-                                            ),
-                                            borderRadius:
-                                                BorderRadius.circular(8),
-                                          ),
-                                          child: TransactionsCard(
-                                            minNumber:
-                                                stock.additionalFields?.fields
-                                                        .firstWhere(
-                                                          (field) =>
-                                                              field.key ==
-                                                              'materialNoteNumber',
-                                                          orElse: () =>
-                                                              const AdditionalField(
-                                                                  'materialNoteNumber',
-                                                                  ''),
-                                                        )
-                                                        .value
-                                                        ?.toString() ??
-                                                    'N/A',
-                                            cddCode:
-                                                stock.additionalFields?.fields
-                                                        .firstWhere(
-                                                          (field) =>
-                                                              field.key ==
-                                                              'productName',
-                                                          orElse: () =>
-                                                              AdditionalField(
-                                                                  'productName',
-                                                                  'N/A'),
-                                                        )
-                                                        .value
-                                                        ?.toString() ??
-                                                    'N/A',
-                                            date:
-                                                'Date: ${stock.dateOfEntryTime?.toLocal().toString().split(' ')[0] ?? 'N/A'}',
-                                            items: [],
-                                            data: {},
-                                            waybillNumber:
-                                                ' ${stock.wayBillNumber ?? 'N/A'}',
-                                          ),
-                                        ),
-                                      );
-                                    },
-                                  );
-                                },
-                              ),
-                            )
-                          ],
-                        ),
-                      ),
-                    )
-                ],
-              ),
-            ),
-          ),
-          // Fixed footer with Next button
-          DigitCard(
-            margin: const EdgeInsets.fromLTRB(spacer2, 0, spacer2, spacer2),
+      body: GestureDetector(
+        onTap: () => FocusScope.of(context).unfocus(),
+        child: ScrollableContent(
+          header: const Column(
             children: [
-              DigitButton(
-                  type: DigitButtonType.primary,
-                  mainAxisSize: MainAxisSize.max,
-                  size: DigitButtonSize.large,
-                  label: "Next",
-                  onPressed: () {
-                    selectedStock != null ? _handleNextButtonPressed : null;
-                  }),
+              BackNavigationHelpHeaderWidget(showHelp: true),
             ],
           ),
-        ],
+          children: [
+            if (filteredStock.isEmpty)
+              const Center(child: Text('No transactions available.'))
+            else
+              Container(
+                decoration: BoxDecoration(
+                  color: Colors.white,
+                  borderRadius: BorderRadius.circular(spacer2),
+                ),
+                margin: const EdgeInsets.all(spacer2),
+                child: Padding(
+                  padding: const EdgeInsets.all(8.0),
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      const SizedBox(height: 16.0),
+                      Text("Select the Material Issue number",
+                          style: textTheme.headingL),
+                      const SizedBox(height: 16.0),
+                      SizedBox(
+                        height: MediaQuery.of(context).size.height * 0.8,
+                        child: BlocBuilder<StockBloc, StockState>(
+                          builder: (context, state) {
+                            return ListView.builder(
+                              itemCount: filteredStock.length,
+                              itemBuilder: (context, index) {
+                                final stock = filteredStock[index];
+
+                                return GestureDetector(
+                                  onTap: () => _navigateToDetails(stock),
+                                  child: Container(
+                                    margin: const EdgeInsets.only(bottom: 8),
+                                    decoration: BoxDecoration(
+                                      border: Border.all(
+                                        color: Colors.grey,
+                                        width: 1,
+                                      ),
+                                      borderRadius: BorderRadius.circular(8),
+                                    ),
+                                    child: TransactionsCard(
+                                      minNumber: stock.additionalFields?.fields
+                                              .firstWhere(
+                                                (field) =>
+                                                    field.key ==
+                                                    'materialNoteNumber',
+                                                orElse: () =>
+                                                    const AdditionalField(
+                                                        'materialNoteNumber',
+                                                        ''),
+                                              )
+                                              .value
+                                              ?.toString() ??
+                                          'N/A',
+                                      cddCode: stock.additionalFields?.fields
+                                              .firstWhere(
+                                                (field) =>
+                                                    field.key == 'productName',
+                                                orElse: () => AdditionalField(
+                                                    'productName', 'N/A'),
+                                              )
+                                              .value
+                                              ?.toString() ??
+                                          'N/A',
+                                      date:
+                                          'Date: ${stock.dateOfEntryTime?.toLocal().toString().split(' ')[0] ?? 'N/A'}',
+                                      items: [],
+                                      data: {},
+                                      waybillNumber:
+                                          ' ${stock.wayBillNumber ?? 'N/A'}',
+                                    ),
+                                  ),
+                                );
+                              },
+                            );
+                          },
+                        ),
+                      )
+                    ],
+                  ),
+                ),
+              )
+          ],
+        ),
       ),
     );
   }

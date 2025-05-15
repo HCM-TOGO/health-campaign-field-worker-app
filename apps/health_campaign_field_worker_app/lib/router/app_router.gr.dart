@@ -627,6 +627,18 @@ abstract class _$AppRouter extends RootStackRouter {
         ),
       );
     },
+    ViewStockRecordsLGARoute.name: (routeData) {
+      final args = routeData.argsAs<ViewStockRecordsLGARouteArgs>();
+      return AutoRoutePage<dynamic>(
+        routeData: routeData,
+        child: ViewStockRecordsLGAPage(
+          key: args.key,
+          appLocalizations: args.appLocalizations,
+          mrnNumber: args.mrnNumber,
+          stockRecords: args.stockRecords,
+        ),
+      );
+    },
     ViewStockRecordsRoute.name: (routeData) {
       final args = routeData.argsAs<ViewStockRecordsRouteArgs>();
       return AutoRoutePage<dynamic>(
@@ -2896,6 +2908,55 @@ class ViewAllTransactionsRouteArgs {
   @override
   String toString() {
     return 'ViewAllTransactionsRouteArgs{key: $key, warehouseId: $warehouseId}';
+  }
+}
+
+/// generated route for
+/// [ViewStockRecordsLGAPage]
+class ViewStockRecordsLGARoute
+    extends PageRouteInfo<ViewStockRecordsLGARouteArgs> {
+  ViewStockRecordsLGARoute({
+    Key? key,
+    RegistrationDeliveryLocalization? appLocalizations,
+    required String mrnNumber,
+    required List<StockModel> stockRecords,
+    List<PageRouteInfo>? children,
+  }) : super(
+          ViewStockRecordsLGARoute.name,
+          args: ViewStockRecordsLGARouteArgs(
+            key: key,
+            appLocalizations: appLocalizations,
+            mrnNumber: mrnNumber,
+            stockRecords: stockRecords,
+          ),
+          initialChildren: children,
+        );
+
+  static const String name = 'ViewStockRecordsLGARoute';
+
+  static const PageInfo<ViewStockRecordsLGARouteArgs> page =
+      PageInfo<ViewStockRecordsLGARouteArgs>(name);
+}
+
+class ViewStockRecordsLGARouteArgs {
+  const ViewStockRecordsLGARouteArgs({
+    this.key,
+    this.appLocalizations,
+    required this.mrnNumber,
+    required this.stockRecords,
+  });
+
+  final Key? key;
+
+  final RegistrationDeliveryLocalization? appLocalizations;
+
+  final String mrnNumber;
+
+  final List<StockModel> stockRecords;
+
+  @override
+  String toString() {
+    return 'ViewStockRecordsLGARouteArgs{key: $key, appLocalizations: $appLocalizations, mrnNumber: $mrnNumber, stockRecords: $stockRecords}';
   }
 }
 
