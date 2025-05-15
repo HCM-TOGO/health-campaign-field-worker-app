@@ -41,9 +41,7 @@ class _ViewAllTransactionsScreenState extends State<ViewAllTransactionsScreen> {
         context.read<LocalRepository<StockModel, StockSearchModel>>()
             as CustomStockLocalRepository;
     String? warehouseId = widget.warehouseId;
-    if (warehouseId != null) {
-      warehouseId = warehouseId.replaceAll('FAC_', '');
-    }
+
     dynamic result;
     // check for valid user
     if (isLGAUser() || isHFUser(context)) {
@@ -108,7 +106,7 @@ class _ViewAllTransactionsScreenState extends State<ViewAllTransactionsScreen> {
       MaterialPageRoute(
         builder: (context) => ViewStockRecordsLGAPage(
           mrnNumber: mrnNumber,
-          stockRecords: sameMrnStocks,
+          stockRecords: [stock],
         ),
       ),
     );
