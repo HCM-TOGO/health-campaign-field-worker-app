@@ -232,7 +232,7 @@ class CustomTransactionalDetailsPageState
                       return ScrollableContent(
                         header: Column(children: [
                           BackNavigationHelpHeaderWidget(
-                            showHelp: true,
+                            showHelp: false,
                             handleBack: () {
                               final stockState =
                                   context.read<RecordStockBloc>().state;
@@ -735,11 +735,10 @@ class CustomTransactionalDetailsPageState
 
                                                 context.read<AuthBloc>().add(
                                                       AuthAddSpaqCountsEvent(
-                                                        spaq1Count: spaq1,
-                                                        spaq2Count: spaq2,
-                                                        blueVasCount: 0,
-                                                        redVasCount: 0
-                                                      ),
+                                                          spaq1Count: spaq1,
+                                                          spaq2Count: spaq2,
+                                                          blueVasCount: 0,
+                                                          redVasCount: 0),
                                                     );
                                               }
                                             }

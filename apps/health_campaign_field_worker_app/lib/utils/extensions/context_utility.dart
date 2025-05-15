@@ -167,26 +167,14 @@ extension ContextUtilityExtensions on BuildContext {
   }
 
   bool get isCDD {
-    UserRequestModel loggedInUser;
-
-    try {
-      loggedInUser = this.loggedInUser;
-    } catch (_) {
-      return false;
-    }
-
-    List<String> targetedRoles = [
-      "WAREHOUSE_MANAGER",
-      "DISTRIBUTOR",
-    ];
-
-    for (final role in loggedInUser.roles) {
-      if (targetedRoles.contains(role.code)) {
-        targetedRoles.remove(role.code);
-      }
-    }
-
-    return targetedRoles.isEmpty;
+    return loggedInUserRoles
+        .where(
+          (role) =>
+              role.code == RolesType.distributor.toValue() ||
+              role.code == RolesType.communityDistributor.toValue(),
+        )
+        .toList()
+        .isNotEmpty;
   }
 
   List<UserRoleModel> get loggedInUserRoles {

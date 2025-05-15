@@ -9,6 +9,7 @@ import 'package:inventory_management/blocs/record_stock.dart';
 import 'package:inventory_management/models/entities/stock.dart';
 import 'package:inventory_management/models/entities/transaction_reason.dart';
 import 'package:inventory_management/models/entities/transaction_type.dart';
+import 'package:inventory_management/utils/utils.dart';
 import 'package:inventory_management/widgets/back_navigation_help_header.dart';
 import '../../blocs/inventory_management/stock_bloc.dart';
 import '../../router/app_router.dart';
@@ -44,7 +45,9 @@ class _ViewAllTransactionsScreenState extends State<ViewAllTransactionsScreen> {
 
     dynamic result;
     // check for valid user
-    if (isLGAUser() || isHFUser(context)) {
+    if (isLGAUser() ||
+        isHFUser(context) ||
+        InventorySingleton().isDistributor) {
       result = await repository.search(StockSearchModel(
           transactionType: [TransactionType.dispatched.toValue()],
           transactionReason: [],
@@ -124,7 +127,7 @@ class _ViewAllTransactionsScreenState extends State<ViewAllTransactionsScreen> {
         child: ScrollableContent(
           header: const Column(
             children: [
-              BackNavigationHelpHeaderWidget(showHelp: true),
+              BackNavigationHelpHeaderWidget(showHelp: false),
             ],
           ),
           children: [

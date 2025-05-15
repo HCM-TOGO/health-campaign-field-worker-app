@@ -525,7 +525,7 @@ class _RecordRedosePageState extends LocalizedState<RecordRedosePage> {
                                     ),
                                     header: const Column(children: [
                                       BackNavigationHelpHeaderWidget(
-                                        showHelp: true,
+                                        showHelp: false,
                                       ),
                                     ]),
                                     children: [

@@ -102,7 +102,9 @@ class _CustomRecordReferralDetailsPageState
                       return ScrollableContent(
                         enableFixedDigitButton: true,
                         header: const Column(children: [
-                          CustomBackNavigationHelpHeaderWidget(),
+                          CustomBackNavigationHelpHeaderWidget(
+                            showHelp: false,
+                          ),
                         ]),
                         footer: BlocBuilder<ServiceBloc, ServiceState>(
                           builder: (context, serviceState) {
@@ -798,7 +800,7 @@ class _CustomRecordReferralDetailsPageState
                                             );
                                           }),
                                       ReactiveWrapperField<String>(
-                                        validationMessages: {
+                                          validationMessages: {
                                             'required': (_) =>
                                                 localizations.translate(
                                                   i18.common.corecommonRequired,

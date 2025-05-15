@@ -438,6 +438,8 @@ class StockDetails {
     return 'STOCK_DETAILS_BATCH_NUMBER';
   }
 
+  String get transportTypeLabel => 'STOCK_DETAILS_TYPE_OF_TRANSPORT_LABEL';
+
   String get quantityUnusedReturnedLabel =>
       'STOCK_DETAILS_UNUSED_QUANTITY_RETURNED';
 
@@ -1010,6 +1012,10 @@ class SyncDialog {
 class StockReconciliationShowcase {
   const StockReconciliationShowcase();
 
+  String get warehouseLabel {
+    return 'STOCK_RECONCILIATION_SHOWCASE_WAREHOUSE_LABEL';
+  }
+
   String get warehouseName {
     return 'STOCK_RECONCILIATION_SHOWCASE_WAREHOUSE_NAME';
   }
@@ -1223,7 +1229,7 @@ class BeneficiaryDetails {
       "ERROR_VALIDATIN_FOR_EXCESS_STOCK_DISPATCH";
   String get errorHeader => "ERROR_VALIDATION_HEADER";
   String get goToHome => "GO_BACK_HOME";
-  String get insufficientStockMessage => 'INSUFFICIENT_AZT_STOCK_MESSAGE';
+  String get insufficientStockMessage => 'INSUFFICIENT_STOCK_MESSAGE_REGISTER';
   String get insufficientStockMessageDelivery =>
       'INSUFFICIENT_SMC_STOCK_MESSAGE_DELIVERY';
 
@@ -1232,8 +1238,11 @@ class BeneficiaryDetails {
   String get insufficientAZTStockMessageDelivery =>
       'INSUFFICIENT_STOCK_MESSAGE_ADMINISTRATION';
 
+  String get blueVasZeroQuantity => 'BLUE_VAS_ZERO_QUANTITY';
+  String get redVasZeroQuantity => 'RED_VAS_ZERO_QUANTITY';
+
   String get householdId => 'HOUSEHOLD_ID_TEXT';
-  String get beneficiaryId => 'BENEFICIARY_ID';
+  String get beneficiaryId => 'BENEFICIARY_ID_TEXT';
   String get backToHouseholdDetails => 'BACK_TO_HOUSEHOLD_DETAILS';
   String get beneficiaryDoseUnit => 'BENEFICIARY_DETAILS_DOSE_UNIT';
   String get spaq1DoseUnit => 'SPAQ1_STOCK_ZERO';

@@ -21,6 +21,7 @@ import 'package:health_campaign_field_worker_app/pages/inventory_management/cust
 import 'package:inventory_management/inventory_management.dart';
 import 'package:inventory_management/router/inventory_router.gm.dart';
 import 'package:inventory_management/utils/extensions/extensions.dart';
+import 'package:logger/logger.dart';
 import 'package:reactive_forms/reactive_forms.dart';
 
 import 'package:inventory_management/utils/i18_key_constants.dart' as i18;
@@ -242,7 +243,7 @@ class CustomStockDetailsPageState
                       return ScrollableContent(
                         header: Column(children: [
                           BackNavigationHelpHeaderWidget(
-                            showHelp: true,
+                            showHelp: false,
                             handleBack: () {
                               final stockState =
                                   context.read<RecordStockBloc>().state;
@@ -336,6 +337,8 @@ class CustomStockDetailsPageState
                                             ),
                                           );
                                         } else {
+                                          // Logger().d(
+                                          //     "This is the form data ${form.control(_productVariantKey).value as List<ProductVariantModel>}");
                                           FocusManager.instance.primaryFocus
                                               ?.unfocus();
                                           context
@@ -689,16 +692,25 @@ class CustomStockDetailsPageState
                                                           .value
                                                       as List<
                                                           ProductVariantModel>;
+
+                                              // Logger().d(
+                                              //     "This is the selected products $selectedProducts");
+
                                               final receivedFrom = form
                                                   .control(_secondaryPartyKey)
                                                   .value as String;
-
                                               context.read<StockBloc>().add(
                                                     StockSelectedEvent(
                                                       selectedProducts:
                                                           selectedProducts,
+                                                      secondaryPartyType:
+                                                          deliveryTeamSelected
+                                                              ? "STAFF"
+                                                              : "WAREHOUSE",
                                                       receivedFrom:
-                                                          selectedFacilityId ??
+                                                          (deliveryTeamSelected
+                                                                  ? deliveryTeamName
+                                                                  : selectedFacilityId) ??
                                                               "",
                                                     ),
                                                   );
@@ -801,9 +813,9 @@ class CustomStockDetailsPageState
                                           });
                                         }
                                       },
-                                isDisabled: !form.valid,
+                                // isDisabled: !form.valid,
                                 label: localizations
-                                    .translate(i18.common.coreCommonSubmit),
+                                    .translate(i18.common.coreCommonNext),
                               );
                             })
                           ],
@@ -1196,10 +1208,17 @@ class CustomStockDetailsPageState
                                                       return InputField(
                                                         type: InputType.search,
                                                         isRequired: true,
-                                                        label: localizations
-                                                            .translate(
-                                                          '${pageTitle}_${i18.stockReconciliationDetails.stockLabel}',
-                                                        ),
+                                                        label: (entryType ==
+                                                                StockRecordEntryType
+                                                                    .returned)
+                                                            ? localizations
+                                                                .translate(i18
+                                                                    .stockDetails
+                                                                    .selectTransactingPartyReturned)
+                                                            : localizations
+                                                                .translate(
+                                                                '${pageTitle}_${i18.stockReconciliationDetails.stockLabel}',
+                                                              ),
                                                         onChange: (value) {
                                                           field.control
                                                               .markAsTouched();
@@ -1472,7 +1491,7 @@ class CustomStockDetailsPageState
                                         builder: (field) {
                                           return LabeledField(
                                             label: localizations.translate(
-                                              i18.stockDetails
+                                              i18_local.stockDetails
                                                   .transportTypeLabel,
                                             ),
                                             child: DigitDropdown(

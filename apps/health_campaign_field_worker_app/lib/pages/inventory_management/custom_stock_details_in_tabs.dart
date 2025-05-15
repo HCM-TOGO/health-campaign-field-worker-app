@@ -44,6 +44,7 @@ class _DynamicTabsPageState extends LocalizedState<DynamicTabsPage>
   late final Map<String, FormGroup> _forms = {};
   late List<ProductVariantModel> products;
   late String receivedFrom;
+  late String secondaryPartyType;
   late List<dynamic> _formkeys;
   final Map<String, StockModel> _tabStocks = {};
   String _sharedMRN = '';
@@ -100,6 +101,7 @@ class _DynamicTabsPageState extends LocalizedState<DynamicTabsPage>
       if (state is StockSelectedState) {
         products = state.selectedProducts;
         receivedFrom = state.receivedFrom;
+        secondaryPartyType = state.secondaryPartyType;
         _tabController = TabController(length: products.length, vsync: this);
         _formkeys =
             List.generate(products.length, (_) => GlobalKey<FormState>());
@@ -211,7 +213,7 @@ class _DynamicTabsPageState extends LocalizedState<DynamicTabsPage>
       case StockRecordEntryType.damaged:
       case StockRecordEntryType.returned:
         senderId = secondartParty;
-        senderType = "WAREHOUSE";
+        senderType = secondaryPartyType;
         receiverId = primaryId;
         receiverType = primaryType;
         senderIdToShowOnTab = senderId;
@@ -219,7 +221,7 @@ class _DynamicTabsPageState extends LocalizedState<DynamicTabsPage>
         break;
       case StockRecordEntryType.dispatch:
         receiverId = secondartParty;
-        receiverType = "WAREHOUSE";
+        receiverType = secondaryPartyType;
         senderId = primaryId;
         senderType = primaryType;
         senderIdToShowOnTab = senderId;
@@ -355,9 +357,11 @@ class _DynamicTabsPageState extends LocalizedState<DynamicTabsPage>
     StockRecordEntryType entryType = stockState.entryType;
     bool isLastTab = _tabController.index == _tabController.length - 1;
     String quantityCountLabel;
+    String pageTitle;
 
     switch (entryType) {
       case StockRecordEntryType.receipt:
+        pageTitle = i18.stockDetails.receivedPageTitle;
         if (productName == "Blue VAS" || productName == "Red VAS") {
           quantityCountLabel =
               i18_local.stockDetails.quantityCapsuleReceivedLabel;
@@ -366,6 +370,7 @@ class _DynamicTabsPageState extends LocalizedState<DynamicTabsPage>
         }
         break;
       case StockRecordEntryType.dispatch:
+        pageTitle = i18.stockDetails.issuedPageTitle;
         if (productName == "Blue VAS" || productName == "Red VAS") {
           quantityCountLabel = i18_local.stockDetails.quantityCapsuleSentLabel;
         } else {
@@ -373,6 +378,7 @@ class _DynamicTabsPageState extends LocalizedState<DynamicTabsPage>
         }
         break;
       case StockRecordEntryType.returned:
+        pageTitle = i18.stockDetails.returnedPageTitle;
         if (productName == "Blue VAS" || productName == "Red VAS") {
           quantityCountLabel =
               i18_local.stockDetails.quantityCapsuleReturnedLabel;
@@ -381,10 +387,12 @@ class _DynamicTabsPageState extends LocalizedState<DynamicTabsPage>
         }
         break;
       case StockRecordEntryType.loss:
+        pageTitle = i18.stockDetails.lostPageTitle;
         quantityCountLabel = i18.stockDetails.quantityLostLabel;
 
         break;
       case StockRecordEntryType.damaged:
+        pageTitle = i18.stockDetails.damagedPageTitle;
         quantityCountLabel = i18.stockDetails.quantityDamagedLabel;
         break;
     }
@@ -401,10 +409,10 @@ class _DynamicTabsPageState extends LocalizedState<DynamicTabsPage>
                 Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    const Text(
-                      'Stock Receipt Details',
-                      style:
-                          TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
+                    Text(
+                      localizations.translate(pageTitle),
+                      style: const TextStyle(
+                          fontSize: 16, fontWeight: FontWeight.bold),
                     ),
                     const SizedBox(height: 12),
                     Row(
@@ -416,7 +424,14 @@ class _DynamicTabsPageState extends LocalizedState<DynamicTabsPage>
                     const SizedBox(height: 8),
                     Row(
                       children: [
-                        const Expanded(child: Text('Received From')),
+                        Expanded(
+                          child: Text((entryType ==
+                                  StockRecordEntryType.returned)
+                              ? localizations.translate(i18
+                                  .stockDetails.selectTransactingPartyReturned)
+                              : localizations.translate(
+                                  '${pageTitle}_${i18.stockReconciliationDetails.stockLabel}')),
+                        ),
                         Expanded(
                             child: Text(
                           senderIdToShowOnTab == null

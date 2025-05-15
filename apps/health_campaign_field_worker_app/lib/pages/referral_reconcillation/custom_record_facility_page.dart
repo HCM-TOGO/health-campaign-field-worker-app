@@ -79,8 +79,13 @@ class _CustomReferralFacilityPageState
             final projectFacilities = facilities
                 .where((e) => e.id != 'N/A' && e.id != 'Delivery Team')
                 .toList();
-                selectedProjectFacilityId ??= facilities.where((e) => 
-                  e.boundaryCode == ReferralReconSingleton().boundary?.boundaryCode).first.id.toString();
+            selectedProjectFacilityId ??= facilities
+                .where((e) =>
+                    e.boundaryCode ==
+                    ReferralReconSingleton().boundary?.boundaryCode)
+                .first
+                .id
+                .toString();
 
             return facilities.isNotEmpty
                 ? Scaffold(
@@ -97,7 +102,9 @@ class _CustomReferralFacilityPageState
                           builder: (context, form, child) => ScrollableContent(
                             enableFixedDigitButton: true,
                             header: const Column(children: [
-                              CustomBackNavigationHelpHeaderWidget(),
+                              CustomBackNavigationHelpHeaderWidget(
+                                showHelp: false,
+                              ),
                             ]),
                             footer: DigitCard(
                                 margin: EdgeInsets.fromLTRB(
@@ -473,8 +480,7 @@ class _CustomReferralFacilityPageState
                       ).first.id.toString()}',
                 )
               : localizations.translate(
-                  'PJ_FAC_${facilities.where((e) => 
-                  e.boundaryCode == ReferralReconSingleton().boundary?.boundaryCode).first.id.toString()}',
+                  'PJ_FAC_${facilities.where((e) => e.boundaryCode == ReferralReconSingleton().boundary?.boundaryCode).first.id.toString()}',
                 ),
         ),
         validators: [Validators.required],

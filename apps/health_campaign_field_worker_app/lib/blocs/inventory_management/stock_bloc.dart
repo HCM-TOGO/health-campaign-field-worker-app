@@ -8,9 +8,12 @@ abstract class StockEvent {}
 class StockSelectedEvent extends StockEvent {
   final List<ProductVariantModel> selectedProducts;
   final String receivedFrom;
+  final String secondaryPartyType;
 
   StockSelectedEvent(
-      {required this.selectedProducts, required this.receivedFrom});
+      {required this.selectedProducts,
+      required this.receivedFrom,
+      required this.secondaryPartyType});
 }
 
 class SubmitStockEvent extends StockEvent {
@@ -26,9 +29,12 @@ class StockInitial extends StockState {}
 class StockSelectedState extends StockState {
   final List<ProductVariantModel> selectedProducts;
   final String receivedFrom;
+  final String secondaryPartyType;
 
   StockSelectedState(
-      {required this.selectedProducts, required this.receivedFrom});
+      {required this.selectedProducts,
+      required this.receivedFrom,
+      required this.secondaryPartyType});
 }
 
 class StockSubmittedState extends StockState {
@@ -43,6 +49,7 @@ class StockBloc extends Bloc<StockEvent, StockState> {
       emit(StockSelectedState(
         selectedProducts: event.selectedProducts,
         receivedFrom: event.receivedFrom,
+        secondaryPartyType: event.secondaryPartyType,
       ));
     });
 

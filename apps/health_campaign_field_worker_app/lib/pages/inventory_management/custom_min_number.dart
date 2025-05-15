@@ -110,7 +110,7 @@ class CustomMinNumberPageState extends LocalizedState<CustomMinNumberPage> {
         child: ScrollableContent(
           header: const Column(
             children: [
-              BackNavigationHelpHeaderWidget(showHelp: true),
+              BackNavigationHelpHeaderWidget(showHelp: false),
             ],
           ),
           footer: SizedBox(
@@ -150,6 +150,7 @@ class CustomMinNumberPageState extends LocalizedState<CustomMinNumberPage> {
                           SizedBox(
                             height: MediaQuery.of(context).size.height * 0.7,
                             child: ListView.builder(
+                              reverse: true,
                               itemCount: groupedEntries.length,
                               itemBuilder: (context, index) {
                                 final mrn = groupedEntries[index].key;

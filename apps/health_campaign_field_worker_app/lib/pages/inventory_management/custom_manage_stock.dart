@@ -44,7 +44,7 @@ class CustomManageStocksPageState
     return Scaffold(
       body: ScrollableContent(
         header: const BackNavigationHelpHeaderWidget(
-          showHelp: true,
+          showHelp: false,
         ),
         children: [
           Column(
@@ -66,246 +66,13 @@ class CustomManageStocksPageState
               Column(children: [
                 Padding(
                   padding: const EdgeInsets.only(left: spacer2, right: spacer2),
-                  child: MenuCard(
-                    heading: localizations
-                        .translate(i18.manageStock.recordStockReceiptLabel),
-                    description: localizations.translate(
-                        i18.manageStock.recordStockReceiptDescription),
-                    icon: Icons.file_download_outlined,
-                    onTap: () {
-                      showDialog(
-                          context: context,
-                          builder: (context) {
-                            return AlertDialog(
-                              content: Column(
-                                mainAxisSize: MainAxisSize.min,
-                                children: [
-                                  GestureDetector(
-                                    onTap: () {
-                                      context.router.push(
-                                        RecordStockWrapperRoute(
-                                          type: StockRecordEntryType.receipt,
-                                        ),
-                                      );
-
-                                      Navigator.of(context).pop();
-                                    },
-                                    child: Container(
-                                      width: double.infinity,
-                                      decoration: BoxDecoration(
-                                        border: Border.all(
-                                          color: Colors.orange[800]!,
-                                          width: 1,
-                                        ),
-                                        borderRadius: BorderRadius.circular(8),
-                                        color: Colors.white,
-                                      ),
-                                      padding: const EdgeInsets.all(16),
-                                      child: Center(
-                                        child: Row(
-                                          children: [
-                                            Icon(
-                                              Icons.file_download_outlined,
-                                              size: 24,
-                                              color: Colors.orange[800],
-                                            ),
-                                            const SizedBox(width: 8),
-                                            Text(
-                                              "Create New Transaction",
-                                              style: TextStyle(
-                                                fontSize: 16,
-                                                color: Colors.orange[800],
-                                                fontWeight: FontWeight.bold,
-                                              ),
-                                            ),
-                                          ],
-                                        ),
-                                      ),
-                                    ),
-                                  ),
-                                  const SizedBox(
-                                      height:
-                                          16), // Add spacing between buttons
-                                  GestureDetector(
-                                    onTap: () {
-                                      context.router.push(
-                                        CustomMinNumberRoute(
-                                          type: StockRecordEntryType.receipt,
-                                        ),
-                                      );
-                                      Navigator.of(context).pop();
-                                    },
-                                    child: Container(
-                                      width: 400,
-                                      decoration: BoxDecoration(
-                                        border: Border.all(
-                                          color: Colors.orange[800]!,
-                                          width: 1,
-                                        ),
-                                        borderRadius: BorderRadius.circular(8),
-                                        color: Colors.white,
-                                      ),
-                                      padding: const EdgeInsets.all(16),
-                                      child: Center(
-                                        child: Row(
-                                          children: [
-                                            Icon(
-                                              Icons.remove_red_eye,
-                                              size: 24,
-                                              color: Colors.orange[800],
-                                            ),
-                                            const SizedBox(width: 8),
-                                            Text(
-                                              "View Created Transaction",
-                                              style: TextStyle(
-                                                fontSize: 16,
-                                                color: Colors.orange[800],
-                                                fontWeight: FontWeight.bold,
-                                              ),
-                                            ),
-                                          ],
-                                        ),
-                                      ),
-                                    ),
-                                  ),
-                                ],
-                              ),
-                            );
-                          });
-                    },
-                  ),
-                ),
-                if (!context.isCDD)
-                  const SizedBox(
-                    height: spacer4,
-                  ),
-                if (!context.isCDD)
-                  Padding(
-                    padding:
-                        const EdgeInsets.only(left: spacer2, right: spacer2),
-                    child: MenuCard(
-                        heading: localizations
-                            .translate(i18.manageStock.recordStockIssuedLabel),
-                        description: localizations.translate(
-                            i18.manageStock.recordStockIssuedDescription),
-                        icon: Icons.file_upload_outlined,
-                        onTap: () {
-                          showDialog(
-                              context: context,
-                              builder: (context) {
-                                return AlertDialog(
-                                  content: Column(
-                                    mainAxisSize: MainAxisSize.min,
-                                    children: [
-                                      GestureDetector(
-                                        onTap: () {
-                                          context.router.push(
-                                            RecordStockWrapperRoute(
-                                              type:
-                                                  StockRecordEntryType.dispatch,
-                                            ),
-                                          );
-                                          Navigator.of(context).pop();
-                                        },
-                                        child: Container(
-                                          width: double.infinity,
-                                          decoration: BoxDecoration(
-                                            border: Border.all(
-                                              color: Colors.orange[800]!,
-                                              width: 1,
-                                            ),
-                                            borderRadius:
-                                                BorderRadius.circular(8),
-                                            color: Colors.white,
-                                          ),
-                                          padding: const EdgeInsets.all(16),
-                                          child: Center(
-                                            child: Row(
-                                              children: [
-                                                Icon(
-                                                  Icons.file_download_outlined,
-                                                  size: 24,
-                                                  color: Colors.orange[800],
-                                                ),
-                                                const SizedBox(width: 8),
-                                                Text(
-                                                  "Create New Transaction",
-                                                  style: TextStyle(
-                                                    fontSize: 20,
-                                                    color: Colors.orange[800],
-                                                    fontWeight: FontWeight.bold,
-                                                  ),
-                                                ),
-                                              ],
-                                            ),
-                                          ),
-                                        ),
-                                      ),
-                                      const SizedBox(
-                                          height:
-                                              16), // Add spacing between buttons
-                                      GestureDetector(
-                                        onTap: () {
-                                          context.router.push(
-                                            CustomMinNumberRoute(
-                                              type:
-                                                  StockRecordEntryType.dispatch,
-                                            ),
-                                          );
-                                          Navigator.of(context).pop();
-                                        },
-                                        child: Container(
-                                          width: 400,
-                                          decoration: BoxDecoration(
-                                            border: Border.all(
-                                              color: Colors.orange[800]!,
-                                              width: 1,
-                                            ),
-                                            borderRadius:
-                                                BorderRadius.circular(8),
-                                            color: Colors.white,
-                                          ),
-                                          padding: const EdgeInsets.all(16),
-                                          child: Center(
-                                            child: Row(
-                                              children: [
-                                                Icon(
-                                                  Icons.remove_red_eye,
-                                                  size: 24,
-                                                  color: Colors.orange[800],
-                                                ),
-                                                const SizedBox(width: 8),
-                                                Text(
-                                                  "View Created Transaction",
-                                                  style: TextStyle(
-                                                    fontSize: 16,
-                                                    color: Colors.orange[800],
-                                                    fontWeight: FontWeight.bold,
-                                                  ),
-                                                ),
-                                              ],
-                                            ),
-                                          ),
-                                        ),
-                                      ),
-                                    ],
-                                  ),
-                                );
-                              });
-                        }),
-                  ),
-                const SizedBox(
-                  height: spacer4,
-                ),
-                Padding(
-                  padding: const EdgeInsets.only(left: spacer2, right: spacer2),
-                  child: MenuCard(
+                  child: Stack(children: [
+                    MenuCard(
                       heading: localizations
-                          .translate(i18.manageStock.recordStockReturnedLabel),
+                          .translate(i18.manageStock.recordStockReceiptLabel),
                       description: localizations.translate(
-                        i18.manageStock.recordStockReturnedDescription,
-                      ),
-                      icon: Icons.settings_backup_restore,
+                          i18.manageStock.recordStockReceiptDescription),
+                      icon: Icons.file_download_outlined,
                       onTap: () {
                         showDialog(
                             context: context,
@@ -318,9 +85,10 @@ class CustomManageStocksPageState
                                       onTap: () {
                                         context.router.push(
                                           RecordStockWrapperRoute(
-                                            type: StockRecordEntryType.returned,
+                                            type: StockRecordEntryType.receipt,
                                           ),
                                         );
+
                                         Navigator.of(context).pop();
                                       },
                                       child: Container(
@@ -357,12 +125,14 @@ class CustomManageStocksPageState
                                         ),
                                       ),
                                     ),
-                                    const SizedBox(height: 16),
+                                    const SizedBox(
+                                        height:
+                                            16), // Add spacing between buttons
                                     GestureDetector(
                                       onTap: () {
                                         context.router.push(
                                           CustomMinNumberRoute(
-                                            type: StockRecordEntryType.returned,
+                                            type: StockRecordEntryType.receipt,
                                           ),
                                         );
                                         Navigator.of(context).pop();
@@ -405,7 +175,292 @@ class CustomManageStocksPageState
                                 ),
                               );
                             });
-                      }),
+                      },
+                    ),
+                    Positioned(
+                      top: 0,
+                      bottom: 0,
+                      right: 16,
+                      child: Center(
+                          child: Icon(
+                        Icons.arrow_circle_right,
+                        color: Colors.orange[800],
+                        size: Base.height,
+                      )),
+                    ),
+                  ]),
+                ),
+                if (!context.isCDD)
+                  const SizedBox(
+                    height: spacer4,
+                  ),
+                if (!context.isCDD)
+                  Padding(
+                    padding:
+                        const EdgeInsets.only(left: spacer2, right: spacer2),
+                    child: Stack(
+                      children: [
+                        MenuCard(
+                            heading: localizations.translate(
+                                i18.manageStock.recordStockIssuedLabel),
+                            description: localizations.translate(
+                                i18.manageStock.recordStockIssuedDescription),
+                            icon: Icons.file_upload_outlined,
+                            onTap: () {
+                              showDialog(
+                                  context: context,
+                                  builder: (context) {
+                                    return AlertDialog(
+                                      content: Column(
+                                        mainAxisSize: MainAxisSize.min,
+                                        children: [
+                                          GestureDetector(
+                                            onTap: () {
+                                              context.router.push(
+                                                RecordStockWrapperRoute(
+                                                  type: StockRecordEntryType
+                                                      .dispatch,
+                                                ),
+                                              );
+                                              Navigator.of(context).pop();
+                                            },
+                                            child: Container(
+                                              width: double.infinity,
+                                              decoration: BoxDecoration(
+                                                border: Border.all(
+                                                  color: Colors.orange[800]!,
+                                                  width: 1,
+                                                ),
+                                                borderRadius:
+                                                    BorderRadius.circular(8),
+                                                color: Colors.white,
+                                              ),
+                                              padding: const EdgeInsets.all(16),
+                                              child: Center(
+                                                child: Row(
+                                                  children: [
+                                                    Icon(
+                                                      Icons
+                                                          .file_download_outlined,
+                                                      size: 24,
+                                                      color: Colors.orange[800],
+                                                    ),
+                                                    const SizedBox(width: 8),
+                                                    Text(
+                                                      "Create New Transaction",
+                                                      style: TextStyle(
+                                                        fontSize: 20,
+                                                        color:
+                                                            Colors.orange[800],
+                                                        fontWeight:
+                                                            FontWeight.bold,
+                                                      ),
+                                                    ),
+                                                  ],
+                                                ),
+                                              ),
+                                            ),
+                                          ),
+                                          const SizedBox(
+                                              height:
+                                                  16), // Add spacing between buttons
+                                          GestureDetector(
+                                            onTap: () {
+                                              context.router.push(
+                                                CustomMinNumberRoute(
+                                                  type: StockRecordEntryType
+                                                      .dispatch,
+                                                ),
+                                              );
+                                              Navigator.of(context).pop();
+                                            },
+                                            child: Container(
+                                              width: 400,
+                                              decoration: BoxDecoration(
+                                                border: Border.all(
+                                                  color: Colors.orange[800]!,
+                                                  width: 1,
+                                                ),
+                                                borderRadius:
+                                                    BorderRadius.circular(8),
+                                                color: Colors.white,
+                                              ),
+                                              padding: const EdgeInsets.all(16),
+                                              child: Center(
+                                                child: Row(
+                                                  children: [
+                                                    Icon(
+                                                      Icons.remove_red_eye,
+                                                      size: 24,
+                                                      color: Colors.orange[800],
+                                                    ),
+                                                    const SizedBox(width: 8),
+                                                    Text(
+                                                      "View Created Transaction",
+                                                      style: TextStyle(
+                                                        fontSize: 16,
+                                                        color:
+                                                            Colors.orange[800],
+                                                        fontWeight:
+                                                            FontWeight.bold,
+                                                      ),
+                                                    ),
+                                                  ],
+                                                ),
+                                              ),
+                                            ),
+                                          ),
+                                        ],
+                                      ),
+                                    );
+                                  });
+                            }),
+                        Positioned(
+                          top: 0,
+                          bottom: 0,
+                          right: 16,
+                          child: Center(
+                              child: Icon(
+                            Icons.arrow_circle_right,
+                            color: Colors.orange[800],
+                            size: Base.height,
+                          )),
+                        ),
+                      ],
+                    ),
+                  ),
+                const SizedBox(
+                  height: spacer4,
+                ),
+                Padding(
+                  padding: const EdgeInsets.only(left: spacer2, right: spacer2),
+                  child: Stack(
+                    children: [
+                      MenuCard(
+                          heading: localizations.translate(
+                              i18.manageStock.recordStockReturnedLabel),
+                          description: localizations.translate(
+                            i18.manageStock.recordStockReturnedDescription,
+                          ),
+                          icon: Icons.settings_backup_restore,
+                          onTap: () {
+                            showDialog(
+                                context: context,
+                                builder: (context) {
+                                  return AlertDialog(
+                                    content: Column(
+                                      mainAxisSize: MainAxisSize.min,
+                                      children: [
+                                        GestureDetector(
+                                          onTap: () {
+                                            context.router.push(
+                                              RecordStockWrapperRoute(
+                                                type: StockRecordEntryType
+                                                    .returned,
+                                              ),
+                                            );
+                                            Navigator.of(context).pop();
+                                          },
+                                          child: Container(
+                                            width: double.infinity,
+                                            decoration: BoxDecoration(
+                                              border: Border.all(
+                                                color: Colors.orange[800]!,
+                                                width: 1,
+                                              ),
+                                              borderRadius:
+                                                  BorderRadius.circular(8),
+                                              color: Colors.white,
+                                            ),
+                                            padding: const EdgeInsets.all(16),
+                                            child: Center(
+                                              child: Row(
+                                                children: [
+                                                  Icon(
+                                                    Icons
+                                                        .file_download_outlined,
+                                                    size: 24,
+                                                    color: Colors.orange[800],
+                                                  ),
+                                                  const SizedBox(width: 8),
+                                                  Text(
+                                                    "Create New Transaction",
+                                                    style: TextStyle(
+                                                      fontSize: 16,
+                                                      color: Colors.orange[800],
+                                                      fontWeight:
+                                                          FontWeight.bold,
+                                                    ),
+                                                  ),
+                                                ],
+                                              ),
+                                            ),
+                                          ),
+                                        ),
+                                        const SizedBox(height: 16),
+                                        GestureDetector(
+                                          onTap: () {
+                                            context.router.push(
+                                              CustomMinNumberRoute(
+                                                type: StockRecordEntryType
+                                                    .returned,
+                                              ),
+                                            );
+                                            Navigator.of(context).pop();
+                                          },
+                                          child: Container(
+                                            width: 400,
+                                            decoration: BoxDecoration(
+                                              border: Border.all(
+                                                color: Colors.orange[800]!,
+                                                width: 1,
+                                              ),
+                                              borderRadius:
+                                                  BorderRadius.circular(8),
+                                              color: Colors.white,
+                                            ),
+                                            padding: const EdgeInsets.all(16),
+                                            child: Center(
+                                              child: Row(
+                                                children: [
+                                                  Icon(
+                                                    Icons.remove_red_eye,
+                                                    size: 24,
+                                                    color: Colors.orange[800],
+                                                  ),
+                                                  const SizedBox(width: 8),
+                                                  Text(
+                                                    "View Created Transaction",
+                                                    style: TextStyle(
+                                                      fontSize: 16,
+                                                      color: Colors.orange[800],
+                                                      fontWeight:
+                                                          FontWeight.bold,
+                                                    ),
+                                                  ),
+                                                ],
+                                              ),
+                                            ),
+                                          ),
+                                        ),
+                                      ],
+                                    ),
+                                  );
+                                });
+                          }),
+                      Positioned(
+                        top: 0,
+                        bottom: 0,
+                        right: 16,
+                        child: Center(
+                            child: Icon(
+                          Icons.arrow_circle_right,
+                          color: Colors.orange[800],
+                          size: Base.height,
+                        )),
+                      ),
+                    ],
+                  ),
                 ),
                 // const SizedBox(
                 //   height: spacer4,
