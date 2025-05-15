@@ -1,5 +1,6 @@
 import 'package:auto_route/auto_route.dart';
 import 'package:digit_ui_components/digit_components.dart';
+import 'package:digit_ui_components/theme/digit_extended_theme.dart';
 import 'package:digit_ui_components/widgets/molecules/panel_cards.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
@@ -34,6 +35,7 @@ class CustomAcknowledgementPageState
     extends LocalizedState<CustomAcknowledgementPage> {
   @override
   Widget build(BuildContext context) {
+    final theme = Theme.of(context);
     return PopScope(
       canPop: false,
       child: Scaffold(
@@ -41,6 +43,7 @@ class CustomAcknowledgementPageState
           padding: const EdgeInsets.all(spacer2),
           child: PanelCard(
             type: PanelType.success,
+    additionWidgets: [Text(widget.mrnNumber, style: theme.textTheme.bodyLarge?.copyWith(color: theme.colorTheme.paper.primary),)],
             description: localizations.translate(
               i18_local.acknowledgementSuccess
                   .transactionAcknowledgementDescriptionText,
