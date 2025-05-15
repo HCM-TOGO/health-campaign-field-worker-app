@@ -117,7 +117,7 @@ class CustomReferBeneficiaryVASPageState
                     widget.isReadministrationUnSuccessful
                         ? const CustomBackNavigationHelpHeaderWidget(
                             showBackNavigation: false,
-                            showHelp: true,
+                            showHelp: false,
                             showcaseButton: null,
                           )
                         : const CustomBackNavigationHelpHeaderWidget(

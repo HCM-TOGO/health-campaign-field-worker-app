@@ -532,7 +532,7 @@ class CustomDeliverInterventionPageState
                                             EdgeInsets.only(bottom: spacer2),
                                         child:
                                             CustomBackNavigationHelpHeaderWidget(
-                                          showHelp: true,
+                                          showHelp: false,
                                         ),
                                       ),
                                     ]),

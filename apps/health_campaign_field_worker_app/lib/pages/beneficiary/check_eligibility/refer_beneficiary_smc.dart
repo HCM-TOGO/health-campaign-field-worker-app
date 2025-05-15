@@ -95,11 +95,12 @@ class CustomReferBeneficiarySMCPageState
                     .where((e) => e.usage == Constants.healthFacility)
                     .toList();
 
-                return projectFacilities.isEmpty ? allFacilities : projectFacilities;
+                return projectFacilities.isEmpty
+                    ? allFacilities
+                    : projectFacilities;
               },
             ) ??
             [];
-
 
         facilities.addAll(healthFacilities);
 
@@ -120,7 +121,7 @@ class CustomReferBeneficiarySMCPageState
                     widget.isReadministrationUnSuccessful
                         ? const CustomBackNavigationHelpHeaderWidget(
                             showBackNavigation: false,
-                            showHelp: true,
+                            showHelp: false,
                             showcaseButton: null,
                           )
                         : const CustomBackNavigationHelpHeaderWidget(
@@ -184,7 +185,7 @@ class CustomReferBeneficiarySMCPageState
                                         ],
                                       ),
                                     );
-                                    if(submit == null || !submit) {
+                                    if (submit == null || !submit) {
                                       return;
                                     }
                                     clickedStatus.value = true;
@@ -453,8 +454,12 @@ class CustomReferBeneficiarySMCPageState
         validators: [Validators.required],
       ),
       _referredToKey: FormControl<String>(
-        value:
-            healthFacilities.where((e) => e.boundaryCode == context.loggedInUserModel?.boundaryCode).first.id.toString(),
+        value: healthFacilities
+            .where((e) =>
+                e.boundaryCode == context.loggedInUserModel?.boundaryCode)
+            .first
+            .id
+            .toString(),
         validators: [
           Validators.required,
         ],

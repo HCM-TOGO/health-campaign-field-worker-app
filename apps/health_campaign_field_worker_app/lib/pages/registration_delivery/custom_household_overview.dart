@@ -107,7 +107,7 @@ class _CustomHouseholdOverviewPageState
                         header: Padding(
                           padding: const EdgeInsets.only(bottom: spacer2),
                           child: CustomBackNavigationHelpHeaderWidget(
-                            showHelp: true,
+                            showHelp: false,
                             handleback: () {
                               context
                                   .read<SearchHouseholdsBloc>()

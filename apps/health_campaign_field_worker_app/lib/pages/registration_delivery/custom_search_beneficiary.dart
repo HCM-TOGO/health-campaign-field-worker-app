@@ -687,6 +687,27 @@ class _CustomSearchBeneficiaryPageState
                         int blueVas = context.blueVas;
                         int redVas = context.redVas;
 
+                        String descriptionText = localizations.translate(
+                            i18_local
+                                .beneficiaryDetails.insufficientStockMessage);
+
+                        if (spaq1 == 0) {
+                          descriptionText +=
+                              "\n ${localizations.translate(i18_local.beneficiaryDetails.spaq1DoseUnit)}";
+                        }
+                        if (spaq2 == 0) {
+                          descriptionText +=
+                              "\n ${localizations.translate(i18_local.beneficiaryDetails.spaq2DoseUnit)}";
+                        }
+                        if (blueVas == 0) {
+                          descriptionText +=
+                              "\n ${localizations.translate(i18_local.beneficiaryDetails.blueVasZeroQuantity)}";
+                        }
+                        if (redVas == 0) {
+                          descriptionText +=
+                              "\n ${localizations.translate(i18_local.beneficiaryDetails.redVasZeroQuantity)}";
+                        }
+
                         if ((spaq1 > 0 ||
                             spaq2 > 0 ||
                             blueVas > 0 ||
@@ -715,10 +736,7 @@ class _CustomSearchBeneficiaryPageState
                               onOutsideTap: () {
                                 Navigator.of(popupContext).pop(false);
                               },
-                              description: localizations.translate(
-                                i18_local.beneficiaryDetails
-                                    .insufficientStockMessage,
-                              ),
+                              description: descriptionText,
                               type: PopUpType.simple,
                               actions: [
                                 DigitButton(
@@ -731,14 +749,13 @@ class _CustomSearchBeneficiaryPageState
                                       rootNavigator: true,
                                     ).pop();
 //
-                                    
                                   },
                                   type: DigitButtonType.primary,
                                   size: DigitButtonSize.large,
                                 ),
                               ],
                             ),
-                          ) ;
+                          );
                         }
                       },
                     );

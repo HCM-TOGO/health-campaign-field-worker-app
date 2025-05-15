@@ -151,7 +151,9 @@ class CustomInventoryReportDetailsPageState
             return ScrollableContent(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                const BackNavigationHelpHeaderWidget(showHelp: true,),
+                const BackNavigationHelpHeaderWidget(
+                  showHelp: false,
+                ),
                 Container(
                   padding: const EdgeInsets.all(spacer2),
                   child: Align(

@@ -176,7 +176,7 @@ class CustomBeneficiaryDetailsPageState
                         enableFixedDigitButton: true,
                         header: const Column(children: [
                           CustomBackNavigationHelpHeaderWidget(
-                            showHelp: true,
+                            showHelp: false,
                           ),
                         ]),
                         footer: BlocBuilder<DeliverInterventionBloc,

@@ -110,7 +110,7 @@ class CustomMinNumberPageState extends LocalizedState<CustomMinNumberPage> {
         child: ScrollableContent(
           header: const Column(
             children: [
-              BackNavigationHelpHeaderWidget(showHelp: true),
+              BackNavigationHelpHeaderWidget(showHelp: false),
             ],
           ),
           footer: SizedBox(
