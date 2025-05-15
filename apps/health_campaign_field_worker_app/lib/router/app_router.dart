@@ -99,6 +99,7 @@ part 'app_router.gr.dart';
     ReferralReconciliationRoute,
     AttendanceRoute,
     ComplaintsRoute,
+    SurveyFormRoute,
   ],
 )
 class AppRouter extends _$AppRouter {
@@ -527,6 +528,25 @@ class AppRouter extends _$AppRouter {
           page: BoundarySelectionRoute.page,
           path: 'select-boundary',
         ),
+
+        // SurveyForm Route
+        AutoRoute(
+            page: SurveyFormWrapperRoute.page,
+            path: 'surveyForm',
+            children: [
+              AutoRoute(
+                page: SurveyformRoute.page,
+                path: '',
+              ),
+              AutoRoute(
+                  page: SurveyFormBoundaryViewRoute.page,
+                  path: 'view-boundary'),
+              AutoRoute(page: SurveyFormViewRoute.page, path: 'view'),
+              AutoRoute(page: SurveyFormPreviewRoute.page, path: 'preview'),
+              AutoRoute(
+                  page: SurveyFormAcknowledgementRoute.page,
+                  path: 'surveyForm-acknowledgement'),
+            ]),
 
         AutoRoute(
           page: ComplaintsInboxWrapperRoute.page,
