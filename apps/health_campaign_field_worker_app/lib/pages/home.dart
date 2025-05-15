@@ -120,6 +120,7 @@ class _HomePageState extends LocalizedState<HomePage> {
     });
 
     if (!(roles.contains(RolesType.distributor.toValue()) ||
+        roles.contains(RolesType.communityDistributor.toValue()) ||
         roles.contains(RolesType.registrar.toValue()))) {
       skipProgressBar = true;
     }
@@ -802,7 +803,9 @@ void setPackagesSingleton(BuildContext context) {
               .isNotEmpty,
           isDistributor: context.loggedInUserRoles
               .where(
-                (role) => role.code == RolesType.distributor.toValue(),
+                (role) =>
+                    role.code == RolesType.distributor.toValue() ||
+                    role.code == RolesType.communityDistributor.toValue(),
               )
               .toList()
               .isNotEmpty,
@@ -839,7 +842,9 @@ void setPackagesSingleton(BuildContext context) {
               .isNotEmpty,
           isDistributor: context.loggedInUserRoles
               .where(
-                (role) => role.code == RolesType.distributor.toValue(),
+                (role) =>
+                    role.code == RolesType.distributor.toValue() ||
+                    role.code == RolesType.communityDistributor.toValue(),
               )
               .toList()
               .isNotEmpty,
