@@ -5,6 +5,7 @@ import 'package:digit_ui_components/widgets/molecules/digit_card.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:health_campaign_field_worker_app/data/repositories/local/inventory_management/custom_stock.dart';
+import 'package:inventory_management/blocs/record_stock.dart';
 import 'package:inventory_management/models/entities/stock.dart';
 import 'package:inventory_management/models/entities/transaction_reason.dart';
 import 'package:inventory_management/models/entities/transaction_type.dart';
@@ -30,6 +31,7 @@ class _ViewAllTransactionsScreenState extends State<ViewAllTransactionsScreen> {
   void initState() {
     super.initState();
     loadLocalStockData();
+    final stockState = context.read<RecordStockBloc>().state;
   }
 
   List<StockModel> stockList = [];

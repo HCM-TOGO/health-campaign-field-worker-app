@@ -164,11 +164,6 @@ class AppRouter extends _$AppRouter {
           path: 'custom-min-number',
         ),
 
-        AutoRoute(
-          page: ViewAllTransactionsRoute.page,
-          path: 'custom-all-transactions',
-        ),
-
         // Referral Reconciliation Route
         AutoRoute(
             page: CustomHFCreateReferralWrapperRoute.page,
@@ -465,11 +460,6 @@ class AppRouter extends _$AppRouter {
         ),
 
         AutoRoute(
-          page: ViewStockRecordsLGARoute.page,
-          path: 'custom-stock-view-lga',
-        ),
-
-        AutoRoute(
           page: RecordStockWrapperRoute.page,
           path: 'record-stock',
           children: [
@@ -498,6 +488,14 @@ class AppRouter extends _$AppRouter {
             AutoRoute(
               page: CustomTransactionalDetailsRoute.page,
               path: 'custom-transaction-details',
+            ),
+            AutoRoute(
+              page: ViewAllTransactionsRoute.page,
+              path: 'custom-all-transactions',
+            ),
+            AutoRoute(
+              page: ViewStockRecordsLGARoute.page,
+              path: 'custom-stock-view-lga',
             ),
           ],
         ),

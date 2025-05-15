@@ -48,7 +48,7 @@ class _ViewStockRecordsLGAPageState
       ),
       'comments': FormControl<String>(),
     });
-    final state = context.read<RecordStockBloc>().state;
+    final recordStockBloc = BlocProvider.of<RecordStockBloc>(context);
   }
 
   @override
