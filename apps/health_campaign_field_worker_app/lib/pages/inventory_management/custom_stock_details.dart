@@ -21,6 +21,7 @@ import 'package:health_campaign_field_worker_app/pages/inventory_management/cust
 import 'package:inventory_management/inventory_management.dart';
 import 'package:inventory_management/router/inventory_router.gm.dart';
 import 'package:inventory_management/utils/extensions/extensions.dart';
+import 'package:logger/logger.dart';
 import 'package:reactive_forms/reactive_forms.dart';
 
 import 'package:inventory_management/utils/i18_key_constants.dart' as i18;
@@ -336,6 +337,8 @@ class CustomStockDetailsPageState
                                             ),
                                           );
                                         } else {
+                                          // Logger().d(
+                                          //     "This is the form data ${form.control(_productVariantKey).value as List<ProductVariantModel>}");
                                           FocusManager.instance.primaryFocus
                                               ?.unfocus();
                                           context
@@ -689,10 +692,13 @@ class CustomStockDetailsPageState
                                                           .value
                                                       as List<
                                                           ProductVariantModel>;
+
+                                              // Logger().d(
+                                              //     "This is the selected products $selectedProducts");
+
                                               final receivedFrom = form
                                                   .control(_secondaryPartyKey)
                                                   .value as String;
-
                                               context.read<StockBloc>().add(
                                                     StockSelectedEvent(
                                                       selectedProducts:
