@@ -37,7 +37,7 @@ class CustomMinNumberPageState extends LocalizedState<CustomMinNumberPage> {
     super.initState();
     loadLocalStockData();
     Logger().i(
-        "Stock Type: ${widget.type == StockRecordEntryType.returned ? "RETURNED" : widget.type == StockRecordEntryType.receipt ? "RECEIPT" : "DISPATCH"}");
+        "Stock Type: ${widget.type == StockRecordEntryType.returned ? "RETURNED" : widget.type == StockRecordEntryType.receipt ? "RECEIVED" : "DISPATCHED"}");
   }
 
   Future<void> loadLocalStockData() async {
