@@ -44,6 +44,7 @@ class _DynamicTabsPageState extends LocalizedState<DynamicTabsPage>
   late final Map<String, FormGroup> _forms = {};
   late List<ProductVariantModel> products;
   late String receivedFrom;
+  late String secondaryPartyType;
   late List<dynamic> _formkeys;
   final Map<String, StockModel> _tabStocks = {};
   String _sharedMRN = '';
@@ -91,6 +92,7 @@ class _DynamicTabsPageState extends LocalizedState<DynamicTabsPage>
       if (state is StockSelectedState) {
         products = state.selectedProducts;
         receivedFrom = state.receivedFrom;
+        secondaryPartyType = state.secondaryPartyType;
         _tabController = TabController(length: products.length, vsync: this);
         _formkeys =
             List.generate(products.length, (_) => GlobalKey<FormState>());
@@ -209,14 +211,14 @@ class _DynamicTabsPageState extends LocalizedState<DynamicTabsPage>
       case StockRecordEntryType.damaged:
       case StockRecordEntryType.returned:
         senderId = secondartParty;
-        senderType = "WAREHOUSE";
+        senderType = secondaryPartyType;
         receiverId = primaryId;
         receiverType = primaryType;
 
         break;
       case StockRecordEntryType.dispatch:
         receiverId = secondartParty;
-        receiverType = "WAREHOUSE";
+        receiverType = secondaryPartyType;
         senderId = primaryId;
         senderType = primaryType;
         break;

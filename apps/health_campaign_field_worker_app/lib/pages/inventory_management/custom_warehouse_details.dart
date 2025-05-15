@@ -63,7 +63,7 @@ class CustomWarehouseDetailsPageState
           value: localizations
               .translate(InventorySingleton().boundary!.code ?? ''),
         ),
-        _warehouseKey: FormControl<FacilityModel>(
+        _warehouseKey: FormControl<String>(
           validators: isDistributor ? [] : [Validators.required],
         ),
         _teamCodeKey: FormControl<String>(
@@ -277,11 +277,11 @@ class CustomWarehouseDetailsPageState
                                                                     .toString(),
                                                               )
                                                             : facility,
-                                                        primaryId: facility
-                                                                    .id ==
-                                                                "Delivery Team"
-                                                            ? teamCode ?? ''
-                                                            : facility.id,
+                                                        primaryId:
+                                                            InventorySingleton()
+                                                                    .isDistributor
+                                                                ? teamCode ?? ''
+                                                                : facility.id,
                                                         primaryType: (InventorySingleton()
                                                                         .isDistributor! &&
                                                                     !InventorySingleton()
@@ -313,7 +313,10 @@ class CustomWarehouseDetailsPageState
                                                       context.router.push(
                                                           ViewAllTransactionsRoute(
                                                               warehouseId:
-                                                                  selectedFacilityId));
+                                                                  InventorySingleton()
+                                                                          .isDistributor
+                                                                      ? teamCode
+                                                                      : selectedFacilityId));
                                                     }
                                                   }
                                                 },

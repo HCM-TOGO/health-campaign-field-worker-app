@@ -697,8 +697,14 @@ class CustomStockDetailsPageState
                                                     StockSelectedEvent(
                                                       selectedProducts:
                                                           selectedProducts,
+                                                      secondaryPartyType:
+                                                          deliveryTeamSelected
+                                                              ? "STAFF"
+                                                              : "WAREHOUSE",
                                                       receivedFrom:
-                                                          selectedFacilityId ??
+                                                          (deliveryTeamSelected
+                                                                  ? deliveryTeamName
+                                                                  : selectedFacilityId) ??
                                                               "",
                                                     ),
                                                   );
