@@ -10,10 +10,12 @@ import 'package:inventory_management/models/entities/stock.dart';
 import 'package:inventory_management/models/entities/transaction_reason.dart';
 import 'package:inventory_management/models/entities/transaction_type.dart';
 import 'package:inventory_management/utils/i18_key_constants.dart' as i18;
+import 'package:inventory_management/utils/utils.dart';
 import 'package:registration_delivery/widgets/localized.dart';
 import 'package:reactive_forms/reactive_forms.dart';
 
 import '../../router/app_router.dart';
+import '../../utils/extensions/extensions.dart';
 
 @RoutePage()
 class ViewStockRecordsLGAPage extends LocalizedStatefulWidget {
@@ -72,11 +74,25 @@ class _ViewStockRecordsLGAPageState
         ];
 
         return stock.copyWith(
+          id: null,
+          rowVersion: 1,
           transactionType: TransactionType.received.toValue(),
           transactionReason: TransactionReason.received.toValue(),
           quantity: _form.control('quantityReceived').value.toString(),
           additionalFields: stock.additionalFields?.copyWith(
             fields: newFields,
+          ),
+          auditDetails: AuditDetails(
+            createdBy: InventorySingleton().loggedInUserUuid,
+            createdTime: context.millisecondsSinceEpoch(),
+            lastModifiedBy: InventorySingleton().loggedInUserUuid,
+            lastModifiedTime: context.millisecondsSinceEpoch(),
+          ),
+          clientAuditDetails: ClientAuditDetails(
+            createdBy: InventorySingleton().loggedInUserUuid,
+            createdTime: context.millisecondsSinceEpoch(),
+            lastModifiedBy: InventorySingleton().loggedInUserUuid,
+            lastModifiedTime: context.millisecondsSinceEpoch(),
           ),
         );
       }).toList();
@@ -86,6 +102,9 @@ class _ViewStockRecordsLGAPageState
               RecordStockSaveStockDetailsEvent(
                 stockModel: stock,
               ),
+            );
+        context.read<RecordStockBloc>().add(
+              const RecordStockCreateStockEntryEvent(),
             );
       }
 
