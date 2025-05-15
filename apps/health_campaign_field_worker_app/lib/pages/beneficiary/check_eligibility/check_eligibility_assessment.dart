@@ -144,7 +144,7 @@ class _EligibilityChecklistViewPage
                           if (!(context.isHealthFacilitySupervisor &&
                               widget.referralClientRefId != null))
                             const CustomBackNavigationHelpHeaderWidget(
-                              showHelp: true,
+                              showHelp: false,
                             ),
                         ]),
                         enableFixedButton: true,

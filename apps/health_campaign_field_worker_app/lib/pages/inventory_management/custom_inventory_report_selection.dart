@@ -41,7 +41,9 @@ class CustomInventoryReportSelectionPageState
     return Scaffold(
       body: ScrollableContent(
         header: const Column(children: [
-          BackNavigationHelpHeaderWidget(showHelp: true,),
+          BackNavigationHelpHeaderWidget(
+            showHelp: false,
+          ),
         ]),
         children: [
           Column(

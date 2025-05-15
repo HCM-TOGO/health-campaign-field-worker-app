@@ -160,7 +160,7 @@ class CaregiverConsentPageState extends LocalizedState<CaregiverConsentPage> {
               Padding(
                 padding: EdgeInsets.only(bottom: spacer2),
                 child: CustomBackNavigationHelpHeaderWidget(
-                  showHelp: true,
+                  showHelp: false,
                 ),
               ),
             ],

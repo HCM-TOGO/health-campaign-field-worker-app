@@ -126,7 +126,7 @@ class _ViewAllTransactionsScreenState extends State<ViewAllTransactionsScreen> {
         child: ScrollableContent(
           header: const Column(
             children: [
-              BackNavigationHelpHeaderWidget(showHelp: true),
+              BackNavigationHelpHeaderWidget(showHelp: false),
             ],
           ),
           children: [

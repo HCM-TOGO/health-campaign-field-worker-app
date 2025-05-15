@@ -44,7 +44,7 @@ class CustomManageStocksPageState
     return Scaffold(
       body: ScrollableContent(
         header: const BackNavigationHelpHeaderWidget(
-          showHelp: true,
+          showHelp: false,
         ),
         children: [
           Column(

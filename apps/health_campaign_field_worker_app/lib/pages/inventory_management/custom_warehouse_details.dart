@@ -184,7 +184,7 @@ class CustomWarehouseDetailsPageState
                           return ScrollableContent(
                             header: const Column(children: [
                               BackNavigationHelpHeaderWidget(
-                                showHelp: true,
+                                showHelp: false,
                               ),
                             ]),
                             footer: SizedBox(
