@@ -47,15 +47,15 @@ class CustomWarehouseDetailsPageState
   String? selectedFacilityId;
   TextEditingController controller1 = TextEditingController();
 
-  @override
-  void initState() {
-    clearQRCodes();
-    final stockState = context.read<RecordStockBloc>().state;
-    setState(() {
-      selectedFacilityId = stockState.primaryId;
-    });
-    super.initState();
-  }
+  // @override
+  // void initState() {
+  //   clearQRCodes();
+  //   final stockState = context.read<RecordStockBloc>().state;
+  //   setState(() {
+  //     selectedFacilityId = stockState.primaryId;
+  //   });
+  //   super.initState();
+  // }
 
   FormGroup buildForm(bool isDistributor, RecordStockState stockState) =>
       fb.group(<String, Object>{
@@ -64,12 +64,12 @@ class CustomWarehouseDetailsPageState
           value: localizations
               .translate(InventorySingleton().boundary!.code ?? ''),
         ),
-        _warehouseKey: FormControl<String>(
-          validators: [Validators.required],
+        _warehouseKey: FormControl<FacilityModel>(
+          validators: isDistributor ? [] : [Validators.required],
         ),
         _teamCodeKey: FormControl<String>(
-          value: stockState.primaryId ?? '',
-          validators: deliveryTeamSelected ? [Validators.required] : [],
+          value: stockState.primaryId ?? context.loggedInUserUuid,
+          validators: isDistributor ? [Validators.required] : [],
         ),
       });
 
@@ -176,10 +176,10 @@ class CustomWarehouseDetailsPageState
                                 !InventorySingleton().isWareHouseMgr!,
                             stockState),
                         builder: (context, form, child) {
-                          form.control(_teamCodeKey).value =
-                              scannerState.qrCodes.isNotEmpty
-                                  ? scannerState.qrCodes.firstOrNull
-                                  : '';
+                          // form.control(_teamCodeKey).value =
+                          //     scannerState.qrCodes.isNotEmpty
+                          //         ? scannerState.qrCodes.firstOrNull
+                          //         : '';
 
                           return ScrollableContent(
                             header: const Column(children: [
@@ -218,7 +218,8 @@ class CustomWarehouseDetailsPageState
                                                       .value as String?;
 
                                                   final facility =
-                                                      deliveryTeamSelected
+                                                      InventorySingleton()
+                                                              .isDistributor
                                                           ? FacilityModel(
                                                               id: teamCode ??
                                                                   'Delivery Team',
@@ -312,10 +313,8 @@ class CustomWarehouseDetailsPageState
                                                     } else {
                                                       context.router.push(
                                                           ViewAllTransactionsRoute(
-                                                              warehouseId: form
-                                                                  .control(
-                                                                      _warehouseKey)
-                                                                  .value));
+                                                              warehouseId:
+                                                                  selectedFacilityId));
                                                     }
                                                   }
                                                 },
@@ -376,72 +375,74 @@ class CustomWarehouseDetailsPageState
                                             readOnly: true,
                                           );
                                         }),
-                                    InkWell(
-                                      onTap: () async {
-                                        clearQRCodes();
-                                        form.control(_teamCodeKey).value = '';
+                                    if (!InventorySingleton().isDistributor)
+                                      InkWell(
+                                        onTap: () async {
+                                          // clearQRCodes();
+                                          // form.control(_teamCodeKey).value = '';
 
-                                        final facility =
-                                            await Navigator.of(context).push(
-                                          MaterialPageRoute(
-                                            builder: (context) =>
-                                                InventoryFacilitySelectionPage(
-                                              facilities: facilities,
+                                          final facility =
+                                              await Navigator.of(context).push(
+                                            MaterialPageRoute(
+                                              builder: (context) =>
+                                                  InventoryFacilitySelectionPage(
+                                                facilities: facilities,
+                                              ),
                                             ),
-                                          ),
-                                        );
+                                          );
 
-                                        if (facility == null) return;
-                                        form.control(_warehouseKey).value =
-                                            localizations.translate(
-                                                'FAC_${facility.id}');
-                                        controller1.text = localizations
-                                            .translate('FAC_${facility.id}');
+                                          if (facility == null) return;
+                                          form.control(_warehouseKey).value =
+                                              localizations.translate(
+                                                  'FAC_${facility.id}');
+                                          controller1.text = localizations
+                                              .translate('FAC_${facility.id}');
 
-                                        setState(() {
-                                          selectedFacilityId = facility.id;
-                                        });
-                                        if (facility.id == 'Delivery Team') {
                                           setState(() {
-                                            deliveryTeamSelected = true;
+                                            selectedFacilityId = facility.id;
                                           });
-                                        } else {
-                                          setState(() {
-                                            deliveryTeamSelected = false;
-                                          });
-                                        }
-                                      },
-                                      child: IgnorePointer(
-                                        child: ReactiveWrapperField(
-                                            formControlName: _warehouseKey,
-                                            validationMessages: {
-                                              'required': (object) =>
-                                                  localizations.translate(
-                                                    '${i18.individualDetails.nameLabelText}_IS_REQUIRED',
+                                          if (facility.id == 'Delivery Team') {
+                                            setState(() {
+                                              deliveryTeamSelected = true;
+                                            });
+                                          } else {
+                                            setState(() {
+                                              deliveryTeamSelected = false;
+                                            });
+                                          }
+                                        },
+                                        child: IgnorePointer(
+                                          child: ReactiveWrapperField(
+                                              formControlName: _warehouseKey,
+                                              validationMessages: {
+                                                'required': (object) =>
+                                                    localizations.translate(
+                                                      '${i18.individualDetails.nameLabelText}_IS_REQUIRED',
+                                                    ),
+                                              },
+                                              showErrors: (control) =>
+                                                  control.invalid &&
+                                                  control.touched,
+                                              builder: (field) {
+                                                return InputField(
+                                                  type: InputType.search,
+                                                  label:
+                                                      localizations.translate(
+                                                    i18.stockReconciliationDetails
+                                                        .facilityLabel,
                                                   ),
-                                            },
-                                            showErrors: (control) =>
-                                                control.invalid &&
-                                                control.touched,
-                                            builder: (field) {
-                                              return InputField(
-                                                type: InputType.search,
-                                                label: localizations.translate(
-                                                  i18_local
-                                                      .stockReconciliationShowcase
-                                                      .warehouseLabel,
-                                                ),
-                                                controller: controller1,
-                                                isRequired: true,
-                                                errorMessage: field.errorText,
-                                                onChange: (value) {
-                                                  field.control.markAsTouched();
-                                                },
-                                              );
-                                            }),
+                                                  controller: controller1,
+                                                  isRequired: true,
+                                                  errorMessage: field.errorText,
+                                                  onChange: (value) {
+                                                    field.control
+                                                        .markAsTouched();
+                                                  },
+                                                );
+                                              }),
+                                        ),
                                       ),
-                                    ),
-                                    if (deliveryTeamSelected)
+                                    if (InventorySingleton().isDistributor)
                                       ReactiveWrapperField(
                                           formControlName: _teamCodeKey,
                                           builder: (field) {

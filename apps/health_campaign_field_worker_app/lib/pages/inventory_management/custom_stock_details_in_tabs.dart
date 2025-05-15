@@ -573,7 +573,9 @@ class _DynamicTabsPageState extends LocalizedState<DynamicTabsPage>
                       await _saveCurrentTabData(productName);
 
                       if (_tabController.index < products.length - 1) {
-                        _tabController.animateTo(_tabController.index + 1);
+                        if (form.valid) {
+                          _tabController.animateTo(_tabController.index + 1);
+                        }
                       } else {
                         await _handleFinalSubmission(context);
                       }

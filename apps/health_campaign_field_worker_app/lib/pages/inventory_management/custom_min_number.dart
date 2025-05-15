@@ -37,7 +37,7 @@ class CustomMinNumberPageState extends LocalizedState<CustomMinNumberPage> {
     super.initState();
     loadLocalStockData();
     Logger().i(
-        "Stock Type: ${widget.type == StockRecordEntryType.returned ? "RETURNED" : widget.type == StockRecordEntryType.receipt ? "RECEIPT" : "DISPATCH"}");
+        "Stock Type: ${widget.type == StockRecordEntryType.returned ? "RETURNED" : widget.type == StockRecordEntryType.receipt ? "RECEIVED" : "DISPATCHED"}");
   }
 
   Future<void> loadLocalStockData() async {
@@ -150,6 +150,7 @@ class CustomMinNumberPageState extends LocalizedState<CustomMinNumberPage> {
                           SizedBox(
                             height: MediaQuery.of(context).size.height * 0.7,
                             child: ListView.builder(
+                              reverse: true,
                               itemCount: groupedEntries.length,
                               itemBuilder: (context, index) {
                                 final mrn = groupedEntries[index].key;
