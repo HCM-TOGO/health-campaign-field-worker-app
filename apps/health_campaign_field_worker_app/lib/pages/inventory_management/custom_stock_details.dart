@@ -698,7 +698,8 @@ class CustomStockDetailsPageState
                                                       selectedProducts:
                                                           selectedProducts,
                                                       receivedFrom:
-                                                          receivedFrom,
+                                                          selectedFacilityId ??
+                                                              "",
                                                     ),
                                                   );
 

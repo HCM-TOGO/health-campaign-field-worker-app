@@ -311,10 +311,8 @@ class CustomWarehouseDetailsPageState
                                                     } else {
                                                       context.router.push(
                                                           ViewAllTransactionsRoute(
-                                                              warehouseId: form
-                                                                  .control(
-                                                                      _warehouseKey)
-                                                                  .value));
+                                                              warehouseId:
+                                                                  selectedFacilityId));
                                                     }
                                                   }
                                                 },

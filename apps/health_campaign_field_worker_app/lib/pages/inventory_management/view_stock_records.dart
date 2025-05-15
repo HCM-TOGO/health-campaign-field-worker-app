@@ -153,7 +153,7 @@ class _ViewStockRecordsPageState extends LocalizedState<ViewStockRecordsPage>
                   // Waybill Number
                   InputField(
                     type: InputType.text,
-                    label: 'Waybill Number',
+                    label: 'Waybill Number *',
                     initialValue: stock.wayBillNumber ?? '',
                     isDisabled: true,
                     readOnly: true,
@@ -179,7 +179,7 @@ class _ViewStockRecordsPageState extends LocalizedState<ViewStockRecordsPage>
                   // Quantity
                   InputField(
                     type: InputType.text,
-                    label: 'Quantity',
+                    label: 'Quantity *',
                     initialValue: stock.quantity ?? '',
                     isDisabled: true,
                     readOnly: true,
