@@ -121,6 +121,11 @@ class _ViewStockRecordsLGAPageState
 
   @override
   Widget build(BuildContext context) {
+    // Assumption sender receiver Id not changed ,
+    //using the same as downloaded stock data
+    // and this flow is for stock receipt for LGA
+    final senderIdToShowOnTab = widget.stockRecords.first.senderId;
+
     return Scaffold(
       appBar: AppBar(
         title: Text('Stock Records - ${widget.mrnNumber}'),
@@ -153,9 +158,11 @@ class _ViewStockRecordsLGAPageState
                       Row(
                         children: [
                           const Expanded(child: Text('Received From')),
+                          // TODO : verify this , showing senderId here
                           Expanded(
-                              child: Text(
-                                  widget.stockRecords.first.facilityId ?? '')),
+                            child: Text(localizations
+                                .translate('FAC_$senderIdToShowOnTab')),
+                          ),
                         ],
                       ),
                     ],

@@ -48,6 +48,15 @@ class _DynamicTabsPageState extends LocalizedState<DynamicTabsPage>
   final Map<String, StockModel> _tabStocks = {};
   String _sharedMRN = '';
   bool _isInitializing = true;
+  String? senderIdToShowOnTab = '';
+
+// fields to capture stock metadata
+  String? senderId;
+  String? senderType;
+  String? receiverId;
+  String? receiverType;
+  String? transactionType;
+  String? transactionReason;
 
   static const _productVariantKey = 'productVariant';
   static const _secondaryPartyKey = 'secondaryParty';
@@ -150,13 +159,6 @@ class _DynamicTabsPageState extends LocalizedState<DynamicTabsPage>
     final state = context.read<RecordStockBloc>().state;
     StockRecordEntryType entryType = state.entryType;
 
-    String? senderId;
-    String? senderType;
-    String? receiverId;
-    String? receiverType;
-    String? transactionType;
-    String? transactionReason;
-
     // info setting the transaction related info here for the stock the model
 
     // setTransactionTypeAndReason(
@@ -212,6 +214,7 @@ class _DynamicTabsPageState extends LocalizedState<DynamicTabsPage>
         senderType = "WAREHOUSE";
         receiverId = primaryId;
         receiverType = primaryType;
+        senderIdToShowOnTab = senderId;
 
         break;
       case StockRecordEntryType.dispatch:
@@ -219,6 +222,7 @@ class _DynamicTabsPageState extends LocalizedState<DynamicTabsPage>
         receiverType = "WAREHOUSE";
         senderId = primaryId;
         senderType = primaryType;
+        senderIdToShowOnTab = senderId;
         break;
     }
 
@@ -233,7 +237,7 @@ class _DynamicTabsPageState extends LocalizedState<DynamicTabsPage>
           '0',
       wayBillNumber:
           _forms[productSku]?.control(_waybillNumberKey)?.value?.toString(),
-      transactionReason:
+      transactionReason: transactionReason ??
           _forms[productSku]?.control(_transactionReasonKey)?.value?.toString(),
       clientReferenceId: IdGen.i.identifier,
       additionalFields: StockAdditionalFields(
@@ -413,7 +417,13 @@ class _DynamicTabsPageState extends LocalizedState<DynamicTabsPage>
                     Row(
                       children: [
                         const Expanded(child: Text('Received From')),
-                        Expanded(child: Text(receivedFrom)),
+                        Expanded(
+                            child: Text(
+                          senderIdToShowOnTab == null
+                              ? localizations.translate(i18.common.noMatchFound)
+                              : localizations
+                                  .translate('FAC_$senderIdToShowOnTab'),
+                        )),
                       ],
                     ),
                   ],
@@ -600,7 +610,9 @@ class _DynamicTabsPageState extends LocalizedState<DynamicTabsPage>
     _tabStocks[productName] = currentStock.copyWith(
       quantity: form.control(_transactionQuantityKey).value?.toString(),
       wayBillNumber: form.control(_waybillNumberKey).value?.toString(),
-      transactionReason: form.control(_transactionReasonKey).value?.toString(),
+      transactionReason:
+          form.control(_transactionReasonKey).value?.toString() ??
+              transactionReason,
       additionalFields: currentStock.additionalFields?.copyWith(
         fields: [
           ...(currentStock.additionalFields?.fields ?? []),

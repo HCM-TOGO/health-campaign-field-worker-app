@@ -1,5 +1,6 @@
 import 'package:auto_route/auto_route.dart';
 import 'package:collection/collection.dart';
+import 'package:digit_data_model/data/local_store/sql_store/tables/product_variant.dart';
 import 'package:digit_data_model/data_model.dart';
 import 'package:digit_ui_components/digit_components.dart';
 import 'package:digit_ui_components/theme/digit_extended_theme.dart';
@@ -151,7 +152,9 @@ class CustomInventoryReportDetailsPageState
             return ScrollableContent(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                const BackNavigationHelpHeaderWidget(showHelp: true,),
+                const BackNavigationHelpHeaderWidget(
+                  showHelp: false,
+                ),
                 Container(
                   padding: const EdgeInsets.all(spacer2),
                   child: Align(
@@ -364,6 +367,24 @@ class CustomInventoryReportDetailsPageState
                                                               context.read<
                                                                   CustomInventoryReportBloc>());
                                                         },
+                                                        selectedOption: (form
+                                                                    .control(
+                                                                        _productVariantKey)
+                                                                    .value !=
+                                                                null)
+                                                            ? DropdownItem(
+                                                                name: localizations.translate((form.control(_productVariantKey).value
+                                                                            as ProductVariantModel)
+                                                                        .sku ??
+                                                                    (form.control(_productVariantKey).value
+                                                                            as ProductVariantModel)
+                                                                        .id),
+                                                                code: (form.control(_productVariantKey).value
+                                                                        as ProductVariantModel)
+                                                                    .id)
+                                                            : const DropdownItem(
+                                                                name: '',
+                                                                code: ''),
                                                       ),
                                                     );
                                                   },
@@ -430,15 +451,15 @@ class CustomInventoryReportDetailsPageState
                                                       InventoryReportType
                                                           .returned)
                                                     DigitGridColumn(
-                                                      label: i18
+                                                      label: localizations.translate(i18
                                                           .inventoryReportDetails
-                                                          .returnedQuantityLabel,
+                                                          .returnedQuantityLabel),
                                                       key: partialQuantityKey,
                                                       width: 200,
                                                     ),
                                                   DigitGridColumn(
-                                                    label:
-                                                        transactingPartyLabel,
+                                                    label: localizations.translate(
+                                                        transactingPartyLabel),
                                                     key: transactingPartyKey,
                                                     width: 200,
                                                   ),
@@ -479,23 +500,30 @@ class CustomInventoryReportDetailsPageState
                                                                       '',
                                                             ),
                                                           DigitGridCell(
-                                                            key:
-                                                                transactingPartyKey,
-                                                            value: widget.reportType ==
-                                                                        InventoryReportType
-                                                                            .receipt ||
-                                                                    widget.reportType ==
-                                                                        InventoryReportType
-                                                                            .dispatch
-                                                                ? model.receiverId ??
-                                                                    model
-                                                                        .receiverType ??
-                                                                    ''
-                                                                : model.senderId ??
-                                                                    model
-                                                                        .receiverType ??
-                                                                    '',
-                                                          ),
+                                                              key:
+                                                                  transactingPartyKey,
+                                                              value: widget.reportType ==
+                                                                          InventoryReportType
+                                                                              .receipt ||
+                                                                      widget.reportType ==
+                                                                          InventoryReportType
+                                                                              .dispatch
+                                                                  ? model.receiverId ==
+                                                                          null
+                                                                      ? localizations.translate(i18
+                                                                          .common
+                                                                          .noMatchFound)
+                                                                      : localizations
+                                                                          .translate(
+                                                                              'FAC_${model.receiverId}')
+                                                                  : model.senderId ==
+                                                                          null
+                                                                      ? localizations.translate(i18
+                                                                          .common
+                                                                          .noMatchFound)
+                                                                      : localizations
+                                                                          .translate(
+                                                                              'FAC_${model.senderId}')),
                                                         ],
                                                       ),
                                                   ],
