@@ -1,3 +1,6 @@
+import 'dart:convert';
+import 'dart:io';
+
 import 'package:auto_route/auto_route.dart';
 import 'package:digit_data_model/data_model.dart';
 import 'package:digit_ui_components/digit_components.dart';
@@ -103,6 +106,7 @@ class CustomMinNumberPageState extends LocalizedState<CustomMinNumberPage> {
     }
 
     final groupedEntries = groupedStock.entries.toList();
+    List<StockModel> finalStocks = [];
 
     return Scaffold(
       body: GestureDetector(
@@ -154,7 +158,18 @@ class CustomMinNumberPageState extends LocalizedState<CustomMinNumberPage> {
                               itemCount: groupedEntries.length,
                               itemBuilder: (context, index) {
                                 final mrn = groupedEntries[index].key;
+                                finalStocks = [];
+                                for (StockModel stockModel
+                                    in groupedEntries[index].value) {
+                                  finalStocks
+                                      .add(condenseStockObject(stockModel));
+                                }
                                 final stocks = groupedEntries[index].value;
+                                final jsonStr = jsonEncode(finalStocks);
+
+                                final compressed =
+                                    zlib.encode(utf8.encode(jsonStr));
+                                final encoded = base64Url.encode(compressed);
 
                                 return Padding(
                                   padding: const EdgeInsets.all(8.0),
@@ -177,24 +192,26 @@ class CustomMinNumberPageState extends LocalizedState<CustomMinNumberPage> {
                                                 .auditDetails
                                                 ?.createdTime ??
                                             0),
-                                        'items': stocks.map((s) {
-                                          final name = s
-                                                  .additionalFields?.fields
-                                                  .firstWhere(
-                                                    (f) =>
-                                                        f.key == 'productName',
-                                                    orElse: () =>
-                                                        const AdditionalField(
-                                                            '', ''),
-                                                  )
-                                                  .value ??
-                                              'N/A';
-                                          return {
-                                            'name': name.toString(),
-                                            'quantity':
-                                                (s.quantity ?? 0).toString(),
-                                          };
-                                        }).toList(),
+                                        'items': encoded,
+
+                                        // stocks.map((s) {
+                                        //   final name = s
+                                        //           .additionalFields?.fields
+                                        //           .firstWhere(
+                                        //             (f) =>
+                                        //                 f.key == 'productName',
+                                        //             orElse: () =>
+                                        //                 const AdditionalField(
+                                        //                     '', ''),
+                                        //           )
+                                        //           .value ??
+                                        //       'N/A';
+                                        //   return {
+                                        //     'name': name.toString(),
+                                        //     'quantity':
+                                        //         (s.quantity ?? 0).toString(),
+                                        //   };
+                                        // }).toList(),
                                         'waybillNumber':
                                             stocks.first.wayBillNumber ?? '',
                                       },
@@ -238,6 +255,18 @@ class CustomMinNumberPageState extends LocalizedState<CustomMinNumberPage> {
             ),
           ],
         ),
+      ),
+    );
+  }
+
+  StockModel condenseStockObject(StockModel stockModel) {
+    return stockModel.copyWith(
+      auditDetails: null,
+      clientAuditDetails: null,
+      additionalFields: stockModel.additionalFields?.copyWith(
+        fields: [
+          ...(stockModel.additionalFields?.fields ?? []),
+        ],
       ),
     );
   }

@@ -6,6 +6,8 @@ import 'package:inventory_management/utils/utils.dart';
 
 import 'package:qr_flutter/qr_flutter.dart';
 
+import '../../utils/utils.dart';
+
 class MinNumberCard extends StatelessWidget {
   final String minNumber;
   final String cddCode;
@@ -60,18 +62,18 @@ class MinNumberCard extends StatelessWidget {
                 ),
               ),
             ),
-            if (!InventorySingleton().isWareHouseMgr)
+            if (isHFUser(context))
               Container(
-                height: 155,
-                width: 155,
+                height: 200,
+                width: 200,
                 alignment: Alignment.center,
                 child: QrImageView(
                   data: data.toString(),
                   version: QrVersions.auto,
-                  size: 150.0,
+                  size: 250.0,
                 ),
               ),
-            if (!InventorySingleton().isWareHouseMgr)
+            if (isHFUser(context))
               const SizedBox(height: 8.0), // Replace spacer2
             Text(cddCode),
             const SizedBox(height: 8.0), // Replace spacer2

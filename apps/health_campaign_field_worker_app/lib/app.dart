@@ -8,7 +8,9 @@ import 'package:digit_ui_components/services/location_bloc.dart';
 import 'package:dio/dio.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:inventory_management/blocs/record_stock.dart';
 import 'package:inventory_management/models/entities/stock.dart';
+import 'package:inventory_management/utils/utils.dart';
 import 'package:isar/isar.dart';
 import 'package:location/location.dart';
 import 'package:registration_delivery/data/repositories/local/household_global_search.dart';
@@ -130,6 +132,18 @@ class MainApplicationState extends State<MainApplication>
                   );
                 },
                 lazy: false,
+              ),
+              BlocProvider(
+                create: (context) {
+                  return RecordStockBloc(
+                    stockRepository:
+                        context.repository<StockModel, StockSearchModel>(),
+                    RecordStockCreateState(
+                      entryType: StockRecordEntryType.receipt,
+                      projectId: InventorySingleton().projectId,
+                    ),
+                  );
+                },
               ),
               BlocProvider(
                 create: (context) {
@@ -483,7 +497,7 @@ class MainApplicationState extends State<MainApplication>
                                   const UnauthenticatedRouteWrapper(),
                                 ],
                                 authenticated: (_, __, ___, ____, _____, ______,
-                                        _______,________,_________) =>
+                                        _______, ________, _________) =>
                                     [
                                   AuthenticatedRouteWrapper(),
                                 ],

@@ -51,6 +51,7 @@ import '../pages/inventory_management/view_stock_records.dart';
 import 'package:inventory_management/models/entities/stock.dart';
 import '../pages/inventory_management/custom_min_number.dart';
 import '../pages/inventory_management/view_all_transactions_page.dart';
+import '../pages/inventory_management/qrscanner.dart';
 import '../pages/language_selection.dart';
 import '../pages/login.dart';
 import '../pages/profile.dart';
@@ -126,6 +127,18 @@ class AppRouter extends _$AppRouter {
         AutoRoute(page: HomeRoute.page, path: 'home'),
         AutoRoute(page: ProfileRoute.page, path: 'profile'),
         AutoRoute(page: UserQRDetailsRoute.page, path: 'user-qr-code'),
+        AutoRoute(
+          page: CustomManageStocksRoute.page,
+          path: 'custom-manage-stocks',
+        ),
+        AutoRoute(
+          page: QRScannerRoute.page,
+          path: 'qr-scanner',
+        ),
+        AutoRoute(
+          page: ViewStockRecordsLGARoute.page,
+          path: 'custom-stock-view-lga',
+        ),
         AutoRoute(
           page: CustomMinNumberRoute.page,
           path: 'custom-min-number',
@@ -447,10 +460,6 @@ class AppRouter extends _$AppRouter {
         //   page: ManageStocksRoute.page,
         //   path: 'manage-stocks',
         // ),
-        AutoRoute(
-          page: CustomManageStocksRoute.page,
-          path: 'custom-manage-stocks',
-        ),
 
         AutoRoute(
             page: CustomAcknowledgementRoute.page,
@@ -493,10 +502,6 @@ class AppRouter extends _$AppRouter {
             AutoRoute(
               page: ViewAllTransactionsRoute.page,
               path: 'custom-all-transactions',
-            ),
-            AutoRoute(
-              page: ViewStockRecordsLGARoute.page,
-              path: 'custom-stock-view-lga',
             ),
           ],
         ),

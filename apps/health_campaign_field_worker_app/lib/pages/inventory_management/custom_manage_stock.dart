@@ -1,4 +1,5 @@
 import 'package:auto_route/auto_route.dart';
+import 'package:digit_scanner/pages/qr_scanner.dart';
 import 'package:digit_ui_components/digit_components.dart';
 import 'package:digit_ui_components/theme/digit_extended_theme.dart';
 import 'package:digit_ui_components/widgets/atoms/menu_card.dart';
@@ -11,12 +12,14 @@ import 'package:flutter/rendering.dart';
 import 'package:flutter/widgets.dart';
 
 import 'package:inventory_management/utils/i18_key_constants.dart' as i18;
+import 'package:inventory_management/utils/utils.dart';
 import 'package:inventory_management/widgets/localized.dart';
 import 'package:inventory_management/blocs/record_stock.dart';
 import 'package:inventory_management/widgets/back_navigation_help_header.dart';
 
 import '../../router/app_router.dart';
 import '../../utils/utils.dart';
+import 'qrscanner.dart';
 
 @RoutePage()
 class CustomManageStocksPage extends LocalizedStatefulWidget {
@@ -83,13 +86,19 @@ class CustomManageStocksPageState
                                   children: [
                                     GestureDetector(
                                       onTap: () {
-                                        context.router.push(
-                                          RecordStockWrapperRoute(
-                                            type: StockRecordEntryType.receipt,
-                                          ),
-                                        );
+                                        if (InventorySingleton()
+                                            .isDistributor) {
+                                          context.router.push(QRScannerRoute());
+                                        } else {
+                                          context.router.push(
+                                            RecordStockWrapperRoute(
+                                              type:
+                                                  StockRecordEntryType.receipt,
+                                            ),
+                                          );
 
-                                        Navigator.of(context).pop();
+                                          Navigator.of(context).pop();
+                                        }
                                       },
                                       child: Container(
                                         width: double.infinity,
