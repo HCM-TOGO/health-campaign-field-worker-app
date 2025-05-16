@@ -858,11 +858,6 @@ class _DynamicTabsPageState extends LocalizedState<DynamicTabsPage>
                   redVasCount: redVasCount,
                 ),
               );
-          // _tabController.animateTo(_tabController.index + 1);
-
-          context.read<RecordStockBloc>().add(
-                const RecordStockCreateStockEntryEvent(),
-              );
         }
       }
 
