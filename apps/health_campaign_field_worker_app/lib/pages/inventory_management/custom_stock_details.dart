@@ -74,6 +74,9 @@ class CustomStockDetailsPageState
     return fb.group({
       _productVariantKey: FormControl<List<ProductVariantModel>>(
         value: [],
+        validators: [
+          Validators.required,
+        ],
       ),
       _secondaryPartyKey: FormControl<String>(
         validators: [Validators.required],
@@ -288,6 +291,34 @@ class CustomStockDetailsPageState
                                     : () async {
                                         form.markAllAsTouched();
                                         if (!form.valid) {
+                                          return;
+                                        }
+                                        if (form
+                                            .control(_productVariantKey)
+                                            .value
+                                            .isEmpty) {
+                                          Toast.showToast(
+                                            context,
+                                            type: ToastType.error,
+                                            message: localizations.translate(
+                                              i18_local
+                                                  .stockDetails.productRequired,
+                                            ),
+                                          );
+                                          return;
+                                        }
+                                        if (deliveryTeamSelected &&
+                                            form
+                                                .control(_deliveryTeamKey)
+                                                .value
+                                                .isEmpty) {
+                                          Toast.showToast(
+                                            context,
+                                            type: ToastType.error,
+                                            message: localizations.translate(
+                                              i18.stockDetails.teamCodeRequired,
+                                            ),
+                                          );
                                           return;
                                         }
                                         final primaryId =
@@ -1241,6 +1272,17 @@ class CustomStockDetailsPageState
                                 child: ReactiveWrapperField(
                                     formControlName: _deliveryTeamKey,
                                     builder: (field) {
+                                      final textController =
+                                          TextEditingController(
+                                        text: field.control.value?.toString() ??
+                                            '',
+                                      );
+                                      field.control.valueChanges
+                                          .listen((value) {
+                                        if (textController.text != value) {
+                                          textController.text = value ?? '';
+                                        }
+                                      });
                                       return InputField(
                                         type: InputType.search,
                                         label: localizations.translate(
@@ -1248,6 +1290,7 @@ class CustomStockDetailsPageState
                                               .teamCodeLabel,
                                         ),
                                         isRequired: deliveryTeamSelected,
+                                        controller: textController,
                                         suffixIcon: Icons.qr_code_2,
                                         onSuffixTap: (value) {
                                           //[TODO: Add route to auto_route]
@@ -1281,6 +1324,7 @@ class CustomStockDetailsPageState
                                           } else {
                                             clearQRCodes();
                                           }
+                                          field.didChange(value);
                                         },
                                       );
                                     }),
