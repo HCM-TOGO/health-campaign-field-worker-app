@@ -59,8 +59,18 @@ class _ViewAllTransactionsScreenState extends State<ViewAllTransactionsScreen> {
           senderId: warehouseId));
     }
 
+    final List<StockModel> stocks = List<StockModel>.from(result);
+    final filteredResult = stocks.where((stock) {
+      return stock.additionalFields?.fields.any(
+            (field) =>
+                field.key == 'received' &&
+                field.value.toString().toLowerCase() == 'true',
+          ) ??
+          false;
+    }).toList();
+
     setState(() {
-      stockList = result;
+      stockList = filteredResult;
     });
   }
 

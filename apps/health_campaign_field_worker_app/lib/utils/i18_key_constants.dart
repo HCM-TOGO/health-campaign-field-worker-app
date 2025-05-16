@@ -448,6 +448,8 @@ class StockDetails {
 
   String get quantityReturnedMaxError =>
       'STOCK_DETAILS_RETURNED_MAX_QUANTITY_ERROR';
+
+  String get productRequired => 'STOCK_DETAILS_PRODUCT_IS_REQUIRED';
 }
 
 class InventoryReportDetails {
@@ -836,6 +838,11 @@ class Home {
 
 class AcknowledgementSuccess {
   const AcknowledgementSuccess();
+  String get mrnNumberLabel => 'MRN_NUMBER_LABEL';
+
+  String get mrnNumberDescription => "MRN_NUMBER_DESCRIPTION";
+
+  String get mrnNumberHeading => "MRN_NUMBER_HEADING";
 
   String get actionLabelText => 'ACKNOWLEDGEMENT_SUCCESS_ACTION_LABEL_TEXT';
 
