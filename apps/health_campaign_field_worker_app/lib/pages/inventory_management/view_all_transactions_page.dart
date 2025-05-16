@@ -16,6 +16,7 @@ import '../../router/app_router.dart';
 import '../../utils/utils.dart';
 import '../../widgets/action_card/all_transactions_card.dart';
 import 'view_record_lga.dart';
+import 'package:collection/collection.dart';
 
 @RoutePage()
 class ViewAllTransactionsScreen extends StatefulWidget {
@@ -43,7 +44,8 @@ class _ViewAllTransactionsScreenState extends State<ViewAllTransactionsScreen> {
             as CustomStockLocalRepository;
     String? warehouseId = widget.warehouseId;
 
-    dynamic result;
+    List<StockModel> result;
+    List<StockModel> receivedResult;
     // check for valid user
     if (isLGAUser() ||
         isHFUser(context) ||
@@ -52,22 +54,41 @@ class _ViewAllTransactionsScreenState extends State<ViewAllTransactionsScreen> {
           transactionType: [TransactionType.dispatched.toValue()],
           transactionReason: [],
           receiverId: warehouseId == null ? [] : [warehouseId]));
+      receivedResult = await repository.search(StockSearchModel(
+          transactionType: [TransactionType.received.toValue()],
+          transactionReason: [TransactionReason.received.toValue()],
+          receiverId: [warehouseId ?? '']));
+      result = result.where((stock) {
+        String minStock = stock.additionalFields?.fields
+                .firstWhere(
+                  (field) => field.key == 'materialNoteNumber',
+                  orElse: () => const AdditionalField('materialNoteNumber', ''),
+                )
+                .value
+                ?.toString() ??
+            'N/A';
+        return receivedResult.firstWhereOrNull((item) {
+              return item.productVariantId == stock.productVariantId &&
+                  item.receiverId == stock.receiverId &&
+                  item.senderId == stock.senderId &&
+                  minStock ==
+                      item.additionalFields?.fields
+                          .firstWhere(
+                            (field) => field.key == 'materialNoteNumber',
+                            orElse: () =>
+                                const AdditionalField('materialNoteNumber', ''),
+                          )
+                          .value
+                          ?.toString();
+            }) ==
+            null;
+      }).toList();
     } else {
       result = await repository.search(StockSearchModel(
           transactionType: [TransactionType.received.toValue()],
           transactionReason: [TransactionReason.received.toValue()],
           senderId: warehouseId));
     }
-
-    // final List<StockModel> stocks = List<StockModel>.from(result);
-    // final filteredResult = stocks.where((stock) {
-    //   return stock.additionalFields?.fields.any(
-    //         (field) =>
-    //             field.key == 'received' &&
-    //             field.value.toString().toLowerCase() == 'false',
-    //       ) ??
-    //       true;
-    // }).toList();
 
     setState(() {
       stockList = result;
@@ -80,7 +101,7 @@ class _ViewAllTransactionsScreenState extends State<ViewAllTransactionsScreen> {
       final mrn = stock.additionalFields?.fields
               .firstWhere(
                 (f) => f.key == 'materialNoteNumber',
-                orElse: () => AdditionalField('materialNoteNumber', ''),
+                orElse: () => const AdditionalField('materialNoteNumber', ''),
               )
               .value
               ?.toString() ??
@@ -96,7 +117,7 @@ class _ViewAllTransactionsScreenState extends State<ViewAllTransactionsScreen> {
     final mrnNumber = stock.additionalFields?.fields
             .firstWhere(
               (field) => field.key == 'materialNoteNumber',
-              orElse: () => AdditionalField('materialNoteNumber', ''),
+              orElse: () => const AdditionalField('materialNoteNumber', ''),
             )
             .value
             ?.toString() ??
@@ -107,7 +128,7 @@ class _ViewAllTransactionsScreenState extends State<ViewAllTransactionsScreen> {
       final currentMrn = s.additionalFields?.fields
               .firstWhere(
                 (field) => field.key == 'materialNoteNumber',
-                orElse: () => AdditionalField('materialNoteNumber', ''),
+                orElse: () => const AdditionalField('materialNoteNumber', ''),
               )
               .value
               ?.toString() ??
@@ -197,8 +218,9 @@ class _ViewAllTransactionsScreenState extends State<ViewAllTransactionsScreen> {
                                               .firstWhere(
                                                 (field) =>
                                                     field.key == 'productName',
-                                                orElse: () => AdditionalField(
-                                                    'productName', 'N/A'),
+                                                orElse: () =>
+                                                    const AdditionalField(
+                                                        'productName', 'N/A'),
                                               )
                                               .value
                                               ?.toString() ??

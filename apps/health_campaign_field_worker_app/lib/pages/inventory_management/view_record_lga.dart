@@ -72,7 +72,6 @@ class _ViewStockRecordsLGAPageState
               field.key != 'quantityReceived' && field.key != 'comments'),
           AdditionalField('quantityReceived',
               _form.control('quantityReceived').value.toString()),
-          AdditionalField('received', 'true'.toString()),
           if (_form.control('comments').value != null)
             AdditionalField('comments', _form.control('comments').value),
         ];
@@ -164,6 +163,7 @@ class _ViewStockRecordsLGAPageState
         CustomAcknowledgementRoute(
           mrnNumber: widget.mrnNumber,
           stockRecords: updatedStocks,
+          entryType: StockRecordEntryType.receipt
         ),
       );
     } else {
@@ -245,7 +245,14 @@ class _ViewStockRecordsLGAPageState
                               style: TextStyle(
                                 fontSize: 16,
                                 fontWeight: FontWeight.bold,
-                                color: Theme.of(context).primaryColor,
+                                color: productName == 'SPAQ 1' ||
+                                        productName == 'SPAQ 2'
+                                    ? Colors.orange
+                                    : productName == 'Red VAS'
+                                        ? Colors.red
+                                        : productName == 'Blue VAS'
+                                            ? Colors.blue
+                                            : Theme.of(context).primaryColor,
                               ),
                             ),
                             const SizedBox(height: 12),

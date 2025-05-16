@@ -75,6 +75,7 @@ abstract class _$AppRouter extends RootStackRouter {
           appLocalizations: args.appLocalizations,
           mrnNumber: args.mrnNumber,
           stockRecords: args.stockRecords,
+          entryType: args.entryType,
         ),
       );
     },
@@ -491,6 +492,76 @@ abstract class _$AppRouter extends RootStackRouter {
         ),
       );
     },
+    CustomSurveyFormAcknowledgementRoute.name: (routeData) {
+      final args = routeData.argsAs<CustomSurveyFormAcknowledgementRouteArgs>(
+          orElse: () => const CustomSurveyFormAcknowledgementRouteArgs());
+      return AutoRoutePage<dynamic>(
+        routeData: routeData,
+        child: CustomSurveyFormAcknowledgementPage(
+          key: args.key,
+          appLocalizations: args.appLocalizations,
+          isDataRecordSuccess: args.isDataRecordSuccess,
+          label: args.label,
+          description: args.description,
+          descriptionTableData: args.descriptionTableData,
+        ),
+      );
+    },
+    CustomSurveyFormBoundaryViewRoute.name: (routeData) {
+      final args = routeData.argsAs<CustomSurveyFormBoundaryViewRouteArgs>(
+          orElse: () => const CustomSurveyFormBoundaryViewRouteArgs());
+      return AutoRoutePage<dynamic>(
+        routeData: routeData,
+        child: CustomSurveyFormBoundaryViewPage(
+          key: args.key,
+          appLocalizations: args.appLocalizations,
+        ),
+      );
+    },
+    CustomSurveyFormPreviewRoute.name: (routeData) {
+      final args = routeData.argsAs<CustomSurveyFormPreviewRouteArgs>(
+          orElse: () => const CustomSurveyFormPreviewRouteArgs());
+      return AutoRoutePage<dynamic>(
+        routeData: routeData,
+        child: CustomSurveyFormPreviewPage(
+          key: args.key,
+          appLocalizations: args.appLocalizations,
+        ),
+      );
+    },
+    CustomSurveyFormViewRoute.name: (routeData) {
+      final args = routeData.argsAs<CustomSurveyFormViewRouteArgs>(
+          orElse: () => const CustomSurveyFormViewRouteArgs());
+      return AutoRoutePage<dynamic>(
+        routeData: routeData,
+        child: CustomSurveyFormViewPage(
+          key: args.key,
+          appLocalizations: args.appLocalizations,
+        ),
+      );
+    },
+    CustomSurveyFormWrapperRoute.name: (routeData) {
+      final args = routeData.argsAs<CustomSurveyFormWrapperRouteArgs>(
+          orElse: () => const CustomSurveyFormWrapperRouteArgs());
+      return AutoRoutePage<dynamic>(
+        routeData: routeData,
+        child: CustomSurveyFormWrapperPage(
+          key: args.key,
+          isEditing: args.isEditing,
+        ),
+      );
+    },
+    CustomSurveyformRoute.name: (routeData) {
+      final args = routeData.argsAs<CustomSurveyformRouteArgs>(
+          orElse: () => const CustomSurveyformRouteArgs());
+      return AutoRoutePage<dynamic>(
+        routeData: routeData,
+        child: CustomSurveyformPage(
+          key: args.key,
+          appLocalizations: args.appLocalizations,
+        ),
+      );
+    },
     CustomTransactionalDetailsRoute.name: (routeData) {
       final args = routeData.argsAs<CustomTransactionalDetailsRouteArgs>(
           orElse: () => const CustomTransactionalDetailsRouteArgs());
@@ -864,6 +935,7 @@ class CustomAcknowledgementRoute
     RegistrationDeliveryLocalization? appLocalizations,
     required String mrnNumber,
     required List<StockModel> stockRecords,
+    required StockRecordEntryType entryType,
     List<PageRouteInfo>? children,
   }) : super(
           CustomAcknowledgementRoute.name,
@@ -872,6 +944,7 @@ class CustomAcknowledgementRoute
             appLocalizations: appLocalizations,
             mrnNumber: mrnNumber,
             stockRecords: stockRecords,
+            entryType: entryType,
           ),
           initialChildren: children,
         );
@@ -888,6 +961,7 @@ class CustomAcknowledgementRouteArgs {
     this.appLocalizations,
     required this.mrnNumber,
     required this.stockRecords,
+    required this.entryType,
   });
 
   final Key? key;
@@ -898,9 +972,11 @@ class CustomAcknowledgementRouteArgs {
 
   final List<StockModel> stockRecords;
 
+  final StockRecordEntryType entryType;
+
   @override
   String toString() {
-    return 'CustomAcknowledgementRouteArgs{key: $key, appLocalizations: $appLocalizations, mrnNumber: $mrnNumber, stockRecords: $stockRecords}';
+    return 'CustomAcknowledgementRouteArgs{key: $key, appLocalizations: $appLocalizations, mrnNumber: $mrnNumber, stockRecords: $stockRecords, entryType: $entryType}';
   }
 }
 
@@ -2440,6 +2516,259 @@ class CustomSummaryRouteArgs {
   @override
   String toString() {
     return 'CustomSummaryRouteArgs{key: $key, appLocalizations: $appLocalizations}';
+  }
+}
+
+/// generated route for
+/// [CustomSurveyFormAcknowledgementPage]
+class CustomSurveyFormAcknowledgementRoute
+    extends PageRouteInfo<CustomSurveyFormAcknowledgementRouteArgs> {
+  CustomSurveyFormAcknowledgementRoute({
+    Key? key,
+    SurveyFormLocalization? appLocalizations,
+    bool isDataRecordSuccess = false,
+    String? label,
+    String? description,
+    Map<String, dynamic>? descriptionTableData,
+    List<PageRouteInfo>? children,
+  }) : super(
+          CustomSurveyFormAcknowledgementRoute.name,
+          args: CustomSurveyFormAcknowledgementRouteArgs(
+            key: key,
+            appLocalizations: appLocalizations,
+            isDataRecordSuccess: isDataRecordSuccess,
+            label: label,
+            description: description,
+            descriptionTableData: descriptionTableData,
+          ),
+          initialChildren: children,
+        );
+
+  static const String name = 'CustomSurveyFormAcknowledgementRoute';
+
+  static const PageInfo<CustomSurveyFormAcknowledgementRouteArgs> page =
+      PageInfo<CustomSurveyFormAcknowledgementRouteArgs>(name);
+}
+
+class CustomSurveyFormAcknowledgementRouteArgs {
+  const CustomSurveyFormAcknowledgementRouteArgs({
+    this.key,
+    this.appLocalizations,
+    this.isDataRecordSuccess = false,
+    this.label,
+    this.description,
+    this.descriptionTableData,
+  });
+
+  final Key? key;
+
+  final SurveyFormLocalization? appLocalizations;
+
+  final bool isDataRecordSuccess;
+
+  final String? label;
+
+  final String? description;
+
+  final Map<String, dynamic>? descriptionTableData;
+
+  @override
+  String toString() {
+    return 'CustomSurveyFormAcknowledgementRouteArgs{key: $key, appLocalizations: $appLocalizations, isDataRecordSuccess: $isDataRecordSuccess, label: $label, description: $description, descriptionTableData: $descriptionTableData}';
+  }
+}
+
+/// generated route for
+/// [CustomSurveyFormBoundaryViewPage]
+class CustomSurveyFormBoundaryViewRoute
+    extends PageRouteInfo<CustomSurveyFormBoundaryViewRouteArgs> {
+  CustomSurveyFormBoundaryViewRoute({
+    Key? key,
+    SurveyFormLocalization? appLocalizations,
+    List<PageRouteInfo>? children,
+  }) : super(
+          CustomSurveyFormBoundaryViewRoute.name,
+          args: CustomSurveyFormBoundaryViewRouteArgs(
+            key: key,
+            appLocalizations: appLocalizations,
+          ),
+          initialChildren: children,
+        );
+
+  static const String name = 'CustomSurveyFormBoundaryViewRoute';
+
+  static const PageInfo<CustomSurveyFormBoundaryViewRouteArgs> page =
+      PageInfo<CustomSurveyFormBoundaryViewRouteArgs>(name);
+}
+
+class CustomSurveyFormBoundaryViewRouteArgs {
+  const CustomSurveyFormBoundaryViewRouteArgs({
+    this.key,
+    this.appLocalizations,
+  });
+
+  final Key? key;
+
+  final SurveyFormLocalization? appLocalizations;
+
+  @override
+  String toString() {
+    return 'CustomSurveyFormBoundaryViewRouteArgs{key: $key, appLocalizations: $appLocalizations}';
+  }
+}
+
+/// generated route for
+/// [CustomSurveyFormPreviewPage]
+class CustomSurveyFormPreviewRoute
+    extends PageRouteInfo<CustomSurveyFormPreviewRouteArgs> {
+  CustomSurveyFormPreviewRoute({
+    Key? key,
+    SurveyFormLocalization? appLocalizations,
+    List<PageRouteInfo>? children,
+  }) : super(
+          CustomSurveyFormPreviewRoute.name,
+          args: CustomSurveyFormPreviewRouteArgs(
+            key: key,
+            appLocalizations: appLocalizations,
+          ),
+          initialChildren: children,
+        );
+
+  static const String name = 'CustomSurveyFormPreviewRoute';
+
+  static const PageInfo<CustomSurveyFormPreviewRouteArgs> page =
+      PageInfo<CustomSurveyFormPreviewRouteArgs>(name);
+}
+
+class CustomSurveyFormPreviewRouteArgs {
+  const CustomSurveyFormPreviewRouteArgs({
+    this.key,
+    this.appLocalizations,
+  });
+
+  final Key? key;
+
+  final SurveyFormLocalization? appLocalizations;
+
+  @override
+  String toString() {
+    return 'CustomSurveyFormPreviewRouteArgs{key: $key, appLocalizations: $appLocalizations}';
+  }
+}
+
+/// generated route for
+/// [CustomSurveyFormViewPage]
+class CustomSurveyFormViewRoute
+    extends PageRouteInfo<CustomSurveyFormViewRouteArgs> {
+  CustomSurveyFormViewRoute({
+    Key? key,
+    SurveyFormLocalization? appLocalizations,
+    List<PageRouteInfo>? children,
+  }) : super(
+          CustomSurveyFormViewRoute.name,
+          args: CustomSurveyFormViewRouteArgs(
+            key: key,
+            appLocalizations: appLocalizations,
+          ),
+          initialChildren: children,
+        );
+
+  static const String name = 'CustomSurveyFormViewRoute';
+
+  static const PageInfo<CustomSurveyFormViewRouteArgs> page =
+      PageInfo<CustomSurveyFormViewRouteArgs>(name);
+}
+
+class CustomSurveyFormViewRouteArgs {
+  const CustomSurveyFormViewRouteArgs({
+    this.key,
+    this.appLocalizations,
+  });
+
+  final Key? key;
+
+  final SurveyFormLocalization? appLocalizations;
+
+  @override
+  String toString() {
+    return 'CustomSurveyFormViewRouteArgs{key: $key, appLocalizations: $appLocalizations}';
+  }
+}
+
+/// generated route for
+/// [CustomSurveyFormWrapperPage]
+class CustomSurveyFormWrapperRoute
+    extends PageRouteInfo<CustomSurveyFormWrapperRouteArgs> {
+  CustomSurveyFormWrapperRoute({
+    Key? key,
+    bool isEditing = false,
+    List<PageRouteInfo>? children,
+  }) : super(
+          CustomSurveyFormWrapperRoute.name,
+          args: CustomSurveyFormWrapperRouteArgs(
+            key: key,
+            isEditing: isEditing,
+          ),
+          initialChildren: children,
+        );
+
+  static const String name = 'CustomSurveyFormWrapperRoute';
+
+  static const PageInfo<CustomSurveyFormWrapperRouteArgs> page =
+      PageInfo<CustomSurveyFormWrapperRouteArgs>(name);
+}
+
+class CustomSurveyFormWrapperRouteArgs {
+  const CustomSurveyFormWrapperRouteArgs({
+    this.key,
+    this.isEditing = false,
+  });
+
+  final Key? key;
+
+  final bool isEditing;
+
+  @override
+  String toString() {
+    return 'CustomSurveyFormWrapperRouteArgs{key: $key, isEditing: $isEditing}';
+  }
+}
+
+/// generated route for
+/// [CustomSurveyformPage]
+class CustomSurveyformRoute extends PageRouteInfo<CustomSurveyformRouteArgs> {
+  CustomSurveyformRoute({
+    Key? key,
+    SurveyFormLocalization? appLocalizations,
+    List<PageRouteInfo>? children,
+  }) : super(
+          CustomSurveyformRoute.name,
+          args: CustomSurveyformRouteArgs(
+            key: key,
+            appLocalizations: appLocalizations,
+          ),
+          initialChildren: children,
+        );
+
+  static const String name = 'CustomSurveyformRoute';
+
+  static const PageInfo<CustomSurveyformRouteArgs> page =
+      PageInfo<CustomSurveyformRouteArgs>(name);
+}
+
+class CustomSurveyformRouteArgs {
+  const CustomSurveyformRouteArgs({
+    this.key,
+    this.appLocalizations,
+  });
+
+  final Key? key;
+
+  final SurveyFormLocalization? appLocalizations;
+
+  @override
+  String toString() {
+    return 'CustomSurveyformRouteArgs{key: $key, appLocalizations: $appLocalizations}';
   }
 }
 

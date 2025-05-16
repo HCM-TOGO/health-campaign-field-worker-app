@@ -6,6 +6,7 @@ import 'package:digit_ui_components/widgets/atoms/menu_card.dart';
 import 'package:digit_ui_components/widgets/scrollable_content.dart';
 import 'package:flutter/material.dart';
 import 'package:health_campaign_field_worker_app/router/app_router.dart';
+import 'package:health_campaign_field_worker_app/widgets/custom_back_navigation.dart';
 import 'package:inventory_management/router/inventory_router.gm.dart';
 import 'package:digit_components/widgets/digit_dialog.dart';
 import 'package:flutter/rendering.dart';
@@ -46,8 +47,8 @@ class CustomManageStocksPageState
 
     return Scaffold(
       body: ScrollableContent(
-        header: const BackNavigationHelpHeaderWidget(
-          showHelp: false,
+        header: const CustomBackNavigationHelpHeaderWidget(
+          showHelp: true,
         ),
         children: [
           Column(
@@ -56,7 +57,7 @@ class CustomManageStocksPageState
             children: [
               Padding(
                 padding: const EdgeInsets.only(
-                    left: spacer2, right: spacer2, bottom: spacer4),
+                    left: spacer2, right: spacer2, bottom: spacer4, top: spacer4),
                 child: Align(
                   alignment: Alignment.topLeft,
                   child: Text(

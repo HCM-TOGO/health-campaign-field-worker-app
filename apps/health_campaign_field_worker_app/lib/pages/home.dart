@@ -517,7 +517,7 @@ class _HomePageState extends LocalizedState<HomePage> {
               triggerLocalization();
               isTriggerLocalisation = false;
             }
-            context.router.push(SurveyFormWrapperRoute());
+            context.router.push(CustomSurveyFormWrapperRoute());
           },
         ),
       ),

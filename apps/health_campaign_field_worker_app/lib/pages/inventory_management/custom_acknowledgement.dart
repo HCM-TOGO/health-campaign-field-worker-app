@@ -19,12 +19,14 @@ import '../../widgets/digit_ui_component/custom_panel_card.dart';
 class CustomAcknowledgementPage extends LocalizedStatefulWidget {
   final String mrnNumber;
   final List<StockModel> stockRecords;
+  final StockRecordEntryType entryType;
 
   const CustomAcknowledgementPage({
     super.key,
     super.appLocalizations,
     required this.mrnNumber,
     required this.stockRecords,
+    required this.entryType,
   });
 
   @override
@@ -36,8 +38,24 @@ class CustomAcknowledgementPageState
     extends LocalizedState<CustomAcknowledgementPage> {
   @override
   Widget build(BuildContext context) {
+
+    var showLabel = localizations.translate(i18_local.acknowledgementSuccess.mrnNumberLabel);
+    var showDescription = localizations.translate(i18_local.acknowledgementSuccess.mrrnNumberDescription);
+    var showHeading = localizations.translate(i18_local.acknowledgementSuccess.mrrnNumberHeading);
+
+    if(widget.entryType == StockRecordEntryType.dispatch) {
+        showLabel = localizations.translate(i18_local.acknowledgementSuccess.minNumberLabel);
+        showDescription = localizations.translate(i18_local.acknowledgementSuccess.minNumberDescription);
+        showHeading = localizations.translate(i18_local.acknowledgementSuccess.minNumberHeading);
+    }
+    else if(widget.entryType == StockRecordEntryType.returned) {
+        showLabel = localizations.translate(i18_local.acknowledgementSuccess.mrnNumberLabel);
+        showDescription = localizations.translate(i18_local.acknowledgementSuccess.mrnNumberDescription);
+        showHeading = localizations.translate(i18_local.acknowledgementSuccess.mrnNumberHeading);
+    }
+
     Map<String, String> mrnnumber = {
-      'id': localizations.translate(i18_local.acknowledgementSuccess.mrnNumberLabel),
+      'id': showLabel,
       'value': widget.mrnNumber
     };
     return PopScope(
@@ -48,14 +66,8 @@ class CustomAcknowledgementPageState
           child: CustomPanelCard(
             type: PanelType.success,
             subTitle: mrnnumber,
-            title: localizations.translate(
-              i18_local.acknowledgementSuccess
-                  .mrnNumberHeading,
-            ),
-            description: localizations.translate(
-              i18_local.acknowledgementSuccess
-                  .mrnNumberDescription,
-            ),
+            title: showHeading,
+            description: showDescription,
             actions: [
               DigitButton(
                 label: localizations.translate(
