@@ -164,6 +164,7 @@ class _ViewStockRecordsLGAPageState
         CustomAcknowledgementRoute(
           mrnNumber: widget.mrnNumber,
           stockRecords: updatedStocks,
+          entryType: StockRecordEntryType.receipt
         ),
       );
     } else {
