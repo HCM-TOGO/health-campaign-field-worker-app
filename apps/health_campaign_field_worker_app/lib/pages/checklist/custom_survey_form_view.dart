@@ -178,24 +178,41 @@ class CustomSurveyFormViewPageState
                                               clientReferenceId:
                                                   IdGen.i.identifier,
                                               referenceId: referenceId,
-                                              value: attribute?[i].dataType !=
-                                                      'SingleValueList'
+                                              value: attribute?[i].dataType ==
+                                                      'MultiValueList'
                                                   ? controller[i]
                                                           .text
                                                           .toString()
-                                                          .trim()
                                                           .isNotEmpty
                                                       ? controller[i]
                                                           .text
                                                           .toString()
-                                                      : ''
-                                                  : visibleSurveyFormIndexes
-                                                          .contains(i)
-                                                      ? controller[i]
-                                                          .text
-                                                          .toString()
+                                                          .substring(1)
                                                       : i18.surveyForm
-                                                          .notSelectedKey,
+                                                          .notSelectedKey
+                                                  : attribute?[i].dataType !=
+                                                          'SingleValueList'
+                                                      ? controller[i]
+                                                              .text
+                                                              .toString()
+                                                              .trim()
+                                                              .isNotEmpty
+                                                          ? controller[i]
+                                                              .text
+                                                              .toString()
+                                                          : (attribute?[i]
+                                                                      .dataType !=
+                                                                  'Number'
+                                                              ? i18.surveyForm
+                                                                  .notSelectedKey
+                                                              : '0')
+                                                      : visibleSurveyFormIndexes
+                                                              .contains(i)
+                                                          ? controller[i]
+                                                              .text
+                                                              .toString()
+                                                          : i18.surveyForm
+                                                              .notSelectedKey,
                                               rowVersion: 1,
                                               tenantId: attribute?[i].tenantId,
                                               additionalDetails: ((attribute?[i]
@@ -364,8 +381,8 @@ class CustomSurveyFormViewPageState
                                     if (((controller[index].text == null ||
                                             controller[index].text == '') &&
                                         e.required == true)) {
-                                      return localizations
-                                          .translate("${e.code}_REQUIRED");
+                                      return localizations.translate(
+                                          i18.common.corecommonRequired);
                                     }
                                     if (e.regex != null) {
                                       return (RegExp(e.regex!).hasMatch(
@@ -394,8 +411,8 @@ class CustomSurveyFormViewPageState
                                           onChange: (value) {
                                             field.didChange(value);
                                             controller[index].text = value;
-                                            surveyFormKey.currentState
-                                                ?.validate();
+                                            // surveyFormKey.currentState
+                                            //     ?.validate();
                                           },
                                           errorMessage: field.errorText,
                                           controller: controller[index],
@@ -449,8 +466,8 @@ class CustomSurveyFormViewPageState
                                         onChange: (value) {
                                           field.didChange(value);
                                           controller[index].text = value;
-                                          surveyFormKey.currentState
-                                              ?.validate();
+                                          // surveyFormKey.currentState
+                                          //     ?.validate();
                                         },
                                         errorMessage: field.errorText,
                                         keyboardType: TextInputType.number,
@@ -487,6 +504,10 @@ class CustomSurveyFormViewPageState
                                       builder: (context, state) {
                                         return Column(
                                           children: e.values!
+                                              .where((e1) =>
+                                                  e1 !=
+                                                  i18.surveyForm.notSelectedKey)
+                                              .toList()
                                               .map((item) => DigitCheckbox(
                                                     label: localizations.translate(
                                                         '${selectedServiceDefinition?.code}.${item}'),
@@ -882,7 +903,7 @@ class CustomSurveyFormViewPageState
             if (((controller[index].text == null ||
                     controller[index].text == '') &&
                 item.required == true)) {
-              return localizations.translate("${item.code}_REQUIRED");
+              return localizations.translate(i18.common.corecommonRequired);
             }
             if (item.regex != null) {
               return (RegExp(item.regex!).hasMatch(controller[index].text!))
@@ -993,6 +1014,8 @@ class CustomSurveyFormViewPageState
               builder: (context, state) {
                 return Column(
                   children: item.values!
+                      .where((e1) => e1 != i18.surveyForm.notSelectedKey)
+                      .toList()
                       .map((e) => DigitCheckbox(
                             label: localizations.translate(
                                 '${selectedServiceDefinition?.code}.${e}'),
