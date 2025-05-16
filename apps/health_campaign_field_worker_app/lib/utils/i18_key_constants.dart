@@ -838,6 +838,17 @@ class Home {
 
 class AcknowledgementSuccess {
   const AcknowledgementSuccess();
+
+  String get mrrnNumberDescription => "MRRN_NUMBER_DESCRIPTION";
+
+  String get mrrnNumberHeading => "MRRN_NUMBER_HEADING";
+
+  String get minNumberLabel => 'MIN_NUMBER_LABEL';
+
+  String get minNumberDescription => "MIN_NUMBER_DESCRIPTION";
+
+  String get minNumberHeading => "MIN_NUMBER_HEADING";
+
   String get mrnNumberLabel => 'MRN_NUMBER_LABEL';
 
   String get mrnNumberDescription => "MRN_NUMBER_DESCRIPTION";

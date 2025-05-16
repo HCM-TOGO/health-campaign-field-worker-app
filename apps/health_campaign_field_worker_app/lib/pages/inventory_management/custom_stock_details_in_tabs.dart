@@ -790,6 +790,7 @@ class _DynamicTabsPageState extends LocalizedState<DynamicTabsPage>
               context.router.push(CustomAcknowledgementRoute(
                 mrnNumber: _sharedMRN,
                 stockRecords: _tabStocks.values.toList(),
+                entryType : entryType
               ));
             },
             type: DigitButtonType.primary,

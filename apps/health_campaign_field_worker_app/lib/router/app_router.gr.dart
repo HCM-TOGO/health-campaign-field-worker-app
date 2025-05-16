@@ -75,6 +75,7 @@ abstract class _$AppRouter extends RootStackRouter {
           appLocalizations: args.appLocalizations,
           mrnNumber: args.mrnNumber,
           stockRecords: args.stockRecords,
+          entryType: args.entryType,
         ),
       );
     },
@@ -853,6 +854,7 @@ class CustomAcknowledgementRoute
     RegistrationDeliveryLocalization? appLocalizations,
     required String mrnNumber,
     required List<StockModel> stockRecords,
+    required StockRecordEntryType entryType,
     List<PageRouteInfo>? children,
   }) : super(
           CustomAcknowledgementRoute.name,
@@ -861,6 +863,7 @@ class CustomAcknowledgementRoute
             appLocalizations: appLocalizations,
             mrnNumber: mrnNumber,
             stockRecords: stockRecords,
+            entryType: entryType,
           ),
           initialChildren: children,
         );
@@ -877,6 +880,7 @@ class CustomAcknowledgementRouteArgs {
     this.appLocalizations,
     required this.mrnNumber,
     required this.stockRecords,
+    required this.entryType,
   });
 
   final Key? key;
@@ -887,9 +891,11 @@ class CustomAcknowledgementRouteArgs {
 
   final List<StockModel> stockRecords;
 
+  final StockRecordEntryType entryType;
+
   @override
   String toString() {
-    return 'CustomAcknowledgementRouteArgs{key: $key, appLocalizations: $appLocalizations, mrnNumber: $mrnNumber, stockRecords: $stockRecords}';
+    return 'CustomAcknowledgementRouteArgs{key: $key, appLocalizations: $appLocalizations, mrnNumber: $mrnNumber, stockRecords: $stockRecords, entryType: $entryType}';
   }
 }
 
