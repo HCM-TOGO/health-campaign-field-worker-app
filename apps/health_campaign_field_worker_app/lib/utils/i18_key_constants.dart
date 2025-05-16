@@ -448,6 +448,8 @@ class StockDetails {
 
   String get quantityReturnedMaxError =>
       'STOCK_DETAILS_RETURNED_MAX_QUANTITY_ERROR';
+
+  String get productRequired => 'STOCK_DETAILS_PRODUCT_IS_REQUIRED';
 }
 
 class InventoryReportDetails {
