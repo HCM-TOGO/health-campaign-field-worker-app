@@ -596,6 +596,16 @@ class _DynamicTabsPageState extends LocalizedState<DynamicTabsPage>
                           _tabController.animateTo(_tabController.index + 1);
                         }
                       } else {
+                        int index = 0;
+                        for (final form in _forms.values) {
+                          form.markAllAsTouched();
+                          if (form.invalid) {
+                            _tabController.animateTo(index);
+                            return;
+
+                          }
+                          index++;
+                        }
                         await _handleFinalSubmission(context, entryType);
                       }
                     } else {
