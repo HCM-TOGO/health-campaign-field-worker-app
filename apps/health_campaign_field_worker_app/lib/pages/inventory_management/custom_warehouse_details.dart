@@ -47,16 +47,6 @@ class CustomWarehouseDetailsPageState
   String? selectedFacilityId;
   TextEditingController controller1 = TextEditingController();
 
-  // @override
-  // void initState() {
-  //   clearQRCodes();
-  //   final stockState = context.read<RecordStockBloc>().state;
-  //   setState(() {
-  //     selectedFacilityId = stockState.primaryId;
-  //   });
-  //   super.initState();
-  // }
-
   FormGroup buildForm(bool isDistributor, RecordStockState stockState) =>
       fb.group(<String, Object>{
         _dateOfEntryKey: FormControl<DateTime>(value: DateTime.now()),
@@ -92,24 +82,6 @@ class CustomWarehouseDetailsPageState
             },
             builder: (ctx, facilityState) {
               final facilities = facilityState.whenOrNull(
-                    //   fetched: (facilities, allFacilities) {
-                    //     final teamFacilities = [
-                    //       FacilityModel(
-                    //         id: 'Delivery Team',
-                    //       ),
-                    //     ];
-                    //     teamFacilities.addAll(
-                    //       facilities,
-                    //     );
-
-                    //     return InventorySingleton().isDistributor! &&
-                    //             !InventorySingleton().isWareHouseMgr!
-                    //         ? teamFacilities
-                    //         : facilities;
-                    //   },
-                    // ) ??
-                    // [];
-
                     fetched: (facilities, allfacilities) {
                       if (ctx.selectedProject.address?.boundaryType ==
                           Constants.stateBoundaryLevel) {
@@ -450,7 +422,8 @@ class CustomWarehouseDetailsPageState
                                           formControlName: _teamCodeKey,
                                           builder: (field) {
                                             return InputField(
-                                              type: InputType.search,
+                                              type: InputType.text,
+                                              isDisabled: true,
                                               label: localizations.translate(
                                                 i18.stockReconciliationDetails
                                                     .teamCodeLabel,
@@ -458,42 +431,8 @@ class CustomWarehouseDetailsPageState
                                               initialValue: form
                                                   .control(_teamCodeKey)
                                                   .value,
-                                              isRequired: deliveryTeamSelected,
-                                              suffixIcon: Icons.qr_code_2,
-                                              onSuffixTap: (value) {
-                                                //[TODO: Add route to auto_route]
-                                                Navigator.of(context).push(
-                                                  MaterialPageRoute(
-                                                    builder: (context) =>
-                                                        const DigitScannerPage(
-                                                      quantity: 5,
-                                                      isGS1code: false,
-                                                      singleValue: false,
-                                                    ),
-                                                    settings:
-                                                        const RouteSettings(
-                                                            name:
-                                                                '/qr-scanner'),
-                                                  ),
-                                                );
-                                              },
-                                              onChange: (val) {
-                                                String? value = val;
-                                                if (value != null &&
-                                                    value.trim().isNotEmpty) {
-                                                  context
-                                                      .read<DigitScannerBloc>()
-                                                      .add(
-                                                        DigitScannerEvent
-                                                            .handleScanner(
-                                                          barCode: [],
-                                                          qrCode: [value],
-                                                        ),
-                                                      );
-                                                } else {
-                                                  clearQRCodes();
-                                                }
-                                              },
+                                              isRequired: InventorySingleton()
+                                                  .isDistributor,
                                             );
                                           })
                                   ]),

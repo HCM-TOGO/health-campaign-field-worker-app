@@ -1,6 +1,7 @@
 import 'dart:async';
 
 import 'package:auto_route/auto_route.dart';
+import 'package:collection/collection.dart';
 import 'package:digit_components/widgets/atoms/digit_toaster.dart';
 import 'package:digit_data_model/data_model.dart';
 import 'package:digit_data_model/models/entities/product_variant.dart';
@@ -130,11 +131,13 @@ class _DynamicTabsPageState extends LocalizedState<DynamicTabsPage>
           'materialNoteNumber': FormControl<String>(value: _sharedMRN),
           _transactionReasonKey: FormControl<String>(),
           _waybillNumberKey: FormControl<String>(
-            validators: [
-              Validators.minLength(2),
-              Validators.maxLength(200),
-              Validators.required
-            ],
+            validators: InventorySingleton().isWareHouseMgr
+                ? [
+                    Validators.minLength(2),
+                    Validators.maxLength(200),
+                    Validators.required
+                  ]
+                : [],
           ),
           _transactionQuantityKey: FormControl<int>(validators: [
             Validators.number(),
@@ -372,9 +375,13 @@ class _DynamicTabsPageState extends LocalizedState<DynamicTabsPage>
       case StockRecordEntryType.dispatch:
         pageTitle = i18.stockDetails.issuedPageTitle;
         if (productName == "Blue VAS" || productName == "Red VAS") {
-          quantityCountLabel = i18_local.stockDetails.quantityCapsuleSentLabel;
+          quantityCountLabel = InventorySingleton().isWareHouseMgr
+              ? i18_local.stockDetails.quantityCapsuleSentLabel
+              : i18_local.stockDetails.quantityCapsuleReturnedLabel;
         } else {
-          quantityCountLabel = i18.stockDetails.quantitySentLabel;
+          quantityCountLabel = InventorySingleton().isWareHouseMgr
+              ? i18.stockDetails.quantitySentLabel
+              : i18.stockDetails.quantityReturnedLabel;
         }
         break;
       case StockRecordEntryType.returned:
@@ -589,7 +596,7 @@ class _DynamicTabsPageState extends LocalizedState<DynamicTabsPage>
                           _tabController.animateTo(_tabController.index + 1);
                         }
                       } else {
-                        await _handleFinalSubmission(context);
+                        await _handleFinalSubmission(context, entryType);
                       }
                     } else {
                       form.markAllAsTouched();
@@ -743,102 +750,10 @@ class _DynamicTabsPageState extends LocalizedState<DynamicTabsPage>
     //     ),
     //   ) as bool;
     // }
-
-    if (_tabController.index < _tabController.length - 1) {
-      if (isDistributor) {
-        final totalQty = recordStock.entryType == StockRecordEntryType.dispatch
-            ? ss * -1
-            : ss;
-
-        int spaq1Count = context.spaq1;
-        int spaq2Count = context.spaq2;
-
-        int blueVasCount = context.blueVas;
-        int redVasCount = context.redVas;
-
-        // Custom logic based on productName
-        if (productName == Constants.spaq1) {
-          spaq1Count = totalQty;
-          spaq2Count = 0;
-          redVasCount = 0;
-          blueVasCount = 0;
-        } else if (productName == Constants.spaq2) {
-          spaq2Count = totalQty;
-          spaq1Count = 0;
-          redVasCount = 0;
-          blueVasCount = 0;
-        } else if (productName == Constants.blueVAS) {
-          blueVasCount = totalQty;
-          spaq1Count = 0;
-          spaq2Count = 0;
-          redVasCount = 0;
-        } else {
-          blueVasCount = 0;
-          spaq1Count = 0;
-          spaq2Count = 0;
-          redVasCount = totalQty;
-        }
-        context.read<AuthBloc>().add(
-              AuthAddSpaqCountsEvent(
-                spaq1Count: spaq1Count,
-                spaq2Count: spaq2Count,
-                blueVasCount: blueVasCount,
-                redVasCount: redVasCount,
-              ),
-            );
-        // _tabController.animateTo(_tabController.index + 1);
-
-        context.read<RecordStockBloc>().add(
-              const RecordStockCreateStockEntryEvent(),
-            );
-      } else {
-        // TODO: commenting as it is not required to store for warehousemanager
-        // final totalQty = ss;
-
-        // int spaq1Count = context.spaq1;
-        // int spaq2Count = context.spaq2;
-
-        // int blueVasCount = context.blueVas;
-        // int redVasCount = context.redVas;
-
-        // // Custom logic based on productName
-        // if (productName == Constants.spaq1) {
-        //   spaq1Count = totalQty;
-        //   spaq2Count = 0;
-        //   redVasCount = 0;
-        //   blueVasCount = 0;
-        // } else if (productName == Constants.spaq2) {
-        //   spaq2Count = totalQty;
-        //   spaq1Count = 0;
-        //   redVasCount = 0;
-        //   blueVasCount = 0;
-        // } else if (productName == Constants.blueVAS) {
-        //   blueVasCount = totalQty;
-        //   spaq1Count = 0;
-        //   spaq2Count = 0;
-        //   redVasCount = 0;
-        // } else {
-        //   blueVasCount = 0;
-        //   spaq1Count = 0;
-        //   spaq2Count = 0;
-        //   redVasCount = totalQty;
-        // }
-        // context.read<AuthBloc>().add(
-        //       AuthAddSpaqCountsEvent(
-        //         spaq1Count: spaq1Count,
-        //         spaq2Count: spaq2Count,
-        //         blueVasCount: blueVasCount,
-        //         redVasCount: redVasCount,
-        //       ),
-        //     );
-        // _tabController.animateTo(_tabController.index + 1);
-      }
-    } else {
-      return;
-    }
   }
 
-  Future<void> _handleFinalSubmission(BuildContext context) async {
+  Future<void> _handleFinalSubmission(
+      BuildContext context, StockRecordEntryType entryType) async {
     final lastProduct = products.last.sku ?? '';
 
     final submit = await showCustomPopup(
@@ -897,6 +812,58 @@ class _DynamicTabsPageState extends LocalizedState<DynamicTabsPage>
         context.read<RecordStockBloc>().add(
               const RecordStockCreateStockEntryEvent(),
             );
+
+        if (InventorySingleton().isDistributor) {
+          int ss = int.parse(stockModel.quantity.toString());
+          final totalQty =
+              entryType == StockRecordEntryType.dispatch ? ss * -1 : ss;
+
+          int spaq1Count = context.spaq1;
+          int spaq2Count = context.spaq2;
+
+          int blueVasCount = context.blueVas;
+          int redVasCount = context.redVas;
+
+          String? productName = stockModel.additionalFields?.fields
+              .firstWhereOrNull((element) => element.key == 'productName')
+              ?.value;
+
+          // Custom logic based on productName
+          if (productName == Constants.spaq1) {
+            spaq1Count = totalQty;
+            spaq2Count = 0;
+            redVasCount = 0;
+            blueVasCount = 0;
+          } else if (productName == Constants.spaq2) {
+            spaq2Count = totalQty;
+            spaq1Count = 0;
+            redVasCount = 0;
+            blueVasCount = 0;
+          } else if (productName == Constants.blueVAS) {
+            blueVasCount = totalQty;
+            spaq1Count = 0;
+            spaq2Count = 0;
+            redVasCount = 0;
+          } else {
+            blueVasCount = 0;
+            spaq1Count = 0;
+            spaq2Count = 0;
+            redVasCount = totalQty;
+          }
+          context.read<AuthBloc>().add(
+                AuthAddSpaqCountsEvent(
+                  spaq1Count: spaq1Count,
+                  spaq2Count: spaq2Count,
+                  blueVasCount: blueVasCount,
+                  redVasCount: redVasCount,
+                ),
+              );
+          // _tabController.animateTo(_tabController.index + 1);
+
+          context.read<RecordStockBloc>().add(
+                const RecordStockCreateStockEntryEvent(),
+              );
+        }
       }
 
       //   Navigator.of(context).push(

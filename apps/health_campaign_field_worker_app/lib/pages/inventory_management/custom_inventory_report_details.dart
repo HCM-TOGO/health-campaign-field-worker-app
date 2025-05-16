@@ -9,7 +9,6 @@ import 'package:digit_ui_components/widgets/molecules/digit_card.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:inventory_management/router/inventory_router.gm.dart';
-import 'package:inventory_management/utils/extensions/extensions.dart';
 import 'package:reactive_forms/reactive_forms.dart';
 
 import 'package:inventory_management/utils/i18_key_constants.dart' as i18;
@@ -27,6 +26,7 @@ import 'package:inventory_management/utils/utils.dart';
 import 'package:inventory_management/widgets/back_navigation_help_header.dart';
 
 import '../../blocs/inventory_management/custom_inventory_report.dart';
+import '../../utils/extensions/extensions.dart';
 
 @RoutePage()
 class CustomInventoryReportDetailsPage extends LocalizedStatefulWidget {
@@ -84,9 +84,11 @@ class CustomInventoryReportDetailsPageState
           )
         : InventoryReportLoadStockDataEvent(
             reportType: widget.reportType,
-            facilityId: form.control(_facilityKey).value != null
-                ? selectedFacilityId!
-                : '',
+            facilityId: context.isCDD
+                ? context.loggedInUserUuid
+                : form.control(_facilityKey).value != null
+                    ? selectedFacilityId!
+                    : '',
             productVariantId: form.control(_productVariantKey).value != null
                 ? (form.control(_productVariantKey).value
                         as ProductVariantModel)
@@ -107,6 +109,7 @@ class CustomInventoryReportDetailsPageState
     return fb.group({
       _facilityKey: FormControl<String>(
         validators: [Validators.required],
+        value: context.isCDD ? context.loggedInUserUuid : null,
       ),
       _productVariantKey: FormControl<ProductVariantModel>(),
     });
@@ -119,9 +122,8 @@ class CustomInventoryReportDetailsPageState
     return BlocProvider<CustomInventoryReportBloc>(
       create: (context) => CustomInventoryReportBloc(
         stockReconciliationRepository: context.repository<
-            StockReconciliationModel, StockReconciliationSearchModel>(context),
-        stockRepository:
-            context.repository<StockModel, StockSearchModel>(context),
+            StockReconciliationModel, StockReconciliationSearchModel>(),
+        stockRepository: context.repository<StockModel, StockSearchModel>(),
       ),
       child: Scaffold(
         bottomNavigationBar: DigitCard(
@@ -182,11 +184,11 @@ class CustomInventoryReportDetailsPageState
                                 projectId: InventorySingleton().projectId,
                                 dateOfReconciliation: DateTime.now(),
                               ),
-                              stockRepository: context.repository<StockModel,
-                                  StockSearchModel>(context),
+                              stockRepository: context
+                                  .repository<StockModel, StockSearchModel>(),
                               stockReconciliationRepository: context.repository<
                                   StockReconciliationModel,
-                                  StockReconciliationSearchModel>(context),
+                                  StockReconciliationSearchModel>(),
                             ),
                             child: BlocConsumer<StockReconciliationBloc,
                                 StockReconciliationState>(
@@ -722,7 +724,9 @@ class CustomInventoryReportDetailsPageState
         value = i18.inventoryReportDetails.receiptQuantityLabel;
         break;
       case InventoryReportType.dispatch:
-        value = i18.inventoryReportDetails.dispatchQuantityLabel;
+        value = context.isCDD
+            ? i18.inventoryReportDetails.returnedQuantityLabel
+            : i18.inventoryReportDetails.dispatchQuantityLabel;
         break;
       case InventoryReportType.returned:
         value = i18.inventoryReportDetails.returnedQuantityLabel;
@@ -746,7 +750,9 @@ class CustomInventoryReportDetailsPageState
         value = i18.inventoryReportDetails.receiptTransactingPartyLabel;
         break;
       case InventoryReportType.dispatch:
-        value = i18.inventoryReportDetails.dispatchTransactingPartyLabel;
+        value = context.isCDD
+            ? i18.inventoryReportDetails.returnedTransactingPartyLabel
+            : i18.inventoryReportDetails.dispatchTransactingPartyLabel;
         break;
       case InventoryReportType.returned:
         value = i18.inventoryReportDetails.returnedTransactingPartyLabel;

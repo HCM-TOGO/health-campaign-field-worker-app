@@ -171,9 +171,14 @@ class CustomStockDetailsPageState
 
                     break;
                   case StockRecordEntryType.dispatch:
-                    pageTitle = module.issuedPageTitle;
-                    quantityCountLabel =
-                        i18.inventoryReportDetails.dispatchQuantityLabel;
+                    pageTitle = InventorySingleton().isDistributor
+                        ? module.returnedPageTitle
+                        : module.issuedPageTitle;
+                    quantityCountLabel = InventorySingleton().isDistributor
+                        ? module.returnedPageTitle
+                        : i18.inventoryReportDetails.returnedQuantityLabel;
+                    quantityPartialCountLabel = i18_local
+                        .inventoryReportDetails.partialReturnedQuantityLabel;
                     transactionType = TransactionType.dispatched.toValue();
 
                     break;
@@ -469,37 +474,37 @@ class CustomStockDetailsPageState
                                             spaq1 = totalQuantity *
                                                 Constants.mlPerBottle;
 
-                                            if (spaq1 >
-                                                    totalRemainingQuantityInMl &&
-                                                isDistributor &&
-                                                entryType ==
-                                                    StockRecordEntryType
-                                                        .dispatch) {
-                                              DigitToast.show(
-                                                context,
-                                                options: DigitToastOptions(
-                                                  localizations
-                                                      .translate(
-                                                        i18_local.stockDetails
-                                                            .quantityReturnedMaxError,
-                                                      )
-                                                      .replaceAll(
-                                                        "{1}",
-                                                        totalRemainingQuantityInMl
-                                                            .toString(),
-                                                      )
-                                                      .replaceAll(
-                                                        "{2}",
-                                                        totalExpectedUnusedBottles
-                                                            .toString(),
-                                                      ),
-                                                  true,
-                                                  theme,
-                                                ),
-                                              );
+                                            // if (spaq1 >
+                                            //         totalRemainingQuantityInMl &&
+                                            //     isDistributor &&
+                                            //     entryType ==
+                                            //         StockRecordEntryType
+                                            //             .dispatch) {
+                                            //   DigitToast.show(
+                                            //     context,
+                                            //     options: DigitToastOptions(
+                                            //       localizations
+                                            //           .translate(
+                                            //             i18_local.stockDetails
+                                            //                 .quantityReturnedMaxError,
+                                            //           )
+                                            //           .replaceAll(
+                                            //             "{1}",
+                                            //             totalRemainingQuantityInMl
+                                            //                 .toString(),
+                                            //           )
+                                            //           .replaceAll(
+                                            //             "{2}",
+                                            //             totalExpectedUnusedBottles
+                                            //                 .toString(),
+                                            //           ),
+                                            //       true,
+                                            //       theme,
+                                            //     ),
+                                            //   );
 
-                                              return;
-                                            }
+                                            //   return;
+                                            // }
 
                                             String? senderId;
                                             String? senderType;
@@ -1209,8 +1214,10 @@ class CustomStockDetailsPageState
                                                         type: InputType.search,
                                                         isRequired: true,
                                                         label: (entryType ==
-                                                                StockRecordEntryType
-                                                                    .returned)
+                                                                    StockRecordEntryType
+                                                                        .dispatch &&
+                                                                InventorySingleton()
+                                                                    .isDistributor)
                                                             ? localizations
                                                                 .translate(i18
                                                                     .stockDetails
