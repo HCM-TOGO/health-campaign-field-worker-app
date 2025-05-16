@@ -836,6 +836,11 @@ class Home {
 
 class AcknowledgementSuccess {
   const AcknowledgementSuccess();
+  String get mrnNumberLabel => 'MRN_NUMBER_LABEL';
+
+  String get mrnNumberDescription => "MRN_NUMBER_DESCRIPTION";
+
+  String get mrnNumberHeading => "MRN_NUMBER_HEADING";
 
   String get actionLabelText => 'ACKNOWLEDGEMENT_SUCCESS_ACTION_LABEL_TEXT';
 

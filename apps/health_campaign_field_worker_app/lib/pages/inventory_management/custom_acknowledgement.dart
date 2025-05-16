@@ -13,6 +13,7 @@ import 'package:registration_delivery/widgets/localized.dart';
 import '../../../utils/app_enums.dart';
 import '../../router/app_router.dart';
 import '../../utils/i18_key_constants.dart' as i18_local;
+import '../../widgets/digit_ui_component/custom_panel_card.dart';
 
 @RoutePage()
 class CustomAcknowledgementPage extends LocalizedStatefulWidget {
@@ -35,23 +36,25 @@ class CustomAcknowledgementPageState
     extends LocalizedState<CustomAcknowledgementPage> {
   @override
   Widget build(BuildContext context) {
-    final theme = Theme.of(context);
+    Map<String, String> mrnnumber = {
+      'id': localizations.translate(i18_local.acknowledgementSuccess.mrnNumberLabel),
+      'value': widget.mrnNumber
+    };
     return PopScope(
       canPop: false,
       child: Scaffold(
         body: Padding(
           padding: const EdgeInsets.all(spacer2),
-          child: PanelCard(
+          child: CustomPanelCard(
             type: PanelType.success,
-    additionWidgets: [Text(widget.mrnNumber, style: theme.textTheme.bodyLarge?.copyWith(color: theme.colorTheme.paper.primary),)],
-            description: localizations.translate(
-              i18_local.acknowledgementSuccess
-                  .transactionAcknowledgementDescriptionText,
-              // variables: {'mrnNumber': widget.mrnNumber},
-            ),
+            subTitle: mrnnumber,
             title: localizations.translate(
               i18_local.acknowledgementSuccess
-                  .transactionAcknowledgementDescriptionText,
+                  .mrnNumberHeading,
+            ),
+            description: localizations.translate(
+              i18_local.acknowledgementSuccess
+                  .mrnNumberDescription,
             ),
             actions: [
               DigitButton(
