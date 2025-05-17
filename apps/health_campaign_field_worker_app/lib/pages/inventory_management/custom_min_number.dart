@@ -20,6 +20,8 @@ import 'package:inventory_management/widgets/back_navigation_help_header.dart';
 import '../../router/app_router.dart';
 import 'package:logger/logger.dart';
 
+import '../../widgets/custom_back_navigation.dart';
+
 @RoutePage()
 class CustomMinNumberPage extends LocalizedStatefulWidget {
   final dynamic type;
@@ -115,7 +117,7 @@ class CustomMinNumberPageState extends LocalizedState<CustomMinNumberPage> {
         child: ScrollableContent(
           header: const Column(
             children: [
-              BackNavigationHelpHeaderWidget(showHelp: false),
+              CustomBackNavigationHelpHeaderWidget(showHelp: false),
             ],
           ),
           footer: SizedBox(

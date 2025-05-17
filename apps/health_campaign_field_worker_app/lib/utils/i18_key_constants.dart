@@ -426,6 +426,8 @@ class HomeShowcase {
 class StockDetails {
   const StockDetails();
 
+  String get cddCodeLabel => 'CDD_CODE_LABEL';
+
   String get quantityCapsuleReceivedLabel =>
       'STOCK_DETAILS_CAPSULE_QUANTITY_RECEIVED';
 
@@ -1168,8 +1170,12 @@ class SearchBeneficiary {
 
   String get statisticsLabelText => 'BENEFICIARY_STATISTICS_LABEL_TEXT';
 
+  String get searchBeneficiaryReferralHintText => 'SEARCH_BENEFICIARY_REFERRAL_HINT_TEXT';
+
   String get searchIndividualLabelText =>
       'BENEFICIARY_STATISTICS_SEARCH_INDIVIDUAL_LABEL';
+
+  String get searchBeneficiaryLabelText => 'SEARCH_BENEFICIARY_LABEL_TEXT';
 
   String get noOfHouseholdsRegistered => 'NO_OF_HOUSEHOLDS_REGISTERED';
 
