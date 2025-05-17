@@ -15,6 +15,7 @@ import '../../blocs/inventory_management/stock_bloc.dart';
 import '../../router/app_router.dart';
 import '../../utils/utils.dart';
 import '../../widgets/action_card/all_transactions_card.dart';
+import '../../widgets/custom_back_navigation.dart';
 import 'view_record_lga.dart';
 import 'package:collection/collection.dart';
 
@@ -158,7 +159,7 @@ class _ViewAllTransactionsScreenState extends State<ViewAllTransactionsScreen> {
         child: ScrollableContent(
           header: const Column(
             children: [
-              BackNavigationHelpHeaderWidget(showHelp: false),
+              CustomBackNavigationHelpHeaderWidget(showHelp: false),
             ],
           ),
           children: [

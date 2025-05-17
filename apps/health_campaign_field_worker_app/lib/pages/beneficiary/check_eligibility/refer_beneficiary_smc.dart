@@ -3,6 +3,7 @@ import 'package:digit_components/digit_components.dart';
 import 'package:digit_components/widgets/atoms/digit_radio_button_list.dart';
 import 'package:digit_components/widgets/atoms/digit_toaster.dart';
 import 'package:digit_ui_components/enum/app_enums.dart';
+import 'package:digit_ui_components/theme/spacers.dart';
 import 'package:digit_ui_components/widgets/atoms/digit_button.dart';
 import 'package:digit_ui_components/widgets/atoms/pop_up_card.dart';
 import 'package:flutter/material.dart';
@@ -383,6 +384,7 @@ class CustomReferBeneficiarySMCPageState
                           ),
                           Column(children: [
                             DigitDateFormPicker(
+                              margin: const EdgeInsets.symmetric(vertical: spacer2),
                               isEnabled: false,
                               formControlName: _dateOfReferralKey,
                               label: localizations.translate(

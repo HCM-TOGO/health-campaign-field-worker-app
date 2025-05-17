@@ -20,6 +20,8 @@ import '../../utils/constants.dart';
 import '../../utils/extensions/extensions.dart';
 import 'package:collection/collection.dart';
 
+import '../../widgets/custom_back_navigation.dart';
+
 @RoutePage()
 class ViewStockRecordsLGAPage extends LocalizedStatefulWidget {
   final String mrnNumber;
@@ -177,167 +179,175 @@ class _ViewStockRecordsLGAPageState
     //using the same as downloaded stock data
     // and this flow is for stock receipt for LGA
     final senderIdToShowOnTab = widget.stockRecords.first.senderId;
+    
 
     return Scaffold(
-      appBar: AppBar(
-        title: Text('Stock Records - ${widget.mrnNumber}'),
-      ),
-      body: ReactiveForm(
-        formGroup: _form,
-        child: SingleChildScrollView(
-          padding: const EdgeInsets.all(16),
-          child: Column(
-            children: [
-              DigitCard(
-                padding: const EdgeInsets.all(16),
+      body: ScrollableContent(
+        header: const Column(children: [
+          CustomBackNavigationHelpHeaderWidget(),
+        ],),
+        children: [
+          ReactiveForm(
+            formGroup: _form,
+            child: SingleChildScrollView(
+              padding: const EdgeInsets.all(16),
+              child: Column(
                 children: [
-                  Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
+                  DigitCard(
+                    padding: const EdgeInsets.all(16),
                     children: [
-                      const Text(
-                        'Stock Receipt Details',
-                        style: TextStyle(
-                            fontSize: 16, fontWeight: FontWeight.bold),
-                      ),
-                      const SizedBox(height: 12),
-                      Row(
+                      Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
-                          const Expanded(child: Text('MRN Number')),
-                          Expanded(child: Text(widget.mrnNumber)),
-                        ],
-                      ),
-                      const SizedBox(height: 8),
-                      Row(
-                        children: [
-                          const Expanded(child: Text('Received From')),
-                          // TODO : verify this , showing senderId here
-                          Expanded(
-                            child: Text(localizations
-                                .translate('FAC_$senderIdToShowOnTab')),
+                          const Text(
+                            'Stock Receipt Details',
+                            style: TextStyle(
+                                fontSize: 24, fontWeight: FontWeight.bold),
+                          ),
+                          const SizedBox(height: 12),
+                          Row(
+                            children: [
+                              const Expanded(child: Text('MIN Number')),
+                              Expanded(child: Text(widget.mrnNumber)),
+                            ],
+                          ),
+                          const SizedBox(height: 8),
+                          Row(
+                            children: [
+                              const Expanded(child: Text('Received from')),
+                              // TODO : verify this , showing senderId here
+                              Expanded(
+                                child: Text(localizations
+                                    .translate('FAC_$senderIdToShowOnTab')),
+                              ),
+                            ],
                           ),
                         ],
                       ),
                     ],
                   ),
-                ],
-              ),
-              const SizedBox(height: 20),
-              ...widget.stockRecords.map((stock) {
-                final productName = stock.additionalFields?.fields
-                        .firstWhere(
-                          (field) => field.key == 'productName',
-                          orElse: () => AdditionalField('productName', ''),
-                        )
-                        .value
-                        ?.toString() ??
-                    '';
+                  const SizedBox(height: 20),
+                  ...widget.stockRecords.map((stock) {
+                    final productName = stock.additionalFields?.fields
+                            .firstWhere(
+                              (field) => field.key == 'productName',
+                              orElse: () => AdditionalField('productName', ''),
+                            )
+                            .value
+                            ?.toString() ??
+                        '';
 
-                return Column(
-                  children: [
-                    DigitCard(
-                      padding: const EdgeInsets.all(16),
+                    return Column(
                       children: [
-                        Column(
-                          crossAxisAlignment: CrossAxisAlignment.start,
+                        DigitCard(
+                          padding: const EdgeInsets.all(16),
                           children: [
-                            Text(
-                              productName,
-                              style: TextStyle(
-                                fontSize: 16,
-                                fontWeight: FontWeight.bold,
-                                color: productName == 'SPAQ 1' ||
-                                        productName == 'SPAQ 2'
-                                    ? Colors.orange
-                                    : productName == 'Red VAS'
-                                        ? Colors.red
-                                        : productName == 'Blue VAS'
-                                            ? Colors.blue
-                                            : Theme.of(context).primaryColor,
-                              ),
-                            ),
-                            const SizedBox(height: 12),
-                            InputField(
-                              type: InputType.text,
-                              label: 'Waybill Number *',
-                              initialValue: stock.wayBillNumber ?? '',
-                              isDisabled: true,
-                              readOnly: true,
-                            ),
-                            const SizedBox(height: 12),
-                            InputField(
-                              type: InputType.text,
-                              label: 'Batch Number',
-                              initialValue: stock.additionalFields?.fields
-                                      .firstWhere(
-                                        (field) => field.key == 'batchNumber',
-                                        orElse: () =>
-                                            AdditionalField('batchNumber', ''),
-                                      )
-                                      .value
-                                      ?.toString() ??
-                                  '',
-                              isDisabled: true,
-                              readOnly: true,
-                            ),
-                            const SizedBox(height: 12),
-                            InputField(
-                              type: InputType.text,
-                              label: 'Quantity Sent by Warehouse *',
-                              initialValue: stock.quantity ?? '',
-                              isDisabled: true,
-                              readOnly: true,
-                            ),
-                            const SizedBox(height: 12),
-                            ReactiveWrapperField(
-                              formControlName: 'quantityReceived',
-                              builder: (field) => InputField(
-                                type: InputType.text,
-                                label: 'Actual Quantity Received *',
-                                errorMessage: field.errorText,
-                                keyboardType: TextInputType.number,
-                                onChange: (value) {
-                                  if (value != null && value.isNotEmpty) {
-                                    field.control.value = int.tryParse(value);
-                                  } else {
-                                    field.control.value = null;
-                                  }
-                                },
-                              ),
-                              validationMessages: {
-                                'required': (_) => 'Quantity is required',
-                                'min': (_) => 'Must be at least 1',
-                                'number': (_) => 'Must be a valid number',
-                              },
-                            ),
-                            const SizedBox(height: 12),
-                            ReactiveWrapperField(
-                              formControlName: 'comments',
-                              builder: (field) => InputField(
-                                type: InputType.textArea,
-                                label: 'Comments',
-                                errorMessage: field.errorText,
-                                onChange: (value) =>
-                                    field.control.value = value,
-                              ),
+                            Column(
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              children: [
+                                Text(
+                                  productName,
+                                  style: TextStyle(
+                                    fontSize: 16,
+                                    fontWeight: FontWeight.bold,
+                                    color: productName == 'SPAQ 1' ||
+                                            productName == 'SPAQ 2'
+                                        ? Colors.orange
+                                        : productName == 'Red VAS'
+                                            ? Colors.red
+                                            : productName == 'Blue VAS'
+                                                ? Colors.blue
+                                                : Theme.of(context)
+                                                    .primaryColor,
+                                  ),
+                                ),
+                                const SizedBox(height: 12),
+                                InputField(
+                                  type: InputType.text,
+                                  label: 'Waybill Number *',
+                                  initialValue: stock.wayBillNumber ?? '',
+                                  isDisabled: true,
+                                  readOnly: true,
+                                ),
+                                const SizedBox(height: 12),
+                                InputField(
+                                  type: InputType.text,
+                                  label: 'Batch Number',
+                                  initialValue: stock.additionalFields?.fields
+                                          .firstWhere(
+                                            (field) =>
+                                                field.key == 'batchNumber',
+                                            orElse: () => AdditionalField(
+                                                'batchNumber', ''),
+                                          )
+                                          .value
+                                          ?.toString() ??
+                                      '',
+                                  isDisabled: true,
+                                  readOnly: true,
+                                ),
+                                const SizedBox(height: 12),
+                                InputField(
+                                  type: InputType.text,
+                                  label: 'Quantity Sent by Warehouse *',
+                                  initialValue: stock.quantity ?? '',
+                                  isDisabled: true,
+                                  readOnly: true,
+                                ),
+                                const SizedBox(height: 12),
+                                ReactiveWrapperField(
+                                  formControlName: 'quantityReceived',
+                                  builder: (field) => InputField(
+                                    type: InputType.text,
+                                    label: 'Actual Quantity Received *',
+                                    errorMessage: field.errorText,
+                                    keyboardType: TextInputType.number,
+                                    onChange: (value) {
+                                      if (value != null && value.isNotEmpty) {
+                                        field.control.value =
+                                            int.tryParse(value);
+                                      } else {
+                                        field.control.value = null;
+                                      }
+                                    },
+                                  ),
+                                  validationMessages: {
+                                    'required': (_) => 'Quantity is required',
+                                    'min': (_) => 'Must be at least 1',
+                                    'number': (_) => 'Must be a valid number',
+                                  },
+                                ),
+                                const SizedBox(height: 12),
+                                ReactiveWrapperField(
+                                  formControlName: 'comments',
+                                  builder: (field) => InputField(
+                                    type: InputType.textArea,
+                                    label: 'Comments',
+                                    errorMessage: field.errorText,
+                                    onChange: (value) =>
+                                        field.control.value = value,
+                                  ),
+                                ),
+                              ],
                             ),
                           ],
                         ),
+                        const SizedBox(height: 12),
                       ],
-                    ),
-                    const SizedBox(height: 12),
-                  ],
-                );
-              }).toList(),
-              const SizedBox(height: 24),
-              DigitButton(
-                label: localizations.translate(i18.common.coreCommonSubmit),
-                onPressed: _handleSubmission,
-                type: DigitButtonType.primary,
-                size: DigitButtonSize.large,
+                    );
+                  }).toList(),
+                  const SizedBox(height: 24),
+                  DigitButton(
+                    label: localizations.translate(i18.common.coreCommonSubmit),
+                    onPressed: _handleSubmission,
+                    type: DigitButtonType.primary,
+                    size: DigitButtonSize.large,
+                  ),
+                ],
               ),
-            ],
+            ),
           ),
-        ),
+        ],
       ),
     );
   }
