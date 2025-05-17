@@ -13,6 +13,7 @@ import 'package:referral_reconciliation/utils/constants.dart';
 
 import 'package:referral_reconciliation/utils/date_utils.dart';
 import 'package:referral_reconciliation/utils/i18_key_constants.dart' as i18;
+import '../../utils/i18_key_constants.dart' as i18_local;
 import 'package:referral_reconciliation/blocs/referral_recon_record.dart';
 import 'package:referral_reconciliation/utils/utils.dart';
 import 'package:referral_reconciliation/widgets/back_navigation_help_header.dart';
@@ -222,7 +223,7 @@ class _CustomReferralFacilityPageState
                                             return LabeledField(
                                               isRequired: true,
                                               label: localizations.translate(
-                                                i18.referralReconciliation
+                                                i18_local.referBeneficiary
                                                     .administrationUnitFormLabel,
                                               ),
                                               child: DigitTextFormInput(
