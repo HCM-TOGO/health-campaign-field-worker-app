@@ -155,30 +155,30 @@ class _ViewStockRecordsPageState extends LocalizedState<ViewStockRecordsPage>
                   ),
                   const SizedBox(height: 12),
                   // Waybill Number
-                  InputField(
-                    type: InputType.text,
-                    label: 'Waybill Number *',
-                    initialValue: stock.wayBillNumber ?? '',
-                    isDisabled: true,
-                    readOnly: true,
-                  ),
-                  const SizedBox(height: 12),
+                  // InputField(
+                  //   type: InputType.text,
+                  //   label: 'Waybill Number *',
+                  //   initialValue: stock.wayBillNumber ?? '',
+                  //   isDisabled: true,
+                  //   readOnly: true,
+                  // ),
+                  // const SizedBox(height: 12),
                   // Batch Number
-                  InputField(
-                    type: InputType.text,
-                    label: 'Batch Number',
-                    initialValue: stock.additionalFields?.fields
-                            .firstWhere(
-                              (field) => field.key == 'batchNumber',
-                              orElse: () => AdditionalField('batchNumber', ''),
-                            )
-                            .value
-                            ?.toString() ??
-                        '',
-                    isDisabled: true,
-                    readOnly: true,
-                  ),
-                  const SizedBox(height: 12),
+                  // InputField(
+                  //   type: InputType.text,
+                  //   label: 'Batch Number',
+                  //   initialValue: stock.additionalFields?.fields
+                  //           .firstWhere(
+                  //             (field) => field.key == 'batchNumber',
+                  //             orElse: () => AdditionalField('batchNumber', ''),
+                  //           )
+                  //           .value
+                  //           ?.toString() ??
+                  //       '',
+                  //   isDisabled: true,
+                  //   readOnly: true,
+                  // ),
+                  // const SizedBox(height: 12),
 
                   // Quantity
                   InputField(
