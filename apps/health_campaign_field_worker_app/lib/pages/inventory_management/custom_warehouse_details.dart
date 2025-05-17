@@ -19,11 +19,11 @@ import '../../utils/i18_key_constants.dart' as i18_local;
 import 'package:inventory_management/widgets/localized.dart';
 import 'package:inventory_management/blocs/record_stock.dart';
 import 'package:inventory_management/utils/utils.dart';
-import 'package:inventory_management/widgets/back_navigation_help_header.dart';
 import 'package:inventory_management/widgets/inventory/no_facilities_assigned_dialog.dart';
 
 import '../../router/app_router.dart';
 import '../../utils/utils.dart';
+import '../../widgets/custom_back_navigation.dart';
 
 @RoutePage()
 class CustomWarehouseDetailsPage extends LocalizedStatefulWidget {
@@ -155,7 +155,7 @@ class CustomWarehouseDetailsPageState
 
                           return ScrollableContent(
                             header: const Column(children: [
-                              BackNavigationHelpHeaderWidget(
+                              CustomBackNavigationHelpHeaderWidget(
                                 showHelp: false,
                               ),
                             ]),
@@ -332,7 +332,7 @@ class CustomWarehouseDetailsPageState
                                             cancelText: localizations.translate(
                                               i18.common.coreCommonCancel,
                                             ),
-                                            initialValue: DateFormat('dd/MM/yy')
+                                            initialValue: DateFormat('dd MMM yyyy')
                                                 .format(field.control.value),
                                             readOnly: true,
                                           );
@@ -341,6 +341,7 @@ class CustomWarehouseDetailsPageState
                                         formControlName: _administrativeUnitKey,
                                         builder: (field) {
                                           return InputField(
+                                            isRequired: true,
                                             type: InputType.text,
                                             label: localizations.translate(
                                               i18.warehouseDetails
@@ -425,8 +426,7 @@ class CustomWarehouseDetailsPageState
                                               type: InputType.text,
                                               isDisabled: true,
                                               label: localizations.translate(
-                                                i18.stockReconciliationDetails
-                                                    .teamCodeLabel,
+                                                i18_local.stockDetails.cddCodeLabel,
                                               ),
                                               initialValue: form
                                                   .control(_teamCodeKey)
