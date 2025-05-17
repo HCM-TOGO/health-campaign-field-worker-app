@@ -229,7 +229,10 @@ class _ViewAllTransactionsScreenState extends State<ViewAllTransactionsScreen> {
                                                     .value
                                                     ?.toString() ??
                                                 'N/A',
-                                        cddCode: stock.senderId ?? '',
+                                        cddCode: InventorySingleton()
+                                                .loggedInUser
+                                                ?.name ??
+                                            (stock.senderId ?? ''),
                                         date: (stock.dateOfEntry != null)
                                             ? DateFormat('d MMMM yyyy').format(
                                                 (stock.dateOfEntryTime ??
@@ -256,7 +259,7 @@ class _ViewAllTransactionsScreenState extends State<ViewAllTransactionsScreen> {
                                                         ?.toString() ??
                                                     'N/A',
                                             'quantity':
-                                                stock.quantity.toString()
+                                                (stock.quantity ?? 0).toString()
                                           }
                                         ],
                                         data: {},

@@ -8,6 +8,7 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:inventory_management/blocs/record_stock.dart';
 import 'package:inventory_management/models/entities/stock.dart';
 import 'package:inventory_management/utils/i18_key_constants.dart' as i18;
+import 'package:inventory_management/utils/utils.dart';
 import 'package:registration_delivery/widgets/localized.dart';
 
 @RoutePage()
@@ -154,31 +155,34 @@ class _ViewStockRecordsPageState extends LocalizedState<ViewStockRecordsPage>
                     style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
                   ),
                   const SizedBox(height: 12),
-                  // Waybill Number
-                  // InputField(
-                  //   type: InputType.text,
-                  //   label: 'Waybill Number *',
-                  //   initialValue: stock.wayBillNumber ?? '',
-                  //   isDisabled: true,
-                  //   readOnly: true,
-                  // ),
-                  // const SizedBox(height: 12),
-                  // Batch Number
-                  // InputField(
-                  //   type: InputType.text,
-                  //   label: 'Batch Number',
-                  //   initialValue: stock.additionalFields?.fields
-                  //           .firstWhere(
-                  //             (field) => field.key == 'batchNumber',
-                  //             orElse: () => AdditionalField('batchNumber', ''),
-                  //           )
-                  //           .value
-                  //           ?.toString() ??
-                  //       '',
-                  //   isDisabled: true,
-                  //   readOnly: true,
-                  // ),
-                  // const SizedBox(height: 12),
+                  if (InventorySingleton().isDistributor != true) ...[
+                    // Waybill Number
+                    InputField(
+                      type: InputType.text,
+                      label: 'Waybill Number *',
+                      initialValue: stock.wayBillNumber ?? '',
+                      isDisabled: true,
+                      readOnly: true,
+                    ),
+                    const SizedBox(height: 12),
+                    // Batch Number
+                    InputField(
+                      type: InputType.text,
+                      label: 'Batch Number',
+                      initialValue: stock.additionalFields?.fields
+                              .firstWhere(
+                                (field) => field.key == 'batchNumber',
+                                orElse: () =>
+                                    const AdditionalField('batchNumber', ''),
+                              )
+                              .value
+                              ?.toString() ??
+                          '',
+                      isDisabled: true,
+                      readOnly: true,
+                    ),
+                    const SizedBox(height: 12),
+                  ],
 
                   // Quantity
                   InputField(

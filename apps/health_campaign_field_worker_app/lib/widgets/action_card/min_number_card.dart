@@ -106,7 +106,7 @@ class MinNumberCard extends StatelessWidget {
               );
             }).toList(),
             const SizedBox(height: 8.0), // Replace spacer2
-            if (waybillNumber != null)
+            if (waybillNumber != null && waybillNumber!.trim().isNotEmpty)
               Row(
                 children: [
                   Text("Waybill",
