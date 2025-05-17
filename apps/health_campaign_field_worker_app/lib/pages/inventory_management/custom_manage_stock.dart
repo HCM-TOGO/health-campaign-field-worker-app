@@ -251,7 +251,7 @@ class CustomManageStocksPageState
                       child: Row(
                         children: [
                           Icon(
-                            Icons.file_download_outlined,
+                            Icons.edit_note_outlined,
                             size: 24,
                             color: Colors.orange[800],
                           ),
@@ -358,7 +358,7 @@ class CustomManageStocksPageState
                       child: Row(
                         children: [
                           Icon(
-                            Icons.file_download_outlined,
+                            Icons.edit_note_outlined,
                             size: 24,
                             color: Colors.orange[800],
                           ),
@@ -465,7 +465,7 @@ class CustomManageStocksPageState
                       child: Row(
                         children: [
                           Icon(
-                            Icons.file_download_outlined,
+                            Icons.edit_note_outlined,
                             size: 24,
                             color: Colors.orange[800],
                           ),
