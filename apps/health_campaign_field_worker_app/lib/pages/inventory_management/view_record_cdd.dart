@@ -9,6 +9,7 @@ import 'package:inventory_management/models/entities/stock.dart';
 import 'package:inventory_management/models/entities/transaction_reason.dart';
 import 'package:inventory_management/models/entities/transaction_type.dart';
 import 'package:inventory_management/utils/i18_key_constants.dart' as i18;
+import '../../utils/i18_key_constants.dart' as i18_local;
 import 'package:inventory_management/utils/utils.dart';
 import 'package:registration_delivery/widgets/localized.dart';
 import 'package:reactive_forms/reactive_forms.dart';
@@ -167,14 +168,14 @@ class _ViewStockRecordsCDDPageState
         if (int.parse(stock.quantity!) > stockReceived) {
           Toast.showToast(
             context,
-            message: localizations.translate("Comments is required"),
+            message: localizations.translate(i18_local.inventoryReportDetails.commentIsRequiredText),
             type: ToastType.error,
             position: ToastPosition.aboveOneButtonFooter,
           );
         } else if (int.parse(stock.quantity!) < stockReceived) {
           Toast.showToast(
             context,
-            message: localizations.translate("Check the quantity received"),
+            message: localizations.translate(i18_local.inventoryReportDetails.checkTheQuantityReceivedText),
             type: ToastType.error,
             position: ToastPosition.aboveOneButtonFooter,
           );
@@ -275,7 +276,7 @@ class _ViewStockRecordsCDDPageState
                   const SizedBox(height: 12),
                   InputField(
                     type: InputType.text,
-                    label: 'Waybill Number *',
+                    label: i18_local.inventoryReportDetails.waybillNumberText,
                     initialValue: stock.wayBillNumber ?? '',
                     isDisabled: true,
                     readOnly: true,
@@ -283,7 +284,7 @@ class _ViewStockRecordsCDDPageState
                   const SizedBox(height: 12),
                   InputField(
                     type: InputType.text,
-                    label: 'Batch Number',
+                    label: i18_local.inventoryReportDetails.batchNumberText,
                     initialValue: stock.additionalFields?.fields
                             .firstWhere(
                               (field) => field.key == 'batchNumber',
@@ -298,7 +299,7 @@ class _ViewStockRecordsCDDPageState
                   const SizedBox(height: 12),
                   InputField(
                     type: InputType.text,
-                    label: 'Quantity Sent by Warehouse *',
+                    label: i18_local.inventoryReportDetails.quantityReceivedByWarehouse,
                     initialValue: stock.quantity ?? '',
                     isDisabled: true,
                     readOnly: true,
@@ -308,7 +309,7 @@ class _ViewStockRecordsCDDPageState
                     formControlName: 'quantityReceived',
                     builder: (field) => InputField(
                       type: InputType.text,
-                      label: 'Actual Quantity Received *',
+                      label: i18_local.inventoryReportDetails.actualQuantityReceived,
                       errorMessage: field.errorText,
                       keyboardType: TextInputType.number,
                       onChange: (value) {
@@ -330,7 +331,7 @@ class _ViewStockRecordsCDDPageState
                     formControlName: 'comments',
                     builder: (field) => InputField(
                       type: InputType.textArea,
-                      label: 'Comments',
+                      label: i18_local.inventoryReportDetails.commentsText,
                       errorMessage: field.errorText,
                       onChange: (value) => field.control.value = value,
                     ),
@@ -376,21 +377,21 @@ class _ViewStockRecordsCDDPageState
               Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  const Text(
-                    'Stock Receipt Details',
-                    style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
+                  Text(
+                    localizations.translate(i18_local.inventoryReportDetails.stockReceiptDetailsText),
+                    style: const TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
                   ),
                   const SizedBox(height: 12),
                   Row(
                     children: [
-                      const Expanded(child: Text('MRN Number')),
+                      Expanded(child: Text(localizations.translate(i18_local.acknowledgementSuccess.mrnNumberLabel))),
                       Expanded(child: Text(widget.mrnNumber)),
                     ],
                   ),
                   const SizedBox(height: 8),
                   Row(
                     children: [
-                      const Expanded(child: Text('Received From')),
+                      Expanded(child: Text(i18_local.inventoryReportDetails.receivedFromText)),
                       Expanded(
                         child: Text(localizations
                             .translate('FAC_$senderIdToShowOnTab')),
