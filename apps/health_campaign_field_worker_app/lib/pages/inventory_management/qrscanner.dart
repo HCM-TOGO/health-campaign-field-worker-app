@@ -53,10 +53,10 @@ class _QRScannerPageState extends LocalizedState<QRScannerPage> {
       List<StockModel> stockList = [];
       for (String item in decodedJson) {
         StockModel model = StockModelMapper.fromJson(item);
-        // if (model.receiverId != context.loggedInUserUuid) {
-        //   _showError('This QR code is not applicable for your account');
-        //   return;
-        // }
+        if (model.receiverId != context.loggedInUserUuid) {
+          _showError('This QR code is not applicable for your account');
+          return;
+        }
         stockList.add(model);
       }
 
@@ -109,7 +109,7 @@ class _QRScannerPageState extends LocalizedState<QRScannerPage> {
   Widget build(BuildContext context) {
     return Scaffold(
         appBar: AppBar(
-          title: Text(localizations.translate('qr_scanner.title')),
+          title: Text(localizations.translate('qr_scanner_title')),
           actions: [
             IconButton(
               icon: const Icon(Icons.flash_on),

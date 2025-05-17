@@ -68,6 +68,17 @@ class _ViewStockRecordsCDDPageState
 
   Future<void> _handleSubmission() async {
     if (_form.valid) {
+      context.read<RecordStockBloc>().add(
+            RecordStockSaveTransactionDetailsEvent(
+              dateOfRecord: DateTime.now(),
+              facilityModel: FacilityModel(
+                id: context.loggedInUserUuid,
+              ),
+              primaryId: context.loggedInUserUuid,
+              primaryType: "STAFF",
+            ),
+          );
+
       final updatedStocks = widget.stockRecords.map((stock) {
         final additionalFields = stock.additionalFields?.fields ?? [];
 
@@ -78,17 +89,20 @@ class _ViewStockRecordsCDDPageState
               _form.control('quantityReceived').value.toString()),
           if (_form.control('comments').value != null)
             AdditionalField('comments', _form.control('comments').value),
+          AdditionalField('received', 'true'),
         ];
 
         return stock.copyWith(
           id: null,
           rowVersion: 1,
+          clientReferenceId: IdGen.i.identifier,
           transactionType: TransactionType.received.toValue(),
           transactionReason: TransactionReason.received.toValue(),
           quantity: _form.control('quantityReceived').value.toString(),
           additionalFields: stock.additionalFields?.copyWith(
             fields: newFields,
           ),
+          dateOfEntry: DateTime.now().millisecondsSinceEpoch,
           auditDetails: AuditDetails(
             createdBy: InventorySingleton().loggedInUserUuid,
             createdTime: context.millisecondsSinceEpoch(),

@@ -79,6 +79,7 @@ class _ViewStockRecordsLGAPageState
         return stock.copyWith(
           id: null,
           rowVersion: 1,
+          clientReferenceId: IdGen.i.identifier,
           transactionType: TransactionType.received.toValue(),
           transactionReason: TransactionReason.received.toValue(),
           quantity: _form.control('quantityReceived').value.toString(),
@@ -161,10 +162,9 @@ class _ViewStockRecordsLGAPageState
 
       context.router.push(
         CustomAcknowledgementRoute(
-          mrnNumber: widget.mrnNumber,
-          stockRecords: updatedStocks,
-          entryType: StockRecordEntryType.receipt
-        ),
+            mrnNumber: widget.mrnNumber,
+            stockRecords: updatedStocks,
+            entryType: StockRecordEntryType.receipt),
       );
     } else {
       _form.markAllAsTouched();
