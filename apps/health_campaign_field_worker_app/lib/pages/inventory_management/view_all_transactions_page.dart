@@ -5,6 +5,7 @@ import 'package:digit_ui_components/widgets/molecules/digit_card.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:health_campaign_field_worker_app/data/repositories/local/inventory_management/custom_stock.dart';
+import 'package:intl/intl.dart';
 import 'package:inventory_management/blocs/record_stock.dart';
 import 'package:inventory_management/models/entities/stock.dart';
 import 'package:inventory_management/models/entities/transaction_reason.dart';
@@ -228,21 +229,16 @@ class _ViewAllTransactionsScreenState extends State<ViewAllTransactionsScreen> {
                                                     .value
                                                     ?.toString() ??
                                                 'N/A',
-                                        cddCode: stock.additionalFields?.fields
-                                                .firstWhere(
-                                                  (field) =>
-                                                      field.key ==
-                                                      'productName',
-                                                  orElse: () =>
-                                                      const AdditionalField(
-                                                          'productName', 'N/A'),
-                                                )
-                                                .value
-                                                ?.toString() ??
-                                            'N/A',
-                                        date: stock.dateOfEntryTime != null
-                                            ? 'Date: ${stock.dateOfEntryTime!.toLocal().toString().split(' ')[0]}'
-                                            : '',
+                                        cddCode: stock.senderId ?? '',
+                                        date: (stock.dateOfEntry != null)
+                                            ? DateFormat('d MMMM yyyy').format(
+                                                (stock.dateOfEntryTime ??
+                                                        DateTime.now())
+                                                    .toLocal())
+                                            : formatDateFromMillis(stock
+                                                    .auditDetails
+                                                    ?.createdTime ??
+                                                0),
                                         items: [
                                           {
                                             'name':

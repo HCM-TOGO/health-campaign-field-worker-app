@@ -185,7 +185,7 @@ class CustomMinNumberPageState extends LocalizedState<CustomMinNumberPage> {
                                     child: MinNumberCard(
                                       data: encoded,
                                       minNumber: mrn,
-                                      cddCode: stocks.first.boundaryCode ?? "",
+                                      cddCode: stocks.first.senderId ?? "",
                                       date: formatDateFromMillis(stocks.first
                                               .auditDetails?.createdTime ??
                                           0),
