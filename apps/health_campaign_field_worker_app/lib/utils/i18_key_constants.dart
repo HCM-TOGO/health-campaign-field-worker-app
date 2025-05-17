@@ -493,6 +493,10 @@ class WarehouseDetailsShowcase {
   String get warehouseName {
     return 'WAREHOUSE_DETAILS_SHOWCASE_WAREHOUSE_NAME';
   }
+
+  String get dateOfReturn {
+    return 'WAREHOUSE_DETAILS_SHOWCASE_DATE_OF_RETURN';
+  }
 }
 
 class StockDetailsReceiptShowcase {
@@ -1069,6 +1073,10 @@ class StockReconciliationShowcase {
 
   String get comments {
     return 'STOCK_RECONCILIATION_SHOWCASE_COMMENTS';
+  }
+
+  String get cddCodeLabel {
+    return 'CDD_CODE_LABEL';
   }
 }
 

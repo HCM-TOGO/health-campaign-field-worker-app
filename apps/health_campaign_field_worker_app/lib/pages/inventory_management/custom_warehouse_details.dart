@@ -321,10 +321,17 @@ class CustomWarehouseDetailsPageState
                                         builder: (field) {
                                           return InputField(
                                             type: InputType.date,
-                                            label: localizations.translate(
-                                              i18.warehouseDetails
-                                                  .dateOfReceipt,
-                                            ),
+                                            label: stockState.entryType ==
+                                                    StockRecordEntryType
+                                                        .returned
+                                                ? localizations.translate(
+                                                    i18_local
+                                                        .warehouseDetailsShowcase
+                                                        .dateOfReturn)
+                                                : localizations.translate(
+                                                    i18.warehouseDetails
+                                                        .dateOfReceipt,
+                                                  ),
                                             confirmText:
                                                 localizations.translate(
                                               i18.common.coreCommonOk,
@@ -332,7 +339,8 @@ class CustomWarehouseDetailsPageState
                                             cancelText: localizations.translate(
                                               i18.common.coreCommonCancel,
                                             ),
-                                            initialValue: DateFormat('dd/MM/yy')
+                                            initialValue: DateFormat(
+                                                    'd MMMM yyyy')
                                                 .format(field.control.value),
                                             readOnly: true,
                                           );
@@ -425,8 +433,9 @@ class CustomWarehouseDetailsPageState
                                               type: InputType.text,
                                               isDisabled: true,
                                               label: localizations.translate(
-                                                i18.stockReconciliationDetails
-                                                    .teamCodeLabel,
+                                                i18_local
+                                                    .stockReconciliationShowcase
+                                                    .cddCodeLabel,
                                               ),
                                               initialValue: form
                                                   .control(_teamCodeKey)
