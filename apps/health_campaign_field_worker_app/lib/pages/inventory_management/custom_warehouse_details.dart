@@ -350,10 +350,8 @@ class CustomWarehouseDetailsPageState
                                         builder: (field) {
                                           return InputField(
                                             type: InputType.text,
-                                            label: localizations.translate(
-                                              i18.warehouseDetails
-                                                  .administrativeUnit,
-                                            ),
+                                            label:
+                                                '${localizations.translate(i18.warehouseDetails.administrativeUnit)} *',
                                             initialValue: field.control.value,
                                             readOnly: true,
                                           );
