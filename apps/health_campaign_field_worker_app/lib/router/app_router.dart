@@ -51,6 +51,7 @@ import '../pages/inventory_management/view_stock_records.dart';
 import 'package:inventory_management/models/entities/stock.dart';
 import '../pages/inventory_management/custom_min_number.dart';
 import '../pages/inventory_management/view_all_transactions_page.dart';
+import '../pages/inventory_management/view_record_cdd.dart';
 import '../pages/inventory_management/qrscanner.dart';
 import '../pages/language_selection.dart';
 import '../pages/login.dart';
@@ -147,6 +148,11 @@ class AppRouter extends _$AppRouter {
           page: ViewStockRecordsLGARoute.page,
           path: 'custom-stock-view-lga',
         ),
+        AutoRoute(
+          page: ViewStockRecordsCDDRoute.page,
+          path: 'custom-stock-view-lga',
+        ),
+
         AutoRoute(
           page: CustomMinNumberRoute.page,
           path: 'custom-min-number',

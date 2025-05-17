@@ -74,6 +74,7 @@ dependencies:
   complaints: ^1.0.2
   logger: ^2.5.0
   mobile_scanner: ^3.4.1
+  # qr_code_scanner: ^1.0.1
 
 dev_dependencies:
   flutter_test:
