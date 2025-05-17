@@ -326,11 +326,19 @@ class CustomManageStocksPageState
               children: [
                 GestureDetector(
                   onTap: () {
-                    context.router.push(
-                      RecordStockWrapperRoute(
-                        type: StockRecordEntryType.dispatch,
-                      ),
-                    );
+                    if (context.isCDD) {
+                      context.router.push(
+                        RecordStockWrapperRoute(
+                          type: StockRecordEntryType.returned,
+                        ),
+                      );
+                    } else {
+                      context.router.push(
+                        RecordStockWrapperRoute(
+                          type: StockRecordEntryType.dispatch,
+                        ),
+                      );
+                    }
                     Navigator.of(context).pop();
                   },
                   child: Container(
@@ -369,11 +377,19 @@ class CustomManageStocksPageState
                 const SizedBox(height: 16), // Add spacing between buttons
                 GestureDetector(
                   onTap: () {
-                    context.router.push(
-                      CustomMinNumberRoute(
-                        type: StockRecordEntryType.dispatch,
-                      ),
-                    );
+                    if (context.isCDD) {
+                      context.router.push(
+                        CustomMinNumberRoute(
+                          type: StockRecordEntryType.returned,
+                        ),
+                      );
+                    } else {
+                      context.router.push(
+                        CustomMinNumberRoute(
+                          type: StockRecordEntryType.dispatch,
+                        ),
+                      );
+                    }
                     Navigator.of(context).pop();
                   },
                   child: Container(
