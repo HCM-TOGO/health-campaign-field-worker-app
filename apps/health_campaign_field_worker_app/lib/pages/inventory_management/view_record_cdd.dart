@@ -127,57 +127,77 @@ class _ViewStockRecordsCDDPageState
         context.read<RecordStockBloc>().add(
               const RecordStockCreateStockEntryEvent(),
             );
-        if (InventorySingleton().isDistributor) {
-          final totalQty =
-              int.parse(_form.control('quantityReceived').value.toString());
 
-          int spaq1Count = context.spaq1;
-          int spaq2Count = context.spaq2;
+        final stockReceived =
+            int.parse(_form.control('quantityReceived').value.toString());
 
-          int blueVasCount = context.blueVas;
-          int redVasCount = context.redVas;
-          String productName = stock.additionalFields?.fields
-              .firstWhereOrNull((element) => element.key == "productName")
-              ?.value;
-          // Custom logic based on productName
-          if (productName == Constants.spaq1) {
-            spaq1Count = totalQty;
-            spaq2Count = 0;
-            redVasCount = 0;
-            blueVasCount = 0;
-          } else if (productName == Constants.spaq2) {
-            spaq2Count = totalQty;
-            spaq1Count = 0;
-            redVasCount = 0;
-            blueVasCount = 0;
-          } else if (productName == Constants.blueVAS) {
-            blueVasCount = totalQty;
-            spaq1Count = 0;
-            spaq2Count = 0;
-            redVasCount = 0;
-          } else {
-            blueVasCount = 0;
-            spaq1Count = 0;
-            spaq2Count = 0;
-            redVasCount = totalQty;
+        if (int.parse(stock.quantity!) > stockReceived) {
+          Toast.showToast(
+            context,
+            message: localizations.translate("Comments is required"),
+            type: ToastType.error,
+            position: ToastPosition.aboveOneButtonFooter,
+          );
+        } else if (int.parse(stock.quantity!) < stockReceived) {
+          Toast.showToast(
+            context,
+            message: localizations.translate("Check the quantity received"),
+            type: ToastType.error,
+            position: ToastPosition.aboveOneButtonFooter,
+          );
+        } else {
+          if (InventorySingleton().isDistributor) {
+            final totalQty =
+                int.parse(_form.control('quantityReceived').value.toString());
+
+            int spaq1Count = context.spaq1;
+            int spaq2Count = context.spaq2;
+
+            int blueVasCount = context.blueVas;
+            int redVasCount = context.redVas;
+            String productName = stock.additionalFields?.fields
+                .firstWhereOrNull((element) => element.key == "productName")
+                ?.value;
+            // Custom logic based on productName
+            if (productName == Constants.spaq1) {
+              spaq1Count = totalQty;
+              spaq2Count = 0;
+              redVasCount = 0;
+              blueVasCount = 0;
+            } else if (productName == Constants.spaq2) {
+              spaq2Count = totalQty;
+              spaq1Count = 0;
+              redVasCount = 0;
+              blueVasCount = 0;
+            } else if (productName == Constants.blueVAS) {
+              blueVasCount = totalQty;
+              spaq1Count = 0;
+              spaq2Count = 0;
+              redVasCount = 0;
+            } else {
+              blueVasCount = 0;
+              spaq1Count = 0;
+              spaq2Count = 0;
+              redVasCount = totalQty;
+            }
+            context.read<AuthBloc>().add(
+                  AuthAddSpaqCountsEvent(
+                    spaq1Count: spaq1Count,
+                    spaq2Count: spaq2Count,
+                    blueVasCount: blueVasCount,
+                    redVasCount: redVasCount,
+                  ),
+                );
           }
-          context.read<AuthBloc>().add(
-                AuthAddSpaqCountsEvent(
-                  spaq1Count: spaq1Count,
-                  spaq2Count: spaq2Count,
-                  blueVasCount: blueVasCount,
-                  redVasCount: redVasCount,
-                ),
-              );
         }
-      }
 
-      context.router.push(
-        CustomAcknowledgementRoute(
-            mrnNumber: widget.mrnNumber,
-            stockRecords: updatedStocks,
-            entryType: StockRecordEntryType.receipt),
-      );
+        context.router.push(
+          CustomAcknowledgementRoute(
+              mrnNumber: widget.mrnNumber,
+              stockRecords: updatedStocks,
+              entryType: StockRecordEntryType.receipt),
+        );
+      }
     } else {
       _form.markAllAsTouched();
     }
