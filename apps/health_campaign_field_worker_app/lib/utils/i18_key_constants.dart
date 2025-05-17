@@ -450,6 +450,11 @@ class StockDetails {
       'STOCK_DETAILS_RETURNED_MAX_QUANTITY_ERROR';
 
   String get productRequired => 'STOCK_DETAILS_PRODUCT_IS_REQUIRED';
+
+  String get manageStockLabel => 'STOCK_DETAILS_MANAGE_STOCK_LABEL';
+
+  String get recordStockReturnedDescription =>
+      'STOCK_DETAILS_RECORD_STOCK_RETURNED_DESCRIPTION';
 }
 
 class InventoryReportDetails {
