@@ -423,6 +423,9 @@ class CustomBeneficiaryDetailsPageState
                                                 (projectType?.cycles ?? [])
                                                         .isNotEmpty
                                                     ? CustomRecordDeliveryCycle(
+                                                        eligibilityAssessmentType:
+                                                            widget
+                                                                .eligibilityAssessmentType,
                                                         projectCycles:
                                                             projectType
                                                                     ?.cycles ??
