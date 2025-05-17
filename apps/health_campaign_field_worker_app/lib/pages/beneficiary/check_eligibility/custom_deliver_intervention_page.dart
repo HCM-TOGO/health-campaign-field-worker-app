@@ -557,7 +557,7 @@ class CustomDeliverInterventionPageState
                                                               .deliverIntervention
                                                               .deliverInterventionVASLabel,
                                                         ),
-                                                  style: textTheme.headingXl
+                                                  style: textTheme.headingL
                                                       .copyWith(
                                                           color: theme
                                                               .colorTheme
@@ -670,7 +670,7 @@ class CustomDeliverInterventionPageState
                                                     i18.deliverIntervention
                                                         .deliverInterventionResourceLabel,
                                                   ),
-                                                  style: textTheme.headingXl
+                                                  style: textTheme.headingL
                                                       .copyWith(
                                                           color: theme
                                                               .colorTheme

@@ -163,6 +163,7 @@ class _CustomSearchBeneficiaryPageState
                                     padding: const EdgeInsets.all(spacer2),
                                     child: DigitSearchBar(
                                       controller: searchController,
+                                      icon: const SizedBox.shrink(),
                                       hintText: (RegistrationDeliverySingleton()
                                                   .householdType ==
                                               HouseholdType.community)

@@ -452,6 +452,11 @@ class StockDetails {
       'STOCK_DETAILS_RETURNED_MAX_QUANTITY_ERROR';
 
   String get productRequired => 'STOCK_DETAILS_PRODUCT_IS_REQUIRED';
+
+  String get manageStockLabel => 'STOCK_DETAILS_MANAGE_STOCK_LABEL';
+
+  String get recordStockReturnedDescription =>
+      'STOCK_DETAILS_RECORD_STOCK_RETURNED_DESCRIPTION';
 }
 
 class InventoryReportDetails {
@@ -507,6 +512,10 @@ class WarehouseDetailsShowcase {
 
   String get warehouseName {
     return 'WAREHOUSE_DETAILS_SHOWCASE_WAREHOUSE_NAME';
+  }
+
+  String get dateOfReturn {
+    return 'WAREHOUSE_DETAILS_SHOWCASE_DATE_OF_RETURN';
   }
 }
 
@@ -1085,6 +1094,10 @@ class StockReconciliationShowcase {
   String get comments {
     return 'STOCK_RECONCILIATION_SHOWCASE_COMMENTS';
   }
+
+  String get cddCodeLabel {
+    return 'CDD_CODE_LABEL';
+  }
 }
 
 class StockDetailsReturnedShowcase {
@@ -1365,6 +1378,8 @@ class BeneficiaryDetails {
   String get insufficientStorageContent =>
       'INSUFFICIENT_STORAGE_WARNING_CONTENT';
   String get recordCycle => 'BENEFICIARY_DETAILS_RECORD_CYCLE';
+
+  String get currentSmcCycleLabel => 'BENEFICIARY_DETAILS_CURRENT_SMC_CYCLE';
 }
 
 class PrivacyPolicy {

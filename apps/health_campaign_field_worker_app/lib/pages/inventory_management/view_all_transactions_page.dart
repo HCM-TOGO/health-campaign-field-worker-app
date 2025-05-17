@@ -5,6 +5,7 @@ import 'package:digit_ui_components/widgets/molecules/digit_card.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:health_campaign_field_worker_app/data/repositories/local/inventory_management/custom_stock.dart';
+import 'package:intl/intl.dart';
 import 'package:inventory_management/blocs/record_stock.dart';
 import 'package:inventory_management/models/entities/stock.dart';
 import 'package:inventory_management/models/entities/transaction_reason.dart';
@@ -37,6 +38,7 @@ class _ViewAllTransactionsScreenState extends State<ViewAllTransactionsScreen> {
     final stockState = context.read<RecordStockBloc>().state;
   }
 
+  int? pressedIndex;
   List<StockModel> stockList = [];
 
   Future<void> loadLocalStockData() async {
@@ -178,8 +180,7 @@ class _ViewAllTransactionsScreenState extends State<ViewAllTransactionsScreen> {
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
                       const SizedBox(height: 16.0),
-                      Text("Select the Material Issue number",
-                          style: textTheme.headingL),
+                      Text("Select the MIN number", style: textTheme.headingL),
                       const SizedBox(height: 16.0),
                       SizedBox(
                         height: MediaQuery.of(context).size.height * 0.8,
@@ -189,49 +190,83 @@ class _ViewAllTransactionsScreenState extends State<ViewAllTransactionsScreen> {
                               itemCount: filteredStock.length,
                               itemBuilder: (context, index) {
                                 final stock = filteredStock[index];
-
-                                return GestureDetector(
-                                  onTap: () => _navigateToDetails(stock),
-                                  child: Container(
-                                    margin: const EdgeInsets.only(bottom: 8),
-                                    decoration: BoxDecoration(
-                                      border: Border.all(
+                                return Material(
+                                  color: pressedIndex == index
+                                      ? Colors.orange[300]
+                                      : Colors.white,
+                                  borderRadius: BorderRadius.circular(8),
+                                  child: InkWell(
+                                    onTap: () => _navigateToDetails(stock),
+                                    onTapDown: (_) =>
+                                        setState(() => pressedIndex = index),
+                                    onTapUp: (_) =>
+                                        setState(() => pressedIndex = null),
+                                    onTapCancel: () =>
+                                        setState(() => pressedIndex = null),
+                                    borderRadius: BorderRadius.circular(8),
+                                    customBorder: const RoundedRectangleBorder(
+                                      side: BorderSide(
                                         color: Colors.grey,
                                         width: 1,
                                       ),
-                                      borderRadius: BorderRadius.circular(8),
                                     ),
-                                    child: TransactionsCard(
-                                      minNumber: stock.additionalFields?.fields
-                                              .firstWhere(
-                                                (field) =>
-                                                    field.key ==
-                                                    'materialNoteNumber',
-                                                orElse: () =>
-                                                    const AdditionalField(
-                                                        'materialNoteNumber',
-                                                        ''),
-                                              )
-                                              .value
-                                              ?.toString() ??
-                                          'N/A',
-                                      cddCode: stock.additionalFields?.fields
-                                              .firstWhere(
-                                                (field) =>
-                                                    field.key == 'productName',
-                                                orElse: () =>
-                                                    const AdditionalField(
-                                                        'productName', 'N/A'),
-                                              )
-                                              .value
-                                              ?.toString() ??
-                                          'N/A',
-                                      date:
-                                          'Date: ${stock.dateOfEntryTime?.toLocal().toString().split(' ')[0] ?? 'N/A'}',
-                                      items: [],
-                                      data: {},
-                                      waybillNumber:
-                                          ' ${stock.wayBillNumber ?? 'N/A'}',
+                                    child: Padding(
+                                      padding: const EdgeInsets.only(bottom: 8),
+                                      child: TransactionsCard(
+                                        backgroundColor: pressedIndex == index
+                                            ? Colors.orange[300]
+                                            : Colors.grey[200],
+                                        minNumber:
+                                            stock.additionalFields?.fields
+                                                    .firstWhere(
+                                                      (field) =>
+                                                          field.key ==
+                                                          'materialNoteNumber',
+                                                      orElse: () =>
+                                                          const AdditionalField(
+                                                              'materialNoteNumber',
+                                                              ''),
+                                                    )
+                                                    .value
+                                                    ?.toString() ??
+                                                'N/A',
+                                        cddCode: InventorySingleton()
+                                                .loggedInUser
+                                                ?.name ??
+                                            (stock.senderId ?? ''),
+                                        date: (stock.dateOfEntry != null)
+                                            ? DateFormat('d MMMM yyyy').format(
+                                                (stock.dateOfEntryTime ??
+                                                        DateTime.now())
+                                                    .toLocal())
+                                            : formatDateFromMillis(stock
+                                                    .auditDetails
+                                                    ?.createdTime ??
+                                                0),
+                                        items: [
+                                          {
+                                            'name':
+                                                stock.additionalFields?.fields
+                                                        .firstWhere(
+                                                          (field) =>
+                                                              field.key ==
+                                                              'productName',
+                                                          orElse: () =>
+                                                              const AdditionalField(
+                                                                  'productName',
+                                                                  'N/A'),
+                                                        )
+                                                        .value
+                                                        ?.toString() ??
+                                                    'N/A',
+                                            'quantity':
+                                                (stock.quantity ?? 0).toString()
+                                          }
+                                        ],
+                                        data: {},
+                                        waybillNumber:
+                                            ' ${stock.wayBillNumber ?? 'N/A'}',
+                                      ),
                                     ),
                                   ),
                                 );

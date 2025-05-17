@@ -14,6 +14,7 @@ import 'package:health_campaign_field_worker_app/widgets/action_card/min_number_
 import 'package:inventory_management/blocs/record_stock.dart';
 import 'package:inventory_management/models/entities/stock.dart';
 import 'package:inventory_management/utils/i18_key_constants.dart' as i18;
+import 'package:inventory_management/utils/utils.dart';
 import 'package:inventory_management/widgets/localized.dart';
 import 'package:inventory_management/widgets/back_navigation_help_header.dart';
 import '../../router/app_router.dart';
@@ -187,7 +188,11 @@ class CustomMinNumberPageState extends LocalizedState<CustomMinNumberPage> {
                                     child: MinNumberCard(
                                       data: encoded,
                                       minNumber: mrn,
-                                      cddCode: stocks.first.boundaryCode ?? "",
+                                      cddCode: InventorySingleton()
+                                              .loggedInUser
+                                              ?.name ??
+                                          stocks.first.senderId ??
+                                          "",
                                       date: formatDateFromMillis(stocks.first
                                               .auditDetails?.createdTime ??
                                           0),
@@ -212,8 +217,10 @@ class CustomMinNumberPageState extends LocalizedState<CustomMinNumberPage> {
                                           'quantity': quantity,
                                         };
                                       }).toList(),
-                                      waybillNumber:
-                                          stocks.first.wayBillNumber ?? "",
+                                      waybillNumber: InventorySingleton()
+                                              .isDistributor
+                                          ? null
+                                          : stocks.first.wayBillNumber ?? "",
                                     ),
                                   ),
                                 );

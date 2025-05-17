@@ -321,10 +321,17 @@ class CustomWarehouseDetailsPageState
                                         builder: (field) {
                                           return InputField(
                                             type: InputType.date,
-                                            label: localizations.translate(
-                                              i18.warehouseDetails
-                                                  .dateOfReceipt,
-                                            ),
+                                            label: stockState.entryType ==
+                                                    StockRecordEntryType
+                                                        .returned
+                                                ? localizations.translate(
+                                                    i18_local
+                                                        .warehouseDetailsShowcase
+                                                        .dateOfReturn)
+                                                : localizations.translate(
+                                                    i18.warehouseDetails
+                                                        .dateOfReceipt,
+                                                  ),
                                             confirmText:
                                                 localizations.translate(
                                               i18.common.coreCommonOk,
@@ -343,10 +350,8 @@ class CustomWarehouseDetailsPageState
                                           return InputField(
                                             isRequired: true,
                                             type: InputType.text,
-                                            label: localizations.translate(
-                                              i18.warehouseDetails
-                                                  .administrativeUnit,
-                                            ),
+                                            label:
+                                                '${localizations.translate(i18.warehouseDetails.administrativeUnit)} *',
                                             initialValue: field.control.value,
                                             readOnly: true,
                                           );
