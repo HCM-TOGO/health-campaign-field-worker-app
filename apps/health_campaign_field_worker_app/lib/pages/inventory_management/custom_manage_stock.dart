@@ -131,7 +131,9 @@ class CustomManageStocksPageState
                                           .recordStockReturnedDescription
                                       : i18.manageStock
                                           .recordStockIssuedDescription)),
-                              icon: Icons.file_upload_outlined,
+                              icon: context.isCDD
+                                  ? Icons.settings_backup_restore
+                                  : Icons.file_upload_outlined,
                               onTap: () {
                                 showStockIssueOrReturnDialog(context);
                               }),
