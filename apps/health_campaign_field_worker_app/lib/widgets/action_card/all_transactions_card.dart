@@ -13,6 +13,7 @@ class TransactionsCard extends StatelessWidget {
   final List<Map<String, String>> items;
   final Map<String, dynamic> data;
   final String waybillNumber;
+  final Color? backgroundColor;
 
   const TransactionsCard({
     super.key,
@@ -22,6 +23,7 @@ class TransactionsCard extends StatelessWidget {
     required this.items,
     required this.data,
     required this.waybillNumber,
+    this.backgroundColor,
   });
 
   @override
@@ -31,7 +33,7 @@ class TransactionsCard extends StatelessWidget {
 
     return Container(
       decoration: BoxDecoration(
-        color: Colors.grey[200],
+        color: backgroundColor ?? Colors.grey[200],
         border: Border.all(
           color: Colors.grey[400]!,
           width: 1,
@@ -83,21 +85,28 @@ class TransactionsCard extends StatelessWidget {
                     ),
                     const SizedBox(width: 8.0),
                     Text(
-                      "|",
-                      style: textTheme.bodyL,
-                    ),
-                    Text(
-                      date,
-                      style: textTheme.bodyL,
-                    ), // Replace spacer2
-                    Text(
                       "${item['quantity']!} Units",
                       style: textTheme.bodyL,
                     ),
+                    // const SizedBox(width: 8.0),
+                    // Text(
+                    //   "|",
+                    //   style: textTheme.bodyL,
+                    // ),
+                    // Replace spacer2
                   ],
                 ),
               );
             }).toList(),
+
+            if (date.trim().isNotEmpty) ...[
+              const SizedBox(width: 8.0),
+              Text(
+                date,
+                style: textTheme.bodyL,
+              ),
+            ],
+
             const SizedBox(height: 8.0), // Replace spacer2
             Row(
               children: [
