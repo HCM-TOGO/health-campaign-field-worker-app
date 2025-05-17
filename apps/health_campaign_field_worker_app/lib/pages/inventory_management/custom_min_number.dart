@@ -183,38 +183,7 @@ class CustomMinNumberPageState extends LocalizedState<CustomMinNumberPage> {
                                       );
                                     },
                                     child: MinNumberCard(
-                                      data: {
-                                        'minNumber': mrn,
-                                        'cddCode':
-                                            stocks.first.boundaryCode ?? '',
-                                        'date': formatDateFromMillis(stocks
-                                                .first
-                                                .auditDetails
-                                                ?.createdTime ??
-                                            0),
-                                        'items': encoded,
-
-                                        // stocks.map((s) {
-                                        //   final name = s
-                                        //           .additionalFields?.fields
-                                        //           .firstWhere(
-                                        //             (f) =>
-                                        //                 f.key == 'productName',
-                                        //             orElse: () =>
-                                        //                 const AdditionalField(
-                                        //                     '', ''),
-                                        //           )
-                                        //           .value ??
-                                        //       'N/A';
-                                        //   return {
-                                        //     'name': name.toString(),
-                                        //     'quantity':
-                                        //         (s.quantity ?? 0).toString(),
-                                        //   };
-                                        // }).toList(),
-                                        'waybillNumber':
-                                            stocks.first.wayBillNumber ?? '',
-                                      },
+                                      data: encoded,
                                       minNumber: mrn,
                                       cddCode: stocks.first.boundaryCode ?? "",
                                       date: formatDateFromMillis(stocks.first

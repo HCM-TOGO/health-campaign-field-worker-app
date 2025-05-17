@@ -13,7 +13,7 @@ class MinNumberCard extends StatelessWidget {
   final String cddCode;
   final String date;
   final List<Map<String, String>> items;
-  final Map<String, dynamic> data;
+  final String data;
   final String waybillNumber;
 
   const MinNumberCard({
@@ -68,7 +68,7 @@ class MinNumberCard extends StatelessWidget {
                 width: 200,
                 alignment: Alignment.center,
                 child: QrImageView(
-                  data: data.toString(),
+                  data: data,
                   version: QrVersions.auto,
                   size: 250.0,
                 ),

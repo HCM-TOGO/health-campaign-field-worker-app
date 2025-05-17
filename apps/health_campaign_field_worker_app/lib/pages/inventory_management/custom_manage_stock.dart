@@ -20,7 +20,7 @@ import 'package:inventory_management/widgets/back_navigation_help_header.dart';
 
 import '../../router/app_router.dart';
 import '../../utils/utils.dart';
-import 'qrscanner.dart';
+// import 'qrscanner.dart';
 
 @RoutePage()
 class CustomManageStocksPage extends LocalizedStatefulWidget {
@@ -57,7 +57,10 @@ class CustomManageStocksPageState
             children: [
               Padding(
                 padding: const EdgeInsets.only(
-                    left: spacer2, right: spacer2, bottom: spacer4, top: spacer4),
+                    left: spacer2,
+                    right: spacer2,
+                    bottom: spacer4,
+                    top: spacer4),
                 child: Align(
                   alignment: Alignment.topLeft,
                   child: Text(
@@ -90,6 +93,7 @@ class CustomManageStocksPageState
                                         if (InventorySingleton()
                                             .isDistributor) {
                                           context.router.push(QRScannerRoute());
+                                          Navigator.of(context).pop();
                                         } else {
                                           context.router.push(
                                             RecordStockWrapperRoute(

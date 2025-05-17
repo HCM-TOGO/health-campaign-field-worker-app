@@ -2,12 +2,11 @@ import 'dart:convert';
 import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:logger/logger.dart';
+import 'package:mobile_scanner/mobile_scanner.dart';
 import 'package:inventory_management/blocs/record_stock.dart';
 import 'package:inventory_management/models/entities/stock.dart';
 import 'package:inventory_management/widgets/localized.dart';
-import 'package:mobile_scanner/mobile_scanner.dart';
-import 'package:qr_flutter/qr_flutter.dart';
-
 import '../../router/app_router.dart';
 import '../../utils/extensions/extensions.dart';
 
@@ -25,7 +24,6 @@ class QRScannerPage extends LocalizedStatefulWidget {
 class _QRScannerPageState extends LocalizedState<QRScannerPage> {
   MobileScannerController cameraController = MobileScannerController();
   bool _isScanning = true;
-  String _qrData = '';
   final TextEditingController _qrDataController = TextEditingController();
 
   @override
@@ -40,25 +38,25 @@ class _QRScannerPageState extends LocalizedState<QRScannerPage> {
 
     setState(() => _isScanning = false);
 
-    try {
-      // For emulator testing with simple text
-      if (!Platform.isAndroid && !Platform.isIOS) {
-        if (code == 'test') {
-          code = _generateTestQRData();
-        }
-      }
+    Logger().d('📦 Scanned: $code');
 
+    try {
+      // if (!Platform.isAndroid && !Platform.isIOS && code == 'test') {
+      //   code = _generateTestQRData();
+      // }
       final compressed = base64Url.decode(code);
+
       final decompressed = utf8.decode(zlib.decode(compressed));
       final decodedJson = jsonDecode(decompressed);
+      Logger().d('📦 Decompressed: $decodedJson');
 
       List<StockModel> stockList = [];
       for (String item in decodedJson) {
         StockModel model = StockModelMapper.fromJson(item);
-        if (model.receiverId != context.loggedInUserUuid) {
-          _showError('This QR code is not applicable for your account');
-          return;
-        }
+        // if (model.receiverId != context.loggedInUserUuid) {
+        //   _showError('This QR code is not applicable for your account');
+        //   return;
+        // }
         stockList.add(model);
       }
 
@@ -107,83 +105,54 @@ class _QRScannerPageState extends LocalizedState<QRScannerPage> {
     );
   }
 
-  Widget _buildScanner() {
-    return Column(
-      children: [
-        Expanded(
-          child: MobileScanner(
-            controller: cameraController,
-            onDetect: (capture) {
-              final barcode = capture.barcodes.firstOrNull;
-              if (barcode != null && barcode.rawValue != null) {
-                _processScannedData(barcode.rawValue);
-              }
-            },
-          ),
-        ),
-        if (!Platform.isAndroid && !Platform.isIOS)
-          Padding(
-            padding: const EdgeInsets.all(16.0),
-            child: ElevatedButton(
-              onPressed: () => _processScannedData('test'),
-              child: const Text('Test with Sample QR Data'),
-            ),
-          ),
-      ],
-    );
-  }
-
-  Widget _buildGenerator() {
-    return SingleChildScrollView(
-      child: Padding(
-        padding: const EdgeInsets.all(20.0),
-        child: Column(
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: [
-            TextField(
-              controller: _qrDataController,
-              decoration: InputDecoration(
-                labelText: 'Enter data for QR code',
-                border: const OutlineInputBorder(),
-                suffixIcon: IconButton(
-                  icon: const Icon(Icons.clear),
-                  onPressed: () => _qrDataController.clear(),
-                ),
-              ),
-              maxLines: 3,
-            ),
-            const SizedBox(height: 20),
-          ],
-        ),
-      ),
-    );
-  }
-
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(
-        title: Text(localizations.translate('qr_scanner.title')),
-        actions: [
-          IconButton(
-            icon: Icon(Icons.qr_code),
-            onPressed: () {
-              setState(() {
-                // _showGenerator = !_showGenerator;
-                _qrData = '';
-              });
-            },
-            tooltip: 'Switch to Scanner',
-          ),
-        ],
-      ),
-      body: _buildScanner(),
-      //   floatingActionButton: _showGenerator
-      //       ? null
-      //       : FloatingActionButton(
-      //           onPressed: () => cameraController.toggleTorch(),
-      //           child: const Icon(Icons.flash_on),
-      //         ),
-    );
+        appBar: AppBar(
+          title: Text(localizations.translate('qr_scanner.title')),
+          actions: [
+            IconButton(
+              icon: const Icon(Icons.flash_on),
+              onPressed: () {
+                cameraController.toggleTorch();
+              },
+              tooltip: 'Toggle Torch',
+            ),
+          ],
+        ),
+        body: Stack(
+          children: [
+            MobileScanner(
+              controller: cameraController,
+              onDetect: (capture) {
+                final barcode = capture.barcodes.firstOrNull;
+                if (barcode != null && barcode.rawValue != null) {
+                  _processScannedData(barcode.rawValue);
+                }
+              },
+            ),
+            Align(
+              alignment: Alignment.center,
+              child: Container(
+                width: 250,
+                height: 250,
+                decoration: BoxDecoration(
+                  border: Border.all(color: Colors.green, width: 3),
+                  borderRadius: BorderRadius.circular(12),
+                ),
+              ),
+            ),
+            if (!Platform.isAndroid && !Platform.isIOS)
+              Positioned(
+                bottom: 32,
+                left: 32,
+                right: 32,
+                child: ElevatedButton(
+                  onPressed: () => _processScannedData('test'),
+                  child: const Text('Test with Sample QR Data'),
+                ),
+              ),
+          ],
+        ));
   }
 }
