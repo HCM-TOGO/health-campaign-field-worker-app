@@ -14,16 +14,16 @@ class MinNumberCard extends StatelessWidget {
   final String date;
   final List<Map<String, String>> items;
   final String data;
-  final String waybillNumber;
+  String? waybillNumber;
 
-  const MinNumberCard({
+  MinNumberCard({
     super.key,
     required this.minNumber,
     required this.cddCode,
     required this.date,
     required this.items,
     required this.data,
-    required this.waybillNumber,
+    this.waybillNumber,
   });
 
   @override
@@ -106,18 +106,19 @@ class MinNumberCard extends StatelessWidget {
               );
             }).toList(),
             const SizedBox(height: 8.0), // Replace spacer2
-            Row(
-              children: [
-                Text("Waybill",
-                    style: textTheme.bodyL.copyWith(
-                      fontWeight: FontWeight.bold,
-                    )),
-                const SizedBox(
-                  width: spacer4,
-                ), // Replace spacer2
-                Text(waybillNumber),
-              ],
-            ),
+            if (waybillNumber != null)
+              Row(
+                children: [
+                  Text("Waybill",
+                      style: textTheme.bodyL.copyWith(
+                        fontWeight: FontWeight.bold,
+                      )),
+                  const SizedBox(
+                    width: 16.0, // Replace spacer4 with 16.0
+                  ),
+                  Text(waybillNumber!),
+                ],
+              ),
           ],
         ),
       ),

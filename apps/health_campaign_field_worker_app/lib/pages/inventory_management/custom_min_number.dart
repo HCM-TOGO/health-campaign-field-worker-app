@@ -210,8 +210,8 @@ class CustomMinNumberPageState extends LocalizedState<CustomMinNumberPage> {
                                           'quantity': quantity,
                                         };
                                       }).toList(),
-                                      waybillNumber:
-                                          stocks.first.wayBillNumber ?? "",
+                                      // waybillNumber:
+                                      //     stocks.first.wayBillNumber ?? "",
                                     ),
                                   ),
                                 );
