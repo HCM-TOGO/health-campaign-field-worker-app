@@ -14,6 +14,7 @@ class AttributesSearchModelMapper
   static AttributesSearchModelMapper ensureInitialized() {
     if (_instance == null) {
       MapperContainer.globals.use(_instance = AttributesSearchModelMapper._());
+      EntitySearchModelMapper.ensureInitialized().addSubMapper(_instance!);
     }
     return _instance!;
   }
@@ -233,6 +234,10 @@ class AttributesModelMapper extends SubClassMapperBase<AttributesModel> {
   static AttributesModelMapper ensureInitialized() {
     if (_instance == null) {
       MapperContainer.globals.use(_instance = AttributesModelMapper._());
+      EntityModelMapper.ensureInitialized().addSubMapper(_instance!);
+      AttributesAdditionalFieldsMapper.ensureInitialized();
+      AuditDetailsMapper.ensureInitialized();
+      ClientAuditDetailsMapper.ensureInitialized();
     }
     return _instance!;
   }
@@ -551,6 +556,8 @@ class AttributesAdditionalFieldsMapper
     if (_instance == null) {
       MapperContainer.globals
           .use(_instance = AttributesAdditionalFieldsMapper._());
+      AdditionalFieldsMapper.ensureInitialized().addSubMapper(_instance!);
+      AdditionalFieldMapper.ensureInitialized();
     }
     return _instance!;
   }

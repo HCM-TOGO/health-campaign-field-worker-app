@@ -15,6 +15,7 @@ class ServiceAttributesSearchModelMapper
     if (_instance == null) {
       MapperContainer.globals
           .use(_instance = ServiceAttributesSearchModelMapper._());
+      EntitySearchModelMapper.ensureInitialized().addSubMapper(_instance!);
     }
     return _instance!;
   }
@@ -192,6 +193,10 @@ class ServiceAttributesModelMapper
   static ServiceAttributesModelMapper ensureInitialized() {
     if (_instance == null) {
       MapperContainer.globals.use(_instance = ServiceAttributesModelMapper._());
+      EntityModelMapper.ensureInitialized().addSubMapper(_instance!);
+      ServiceAttributesAdditionalFieldsMapper.ensureInitialized();
+      AuditDetailsMapper.ensureInitialized();
+      ClientAuditDetailsMapper.ensureInitialized();
     }
     return _instance!;
   }
@@ -467,6 +472,8 @@ class ServiceAttributesAdditionalFieldsMapper
     if (_instance == null) {
       MapperContainer.globals
           .use(_instance = ServiceAttributesAdditionalFieldsMapper._());
+      AdditionalFieldsMapper.ensureInitialized().addSubMapper(_instance!);
+      AdditionalFieldMapper.ensureInitialized();
     }
     return _instance!;
   }
