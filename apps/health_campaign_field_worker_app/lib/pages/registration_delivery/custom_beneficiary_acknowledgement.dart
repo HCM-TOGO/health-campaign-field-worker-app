@@ -60,7 +60,7 @@ class CustomBeneficiaryAcknowledgementPageState
     return beneficiaryId == null
         ? null
         : {
-            'id': i18_local.beneficiaryDetails.beneficiaryId,
+            'id': localizations.translate(i18_local.beneficiaryDetails.beneficiaryId),
             'value': beneficiaryId,
           };
   }

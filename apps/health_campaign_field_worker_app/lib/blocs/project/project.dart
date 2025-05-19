@@ -1,7 +1,9 @@
 // GENERATED using mason_cli
 import 'dart:async';
 import 'dart:core';
+import 'dart:math';
 
+import 'package:collection/collection.dart';
 import 'package:attendance_management/models/entities/attendance_log.dart';
 import 'package:attendance_management/models/entities/attendance_register.dart';
 import 'package:connectivity_plus/connectivity_plus.dart';
@@ -11,6 +13,8 @@ import 'package:digit_ui_components/utils/app_logger.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:freezed_annotation/freezed_annotation.dart';
+import 'package:inventory_management/models/entities/stock.dart';
+import 'package:inventory_management/models/entities/transaction_type.dart';
 import 'package:isar/isar.dart';
 import 'package:recase/recase.dart';
 import 'package:survey_form/models/entities/service_definition.dart';
@@ -19,11 +23,13 @@ import '../../../models/app_config/app_config_model.dart' as app_configuration;
 import '../../data/local_store/no_sql/schema/app_configuration.dart';
 import '../../data/local_store/no_sql/schema/row_versions.dart';
 import '../../data/local_store/secure_store/secure_store.dart';
+import '../../data/repositories/local/inventory_management/custom_stock.dart';
 import '../../data/repositories/remote/bandwidth_check.dart';
 import '../../data/repositories/remote/mdms.dart';
 import '../../models/app_config/app_config_model.dart';
 import '../../models/auth/auth_model.dart';
 import '../../models/entities/roles_type.dart';
+import '../../models/data_model.dart';
 import '../../utils/background_service.dart';
 import '../../utils/environment_config.dart';
 import '../../utils/least_level_boundary_singleton.dart';
@@ -102,6 +108,11 @@ class ProjectBloc extends Bloc<ProjectEvent, ProjectState> {
       productVariantRemoteRepository;
   final LocalRepository<ProductVariantModel, ProductVariantSearchModel>
       productVariantLocalRepository;
+
+  /// Stock Repositories
+  final RemoteRepository<StockModel, StockSearchModel> stockRemoteRepository;
+  final LocalRepository<StockModel, StockSearchModel> stockLocalRepository;
+
   final DashboardRemoteRepository dashboardRemoteRepository;
   BuildContext context;
 
@@ -133,6 +144,8 @@ class ProjectBloc extends Bloc<ProjectEvent, ProjectState> {
     required this.attendanceLocalRepository,
     required this.attendanceLogLocalRepository,
     required this.attendanceLogRemoteRepository,
+    required this.stockLocalRepository,
+    required this.stockRemoteRepository,
     required this.context,
   })  : localSecureStore = localSecureStore ?? LocalSecureStore.instance,
         super(const ProjectState()) {
@@ -243,31 +256,6 @@ class ProjectBloc extends Bloc<ProjectEvent, ProjectState> {
         project,
         createOpLog: false,
       );
-    }
-
-    if (projects.isNotEmpty) {
-      // INFO : Need to add project load functions
-
-      try {
-        await _loadProjectFacilities(projects, batchSize);
-      } catch (_) {
-        emit(
-          state.copyWith(
-            loading: false,
-            syncError: ProjectSyncErrorType.projectFacilities,
-          ),
-        );
-      }
-      try {
-        await _loadProductVariants(projects);
-      } catch (_) {
-        emit(
-          state.copyWith(
-            loading: false,
-            syncError: ProjectSyncErrorType.productVariants,
-          ),
-        );
-      }
     }
 
     if (projects.isNotEmpty) {
@@ -399,10 +387,13 @@ class ProjectBloc extends Bloc<ProjectEvent, ProjectState> {
     await projectFacilityLocalRepository.bulkCreate(projectFacilities);
 
     try {
+      // info : download the stock data
+      await downloadStockDataBasedOnRole(projectFacilities);
       final facilities = await facilityRemoteRepository.search(
         FacilitySearchModel(tenantId: envConfig.variables.tenantId),
         limit: 1000,
       );
+
       await facilityLocalRepository.bulkCreate(facilities);
     } catch (e) {
       print(e);
@@ -687,6 +678,70 @@ class ProjectBloc extends Bloc<ProjectEvent, ProjectState> {
         createOpLog: false,
       );
     }
+  }
+
+  // info: downloads stock data from remote , based on the user role
+  FutureOr<void> downloadStockDataBasedOnRole(
+      List<ProjectFacilityModel> projectFacilities) async {
+    final userObject = await localSecureStore.userRequestModel;
+    final userRoles = userObject!.roles.map((e) => e.code);
+
+    // info : assumption both roles will not be assigned to user
+
+    if (userRoles.contains(RolesType.healthFacilitySupervisor.toValue())) {
+      final receiverIds = projectFacilities.map((e) => e.facilityId).toList();
+      final stockSearchModel = StockSearchModel(
+        receiverId: receiverIds,
+        transactionType: [TransactionType.dispatched.toValue()],
+      );
+      final stockEntriesDownloaded =
+          await downloadStockEntries(stockSearchModel);
+      // info : create entries in the local repository
+
+      await createStockDownloadedEntries(stockEntriesDownloaded);
+    } else if (userRoles.contains(RolesType.warehouseManager.toValue())) {
+      final receiverIds = projectFacilities.map((e) => e.facilityId).toList();
+      final stockSearchModel = StockSearchModel(
+        receiverId: receiverIds,
+        transactionType: [TransactionType.dispatched.toValue()],
+      );
+      final stockEntriesDownloaded =
+          await downloadStockEntries(stockSearchModel);
+
+      // info : create entries in the local repository
+      await createStockDownloadedEntries(stockEntriesDownloaded);
+    } else if (userRoles.contains(RolesType.communityDistributor.toValue())) {
+      final receiverIds = [context.loggedInUserUuid];
+      final stockSearchModel = StockSearchModel(
+        receiverId: receiverIds,
+        transactionType: [TransactionType.dispatched.toValue()],
+      );
+      final stockEntriesDownloaded =
+          await downloadStockEntries(stockSearchModel);
+
+      // info : create entries in the local repository
+      await createStockDownloadedEntries(stockEntriesDownloaded);
+    }
+  }
+
+  // info : insert data in db
+  FutureOr<void> createStockDownloadedEntries(
+      List<StockModel> stockEntries) async {
+    await (stockLocalRepository as CustomStockLocalRepository)
+        .bulkStockCreate(stockEntries);
+  }
+
+  // info:  downloads the stock data from remote repository
+
+  FutureOr<List<StockModel>> downloadStockEntries(
+      StockSearchModel stockSearchModel) async {
+    var offset = 0;
+    var initialLimit = Constants.apiCallLimit;
+
+    final stockEntries = await stockRemoteRepository.search(stockSearchModel,
+        limit: initialLimit, offSet: offset);
+
+    return stockEntries;
   }
 }
 

@@ -1,5 +1,6 @@
 library app_utils;
 
+import 'package:inventory_management/inventory_management.dart';
 import 'package:referral_reconciliation/referral_reconciliation.dart'
     as referral_reconciliation_mappers;
 import 'package:collection/collection.dart';
@@ -52,6 +53,7 @@ import '../data/local_store/app_shared_preferences.dart';
 import '../data/local_store/no_sql/schema/localization.dart';
 import '../data/local_store/secure_store/secure_store.dart';
 import '../models/app_config/app_config_model.dart';
+import '../models/entities/roles_type.dart';
 import '../router/app_router.dart';
 import '../widgets/progress_indicator/progress_indicator.dart';
 import 'constants.dart';
@@ -168,6 +170,32 @@ performBackgroundService({
       }
     }
   }
+}
+
+String formatDateFromMillis(int millis) {
+  final date = DateTime.fromMillisecondsSinceEpoch(millis);
+  final day = date.day.toString().padLeft(2, '0');
+  final month = _monthShort(date.month);
+  final year = date.year;
+  return '$day $month $year';
+}
+
+String _monthShort(int month) {
+  const months = [
+    'Jan',
+    'Feb',
+    'Mar',
+    'Apr',
+    'May',
+    'Jun',
+    'Jul',
+    'Aug',
+    'Sep',
+    'Oct',
+    'Nov',
+    'Dec'
+  ];
+  return months[month - 1];
 }
 
 String formatAgeRange(String condition) {
@@ -641,6 +669,35 @@ getSelectedLanguage(AppInitialized state, int index) {
       state.appConfiguration.languages![index].value == selectedLanguage;
 
   return isSelected;
+}
+
+bool isLGAUser() {
+  String? boundaryLevel =
+      RegistrationDeliverySingleton().selectedProject?.address?.boundaryType;
+  if (InventorySingleton().isWareHouseMgr) {
+    if (boundaryLevel == Constants.lgaBoundaryLevel) {
+      return true;
+    }
+  }
+  return false;
+}
+
+bool isHFUser(BuildContext context) {
+  try {
+    // todo : verify this make this healthFacilitySupervsior as per kebbi
+    bool isDownSyncEnabled = context.loggedInUserRoles
+        .where(
+          (role) =>
+              role.code == RolesType.healthFacilityWorker.toValue() ||
+              role.code == RolesType.healthFacilitySupervisor.toValue(),
+        )
+        .toList()
+        .isNotEmpty;
+
+    return isDownSyncEnabled;
+  } catch (_) {
+    return false;
+  }
 }
 
 initializeAllMappers() async {
