@@ -123,10 +123,11 @@ class AppRouter extends _$AppRouter {
       path: '/',
       children: [
         AutoRoute(
-          page: LoginRoute.page,
-          path: 'login',
+          page: LanguageSelectionRoute.page,
+          path: 'language_selection',
           initial: true,
         ),
+        AutoRoute(page: LoginRoute.page, path: 'login'),
       ],
     ),
     AutoRoute(
