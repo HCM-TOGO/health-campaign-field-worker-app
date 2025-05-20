@@ -121,22 +121,22 @@ class CustomMinNumberPageState extends LocalizedState<CustomMinNumberPage> {
               CustomBackNavigationHelpHeaderWidget(showHelp: false),
             ],
           ),
-          // footer: SizedBox(
-          //   child: DigitCard(
-          //     margin: const EdgeInsets.fromLTRB(0, spacer2, 0, 0),
-          //     children: [
-          //       DigitButton(
-          //         type: DigitButtonType.primary,
-          //         mainAxisSize: MainAxisSize.max,
-          //         size: DigitButtonSize.large,
-          //         label: localizations.translate(
-          //           i18.householdDetails.actionLabel,
-          //         ),
-          //         onPressed: () {},
-          //       ),
-          //     ],
-          //   ),
-          // ),
+          footer: SizedBox(
+            child: DigitCard(
+              margin: const EdgeInsets.fromLTRB(0, spacer2, 0, 0),
+              children: [
+                DigitButton(
+                  type: DigitButtonType.primary,
+                  mainAxisSize: MainAxisSize.max,
+                  size: DigitButtonSize.large,
+                  label: localizations.translate(
+                    i18.householdDetails.actionLabel,
+                  ),
+                  onPressed: () {},
+                ),
+              ],
+            ),
+          ),
           children: [
             Container(
               decoration: BoxDecoration(
@@ -203,15 +203,6 @@ class CustomMinNumberPageState extends LocalizedState<CustomMinNumberPage> {
                                     ),
                                     child: Padding(
                                       padding: const EdgeInsets.all(8.0),
-                                      // child: GestureDetector(
-                                      //   onTap: () {
-                                      //     context.router.push(
-                                      //       ViewStockRecordsRoute(
-                                      //         mrnNumber: mrn,
-                                      //         stockRecords: stocks,
-                                      //       ),
-                                      //     );
-                                      //   },
                                       child: MinNumberCard(
                                         backgroundColor: pressedIndex == index
                                             ? Colors.orange[300]
