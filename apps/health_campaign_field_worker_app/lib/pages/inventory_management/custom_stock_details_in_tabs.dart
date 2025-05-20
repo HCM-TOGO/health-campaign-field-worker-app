@@ -14,6 +14,7 @@ import 'package:digit_ui_components/widgets/molecules/show_pop_up.dart';
 import 'package:flutter/material.dart';
 import 'package:digit_ui_components/digit_components.dart';
 import 'package:digit_ui_components/widgets/molecules/digit_card.dart';
+import 'package:flutter_background_service/flutter_background_service.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:health_campaign_field_worker_app/pages/inventory_management/custom_acknowledgement.dart';
 import 'package:inventory_management/blocs/record_stock.dart';
@@ -600,7 +601,11 @@ class _DynamicTabsPageState extends LocalizedState<DynamicTabsPage>
                   type: DigitButtonType.primary,
                   onPressed: () async {
                     if (form.valid) {
-                      await _saveCurrentTabData(productName);
+                      bool isValid =
+                          await _saveCurrentTabData(productName, entryType);
+                      if (!isValid) {
+                        return;
+                      }
 
                       if (_tabController.index < products.length - 1) {
                         if (form.valid) {
@@ -645,9 +650,12 @@ class _DynamicTabsPageState extends LocalizedState<DynamicTabsPage>
     );
   }
 
-  Future<void> _saveCurrentTabData(String productName) async {
+  Future<bool> _saveCurrentTabData(
+      String productName, StockRecordEntryType entryType) async {
     final form = _forms[productName]!;
     final currentStock = _tabStocks[productName]!;
+
+    final theme = Theme.of(context);
 
     _tabStocks[productName] = currentStock.copyWith(
       quantity: form.control(_transactionQuantityKey).value?.toString(),
@@ -665,6 +673,74 @@ class _DynamicTabsPageState extends LocalizedState<DynamicTabsPage>
         ],
       ),
     );
+
+    bool isSubtracted = (entryType == StockRecordEntryType.dispatch ||
+        entryType == StockRecordEntryType.returned);
+    final ss = int.parse(
+        form.control(_transactionQuantityKey).value?.toString() ?? "0");
+
+    final spaq1Count = context.spaq1;
+    final spaq2Count = context.spaq2;
+
+    final blueVasCount = context.blueVas;
+    final redVasCount = context.redVas;
+
+    print(
+        "quantity: ${spaq1Count} ${spaq2Count} ${redVasCount} ${blueVasCount}");
+
+    // Custom logic based on productName
+    if (productName == Constants.spaq1 && isSubtracted && ss > spaq1Count) {
+      await DigitToast.show(
+        context,
+        options: DigitToastOptions(
+            localizations.translate((entryType == StockRecordEntryType.dispatch)
+                ? i18_local.beneficiaryDetails.validationForExcessStockDispatch
+                : i18_local.beneficiaryDetails.validationForExcessStockReturn),
+            true,
+            theme),
+      );
+      return false;
+    } else if (productName == Constants.spaq2 &&
+        isSubtracted &&
+        ss > spaq2Count) {
+      await DigitToast.show(
+        context,
+        options: DigitToastOptions(
+            localizations.translate((entryType == StockRecordEntryType.dispatch)
+                ? i18_local.beneficiaryDetails.validationForExcessStockDispatch
+                : i18_local.beneficiaryDetails.validationForExcessStockReturn),
+            true,
+            theme),
+      );
+      return false;
+    } else if (productName == Constants.blueVAS &&
+        isSubtracted &&
+        ss > blueVasCount) {
+      await DigitToast.show(
+        context,
+        options: DigitToastOptions(
+            localizations.translate((entryType == StockRecordEntryType.dispatch)
+                ? i18_local.beneficiaryDetails.validationForExcessStockDispatch
+                : i18_local.beneficiaryDetails.validationForExcessStockReturn),
+            true,
+            theme),
+      );
+      return false;
+    } else if (productName == Constants.redVAS &&
+        isSubtracted &&
+        ss > redVasCount) {
+      await DigitToast.show(
+        context,
+        options: DigitToastOptions(
+            localizations.translate((entryType == StockRecordEntryType.dispatch)
+                ? i18_local.beneficiaryDetails.validationForExcessStockDispatch
+                : i18_local.beneficiaryDetails.validationForExcessStockReturn),
+            true,
+            theme),
+      );
+      return false;
+    }
+
     final recordStock = context.read<RecordStockBloc>().state;
     context.read<RecordStockBloc>().add(
           RecordStockSaveStockDetailsEvent(
@@ -673,9 +749,6 @@ class _DynamicTabsPageState extends LocalizedState<DynamicTabsPage>
         );
 
     final isDistributor = context.isDistributor;
-
-    final ss = int.parse(
-        form.control(_transactionQuantityKey).value?.toString() ?? "0");
 
 //     if ((ss > context.spaq1 ||
 //             ss > context.spaq2 ||
@@ -770,6 +843,8 @@ class _DynamicTabsPageState extends LocalizedState<DynamicTabsPage>
     //     ),
     //   ) as bool;
     // }
+
+    return true;
   }
 
   Future<void> _handleFinalSubmission(
@@ -833,52 +908,54 @@ class _DynamicTabsPageState extends LocalizedState<DynamicTabsPage>
               const RecordStockCreateStockEntryEvent(),
             );
 
-        if (InventorySingleton().isDistributor) {
-          int ss = int.parse(stockModel.quantity.toString());
-          final totalQty =
-              entryType == StockRecordEntryType.dispatch ? ss * -1 : ss;
+        // if (InventorySingleton().isDistributor) {
+        int ss = int.parse(stockModel.quantity.toString());
+        final totalQty = (entryType == StockRecordEntryType.dispatch ||
+                entryType == StockRecordEntryType.returned)
+            ? ss * -1
+            : ss;
 
-          int spaq1Count = context.spaq1;
-          int spaq2Count = context.spaq2;
+        int spaq1Count = context.spaq1;
+        int spaq2Count = context.spaq2;
 
-          int blueVasCount = context.blueVas;
-          int redVasCount = context.redVas;
+        int blueVasCount = context.blueVas;
+        int redVasCount = context.redVas;
 
-          String? productName = stockModel.additionalFields?.fields
-              .firstWhereOrNull((element) => element.key == 'productName')
-              ?.value;
+        String? productName = stockModel.additionalFields?.fields
+            .firstWhereOrNull((element) => element.key == 'productName')
+            ?.value;
 
-          // Custom logic based on productName
-          if (productName == Constants.spaq1) {
-            spaq1Count = totalQty;
-            spaq2Count = 0;
-            redVasCount = 0;
-            blueVasCount = 0;
-          } else if (productName == Constants.spaq2) {
-            spaq2Count = totalQty;
-            spaq1Count = 0;
-            redVasCount = 0;
-            blueVasCount = 0;
-          } else if (productName == Constants.blueVAS) {
-            blueVasCount = totalQty;
-            spaq1Count = 0;
-            spaq2Count = 0;
-            redVasCount = 0;
-          } else {
-            blueVasCount = 0;
-            spaq1Count = 0;
-            spaq2Count = 0;
-            redVasCount = totalQty;
-          }
-          context.read<AuthBloc>().add(
-                AuthAddSpaqCountsEvent(
-                  spaq1Count: spaq1Count,
-                  spaq2Count: spaq2Count,
-                  blueVasCount: blueVasCount,
-                  redVasCount: redVasCount,
-                ),
-              );
+        // Custom logic based on productName
+        if (productName == Constants.spaq1) {
+          spaq1Count = totalQty;
+          spaq2Count = 0;
+          redVasCount = 0;
+          blueVasCount = 0;
+        } else if (productName == Constants.spaq2) {
+          spaq2Count = totalQty;
+          spaq1Count = 0;
+          redVasCount = 0;
+          blueVasCount = 0;
+        } else if (productName == Constants.blueVAS) {
+          blueVasCount = totalQty;
+          spaq1Count = 0;
+          spaq2Count = 0;
+          redVasCount = 0;
+        } else {
+          blueVasCount = 0;
+          spaq1Count = 0;
+          spaq2Count = 0;
+          redVasCount = totalQty;
         }
+        context.read<AuthBloc>().add(
+              AuthAddSpaqCountsEvent(
+                spaq1Count: spaq1Count,
+                spaq2Count: spaq2Count,
+                blueVasCount: blueVasCount,
+                redVasCount: redVasCount,
+              ),
+            );
+        // }
       }
 
       //   Navigator.of(context).push(

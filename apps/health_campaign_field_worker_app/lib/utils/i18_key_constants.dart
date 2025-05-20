@@ -466,7 +466,8 @@ class InventoryReportDetails {
 
   String get commentIsRequiredText => "COMMENT_IS_REQUIRED_TEXT";
 
-  String get checkTheQuantityReceivedText => 'CHECK_THE_QUANTITY_RECEIEVED_TEXT';
+  String get checkTheQuantityReceivedText =>
+      'CHECK_THE_QUANTITY_RECEIEVED_TEXT';
 
   String get stockReceiptDetailsText => 'STOCK_RECEIPT_DETAILS_TEXT';
 
@@ -1188,7 +1189,8 @@ class SearchBeneficiary {
 
   String get statisticsLabelText => 'BENEFICIARY_STATISTICS_LABEL_TEXT';
 
-  String get searchBeneficiaryReferralHintText => 'SEARCH_BENEFICIARY_REFERRAL_HINT_TEXT';
+  String get searchBeneficiaryReferralHintText =>
+      'SEARCH_BENEFICIARY_REFERRAL_HINT_TEXT';
 
   String get searchIndividualLabelText =>
       'BENEFICIARY_STATISTICS_SEARCH_INDIVIDUAL_LABEL';
@@ -1280,8 +1282,10 @@ class IndividualDetails {
 class BeneficiaryDetails {
   const BeneficiaryDetails();
 
-  String get validationForExcessStock =>
-      "ERROR_VALIDATIN_FOR_EXCESS_STOCK_DISPATCH";
+  String get validationForExcessStockDispatch =>
+      "ERROR_VALIDATION_FOR_EXCESS_STOCK_DISPATCH";
+  String get validationForExcessStockReturn =>
+      "ERROR_VALIDATION_FOR_EXCESS_STOCK_RETURN";
   String get errorHeader => "ERROR_VALIDATION_HEADER";
   String get goToHome => "GO_BACK_HOME";
   String get insufficientStockMessage => 'INSUFFICIENT_STOCK_MESSAGE_REGISTER';
