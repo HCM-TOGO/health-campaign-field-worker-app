@@ -312,6 +312,8 @@ class ReferBeneficiary {
 class HouseholdDetails {
   const HouseholdDetails();
 
+  String get addBeneficiartText => 'ADD_BENEFICIARY_TEXT';
+
   String get householdDetailsLabel => 'HOUSEHOLD_DETAILS_LABEL';
   String get actionLabel => 'HOUSEHOLD_ACTION_LABEL';
   String get dateOfRegistrationLabel =>
