@@ -351,7 +351,7 @@ class CustomWarehouseDetailsPageState
                                             isRequired: true,
                                             type: InputType.text,
                                             label:
-                                                '${localizations.translate(i18.warehouseDetails.administrativeUnit)} *',
+                                                '${localizations.translate(i18.warehouseDetails.administrativeUnit)}',
                                             initialValue: field.control.value,
                                             readOnly: true,
                                           );
