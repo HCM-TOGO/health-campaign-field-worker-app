@@ -450,8 +450,12 @@ class _DynamicTabsPageState extends LocalizedState<DynamicTabsPage>
                             child: Text(
                           senderIdToShowOnTab == null
                               ? localizations.translate(i18.common.noMatchFound)
-                              : localizations
-                                  .translate('FAC_$senderIdToShowOnTab'),
+                              : (entryType == StockRecordEntryType.dispatch ||
+                                      entryType ==
+                                          StockRecordEntryType.returned)
+                                  ? localizations.translate('FAC_$receiverId')
+                                  : localizations
+                                      .translate('FAC_$senderIdToShowOnTab'),
                         )),
                       ],
                     ),
@@ -609,7 +613,6 @@ class _DynamicTabsPageState extends LocalizedState<DynamicTabsPage>
                           if (form.invalid) {
                             _tabController.animateTo(index);
                             return;
-
                           }
                           index++;
                         }
@@ -795,10 +798,9 @@ class _DynamicTabsPageState extends LocalizedState<DynamicTabsPage>
               ).pop(true);
               (context.router.parent() as StackRouter).maybePop();
               context.router.push(CustomAcknowledgementRoute(
-                mrnNumber: _sharedMRN,
-                stockRecords: _tabStocks.values.toList(),
-                entryType : entryType
-              ));
+                  mrnNumber: _sharedMRN,
+                  stockRecords: _tabStocks.values.toList(),
+                  entryType: entryType));
             },
             type: DigitButtonType.primary,
             size: DigitButtonSize.large,
