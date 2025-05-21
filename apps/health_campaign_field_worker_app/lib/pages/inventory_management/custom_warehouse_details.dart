@@ -296,6 +296,14 @@ class CustomWarehouseDetailsPageState
                                         );
                                       },
                                     ),
+                                    if (InventorySingleton().isDistributor)
+                                      DigitButton(
+                                        label: "Scan Resource",
+                                        onPressed: _handleSubmission,
+                                        type: DigitButtonType.primary,
+                                        mainAxisSize: MainAxisSize.max,
+                                        size: DigitButtonSize.large,
+                                      ),
                                   ]),
                             ),
                             children: [
@@ -339,7 +347,8 @@ class CustomWarehouseDetailsPageState
                                             cancelText: localizations.translate(
                                               i18.common.coreCommonCancel,
                                             ),
-                                            initialValue: DateFormat('dd MMM yyyy')
+                                            initialValue: DateFormat(
+                                                    'dd MMM yyyy')
                                                 .format(field.control.value),
                                             readOnly: true,
                                           );
@@ -431,7 +440,8 @@ class CustomWarehouseDetailsPageState
                                               type: InputType.text,
                                               isDisabled: true,
                                               label: localizations.translate(
-                                                i18_local.stockDetails.cddCodeLabel,
+                                                i18_local
+                                                    .stockDetails.cddCodeLabel,
                                               ),
                                               initialValue: form
                                                   .control(_teamCodeKey)
@@ -458,5 +468,11 @@ class CustomWarehouseDetailsPageState
           barCode: [],
           qrCode: [],
         ));
+  }
+
+  void _handleSubmission() {
+    if (InventorySingleton().isDistributor) {
+      context.router.push(QRScannerRoute());
+    }
   }
 }
