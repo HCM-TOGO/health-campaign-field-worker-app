@@ -296,14 +296,14 @@ class CustomWarehouseDetailsPageState
                                         );
                                       },
                                     ),
-                                    if (InventorySingleton().isDistributor)
-                                      DigitButton(
-                                        label: "Scan Resource",
-                                        onPressed: _handleSubmission,
-                                        type: DigitButtonType.primary,
-                                        mainAxisSize: MainAxisSize.max,
-                                        size: DigitButtonSize.large,
-                                      ),
+                                    // if (InventorySingleton().isDistributor)
+                                    //   DigitButton(
+                                    //     label: "Scan Resource",
+                                    //     onPressed: _handleSubmission,
+                                    //     type: DigitButtonType.primary,
+                                    //     mainAxisSize: MainAxisSize.max,
+                                    //     size: DigitButtonSize.large,
+                                    //   ),
                                   ]),
                             ),
                             children: [
