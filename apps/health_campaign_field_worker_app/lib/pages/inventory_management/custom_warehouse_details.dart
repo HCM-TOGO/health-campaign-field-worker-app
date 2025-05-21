@@ -296,6 +296,14 @@ class CustomWarehouseDetailsPageState
                                         );
                                       },
                                     ),
+                                    if (InventorySingleton().isDistributor)
+                                      DigitButton(
+                                        label: "Scan Resource",
+                                        onPressed: _handleSubmission,
+                                        type: DigitButtonType.primary,
+                                        mainAxisSize: MainAxisSize.max,
+                                        size: DigitButtonSize.large,
+                                      ),
                                   ]),
                             ),
                             children: [
@@ -461,5 +469,11 @@ class CustomWarehouseDetailsPageState
           barCode: [],
           qrCode: [],
         ));
+  }
+
+  void _handleSubmission() {
+    if (InventorySingleton().isDistributor) {
+      context.router.push(QRScannerRoute());
+    }
   }
 }
