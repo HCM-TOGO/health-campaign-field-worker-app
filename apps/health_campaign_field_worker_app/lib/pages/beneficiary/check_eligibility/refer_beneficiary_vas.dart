@@ -186,6 +186,7 @@ class CustomReferBeneficiaryVASPageState
                                               referralReasons,
                                               reasons.join(","),
                                             ),
+                                            const AdditionalField('referralType', 'vasReferred')
                                           ],
                                         ),
                                       ),

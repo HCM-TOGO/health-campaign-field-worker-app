@@ -42,18 +42,77 @@ class ViewStockRecordsLGAPage extends LocalizedStatefulWidget {
 class _ViewStockRecordsLGAPageState
     extends LocalizedState<ViewStockRecordsLGAPage> {
   late final FormGroup _form;
+  late final Map<String, int> _issuedQuantities;
+  bool _commentsRequired = false;
 
   @override
   void initState() {
     super.initState();
+    _issuedQuantities = {
+      for (final stock in widget.stockRecords)
+        stock.additionalFields?.fields
+                .firstWhereOrNull((f) => f.key == 'productName')
+                ?.value
+                .toString() ??
+            '': int.tryParse(stock.quantity ?? '0') ?? 0
+    };
     _form = FormGroup({
       'quantityReceived': FormControl<int>(
         validators: [
           Validators.required,
           Validators.min(1),
+          Validators.delegate((control) {
+            final productName = widget
+                    .stockRecords.first.additionalFields?.fields
+                    .firstWhereOrNull((f) => f.key == 'productName')
+                    ?.value
+                    .toString() ??
+                '';
+            final issued = _issuedQuantities[productName] ?? 0;
+            final received = control.value ?? 0;
+            if (received > issued) {
+              return {'maxIssued': true};
+            }
+            return null;
+          })
         ],
       ),
       'comments': FormControl<String>(),
+    });
+    _form.control('quantityReceived').valueChanges.listen((value) {
+      final received = value ?? 0;
+      final productName = widget.stockRecords.first.additionalFields?.fields
+              .firstWhereOrNull((f) => f.key == 'productName')
+              ?.value
+              .toString() ??
+          '';
+      final issued = _issuedQuantities[productName] ?? 0;
+      final required = received < issued;
+      if (_commentsRequired != required) {
+        setState(() {
+          _commentsRequired = required;
+        });
+      }
+    });
+    _form.control('comments').setValidators([
+      Validators.delegate((control) {
+        final received = _form.control('quantityReceived').value ?? 0;
+        final productName = widget.stockRecords.first.additionalFields?.fields
+                .firstWhereOrNull((f) => f.key == 'productName')
+                ?.value
+                .toString() ??
+            '';
+        final issued = _issuedQuantities[productName] ?? 0;
+        if (received < issued &&
+            (control.value == null || control.value.isEmpty)) {
+          control.markAllAsTouched();
+          return {'requiredIfShort': true};
+        }
+        return null;
+      })
+    ]);
+    _form.control('quantityReceived').valueChanges.listen((value) {
+      _form.control('comments').updateValueAndValidity();
     });
     final recordStockBloc = BlocProvider.of<RecordStockBloc>(context);
   }
@@ -179,6 +238,7 @@ class _ViewStockRecordsLGAPageState
     //using the same as downloaded stock data
     // and this flow is for stock receipt for LGA
     final senderIdToShowOnTab = widget.stockRecords.first.senderId;
+    bool commentRequired = false;
 
     return Scaffold(
       body: ScrollableContent(
@@ -316,12 +376,19 @@ class _ViewStockRecordsLGAPageState
                                     'required': (_) => 'Quantity is required',
                                     'min': (_) => 'Must be at least 1',
                                     'number': (_) => 'Must be a valid number',
+                                    'maxIssued': (_) =>
+                                        'Received quantity cannot be more than issued quantity',
                                   },
                                 ),
                                 const SizedBox(height: 12),
                                 ReactiveWrapperField(
                                   formControlName: 'comments',
+                                  validationMessages: {
+                                    'requiredIfShort': (_) =>
+                                        'Comments are required if quantity received is less than issued',
+                                  },
                                   builder: (field) => InputField(
+                                    isRequired: _commentsRequired,
                                     type: InputType.textArea,
                                     label: 'Comments',
                                     errorMessage: field.errorText,
