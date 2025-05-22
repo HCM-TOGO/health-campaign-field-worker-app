@@ -15,12 +15,14 @@ import 'package:registration_delivery/widgets/localized.dart';
 class ViewStockRecordsPage extends LocalizedStatefulWidget {
   final String mrnNumber;
   final List<StockModel> stockRecords;
+  StockRecordEntryType entryType;
 
-  const ViewStockRecordsPage({
+  ViewStockRecordsPage({
     super.key,
     super.appLocalizations,
     required this.mrnNumber,
     required this.stockRecords,
+    this.entryType = StockRecordEntryType.dispatch,
   });
 
   @override
@@ -187,12 +189,23 @@ class _ViewStockRecordsPageState extends LocalizedState<ViewStockRecordsPage>
                   // Quantity
                   InputField(
                     type: InputType.text,
-                    label: 'Quantity *',
+                    label: widget.entryType == StockRecordEntryType.receipt ? 'Issued Quantity *' : 'Quantity *',
                     initialValue: stock.quantity ?? '',
                     isDisabled: true,
                     readOnly: true,
                   ),
                   const SizedBox(height: 12),
+                  Offstage(
+                    offstage: !stock.additionalFields!.fields
+                        .any((e) => e.key == "quantityReceived"),
+                    child: InputField(
+                      type: InputType.text,
+                      label: 'Actual Quantity Received *',
+                      initialValue: stock.additionalFields?.fields.where((e) => e.key == "quantityReceived").first.value,
+                      isDisabled: true,
+                      readOnly: true,
+                    ),
+                  ),
                   // Comments
                   InputField(
                     type: InputType.textArea,

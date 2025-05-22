@@ -38,6 +38,7 @@ import '../../router/app_router.dart';
 import '../../../utils/i18_key_constants.dart' as i18_local;
 import '../../utils/search/global_search_parameters_smc.dart';
 import '../../widgets/showcase/showcase_wrappers.dart';
+import 'custom_view_beneficiary_card.dart';
 
 @RoutePage()
 class CustomSearchBeneficiaryPage extends LocalizedStatefulWidget {
@@ -466,7 +467,7 @@ class _CustomSearchBeneficiaryPageState
 
                               return Container(
                                 margin: const EdgeInsets.only(bottom: spacer2),
-                                child: ViewBeneficiaryCard(
+                                child: CustomViewBeneficiaryCard(
                                   distance:
                                       isProximityEnabled ? distance : null,
                                   householdMember: householdMemberWrapper,
@@ -566,7 +567,7 @@ class _CustomSearchBeneficiaryPageState
                                 return Container(
                                   margin:
                                       const EdgeInsets.only(bottom: kPadding),
-                                  child: ViewBeneficiaryCard(
+                                  child: CustomViewBeneficiaryCard(
                                     householdMember: i,
                                     onOpenPressed: () async {
                                       final scannerBloc =
@@ -728,7 +729,8 @@ class _CustomSearchBeneficiaryPageState
                           customSearchHouseholdsBloc.add(
                             const SearchHouseholdsClearEvent(),
                           );
-                        } else {
+                        } 
+                        else {
                           showCustomPopup(
                             context: context,
                             builder: (popupContext) => Popup(
