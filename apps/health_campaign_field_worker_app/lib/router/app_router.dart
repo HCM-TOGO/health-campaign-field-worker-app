@@ -137,10 +137,10 @@ class AppRouter extends _$AppRouter {
         AutoRoute(page: HomeRoute.page, path: 'home'),
         AutoRoute(page: ProfileRoute.page, path: 'profile'),
         AutoRoute(page: UserQRDetailsRoute.page, path: 'user-qr-code'),
-        AutoRoute(
-          page: CustomManageStocksRoute.page,
-          path: 'custom-manage-stocks',
-        ),
+        // AutoRoute(
+        //   page: CustomManageStocksRoute.page,
+        //   path: 'custom-manage-stocks',
+        // ),
         AutoRoute(
           page: QRScannerRoute.page,
           path: 'qr-scanner',
@@ -485,41 +485,70 @@ class AppRouter extends _$AppRouter {
         ),
 
         AutoRoute(
-          page: RecordStockWrapperRoute.page,
-          path: 'record-stock',
-          children: [
-            // AutoRoute(
-            //   page: WarehouseDetailsRoute.page,
-            //   path: 'warehouse-details',
-            //   initial: true,
-            // ),
-            AutoRoute(
-              page: CustomWarehouseDetailsRoute.page,
-              path: 'custom-warehouse-details',
-              initial: true,
-            ),
-            AutoRoute(
-              page: StockDetailsRoute.page,
-              path: 'details',
-            ),
-            AutoRoute(
-              page: CustomStockDetailsRoute.page,
-              path: 'custom-details',
-            ),
-            RedirectRoute(
-              path: 'details',
-              redirectTo: 'custom-details',
-            ),
-            AutoRoute(
-              page: CustomTransactionalDetailsRoute.page,
-              path: 'custom-transaction-details',
-            ),
-            AutoRoute(
-              page: ViewAllTransactionsRoute.page,
-              path: 'custom-all-transactions',
-            ),
-          ],
+          page: ManageStocksRoute.page,
+          path: 'manage-stocks',
         ),
+        AutoRoute(
+            page: RecordStockWrapperRoute.page,
+            path: 'record-stock',
+            children: [
+              AutoRoute(
+                  page: WarehouseDetailsRoute.page,
+                  path: 'warehouse-details',
+                  initial: true),
+              AutoRoute(page: StockDetailsRoute.page, path: 'details'),
+            ]),
+        AutoRoute(
+            page: InventoryFacilitySelectionRoute.page,
+            path: 'inventory-select-facilities'),
+        AutoRoute(
+            page: StockReconciliationRoute.page, path: 'stock-reconciliation'),
+        AutoRoute(
+            page: InventoryReportSelectionRoute.page,
+            path: 'inventory-report-selection'),
+        AutoRoute(
+            page: InventoryReportDetailsRoute.page,
+            path: 'inventory-report-details'),
+        AutoRoute(
+            page: InventoryAcknowledgementRoute.page,
+            path: 'inventory-acknowledgement'),
+
+        // AutoRoute(
+        //   page: RecordStockWrapperRoute.page,
+        //   path: 'record-stock',
+        //   children: [
+        //     // AutoRoute(
+        //     //   page: WarehouseDetailsRoute.page,
+        //     //   path: 'warehouse-details',
+        //     //   initial: true,
+        //     // ),
+        //     AutoRoute(
+        //       page: CustomWarehouseDetailsRoute.page,
+        //       path: 'custom-warehouse-details',
+        //       initial: true,
+        //     ),
+        //     AutoRoute(
+        //       page: StockDetailsRoute.page,
+        //       path: 'details',
+        //     ),
+        //     AutoRoute(
+        //       page: CustomStockDetailsRoute.page,
+        //       path: 'custom-details',
+        //     ),
+        //     RedirectRoute(
+        //       path: 'details',
+        //       redirectTo: 'custom-details',
+        //     ),
+        //     AutoRoute(
+        //       page: CustomTransactionalDetailsRoute.page,
+        //       path: 'custom-transaction-details',
+        //     ),
+        //     AutoRoute(
+        //       page: ViewAllTransactionsRoute.page,
+        //       path: 'custom-all-transactions',
+        //     ),
+        //   ],
+        // ),
 
         AutoRoute(
           page: InventoryFacilitySelectionRoute.page,

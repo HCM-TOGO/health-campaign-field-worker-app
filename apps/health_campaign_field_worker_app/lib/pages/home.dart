@@ -1,3 +1,4 @@
+import 'package:inventory_management/router/inventory_router.gm.dart';
 import 'package:recase/recase.dart';
 import 'package:referral_reconciliation/referral_reconciliation.dart';
 import 'package:referral_reconciliation/router/referral_reconciliation_router.gm.dart';
@@ -388,7 +389,7 @@ class _HomePageState extends LocalizedState<HomePage> {
                     _,
                     __,
                   ) {
-                    context.router.push(CustomManageStocksRoute());
+                    context.router.push(ManageStocksRoute());
                   },
                 );
           },
