@@ -154,6 +154,7 @@ class _ViewStockRecordsLGAPageState
                 redVasCount: redVasCount,
               ),
             );
+        await Future.delayed(const Duration(milliseconds: 500));
         // _tabController.animateTo(_tabController.index + 1);
 
         context.read<RecordStockBloc>().add(
