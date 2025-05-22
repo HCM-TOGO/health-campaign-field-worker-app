@@ -486,7 +486,7 @@ class CustomIndividualDetailsPageState
                       children: [
                         Text(
                           localizations.translate(
-                            i18.individualDetails.individualsDetailsLabelText,
+                            i18_local.individualDetails.individualDetailsLabelTextUpdate,
                           ),
                           style: textTheme.headingXl.copyWith(
                             color: theme.colorTheme.text.primary,
@@ -514,7 +514,7 @@ class CustomIndividualDetailsPageState
                                 },
                                 builder: (field) => LabeledField(
                                   label: localizations.translate(
-                                    i18.individualDetails.nameLabelText,
+                                    i18_local.individualDetails.individualDetailsNameLabelTextUpdate,
                                   ),
                                   isRequired: true,
                                   child: DigitTextFormInput(
