@@ -1228,6 +1228,8 @@ class SearchBeneficiary {
 class IndividualDetails {
   const IndividualDetails();
 
+  String get individualDetailsLabelTextUpdate => 'INDIVIDUAL_DETAILS_LABEL_TEXT_UPDATE'; 
+  String get individualDetailsNameLabelTextUpdate => 'INDIVIDUAL_DETAILS_NAME_LABEL_TEXT_UPDATE';
   String get landmarkValidationMessage =>
       'INDIVIDUAL_DETAILS_LANDMARK_VALIDATION_MESSAGE';
 
