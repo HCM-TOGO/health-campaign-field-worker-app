@@ -858,7 +858,18 @@ class _DynamicTabsPageState extends LocalizedState<DynamicTabsPage>
 
   Future<void> _handleFinalSubmission(
       BuildContext context, StockRecordEntryType entryType) async {
+    final theme = Theme.of(context);
     final lastProduct = products.last.sku ?? '';
+
+    for (StockModel stock in _tabStocks.values) {
+      String productName = stock.additionalFields?.fields
+          .firstWhereOrNull((element) => element.key == 'productName')
+          ?.value;
+      bool valid = await _saveCurrentTabData(productName, entryType);
+      if (!valid) {
+        return;
+      }
+    }
 
     final submit = await showCustomPopup(
       context: context,
@@ -906,13 +917,6 @@ class _DynamicTabsPageState extends LocalizedState<DynamicTabsPage>
     ) as bool;
 
     if (submit && context.mounted) {
-      for (StockModel stock in _tabStocks.values) {
-        String productName = stock.additionalFields?.fields
-            .firstWhereOrNull((element) => element.key == 'productName')
-            ?.value;
-        await _saveCurrentTabData(productName, entryType);
-      }
-
       int spaq1Count = 0;
       int spaq2Count = 0;
 
