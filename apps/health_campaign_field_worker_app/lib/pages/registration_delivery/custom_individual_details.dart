@@ -622,6 +622,69 @@ class CustomIndividualDetailsPageState
                             }
                           },
                         ),
+                        DigitButton(
+                          prefixIcon: Icons.qr_code_scanner,
+                          capitalizeLetters: false,
+                          label: "Link QR Code to Beneficiary",
+                          mainAxisSize: MainAxisSize.max,
+                          type: DigitButtonType.secondary,
+                          size: DigitButtonSize.large,
+                          isDisabled: false,
+                          onPressed: () {},
+                        ),
+                        Container(
+                          decoration: BoxDecoration(
+                            border: Border.all(
+                              color: Colors.grey,
+                            ),
+                            borderRadius: BorderRadius.circular(4),
+                          ),
+                          margin: const EdgeInsets.symmetric(vertical: 16),
+                          child: StatefulBuilder(
+                            builder: (context, setState) {
+                              String? yesNoValue = 'yes';
+
+                              return Row(
+                                children: [
+                                  Expanded(
+                                    child: RadioListTile<String>(
+                                      title: const Text('Yes'),
+                                      value: 'yes',
+                                      groupValue: yesNoValue,
+                                      onChanged: (value) {
+                                        setState(() {
+                                          yesNoValue = value!;
+                                        });
+                                      },
+                                    ),
+                                  ),
+                                  Expanded(
+                                    child: RadioListTile<String>(
+                                      title: const Text('No'),
+                                      value: 'no',
+                                      groupValue: yesNoValue,
+                                      onChanged: (value) {
+                                        setState(() {
+                                          yesNoValue = value!;
+                                        });
+                                      },
+                                    ),
+                                  ),
+                                ],
+                              );
+                            },
+                          ),
+                        ),
+                        DigitButton(
+                          prefixIcon: Icons.qr_code_scanner,
+                          capitalizeLetters: false,
+                          label: "Previous Beneficiary QR Code",
+                          mainAxisSize: MainAxisSize.max,
+                          type: DigitButtonType.secondary,
+                          size: DigitButtonSize.large,
+                          isDisabled: false,
+                          onPressed: () {},
+                        ),
                         individualDetailsShowcaseData.mobile.buildWith(
                           child: Offstage(
                             offstage: !widget.isHeadOfHousehold,
