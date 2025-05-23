@@ -888,6 +888,8 @@ class Home {
 class AcknowledgementSuccess {
   const AcknowledgementSuccess();
 
+  String get acknowledgementSuccessUpdateLabelText => "ACKNOWLEDGEMENT_SUCCESS_UPDATE_LABEL_TEXT";
+
   String get mrrnNumberDescription => "MRRN_NUMBER_DESCRIPTION";
 
   String get mrrnNumberHeading => "MRRN_NUMBER_HEADING";
