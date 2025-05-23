@@ -127,84 +127,94 @@ class _DynamicTabsPageState extends LocalizedState<DynamicTabsPage>
   }
 
   void _initializeForms() {
+    final state = context.read<RecordStockBloc>().state;
+    StockRecordEntryType entryType = state.entryType;
+
     final selectedProducts =
         products.map((variant) => variant.sku).whereType<String>().toList();
 
     _forms.addAll({
       for (final product in selectedProducts)
-        product: FormGroup({
-          'materialNoteNumber': FormControl<String>(value: _sharedMRN),
-          _transactionReasonKey: FormControl<String>(),
-          _waybillNumberKey: FormControl<String>(
-            validators: InventorySingleton().isWareHouseMgr
-                ? [
-                    Validators.minLength(2),
-                    Validators.maxLength(200),
-                    Validators.required
-                  ]
-                : [],
-          ),
-          _transactionQuantityKey: FormControl<int>(
+        product: FormGroup(
+          {
+            'materialNoteNumber': FormControl<String>(value: _sharedMRN),
+            _transactionReasonKey: FormControl<String>(),
+            _waybillNumberKey: FormControl<String>(
               validators: InventorySingleton().isWareHouseMgr
                   ? [
-                      Validators.number(),
-                      Validators.required,
-                      Validators.min(0),
+                      Validators.minLength(2),
+                      Validators.maxLength(200),
+                      Validators.required
                     ]
-                  : [
-                      Validators.number(),
-                      Validators.required,
-                      Validators.min(0),
-                      Validators.max(10000),
-                    ]),
-          // _waybillQuantityKey:
-          //     FormControl<String>(validators: [Validators.required]),
-          _batchNumberKey: FormControl<String>(),
-          _commentsKey: FormControl<String>(),
+                  : [],
+            ),
+            _transactionQuantityKey: FormControl<int>(
+                validators: InventorySingleton().isWareHouseMgr
+                    ? [
+                        Validators.number(),
+                        Validators.required,
+                        Validators.min(0),
+                      ]
+                    : [
+                        Validators.number(),
+                        Validators.required,
+                        Validators.min(0),
+                        Validators.max(10000),
+                      ]),
+            // _waybillQuantityKey:
+            //     FormControl<String>(validators: [Validators.required]),
+            _batchNumberKey: FormControl<String>(),
+            _commentsKey: FormControl<String>(),
 
-          if (context.read<RecordStockBloc>().state.entryType ==
-              StockRecordEntryType.returned) ...{
-            _unusedBlistersReturnedKey: FormControl<int>(
-                validators: InventorySingleton().isWareHouseMgr
-                    ? [
-                        Validators.number(),
-                        Validators.required,
-                        Validators.min(0),
-                      ]
-                    : [
-                        Validators.number(),
-                        Validators.required,
-                        Validators.min(0),
-                        Validators.max(10000),
-                      ]),
-            _partiallyUsedBlistersReturnedKey: FormControl<int>(
-                validators: InventorySingleton().isWareHouseMgr
-                    ? [
-                        Validators.number(),
-                        Validators.required,
-                        Validators.min(0),
-                      ]
-                    : [
-                        Validators.number(),
-                        Validators.required,
-                        Validators.min(0),
-                        Validators.max(10000),
-                      ]),
-            _wastedBlistersReturnedKey: FormControl<int>(
-                validators: InventorySingleton().isWareHouseMgr
-                    ? [
-                        Validators.number(),
-                        Validators.required,
-                        Validators.min(0),
-                      ]
-                    : [
-                        Validators.number(),
-                        Validators.required,
-                        Validators.min(0),
-                        Validators.max(10000),
-                      ]),
-          }
-        }),
+            if (context.read<RecordStockBloc>().state.entryType ==
+                StockRecordEntryType.returned) ...{
+              _unusedBlistersReturnedKey: FormControl<int>(
+                  validators: InventorySingleton().isWareHouseMgr
+                      ? [
+                          Validators.number(),
+                          Validators.required,
+                          Validators.min(0),
+                        ]
+                      : [
+                          Validators.number(),
+                          Validators.required,
+                          Validators.min(0),
+                          Validators.max(10000),
+                        ]),
+              _partiallyUsedBlistersReturnedKey: FormControl<int>(
+                  validators: InventorySingleton().isWareHouseMgr
+                      ? [
+                          Validators.number(),
+                          Validators.required,
+                          Validators.min(0),
+                        ]
+                      : [
+                          Validators.number(),
+                          Validators.required,
+                          Validators.min(0),
+                          Validators.max(10000),
+                        ]),
+              _wastedBlistersReturnedKey: FormControl<int>(
+                  validators: InventorySingleton().isWareHouseMgr
+                      ? [
+                          Validators.number(),
+                          Validators.required,
+                          Validators.min(0),
+                        ]
+                      : [
+                          Validators.number(),
+                          Validators.required,
+                          Validators.min(0),
+                          Validators.max(10000),
+                        ]),
+            }
+            else ...{
+              _unusedBlistersReturnedKey: FormControl<int>(),
+              _partiallyUsedBlistersReturnedKey: FormControl<int>(),
+              _wastedBlistersReturnedKey: FormControl<int>(),
+            }
+          },
+        ),
     });
   }
 
@@ -799,6 +809,10 @@ class _DynamicTabsPageState extends LocalizedState<DynamicTabsPage>
                                     .control(_partiallyUsedBlistersReturnedKey)
                                     .value +
                                 form.control(_wastedBlistersReturnedKey).value;
+                        if(form.control(_transactionQuantityKey).value == 0) {
+                          await DigitToast.show(context ,options: DigitToastOptions("Sum of the total quantity returned must be greater than 0", true, theme));
+                          return;
+                        }
                         form.markAllAsTouched();
                       }
                     }
