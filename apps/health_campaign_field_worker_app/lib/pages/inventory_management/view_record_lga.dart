@@ -133,6 +133,10 @@ class _ViewStockRecordsLGAPageState
               field.key != 'quantityReceived' && field.key != 'comments'),
           AdditionalField('quantityReceived',
               _form.control('quantityReceived').value.toString()),
+          AdditionalField(
+            'quantitySent',
+            stock.quantity ?? '',
+          ),
           if (_form.control('comments').value != null)
             AdditionalField('comments', _form.control('comments').value),
         ];

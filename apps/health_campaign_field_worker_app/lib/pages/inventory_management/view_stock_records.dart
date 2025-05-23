@@ -189,19 +189,40 @@ class _ViewStockRecordsPageState extends LocalizedState<ViewStockRecordsPage>
                   // Quantity
                   InputField(
                     type: InputType.text,
-                    label: widget.entryType == StockRecordEntryType.receipt ? 'Issued Quantity *' : 'Quantity *',
-                    initialValue: stock.quantity ?? '',
+                    label: (stock.additionalFields?.fields ?? [])
+                            .any((e) => e.key == "quantityReceived")
+                        ? 'Issued Quantity *'
+                        : 'Quantity *',
+                    initialValue: (stock.additionalFields?.fields ?? [])
+                            .any((e) => e.key == "quantityReceived")
+                        ? (stock.additionalFields?.fields ?? [])
+                            .firstWhere(
+                              (e) => e.key == "quantitySent",
+                              orElse: () =>
+                                  const AdditionalField('quantitySent', ''),
+                            )
+                            .value
+                            ?.toString()
+                        : stock.quantity ?? '',
                     isDisabled: true,
                     readOnly: true,
                   ),
                   const SizedBox(height: 12),
                   Offstage(
-                    offstage: !stock.additionalFields!.fields
+                    offstage: !(stock.additionalFields?.fields ?? [])
                         .any((e) => e.key == "quantityReceived"),
                     child: InputField(
                       type: InputType.text,
                       label: 'Actual Quantity Received *',
-                      initialValue: stock.additionalFields?.fields.where((e) => e.key == "quantityReceived").first.value,
+                      initialValue: (stock.additionalFields?.fields ?? [])
+                              .firstWhere(
+                                (e) => e.key == "quantityReceived",
+                                orElse: () => const AdditionalField(
+                                    'quantityReceived', ''),
+                              )
+                              .value
+                              ?.toString() ??
+                          '',
                       isDisabled: true,
                       readOnly: true,
                     ),
