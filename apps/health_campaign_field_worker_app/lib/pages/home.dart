@@ -606,16 +606,11 @@ class _HomePageState extends LocalizedState<HomePage> {
                     LocalRepository<HFReferralModel, HFReferralSearchModel>>(),
 
                 context.read<
-                    LocalRepository<HFReferralModel, HFReferralSearchModel>>(),
-
-                context.read<
                     LocalRepository<AttendanceLogModel,
                         AttendanceLogSearchModel>>(),
 
                 context.read<
                     LocalRepository<PgrServiceModel, PgrServiceSearchModel>>(),
-                context.read<
-                    LocalRepository<HFReferralModel, HFReferralSearchModel>>(),
 
                 context
                     .read<LocalRepository<ServiceModel, ServiceSearchModel>>(),
@@ -650,14 +645,8 @@ class _HomePageState extends LocalizedState<HomePage> {
                     RemoteRepository<HFReferralModel, HFReferralSearchModel>>(),
 
                 context.read<
-                    RemoteRepository<HFReferralModel, HFReferralSearchModel>>(),
-
-                context.read<
                     RemoteRepository<AttendanceLogModel,
                         AttendanceLogSearchModel>>(),
-
-                context.read<
-                    RemoteRepository<HFReferralModel, HFReferralSearchModel>>(),
 
                 context.read<
                     RemoteRepository<HouseholdModel, HouseholdSearchModel>>(),
@@ -797,8 +786,9 @@ void setPackagesSingleton(BuildContext context) {
 
         InventorySingleton().setInitialData(
           isWareHouseMgr: context.loggedInUserRoles
-              .where(
-                  (role) => role.code == RolesType.warehouseManager.toValue() || role.code == RolesType.healthFacilitySupervisor.toValue())
+              .where((role) =>
+                  role.code == RolesType.warehouseManager.toValue() ||
+                  role.code == RolesType.healthFacilitySupervisor.toValue())
               .toList()
               .isNotEmpty,
           isDistributor: context.loggedInUserRoles
@@ -836,8 +826,9 @@ void setPackagesSingleton(BuildContext context) {
         );
         InventorySingleton().setInitialData(
           isWareHouseMgr: context.loggedInUserRoles
-              .where(
-                  (role) => role.code == RolesType.warehouseManager.toValue() || role.code == RolesType.healthFacilitySupervisor.toValue())
+              .where((role) =>
+                  role.code == RolesType.warehouseManager.toValue() ||
+                  role.code == RolesType.healthFacilitySupervisor.toValue())
               .toList()
               .isNotEmpty,
           isDistributor: context.loggedInUserRoles
