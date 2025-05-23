@@ -37,6 +37,7 @@ class MinNumberCard extends StatelessWidget {
         color: isSelected != null && isSelected!
             ? const Color.fromARGB(255, 250, 158, 105)
             : Colors.grey[200],
+
         border: Border.all(
           color: isSelected != null && isSelected!
               ? const Color.fromARGB(255, 223, 107, 41)

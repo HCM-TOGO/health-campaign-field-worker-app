@@ -187,6 +187,7 @@ class _ViewAllTransactionsScreenState extends State<ViewAllTransactionsScreen> {
                         child: BlocBuilder<StockBloc, StockState>(
                           builder: (context, state) {
                             return ListView.builder(
+                              reverse: true,
                               itemCount: filteredStock.length,
                               itemBuilder: (context, index) {
                                 final stock = filteredStock[index];

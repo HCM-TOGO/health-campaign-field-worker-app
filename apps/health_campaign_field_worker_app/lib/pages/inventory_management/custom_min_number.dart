@@ -192,11 +192,11 @@ class CustomMinNumberPageState extends LocalizedState<CustomMinNumberPage> {
                                 final compressed =
                                     zlib.encode(utf8.encode(jsonStr));
                                 final encoded = base64Url.encode(compressed);
-
-                                return Padding(
+                              return Padding(
                                   padding: const EdgeInsets.all(8.0),
                                   child: GestureDetector(
                                     onTap: () {
+                                      
                                       setState(() {
                                         if (selectedMRN == mrn) {
                                           selectedMRN = null;
@@ -230,10 +230,8 @@ class CustomMinNumberPageState extends LocalizedState<CustomMinNumberPage> {
                                                     .value ??
                                                 'N/A')
                                             .toString();
-
                                         final quantity =
                                             (s.quantity ?? 0).toString();
-
                                         return {
                                           'name': name,
                                           'quantity': quantity,
@@ -244,6 +242,7 @@ class CustomMinNumberPageState extends LocalizedState<CustomMinNumberPage> {
                                           ? null
                                           : stocks.first.wayBillNumber ?? "",
                                       isSelected: isSelected,
+
                                     ),
                                   ),
                                 );

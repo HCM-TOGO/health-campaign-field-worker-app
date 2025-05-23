@@ -14,6 +14,7 @@ import 'package:digit_ui_components/widgets/molecules/show_pop_up.dart';
 import 'package:flutter/material.dart';
 import 'package:digit_ui_components/digit_components.dart';
 import 'package:digit_ui_components/widgets/molecules/digit_card.dart';
+import 'package:flutter_background_service/flutter_background_service.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:health_campaign_field_worker_app/pages/inventory_management/custom_acknowledgement.dart';
 import 'package:inventory_management/blocs/record_stock.dart';
@@ -450,8 +451,12 @@ class _DynamicTabsPageState extends LocalizedState<DynamicTabsPage>
                             child: Text(
                           senderIdToShowOnTab == null
                               ? localizations.translate(i18.common.noMatchFound)
-                              : localizations
-                                  .translate('FAC_$senderIdToShowOnTab'),
+                              : (entryType == StockRecordEntryType.dispatch ||
+                                      entryType ==
+                                          StockRecordEntryType.returned)
+                                  ? localizations.translate('FAC_$receiverId')
+                                  : localizations
+                                      .translate('FAC_$senderIdToShowOnTab'),
                         )),
                       ],
                     ),
@@ -596,7 +601,11 @@ class _DynamicTabsPageState extends LocalizedState<DynamicTabsPage>
                   type: DigitButtonType.primary,
                   onPressed: () async {
                     if (form.valid) {
-                      await _saveCurrentTabData(productName);
+                      bool isValid =
+                          await _saveCurrentTabData(productName, entryType);
+                      if (!isValid) {
+                        return;
+                      }
 
                       if (_tabController.index < products.length - 1) {
                         if (form.valid) {
@@ -609,7 +618,6 @@ class _DynamicTabsPageState extends LocalizedState<DynamicTabsPage>
                           if (form.invalid) {
                             _tabController.animateTo(index);
                             return;
-
                           }
                           index++;
                         }
@@ -642,26 +650,106 @@ class _DynamicTabsPageState extends LocalizedState<DynamicTabsPage>
     );
   }
 
-  Future<void> _saveCurrentTabData(String productName) async {
+  Future<bool> _saveCurrentTabData(
+      String productName, StockRecordEntryType entryType) async {
     final form = _forms[productName]!;
     final currentStock = _tabStocks[productName]!;
 
+    final theme = Theme.of(context);
+
     _tabStocks[productName] = currentStock.copyWith(
-      quantity: form.control(_transactionQuantityKey).value?.toString(),
-      wayBillNumber: form.control(_waybillNumberKey).value?.toString(),
+      quantity: form.control(_transactionQuantityKey).value?.toString() != "0"
+          ? form.control(_transactionQuantityKey).value?.toString()
+          : (_forms[productName]?.value)?["quantity"] as String?,
+      wayBillNumber: form.control(_waybillNumberKey).value?.toString() ??
+          (_forms[productName]?.value)?["waybillNumber"] as String?,
       transactionReason:
           form.control(_transactionReasonKey).value?.toString() ??
               transactionReason,
       additionalFields: currentStock.additionalFields?.copyWith(
         fields: [
           ...(currentStock.additionalFields?.fields ?? []),
-          if (form.control(_batchNumberKey).value != null)
+          if (form.control(_batchNumberKey).value != null) ...[
             AdditionalField('batchNumber', form.control(_batchNumberKey).value),
-          if (form.control(_commentsKey).value != null)
+          ] else if ((_forms[productName]?.value)?["batchNumberKey"] !=
+              null) ...[
+            AdditionalField(
+                'batchNumber', (_forms[productName]?.value)?["batchNumberKey"]),
+          ],
+          if (form.control(_commentsKey).value != null) ...[
             AdditionalField('comments', form.control(_commentsKey).value),
+          ] else if ((_forms[productName]?.value)?["comments"] != null) ...[
+            AdditionalField(
+                'comments', (_forms[productName]?.value)?["comments"]),
+          ]
         ],
       ),
     );
+
+    bool isSubtracted = (entryType == StockRecordEntryType.dispatch ||
+        entryType == StockRecordEntryType.returned);
+    final ss = int.parse(
+        form.control(_transactionQuantityKey).value?.toString() ?? "0");
+
+    final spaq1Count = context.spaq1;
+    final spaq2Count = context.spaq2;
+
+    final blueVasCount = context.blueVas;
+    final redVasCount = context.redVas;
+
+    // Custom logic based on productName
+    if (productName == Constants.spaq1 && isSubtracted && ss > spaq1Count) {
+      await DigitToast.show(
+        context,
+        options: DigitToastOptions(
+            localizations.translate((entryType == StockRecordEntryType.dispatch)
+                ? i18_local.beneficiaryDetails.validationForExcessStockDispatch
+                : i18_local.beneficiaryDetails.validationForExcessStockReturn),
+            true,
+            theme),
+      );
+      return false;
+    } else if (productName == Constants.spaq2 &&
+        isSubtracted &&
+        ss > spaq2Count) {
+      await DigitToast.show(
+        context,
+        options: DigitToastOptions(
+            localizations.translate((entryType == StockRecordEntryType.dispatch)
+                ? i18_local.beneficiaryDetails.validationForExcessStockDispatch
+                : i18_local.beneficiaryDetails.validationForExcessStockReturn),
+            true,
+            theme),
+      );
+      return false;
+    } else if (productName == Constants.blueVAS &&
+        isSubtracted &&
+        ss > blueVasCount) {
+      await DigitToast.show(
+        context,
+        options: DigitToastOptions(
+            localizations.translate((entryType == StockRecordEntryType.dispatch)
+                ? i18_local.beneficiaryDetails.validationForExcessStockDispatch
+                : i18_local.beneficiaryDetails.validationForExcessStockReturn),
+            true,
+            theme),
+      );
+      return false;
+    } else if (productName == Constants.redVAS &&
+        isSubtracted &&
+        ss > redVasCount) {
+      await DigitToast.show(
+        context,
+        options: DigitToastOptions(
+            localizations.translate((entryType == StockRecordEntryType.dispatch)
+                ? i18_local.beneficiaryDetails.validationForExcessStockDispatch
+                : i18_local.beneficiaryDetails.validationForExcessStockReturn),
+            true,
+            theme),
+      );
+      return false;
+    }
+
     final recordStock = context.read<RecordStockBloc>().state;
     context.read<RecordStockBloc>().add(
           RecordStockSaveStockDetailsEvent(
@@ -670,9 +758,6 @@ class _DynamicTabsPageState extends LocalizedState<DynamicTabsPage>
         );
 
     final isDistributor = context.isDistributor;
-
-    final ss = int.parse(
-        form.control(_transactionQuantityKey).value?.toString() ?? "0");
 
 //     if ((ss > context.spaq1 ||
 //             ss > context.spaq2 ||
@@ -767,11 +852,24 @@ class _DynamicTabsPageState extends LocalizedState<DynamicTabsPage>
     //     ),
     //   ) as bool;
     // }
+
+    return true;
   }
 
   Future<void> _handleFinalSubmission(
       BuildContext context, StockRecordEntryType entryType) async {
+    final theme = Theme.of(context);
     final lastProduct = products.last.sku ?? '';
+
+    for (StockModel stock in _tabStocks.values) {
+      String productName = stock.additionalFields?.fields
+          .firstWhereOrNull((element) => element.key == 'productName')
+          ?.value;
+      bool valid = await _saveCurrentTabData(productName, entryType);
+      if (!valid) {
+        return;
+      }
+    }
 
     final submit = await showCustomPopup(
       context: context,
@@ -795,10 +893,9 @@ class _DynamicTabsPageState extends LocalizedState<DynamicTabsPage>
               ).pop(true);
               (context.router.parent() as StackRouter).maybePop();
               context.router.push(CustomAcknowledgementRoute(
-                mrnNumber: _sharedMRN,
-                stockRecords: _tabStocks.values.toList(),
-                entryType : entryType
-              ));
+                  mrnNumber: _sharedMRN,
+                  stockRecords: _tabStocks.values.toList(),
+                  entryType: entryType));
             },
             type: DigitButtonType.primary,
             size: DigitButtonSize.large,
@@ -820,6 +917,11 @@ class _DynamicTabsPageState extends LocalizedState<DynamicTabsPage>
     ) as bool;
 
     if (submit && context.mounted) {
+      int spaq1Count = 0;
+      int spaq2Count = 0;
+
+      int blueVasCount = 0;
+      int redVasCount = 0;
       // Loop through all stocks and dispatch individual events
       for (final stockModel in _tabStocks.values) {
         context.read<RecordStockBloc>().add(
@@ -831,53 +933,36 @@ class _DynamicTabsPageState extends LocalizedState<DynamicTabsPage>
               const RecordStockCreateStockEntryEvent(),
             );
 
-        if (InventorySingleton().isDistributor) {
-          int ss = int.parse(stockModel.quantity.toString());
-          final totalQty =
-              entryType == StockRecordEntryType.dispatch ? ss * -1 : ss;
+        final ss = int.parse(stockModel.quantity.toString());
+        final totalQty = (entryType == StockRecordEntryType.dispatch ||
+                entryType == StockRecordEntryType.returned)
+            ? ss * -1
+            : ss;
 
-          int spaq1Count = context.spaq1;
-          int spaq2Count = context.spaq2;
+        String? productName = stockModel.additionalFields?.fields
+            .firstWhereOrNull((element) => element.key == 'productName')
+            ?.value;
 
-          int blueVasCount = context.blueVas;
-          int redVasCount = context.redVas;
-
-          String? productName = stockModel.additionalFields?.fields
-              .firstWhereOrNull((element) => element.key == 'productName')
-              ?.value;
-
-          // Custom logic based on productName
-          if (productName == Constants.spaq1) {
-            spaq1Count = totalQty;
-            spaq2Count = 0;
-            redVasCount = 0;
-            blueVasCount = 0;
-          } else if (productName == Constants.spaq2) {
-            spaq2Count = totalQty;
-            spaq1Count = 0;
-            redVasCount = 0;
-            blueVasCount = 0;
-          } else if (productName == Constants.blueVAS) {
-            blueVasCount = totalQty;
-            spaq1Count = 0;
-            spaq2Count = 0;
-            redVasCount = 0;
-          } else {
-            blueVasCount = 0;
-            spaq1Count = 0;
-            spaq2Count = 0;
-            redVasCount = totalQty;
-          }
-          context.read<AuthBloc>().add(
-                AuthAddSpaqCountsEvent(
-                  spaq1Count: spaq1Count,
-                  spaq2Count: spaq2Count,
-                  blueVasCount: blueVasCount,
-                  redVasCount: redVasCount,
-                ),
-              );
+        // Accumulate quantities based on product
+        if (productName == Constants.spaq1) {
+          spaq1Count += totalQty;
+        } else if (productName == Constants.spaq2) {
+          spaq2Count += totalQty;
+        } else if (productName == Constants.blueVAS) {
+          blueVasCount += totalQty;
+        } else if (productName == Constants.redVAS) {
+          redVasCount += totalQty;
         }
       }
+
+      context.read<AuthBloc>().add(
+            AuthAddSpaqCountsEvent(
+              spaq1Count: spaq1Count,
+              spaq2Count: spaq2Count,
+              blueVasCount: blueVasCount,
+              redVasCount: redVasCount,
+            ),
+          );
 
       //   Navigator.of(context).push(
       //     MaterialPageRoute(

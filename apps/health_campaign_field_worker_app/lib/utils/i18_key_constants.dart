@@ -312,7 +312,13 @@ class ReferBeneficiary {
 class HouseholdDetails {
   const HouseholdDetails();
 
+  String get addBeneficiartText => 'ADD_BENEFICIARY_TEXT';
+
   String get householdDetailsLabel => 'HOUSEHOLD_DETAILS_LABEL';
+
+  String get dateOfHouseholdRegistrationLabelUpdate =>
+      'DATE_OF_HOUSEHOLD_REGISTRATION_LABEL';
+
   String get actionLabel => 'HOUSEHOLD_ACTION_LABEL';
   String get dateOfRegistrationLabel =>
       'HOUSEHOLD_DETAILS_DATE_OF_REGISTRATION_LABEL';
@@ -1228,6 +1234,8 @@ class SearchBeneficiary {
 class IndividualDetails {
   const IndividualDetails();
 
+  String get individualDetailsLabelTextUpdate => 'INDIVIDUAL_DETAILS_LABEL_TEXT_UPDATE'; 
+  String get individualDetailsNameLabelTextUpdate => 'INDIVIDUAL_DETAILS_NAME_LABEL_TEXT_UPDATE';
   String get landmarkValidationMessage =>
       'INDIVIDUAL_DETAILS_LANDMARK_VALIDATION_MESSAGE';
 
@@ -1284,8 +1292,10 @@ class IndividualDetails {
 class BeneficiaryDetails {
   const BeneficiaryDetails();
 
-  String get validationForExcessStock =>
-      "ERROR_VALIDATIN_FOR_EXCESS_STOCK_DISPATCH";
+  String get validationForExcessStockDispatch =>
+      "ERROR_VALIDATION_FOR_EXCESS_STOCK_DISPATCH";
+  String get validationForExcessStockReturn =>
+      "ERROR_VALIDATION_FOR_EXCESS_STOCK_RETURN";
   String get errorHeader => "ERROR_VALIDATION_HEADER";
   String get goToHome => "GO_BACK_HOME";
   String get insufficientStockMessage => 'INSUFFICIENT_STOCK_MESSAGE_REGISTER';
