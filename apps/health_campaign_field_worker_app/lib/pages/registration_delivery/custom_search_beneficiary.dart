@@ -762,6 +762,21 @@ class _CustomSearchBeneficiaryPageState
                     );
                   },
                 ),
+                BlocBuilder<CustomSearchHouseholdsBloc,
+                    CustomSearchHouseholdsState>(
+                  builder: (context, searchHouseholdsState) {
+                    return DigitButton(
+                      prefixIcon: Icons.qr_code_scanner,
+                      capitalizeLetters: false,
+                      label: "Scan QR Code",
+                      mainAxisSize: MainAxisSize.max,
+                      type: DigitButtonType.secondary,
+                      size: DigitButtonSize.large,
+                      isDisabled: false,
+                      onPressed: () {},
+                    );
+                  },
+                ),
               ]),
         ),
       ),
