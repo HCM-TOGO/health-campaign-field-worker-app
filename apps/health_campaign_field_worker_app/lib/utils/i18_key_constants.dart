@@ -466,7 +466,8 @@ class InventoryReportDetails {
 
   String get commentIsRequiredText => "COMMENT_IS_REQUIRED_TEXT";
 
-  String get checkTheQuantityReceivedText => 'CHECK_THE_QUANTITY_RECEIEVED_TEXT';
+  String get checkTheQuantityReceivedText =>
+      'CHECK_THE_QUANTITY_RECEIEVED_TEXT';
 
   String get stockReceiptDetailsText => 'STOCK_RECEIPT_DETAILS_TEXT';
 
@@ -682,6 +683,8 @@ class CaregiverConsent {
 
   String get caregiverConsentActionLabelText =>
       'CARE_GIVER_CONSENT_ACTION_LABEL_TEXT';
+
+  String get caregiverConsentReason => 'CARE_GIVER_CONSENT_REASON_FOR_NO';
 }
 
 class ComplaintsDetailsShowcase {
@@ -1188,7 +1191,8 @@ class SearchBeneficiary {
 
   String get statisticsLabelText => 'BENEFICIARY_STATISTICS_LABEL_TEXT';
 
-  String get searchBeneficiaryReferralHintText => 'SEARCH_BENEFICIARY_REFERRAL_HINT_TEXT';
+  String get searchBeneficiaryReferralHintText =>
+      'SEARCH_BENEFICIARY_REFERRAL_HINT_TEXT';
 
   String get searchIndividualLabelText =>
       'BENEFICIARY_STATISTICS_SEARCH_INDIVIDUAL_LABEL';

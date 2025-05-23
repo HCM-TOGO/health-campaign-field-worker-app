@@ -49,6 +49,20 @@ class CaregiverConsentPage extends LocalizedStatefulWidget {
 class CaregiverConsentPageState extends LocalizedState<CaregiverConsentPage> {
   CaregiverConsentEnum selectedConsent = CaregiverConsentEnum.yes;
   final clickedStatus = ValueNotifier<bool>(false);
+  TextEditingController consentComment = TextEditingController();
+  String? commentErrorText;
+
+  bool validateReason() {
+    setState(() {
+      commentErrorText = (consentComment.text.isEmpty)
+          ? localizations.translate(i18.common.coreCommonReasonRequired)
+          : null;
+    });
+    if (commentErrorText == null)
+      return true;
+    else
+      return false;
+  }
 
   onSubmit(HouseholdModel? householdModel, AddressModel? addressModel) async {
     final bloc = context.read<CustomBeneficiaryRegistrationBloc>();
@@ -103,6 +117,10 @@ class CaregiverConsentPageState extends LocalizedState<CaregiverConsentPage> {
           const AdditionalField(
             "caregiver_consent_registration",
             false,
+          ),
+          AdditionalField(
+            "caregiver_consent_comment",
+            consentComment.text,
           ),
         ]));
 
@@ -177,7 +195,7 @@ class CaregiverConsentPageState extends LocalizedState<CaregiverConsentPage> {
                   onPressed: () {
                     if (selectedConsent == CaregiverConsentEnum.yes) {
                       router.push(CustomHouseHoldDetailsRoute());
-                    } else {
+                    } else if (validateReason()) {
                       registrationState.maybeWhen(orElse: () {
                         return;
                       }, create: (
@@ -222,7 +240,7 @@ class CaregiverConsentPageState extends LocalizedState<CaregiverConsentPage> {
                                         rootNavigator: true,
                                       ).pop(false),
                                   type: DigitButtonType.secondary,
-                                  size: DigitButtonSize.large)
+                                  size: DigitButtonSize.large),
                             ],
                           ),
                         );
@@ -271,16 +289,33 @@ class CaregiverConsentPageState extends LocalizedState<CaregiverConsentPage> {
                             ),
                           ),
                         ],
-                        groupValue: CaregiverConsentEnum.yes.name,
+                        groupValue: selectedConsent.name,
                         onChanged: (value) {
-                          if (value.code == CaregiverConsentEnum.yes.name) {
-                            selectedConsent = CaregiverConsentEnum.yes;
-                          } else {
-                            selectedConsent = CaregiverConsentEnum.no;
-                          }
+                          setState(() {
+                            if (value.code == CaregiverConsentEnum.yes.name) {
+                              selectedConsent = CaregiverConsentEnum.yes;
+                            } else {
+                              selectedConsent = CaregiverConsentEnum.no;
+                            }
+                          });
                         },
                       );
-                    })
+                    }),
+                     if (selectedConsent == CaregiverConsentEnum.no)
+                  LabeledField(
+                    isRequired: true,
+                    label: localizations.translate(
+                        i18_local.caregiverConsent.caregiverConsentReason),
+                    child: DigitTextFormInput(
+                      controller: consentComment,
+                      errorMessage: commentErrorText,
+                      onChange: (value) {
+                        setState(() {
+                          commentErrorText = null;
+                        });
+                      },
+                    ),
+                  )
               ]),
             ),
           ],
