@@ -371,9 +371,8 @@ class CustomDoseAdministeredPageState
                                   ListTile(
                                     title: Text.rich(
                                       TextSpan(
-                                        text: localizations.translate(
-                                          '${i18_local.deliverIntervention.doseCompletionChecksText2} ',
-                                        ),
+                                        text:
+                                            '${localizations.translate(i18_local.deliverIntervention.doseCompletionChecksText2)} ',
                                         style: const TextStyle(
                                             color: Colors.black),
                                         children: [
@@ -385,9 +384,8 @@ class CustomDoseAdministeredPageState
                                                 fontWeight: FontWeight.bold),
                                           ),
                                           TextSpan(
-                                            text: localizations.translate(
-                                              ' ${i18_local.deliverIntervention.doseCompletionChecksText3} ',
-                                            ),
+                                            text:
+                                                ' ${localizations.translate(i18_local.deliverIntervention.doseCompletionChecksText3)} ',
                                           ),
                                           TextSpan(
                                             text: name,
@@ -397,9 +395,8 @@ class CustomDoseAdministeredPageState
                                                 fontWeight: FontWeight.bold),
                                           ),
                                           TextSpan(
-                                            text: localizations.translate(
-                                              ' ${i18_local.deliverIntervention.doseCompletionChecksText4}',
-                                            ),
+                                            text:
+                                                ' (${localizations.translate(i18_local.deliverIntervention.doseCompletionChecksText4)})',
                                           ),
                                         ],
                                       ),
@@ -425,7 +422,8 @@ class CustomDoseAdministeredPageState
                                   ListTile(
                                     title: Text(
                                       localizations.translate(
-                                        i18_local.deliverIntervention.doseCompletionChecksText2,
+                                        i18_local.deliverIntervention
+                                            .doseCompletionChecksText5,
                                       ),
                                     ),
                                     leading: SizedBox(
