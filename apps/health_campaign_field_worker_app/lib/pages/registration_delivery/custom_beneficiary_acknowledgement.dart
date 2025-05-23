@@ -104,7 +104,7 @@ class CustomBeneficiaryAcknowledgementPageState
                 return CustomPanelCard(
                   type: PanelType.success,
                   title: localizations.translate(
-                      i18.acknowledgementSuccess.acknowledgementLabelText),
+                      i18_local.acknowledgementSuccess.acknowledgementSuccessUpdateLabelText),
                   subTitle: subtitleMap(householdMemberWrapper, state.householdModel),
                   actions: [
                     if (householdMemberWrapper != null)

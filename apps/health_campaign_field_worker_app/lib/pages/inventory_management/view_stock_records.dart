@@ -187,6 +187,11 @@ class _ViewStockRecordsPageState extends LocalizedState<ViewStockRecordsPage>
                   ],
 
                   // Quantity
+                  Offstage(
+                    offstage: (stock.additionalFields?.fields ?? [])
+                        .any((e) => e.key == "unusedBlistersReturned"),
+                    child:
+
                   InputField(
                     type: InputType.text,
                     label: (stock.additionalFields?.fields ?? [])
@@ -206,7 +211,64 @@ class _ViewStockRecordsPageState extends LocalizedState<ViewStockRecordsPage>
                         : stock.quantity ?? '',
                     isDisabled: true,
                     readOnly: true,
-                  ),
+                  )),
+                  Offstage(
+                    offstage: !(stock.additionalFields?.fields ?? [])
+                        .any((e) => e.key == "unusedBlistersReturned"),
+                    child:
+
+                  Column(
+                    children: [
+                      InputField(
+                        type: InputType.text,
+                        label: 'Unused Quantity *',
+                        initialValue: (stock.additionalFields?.fields ?? [])
+                              .firstWhere(
+                                (e) => e.key == "unusedBlistersReturned",
+                                orElse: () => const AdditionalField(
+                                    'unusedBlistersReturned', ''),
+                              )
+                              .value
+                              ?.toString() ??
+                          '',
+                        isDisabled: true,
+                        readOnly: true,
+                      ),
+                       const SizedBox(height: 12),
+                       InputField(
+                        type: InputType.text,
+                        label: 'Partially Used Quantity *',
+                        initialValue: (stock.additionalFields?.fields ?? [])
+                              .firstWhere(
+                                (e) => e.key == "partiallyUsedBlistersReturned",
+                                orElse: () => const AdditionalField(
+                                    'partiallyUsedBlistersReturned', ''),
+                              )
+                              .value
+                              ?.toString() ??
+                          '',
+                        isDisabled: true,
+                        readOnly: true,
+                      ),
+                       const SizedBox(height: 12),
+                       InputField(
+                        type: InputType.text,
+                        label: 'Wasted Quantity *',
+                        initialValue: (stock.additionalFields?.fields ?? [])
+                              .firstWhere(
+                                (e) => e.key == "wastedBlistersReturned",
+                                orElse: () => const AdditionalField(
+                                    'wastedBlistersReturned', ''),
+                              )
+                              .value
+                              ?.toString() ??
+                          '',
+                        isDisabled: true,
+                        readOnly: true,
+                      ),
+                       
+                    ],
+                  )),
                   const SizedBox(height: 12),
                   Offstage(
                     offstage: !(stock.additionalFields?.fields ?? [])

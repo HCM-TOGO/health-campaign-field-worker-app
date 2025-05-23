@@ -487,7 +487,7 @@ class CustomIndividualDetailsPageState
                         Text(
                           localizations.translate(
                             
-                            widget.isHeadOfHousehold ? i18_local.individualDetails.caregiverDetailsLabelText : i18.individualDetails.individualsDetailsLabelText,
+                            widget.isHeadOfHousehold ? i18_local.individualDetails.caregiverDetailsLabelText : i18_local.individualDetails.individualsDetailsLabelTextNewUpdate,
                           ),
                           style: textTheme.headingXl.copyWith(
                             color: theme.colorTheme.text.primary,
@@ -515,7 +515,7 @@ class CustomIndividualDetailsPageState
                                 },
                                 builder: (field) => LabeledField(
                                   label: localizations.translate(
-                                    widget.isHeadOfHousehold ? i18_local.individualDetails.caregiverNameLabelText : i18.individualDetails.nameLabelText,
+                                    widget.isHeadOfHousehold ? i18_local.individualDetails.caregiverNameLabelText : i18_local.individualDetails.nameLabelTextNewUpdate,
                                   ),
                                   isRequired: true,
                                   child: DigitTextFormInput(

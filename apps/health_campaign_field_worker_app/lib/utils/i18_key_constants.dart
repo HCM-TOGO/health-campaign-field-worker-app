@@ -888,6 +888,8 @@ class Home {
 class AcknowledgementSuccess {
   const AcknowledgementSuccess();
 
+  String get acknowledgementSuccessUpdateLabelText => "ACKNOWLEDGEMENT_SUCCESS_UPDATE_LABEL_TEXT";
+
   String get mrrnNumberDescription => "MRRN_NUMBER_DESCRIPTION";
 
   String get mrrnNumberHeading => "MRRN_NUMBER_HEADING";
@@ -1247,6 +1249,8 @@ class IndividualDetails {
 
   String get individualDetailsLabelTextUpdate => 'INDIVIDUAL_DETAILS_LABEL_TEXT_UPDATE'; 
   String get individualDetailsNameLabelTextUpdate => 'INDIVIDUAL_DETAILS_NAME_LABEL_TEXT_UPDATE';
+  String get individualsDetailsLabelTextNewUpdate => 'INDIVIDUALS_DETAILS_LABEL_TEXT_NEW_UPDATE';
+  String get nameLabelTextNewUpdate => 'NAME_LABEL_TEXT_NEW_UPDATE';
   String get landmarkValidationMessage =>
       'INDIVIDUAL_DETAILS_LANDMARK_VALIDATION_MESSAGE';
 
