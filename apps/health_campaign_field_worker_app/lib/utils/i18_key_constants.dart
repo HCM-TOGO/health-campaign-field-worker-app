@@ -689,6 +689,8 @@ class CaregiverConsent {
 
   String get caregiverConsentActionLabelText =>
       'CARE_GIVER_CONSENT_ACTION_LABEL_TEXT';
+
+  String get caregiverConsentReason => 'CARE_GIVER_CONSENT_REASON_FOR_NO';
 }
 
 class ComplaintsDetailsShowcase {
