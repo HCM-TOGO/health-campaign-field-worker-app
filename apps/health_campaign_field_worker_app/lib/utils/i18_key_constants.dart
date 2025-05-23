@@ -206,6 +206,17 @@ class DeliverIntervention {
       'DELIVER_INTERVENTION_REDOSE_QUANTITY_LABEL';
   String get dose => 'DELIVER_INTERVENTION_DOSE';
 
+  String get doseCompletionChecksText1 =>
+      'DELIVER_INTERVENTION_DOSE_COMPLETION_CHECKS_TEXT1';
+  String get doseCompletionChecksText2 =>
+      'DELIVER_INTERVENTION_DOSE_COMPLETION_CHECKS_TEXT2';
+  String get doseCompletionChecksText3 =>
+      'DELIVER_INTERVENTION_DOSE_COMPLETION_CHECKS_TEXT3';
+  String get doseCompletionChecksText4 =>
+      'DELIVER_INTERVENTION_DOSE_COMPLETION_CHECKS_TEXT4';
+  String get doseCompletionChecksText5 =>
+      'DELIVER_INTERVENTION_DOSE_COMPLETION_CHECKS_TEXT5';
+
   String get quantityAdministratedLabel => 'QUANTITY_ADMINISTRATED_LABEL';
 
   String get selectTheResourceDeliveredLabel =>
@@ -689,6 +700,8 @@ class CaregiverConsent {
 
   String get caregiverConsentActionLabelText =>
       'CARE_GIVER_CONSENT_ACTION_LABEL_TEXT';
+
+  String get caregiverConsentReason => 'CARE_GIVER_CONSENT_REASON_FOR_NO';
 }
 
 class ComplaintsDetailsShowcase {
@@ -1243,9 +1256,15 @@ class IndividualDetails {
 
   String get individualsDetailsLabelText => 'INDIVIDUAL_LABEL_TEXT';
 
+  String get caregiverDetailsLabelText => 'CAREGIVER_LABEL_TEXT';
+
   String get nameLabelText => 'INDIVIDUAL_NAME_LABEL_TEXT';
 
+  String get caregiverNameLabelText => 'CAREGIVER_NAME_LABEL_TEXT';
+
   String get checkboxLabelText => 'HEAD_OF_HOUSEHOLD_LABEL_TEXT';
+
+  String get checkboxLabelTextUpdate => "HEAD_OF_HOUSEHOLD_CHECKBOX_LABEL_TEXT";
 
   String get idTypeLabelText => 'ID_TYPE_LABEL_TEXT';
 

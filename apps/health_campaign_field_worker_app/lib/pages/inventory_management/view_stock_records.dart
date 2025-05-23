@@ -189,9 +189,21 @@ class _ViewStockRecordsPageState extends LocalizedState<ViewStockRecordsPage>
                   // Quantity
                   InputField(
                     type: InputType.text,
-                    label: 'Quantity *',
-                    // label: widget.entryType == StockRecordEntryType.receipt ? 'Issued Quantity *' : 'Quantity *',
-                    initialValue: stock.quantity ?? '',
+                    label: (stock.additionalFields?.fields ?? [])
+                            .any((e) => e.key == "quantityReceived")
+                        ? 'Issued Quantity *'
+                        : 'Quantity *',
+                    initialValue: (stock.additionalFields?.fields ?? [])
+                            .any((e) => e.key == "quantityReceived")
+                        ? (stock.additionalFields?.fields ?? [])
+                            .firstWhere(
+                              (e) => e.key == "quantitySent",
+                              orElse: () =>
+                                  const AdditionalField('quantitySent', ''),
+                            )
+                            .value
+                            ?.toString()
+                        : stock.quantity ?? '',
                     isDisabled: true,
                     readOnly: true,
                   ),
