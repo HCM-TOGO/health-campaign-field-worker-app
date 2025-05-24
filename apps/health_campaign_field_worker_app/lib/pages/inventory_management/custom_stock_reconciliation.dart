@@ -132,16 +132,26 @@ class CustomStockReconciliationPageState
                                           if (int.tryParse(form
                                                   .control(_manualCountKey)
                                                   .value) !=
-                                              stockState.stockInHand) {
-                                            DigitToast.show(
-                                              context,
-                                              options: DigitToastOptions(
-                                                "Comment is required",
-                                                true,
-                                                theme,
-                                              ),
-                                            );
-                                            return;
+                                              stockState.stockInHand && (form
+                                                .control(
+                                                    _reconciliationCommentsKey)
+                                                .value
+                                                ?.isEmpty || form
+                                                .control(
+                                                    _reconciliationCommentsKey)
+                                                .value.trim() == '')) {
+                                            // ignore: avoid_dynamic_calls
+                                            
+                                              DigitToast.show(
+                                                context,
+                                                options: DigitToastOptions(
+                                                  "Comment is required",
+                                                  true,
+                                                  theme,
+                                                ),
+                                              );
+                                              return;
+                                            
                                           }
                                           if (!form.valid ||
                                               (form
