@@ -63,6 +63,15 @@ class _QRScannerPageState extends LocalizedState<QRScannerPage> {
         stockList.add(model);
       }
 
+      final mrnNumber = stockList.first.additionalFields?.fields
+            .firstWhere(
+              (field) => field.key == 'materialNoteNumber',
+              orElse: () => const AdditionalField('materialNoteNumber', ''),
+            )
+            .value
+            ?.toString() ??
+        'N/A';
+
       if (stockList.isNotEmpty) {
         final shouldSubmit = await dialog.DigitDialog.show<bool>(
           context,
