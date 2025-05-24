@@ -812,9 +812,12 @@ class CustomTransactionalDetailsPageState
                                               items: productVariants
                                                   .map((variant) {
                                                 return DropdownItem(
-                                                  name: localizations.translate(
-                                                    variant.sku ?? variant.id,
-                                                  ).toUpperCase(),
+                                                  name: localizations
+                                                      .translate(
+                                                        variant.sku ??
+                                                            variant.id,
+                                                      )
+                                                      .toUpperCase(),
                                                   code: variant.id,
                                                 );
                                               }).toList(),
@@ -824,16 +827,24 @@ class CustomTransactionalDetailsPageState
                                                           .value !=
                                                       null)
                                                   ? DropdownItem(
-                                                      name: localizations.translate((form
-                                                                      .control(
-                                                                          _productVariantKey)
-                                                                      .value
-                                                                  as ProductVariantModel)
-                                                              .sku ??
-                                                          (form.control(_productVariantKey).value
-                                                                  as ProductVariantModel)
-                                                              .id).toUpperCase(),
-                                                      code: (form.control(_productVariantKey).value
+                                                      name: localizations
+                                                          .translate((form
+                                                                          .control(
+                                                                              _productVariantKey)
+                                                                          .value
+                                                                      as ProductVariantModel)
+                                                                  .sku ??
+                                                              (form
+                                                                          .control(
+                                                                              _productVariantKey)
+                                                                          .value
+                                                                      as ProductVariantModel)
+                                                                  .id)
+                                                          .toUpperCase(),
+                                                      code: (form
+                                                                  .control(
+                                                                      _productVariantKey)
+                                                                  .value
                                                               as ProductVariantModel)
                                                           .id)
                                                   : const DropdownItem(
