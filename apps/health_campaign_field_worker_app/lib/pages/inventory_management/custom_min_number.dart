@@ -58,6 +58,7 @@ class CustomMinNumberPageState extends LocalizedState<CustomMinNumberPage> {
     // Define correct values
     String? transactionType;
     String? transactionReason;
+    dynamic dateCreated;
 
     if (widget.type == StockRecordEntryType.returned) {
       transactionType = 'RECEIVED';
@@ -72,11 +73,14 @@ class CustomMinNumberPageState extends LocalizedState<CustomMinNumberPage> {
       if (transactionType == null) return false;
 
       if ((widget.type == StockRecordEntryType.dispatch)) {
+        Logger().d("This is stock ${stock.clientAuditDetails?.createdBy}");
         return stock.transactionType == transactionType;
       } else if (widget.type == StockRecordEntryType.receipt) {
+        Logger().d("This is stock ${stock.clientAuditDetails?.createdBy}");
         return stock.transactionType == transactionType &&
             stock.transactionReason != 'RETURNED';
       } else {
+        Logger().d("This is stock ${stock.clientAuditDetails?.createdBy}");
         return stock.transactionType == transactionType &&
             stock.transactionReason == transactionReason;
       }
@@ -127,6 +131,7 @@ class CustomMinNumberPageState extends LocalizedState<CustomMinNumberPage> {
             ],
           ),
           footer: SizedBox(
+            height: 130,
             child: DigitCard(
               margin: const EdgeInsets.fromLTRB(0, spacer2, 0, 0),
               children: [
@@ -196,11 +201,10 @@ class CustomMinNumberPageState extends LocalizedState<CustomMinNumberPage> {
                                 final compressed =
                                     zlib.encode(utf8.encode(jsonStr));
                                 final encoded = base64Url.encode(compressed);
-                              return Padding(
+                                return Padding(
                                   padding: const EdgeInsets.all(8.0),
                                   child: GestureDetector(
                                     onTap: () {
-                                      
                                       setState(() {
                                         if (selectedMRN == mrn) {
                                           selectedMRN = null;
@@ -246,7 +250,6 @@ class CustomMinNumberPageState extends LocalizedState<CustomMinNumberPage> {
                                           ? null
                                           : stocks.first.wayBillNumber ?? "",
                                       isSelected: isSelected,
-
                                     ),
                                   ),
                                 );

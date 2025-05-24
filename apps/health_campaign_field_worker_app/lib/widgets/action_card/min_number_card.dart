@@ -53,6 +53,7 @@ class MinNumberCard extends StatelessWidget {
           children: [
             // Replace spacer4 with 16.0
             Container(
+              margin: const EdgeInsets.symmetric(vertical: 10.0),
               width: double.infinity,
               decoration: BoxDecoration(
                 color: isSelected != null && isSelected!
