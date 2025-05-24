@@ -1344,6 +1344,7 @@ class BeneficiaryDetails {
 
   String get validationForExcessStockDispatch =>
       "ERROR_VALIDATION_FOR_EXCESS_STOCK_DISPATCH";
+  String get searchbybeneficiaryidtextupdate => 'SEARCH_BY_BENEFICIARY_ID_TEXT_UPDATE';
   String get validationForExcessStockReturn =>
       "ERROR_VALIDATION_FOR_EXCESS_STOCK_RETURN";
   String get errorHeader => "ERROR_VALIDATION_HEADER";

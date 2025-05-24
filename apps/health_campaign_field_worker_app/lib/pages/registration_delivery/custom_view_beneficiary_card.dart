@@ -163,6 +163,7 @@ class CustomViewBeneficiaryCardState
           (taskData ?? []).isNotEmpty ? taskData?.last : null,
           sideEffects,
         );
+
         final isSideEffectRecorded = recordedSideEffect(
           currentCycle,
           (taskData ?? []).isNotEmpty ? taskData?.last : null,
@@ -400,7 +401,11 @@ class CustomViewBeneficiaryCardState
     CustomStatusKeys statusKeys,
     List<TaskModel>? taskData,
   ) {
-    if (statusKeys.isNotEligible || statusKeys.isIneligibleForSMC || statusKeys.isIneligibleForVAS) {
+    if(statusKeys.isNotEligible) {
+      return localizations.translate(i18_local
+              .householdOverView.householdOverViewHouseholderHeadLabel);
+    }
+    else if (statusKeys.isIneligibleForSMC || statusKeys.isIneligibleForVAS) {
       return localizations.translate(
           i18.householdOverView.householdOverViewNotEligibleIconLabel);
     } else if (statusKeys.isBeneficiaryReferred) {
