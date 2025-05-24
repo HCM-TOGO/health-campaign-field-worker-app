@@ -18,6 +18,7 @@ import 'package:inventory_management/utils/extensions/extensions.dart';
 import 'package:reactive_forms/reactive_forms.dart';
 
 import 'package:inventory_management/utils/i18_key_constants.dart' as i18;
+import '../../utils/i18_key_constants.dart' as i18_local;
 import 'package:inventory_management/widgets/inventory/no_facilities_assigned_dialog.dart';
 import 'package:inventory_management/widgets/localized.dart';
 import 'package:inventory_management/blocs/product_variant.dart';
@@ -130,13 +131,30 @@ class CustomStockReconciliationPageState
                                         type: DigitButtonType.primary,
                                         onPressed: () async {
                                           if (int.tryParse(form
-                                                  .control(_manualCountKey)
-                                                  .value) !=
-                                              stockState.stockInHand) {
+                                                      .control(_manualCountKey)
+                                                      .value) !=
+                                                  // ignore: avoid_dynamic_calls
+                                                  stockState.stockInHand &&
+                                              (form
+                                                      .control(
+                                                          _reconciliationCommentsKey)
+                                                      .value
+                                                      // ignore: avoid_dynamic_calls
+                                                      ?.isEmpty ||
+                                                  form
+                                                          .control(
+                                                              _reconciliationCommentsKey)
+                                                          .value
+                                                          .trim() ==
+                                                      '')) {
+                                            // ignore: avoid_dynamic_calls
                                             DigitToast.show(
                                               context,
                                               options: DigitToastOptions(
-                                                "Comment is required",
+                                                localizations.translate(
+                                                    i18_local
+                                                        .inventoryReportDetails
+                                                        .commentIsRequiredText),
                                                 true,
                                                 theme,
                                               ),
@@ -276,7 +294,7 @@ class CustomStockReconciliationPageState
                                             ),
                                           ) as bool;
 
-                                          if (submit ?? false) {
+                                          if (submit) {
                                             bloc.add(
                                               StockReconciliationCreateEvent(
                                                 model,
@@ -437,11 +455,29 @@ class CustomStockReconciliationPageState
                                                       code: variant.id,
                                                     );
                                                   }).toList(),
+                                                  selectedOption: (field
+                                                              .control.value !=
+                                                          null)
+                                                      ? DropdownItem(
+                                                          name: localizations
+                                                              .translate(
+                                                            (field.control.value
+                                                                        as ProductVariantModel)
+                                                                    .sku ??
+                                                                (field.control
+                                                                            .value
+                                                                        as ProductVariantModel)
+                                                                    .id,
+                                                          ),
+                                                          code: (field.control
+                                                                      .value
+                                                                  as ProductVariantModel)
+                                                              .id)
+                                                      : const DropdownItem(
+                                                          name: '', code: ''),
                                                   onSelect: (value) {
                                                     field.control
                                                         .markAsTouched();
-
-                                                    /// Find the selected product variant model by matching the id
                                                     final selectedVariant =
                                                         productVariants
                                                             .firstWhere(
@@ -449,11 +485,8 @@ class CustomStockReconciliationPageState
                                                           variant.id ==
                                                           value.code,
                                                     );
-
-                                                    /// Update the form control with the selected product variant model
                                                     field.control.value =
                                                         selectedVariant;
-
                                                     ctx
                                                         .read<
                                                             StockReconciliationBloc>()

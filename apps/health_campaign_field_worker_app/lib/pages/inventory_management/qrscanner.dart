@@ -9,6 +9,8 @@ import 'package:inventory_management/models/entities/stock.dart';
 import 'package:inventory_management/widgets/localized.dart';
 import '../../router/app_router.dart';
 import '../../utils/extensions/extensions.dart';
+import 'package:digit_components/widgets/digit_dialog.dart' as dialog;
+import 'package:registration_delivery/utils/i18_key_constants.dart' as i18;
 
 @RoutePage()
 class QRScannerPage extends LocalizedStatefulWidget {
@@ -33,7 +35,7 @@ class _QRScannerPageState extends LocalizedState<QRScannerPage> {
     super.dispose();
   }
 
-  void _processScannedData(String? code) {
+  Future<void> _processScannedData(String? code) async {
     if (!_isScanning || code == null || code.isEmpty) return;
 
     setState(() => _isScanning = false);
@@ -61,12 +63,41 @@ class _QRScannerPageState extends LocalizedState<QRScannerPage> {
       }
 
       if (stockList.isNotEmpty) {
-        context.router.push(
-          ViewStockRecordsCDDRoute(
-            mrnNumber: stockList.first.wayBillNumber ?? "",
-            stockRecords: stockList,
+        final shouldSubmit = await dialog.DigitDialog.show<bool>(
+          context,
+          options: dialog.DigitDialogOptions(
+            titleText: localizations.translate(
+              i18.deliverIntervention.dialogTitle,
+            ),
+            contentText: localizations.translate(
+              i18.deliverIntervention.dialogContent,
+            ),
+            primaryAction: dialog.DigitDialogActions(
+              label: localizations.translate(
+                i18.common.coreCommonSubmit,
+              ),
+              action: (ctx) {
+                Navigator.of(ctx, rootNavigator: true).pop(true);
+              },
+            ),
+            secondaryAction: dialog.DigitDialogActions(
+              label: localizations.translate(
+                i18.common.coreCommonGoback,
+              ),
+              action: (ctx) {
+                Navigator.of(ctx, rootNavigator: true).pop(false);
+              },
+            ),
           ),
         );
+        if (shouldSubmit ?? false) {
+          context.router.push(
+            ViewStockRecordsCDDRoute(
+              mrnNumber: stockList.first.wayBillNumber ?? "",
+              stockRecords: stockList,
+            ),
+          );
+        }
       }
     } catch (e) {
       _showError('Invalid QR code format: ${e.toString()}');

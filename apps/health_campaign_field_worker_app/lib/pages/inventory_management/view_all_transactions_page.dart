@@ -17,20 +17,24 @@ import '../../router/app_router.dart';
 import '../../utils/utils.dart';
 import '../../widgets/action_card/all_transactions_card.dart';
 import '../../widgets/custom_back_navigation.dart';
+import '../../widgets/localized.dart';
 import 'view_record_lga.dart';
 import 'package:collection/collection.dart';
+import 'package:inventory_management/utils/i18_key_constants.dart' as i18;
 
 @RoutePage()
-class ViewAllTransactionsScreen extends StatefulWidget {
+class ViewAllTransactionsScreen extends LocalizedStatefulWidget {
   final String? warehouseId;
-  const ViewAllTransactionsScreen({super.key, required this.warehouseId});
+  const ViewAllTransactionsScreen(
+      {super.key, super.appLocalizations, required this.warehouseId});
 
   @override
   State<ViewAllTransactionsScreen> createState() =>
       _ViewAllTransactionsScreenState();
 }
 
-class _ViewAllTransactionsScreenState extends State<ViewAllTransactionsScreen> {
+class _ViewAllTransactionsScreenState
+    extends LocalizedState<ViewAllTransactionsScreen> {
   @override
   void initState() {
     super.initState();
@@ -38,8 +42,9 @@ class _ViewAllTransactionsScreenState extends State<ViewAllTransactionsScreen> {
     final stockState = context.read<RecordStockBloc>().state;
   }
 
-  int? pressedIndex;
+  int? pressedIndex = -1;
   List<StockModel> stockList = [];
+  StockModel? selectedStock;
 
   Future<void> loadLocalStockData() async {
     final repository =
@@ -164,6 +169,36 @@ class _ViewAllTransactionsScreenState extends State<ViewAllTransactionsScreen> {
               CustomBackNavigationHelpHeaderWidget(showHelp: false),
             ],
           ),
+          footer: SizedBox(
+            height: 130,
+            child: DigitCard(
+              margin: const EdgeInsets.fromLTRB(0, spacer2, 0, 0),
+              children: [
+                DigitButton(
+                  type: DigitButtonType.primary,
+                  mainAxisSize: MainAxisSize.max,
+                  size: DigitButtonSize.large,
+                  label: localizations.translate(
+                    i18.householdDetails.actionLabel,
+                  ),
+                  onPressed: () {
+                    if (pressedIndex != -1) {
+                      _navigateToDetails(selectedStock!);
+                    } else {
+                      ScaffoldMessenger.of(context).showSnackBar(
+                        SnackBar(
+                          content: Text(localizations.translate(
+                            i18.householdDetails.selectRecordErrorMsg,
+                          )),
+                          duration: Duration(seconds: 1),
+                        ),
+                      );
+                    }
+                  },
+                ),
+              ],
+            ),
+          ),
           children: [
             if (filteredStock.isEmpty)
               const Center(child: Text('No transactions available.'))
@@ -191,83 +226,70 @@ class _ViewAllTransactionsScreenState extends State<ViewAllTransactionsScreen> {
                               itemCount: filteredStock.length,
                               itemBuilder: (context, index) {
                                 final stock = filteredStock[index];
-                                return Material(
-                                  color: pressedIndex == index
-                                      ? Colors.orange[300]
-                                      : Colors.white,
-                                  borderRadius: BorderRadius.circular(8),
-                                  child: InkWell(
-                                    onTap: () => _navigateToDetails(stock),
-                                    onTapDown: (_) =>
-                                        setState(() => pressedIndex = index),
-                                    onTapUp: (_) =>
-                                        setState(() => pressedIndex = null),
-                                    onTapCancel: () =>
-                                        setState(() => pressedIndex = null),
-                                    borderRadius: BorderRadius.circular(8),
-                                    customBorder: const RoundedRectangleBorder(
-                                      side: BorderSide(
-                                        color: Colors.grey,
-                                        width: 1,
-                                      ),
-                                    ),
-                                    child: Padding(
-                                      padding: const EdgeInsets.only(bottom: 8),
-                                      child: TransactionsCard(
-                                        backgroundColor: pressedIndex == index
-                                            ? Colors.orange[300]
-                                            : Colors.grey[200],
-                                        minNumber:
-                                            stock.additionalFields?.fields
-                                                    .firstWhere(
-                                                      (field) =>
-                                                          field.key ==
-                                                          'materialNoteNumber',
-                                                      orElse: () =>
-                                                          const AdditionalField(
-                                                              'materialNoteNumber',
-                                                              ''),
-                                                    )
-                                                    .value
-                                                    ?.toString() ??
-                                                'N/A',
-                                        cddCode: InventorySingleton()
-                                                .loggedInUser
-                                                ?.name ??
-                                            (stock.senderId ?? ''),
-                                        date: (stock.dateOfEntry != null)
-                                            ? DateFormat('d MMMM yyyy').format(
-                                                (stock.dateOfEntryTime ??
-                                                        DateTime.now())
-                                                    .toLocal())
-                                            : formatDateFromMillis(stock
-                                                    .auditDetails
-                                                    ?.createdTime ??
-                                                0),
-                                        items: [
-                                          {
-                                            'name':
-                                                stock.additionalFields?.fields
-                                                        .firstWhere(
-                                                          (field) =>
-                                                              field.key ==
-                                                              'productName',
-                                                          orElse: () =>
-                                                              const AdditionalField(
-                                                                  'productName',
-                                                                  'N/A'),
-                                                        )
-                                                        .value
-                                                        ?.toString() ??
-                                                    'N/A',
-                                            'quantity':
-                                                (stock.quantity ?? 0).toString()
-                                          }
-                                        ],
-                                        data: {},
-                                        waybillNumber:
-                                            ' ${stock.wayBillNumber ?? 'N/A'}',
-                                      ),
+                                final isSelected = pressedIndex == index;
+                                return Padding(
+                                  padding: const EdgeInsets.only(bottom: 8),
+                                  child: GestureDetector(
+                                    onTap: () {
+                                      setState(() {
+                                        if (pressedIndex == index) {
+                                          pressedIndex = -1;
+                                          selectedStock = null;
+                                        } else {
+                                          pressedIndex = index;
+                                          selectedStock = stock;
+                                        }
+                                      });
+                                    },
+                                    child: TransactionsCard(
+                                      isSelected: isSelected,
+                                      minNumber: stock.additionalFields?.fields
+                                              .firstWhere(
+                                                (field) =>
+                                                    field.key ==
+                                                    'materialNoteNumber',
+                                                orElse: () =>
+                                                    const AdditionalField(
+                                                        'materialNoteNumber',
+                                                        ''),
+                                              )
+                                              .value
+                                              ?.toString() ??
+                                          'N/A',
+                                      cddCode: InventorySingleton()
+                                              .loggedInUser
+                                              ?.name ??
+                                          (stock.senderId ?? ''),
+                                      date: (stock.dateOfEntry != null)
+                                          ? DateFormat('d MMMM yyyy').format(
+                                              (stock.dateOfEntryTime ??
+                                                      DateTime.now())
+                                                  .toLocal())
+                                          : formatDateFromMillis(
+                                              stock.auditDetails?.createdTime ??
+                                                  0),
+                                      items: [
+                                        {
+                                          'name': stock.additionalFields?.fields
+                                                  .firstWhere(
+                                                    (field) =>
+                                                        field.key ==
+                                                        'productName',
+                                                    orElse: () =>
+                                                        const AdditionalField(
+                                                            'productName',
+                                                            'N/A'),
+                                                  )
+                                                  .value
+                                                  ?.toString() ??
+                                              'N/A',
+                                          'quantity':
+                                              (stock.quantity ?? 0).toString()
+                                        }
+                                      ],
+                                      data: {},
+                                      waybillNumber:
+                                          ' ${stock.wayBillNumber ?? 'N/A'}',
                                     ),
                                   ),
                                 );
