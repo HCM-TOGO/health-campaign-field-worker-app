@@ -366,7 +366,7 @@ class CustomManageStocksPageState
                           Text(
                             "Create New Transaction",
                             style: TextStyle(
-                              fontSize: 20,
+                              fontSize: 16,
                               color: Colors.orange[800],
                               fontWeight: FontWeight.bold,
                             ),

@@ -169,8 +169,10 @@ class CustomMinNumberPageState extends LocalizedState<CustomMinNumberPage> {
                       );
                     } else {
                       ScaffoldMessenger.of(context).showSnackBar(
-                        const SnackBar(
-                          content: Text("Please select a record"),
+                        SnackBar(
+                          content: Text(localizations.translate(
+                            i18.householdDetails.selectRecordErrorMsg,
+                          )),
                           duration: Duration(seconds: 1),
                         ),
                       );

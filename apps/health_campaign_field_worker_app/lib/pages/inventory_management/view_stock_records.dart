@@ -256,10 +256,8 @@ class _ViewStockRecordsPageState extends LocalizedState<ViewStockRecordsPage>
                           .any((e) => e.key == "unusedBlistersReturned"),
                       child: InputField(
                         type: InputType.text,
-                        label: (stock.additionalFields?.fields ?? [])
-                                .any((e) => e.key == "quantityReceived")
-                            ? 'Issued Quantity *'
-                            : 'Quantity *',
+                        label:
+                            '${localizations.translate(quantityCountLabel)} *',
                         initialValue: (stock.additionalFields?.fields ?? [])
                                 .any((e) => e.key == "quantityReceived")
                             ? (stock.additionalFields?.fields ?? [])
@@ -339,7 +337,10 @@ class _ViewStockRecordsPageState extends LocalizedState<ViewStockRecordsPage>
                         .any((e) => e.key == "quantityReceived"),
                     child: InputField(
                       type: InputType.text,
-                      label: 'Actual Quantity Received *',
+                      label: (productName == "Blue VAS" ||
+                              productName == "Red VAS")
+                          ? '${localizations.translate(i18_local.stockDetails.totalQuantityCapsuleReceivedLabel)} *'
+                          : '${localizations.translate(i18_local.stockDetails.totalQuantityBlistersReceivedLabel)} *',
                       initialValue: (stock.additionalFields?.fields ?? [])
                               .firstWhere(
                                 (e) => e.key == "quantityReceived",
