@@ -34,6 +34,7 @@ import 'custom_beneficiary_acknowledgement.dart';
 enum CaregiverConsentEnum {
   yes,
   no,
+  none
 }
 
 @RoutePage()
@@ -48,7 +49,7 @@ class CaregiverConsentPage extends LocalizedStatefulWidget {
 }
 
 class CaregiverConsentPageState extends LocalizedState<CaregiverConsentPage> {
-  CaregiverConsentEnum selectedConsent = CaregiverConsentEnum.yes;
+  CaregiverConsentEnum selectedConsent = CaregiverConsentEnum.none;
   final clickedStatus = ValueNotifier<bool>(false);
   TextEditingController consentComment = TextEditingController();
   String? commentErrorText;
