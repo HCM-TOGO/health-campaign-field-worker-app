@@ -15,6 +15,7 @@ import 'package:health_campaign_field_worker_app/widgets/action_card/min_number_
 import 'package:inventory_management/blocs/record_stock.dart';
 import 'package:inventory_management/models/entities/stock.dart';
 import 'package:inventory_management/utils/i18_key_constants.dart' as i18;
+import '../../utils/i18_key_constants.dart' as i18_local;
 import 'package:inventory_management/utils/utils.dart';
 import 'package:inventory_management/widgets/localized.dart';
 import 'package:inventory_management/widgets/back_navigation_help_header.dart';
@@ -171,7 +172,7 @@ class CustomMinNumberPageState extends LocalizedState<CustomMinNumberPage> {
                       ScaffoldMessenger.of(context).showSnackBar(
                         SnackBar(
                           content: Text(localizations.translate(
-                            i18.householdDetails.selectRecordErrorMsg,
+                            i18_local.householdDetails.selectRecordErrorMsg,
                           )),
                           duration: Duration(seconds: 1),
                         ),
