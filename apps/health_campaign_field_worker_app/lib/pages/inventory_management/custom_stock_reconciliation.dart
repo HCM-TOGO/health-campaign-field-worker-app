@@ -1,5 +1,3 @@
-
-
 import 'package:auto_route/auto_route.dart';
 import 'package:digit_components/widgets/atoms/digit_toaster.dart';
 import 'package:digit_data_model/data_model.dart';
@@ -20,6 +18,7 @@ import 'package:inventory_management/utils/extensions/extensions.dart';
 import 'package:reactive_forms/reactive_forms.dart';
 
 import 'package:inventory_management/utils/i18_key_constants.dart' as i18;
+import '../../utils/i18_key_constants.dart' as i18_local;
 import 'package:inventory_management/widgets/inventory/no_facilities_assigned_dialog.dart';
 import 'package:inventory_management/widgets/localized.dart';
 import 'package:inventory_management/blocs/product_variant.dart';
@@ -132,28 +131,35 @@ class CustomStockReconciliationPageState
                                         type: DigitButtonType.primary,
                                         onPressed: () async {
                                           if (int.tryParse(form
-                                                  .control(_manualCountKey)
-                                                  .value) !=
-                                              stockState.stockInHand && (form
-                                                .control(
-                                                    _reconciliationCommentsKey)
-                                                .value
-                                                ?.isEmpty || form
-                                                .control(
-                                                    _reconciliationCommentsKey)
-                                                .value.trim() == '')) {
+                                                      .control(_manualCountKey)
+                                                      .value) !=
+                                                  // ignore: avoid_dynamic_calls
+                                                  stockState.stockInHand &&
+                                              (form
+                                                      .control(
+                                                          _reconciliationCommentsKey)
+                                                      .value
+                                                      // ignore: avoid_dynamic_calls
+                                                      ?.isEmpty ||
+                                                  form
+                                                          .control(
+                                                              _reconciliationCommentsKey)
+                                                          .value
+                                                          .trim() ==
+                                                      '')) {
                                             // ignore: avoid_dynamic_calls
-                                            
-                                              DigitToast.show(
-                                                context,
-                                                options: DigitToastOptions(
-                                                  "Comment is required",
-                                                  true,
-                                                  theme,
-                                                ),
-                                              );
-                                              return;
-                                            
+                                            DigitToast.show(
+                                              context,
+                                              options: DigitToastOptions(
+                                                localizations.translate(
+                                                    i18_local
+                                                        .inventoryReportDetails
+                                                        .commentIsRequiredText),
+                                                true,
+                                                theme,
+                                              ),
+                                            );
+                                            return;
                                           }
                                           if (!form.valid ||
                                               (form
@@ -438,36 +444,61 @@ class CustomStockReconciliationPageState
                                                       localizations.translate(
                                                     i18.common.noMatchFound,
                                                   ),
-                                                  items: productVariants.map((variant) {
+                                                  items: productVariants
+                                                      .map((variant) {
                                                     return DropdownItem(
-                                                      name: localizations.translate(
+                                                      name: localizations
+                                                          .translate(
                                                         variant.sku ??
                                                             variant.id,
                                                       ),
                                                       code: variant.id,
                                                     );
                                                   }).toList(),
-                                                  selectedOption: (field.control.value != null)
+                                                  selectedOption: (field
+                                                              .control.value !=
+                                                          null)
                                                       ? DropdownItem(
-                                                          name: localizations.translate(
-                                                            (field.control.value as ProductVariantModel).sku ??
-                                                                (field.control.value as ProductVariantModel).id,
+                                                          name: localizations
+                                                              .translate(
+                                                            (field.control.value
+                                                                        as ProductVariantModel)
+                                                                    .sku ??
+                                                                (field.control
+                                                                            .value
+                                                                        as ProductVariantModel)
+                                                                    .id,
                                                           ),
-                                                          code: (field.control.value as ProductVariantModel).id)
-                                                      : const DropdownItem(name: '', code: ''),
+                                                          code: (field.control
+                                                                      .value
+                                                                  as ProductVariantModel)
+                                                              .id)
+                                                      : const DropdownItem(
+                                                          name: '', code: ''),
                                                   onSelect: (value) {
-                                                    field.control.markAsTouched();
-                                                    final selectedVariant = productVariants.firstWhere(
-                                                      (variant) => variant.id == value.code,
+                                                    field.control
+                                                        .markAsTouched();
+                                                    final selectedVariant =
+                                                        productVariants
+                                                            .firstWhere(
+                                                      (variant) =>
+                                                          variant.id ==
+                                                          value.code,
                                                     );
-                                                    field.control.value = selectedVariant;
-                                                    ctx.read<StockReconciliationBloc>().add(
-                                                      StockReconciliationSelectProductEvent(
-                                                        value.code,
-                                                        isDistributor: InventorySingleton().isDistributor! &&
-                                                            !InventorySingleton().isWareHouseMgr!,
-                                                      ),
-                                                    );
+                                                    field.control.value =
+                                                        selectedVariant;
+                                                    ctx
+                                                        .read<
+                                                            StockReconciliationBloc>()
+                                                        .add(
+                                                          StockReconciliationSelectProductEvent(
+                                                            value.code,
+                                                            isDistributor: InventorySingleton()
+                                                                    .isDistributor! &&
+                                                                !InventorySingleton()
+                                                                    .isWareHouseMgr!,
+                                                          ),
+                                                        );
                                                   },
                                                 ),
                                               );
