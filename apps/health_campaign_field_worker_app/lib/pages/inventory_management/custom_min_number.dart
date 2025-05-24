@@ -84,7 +84,7 @@ class CustomMinNumberPageState extends LocalizedState<CustomMinNumberPage> {
           "Stock Created By: $createdBy | Current User: $currentUserUuid | Match: $isMatch");
     }
 
-    final filteredResult = result.where((stock) {
+    List<StockModel> filteredResult = result.where((stock) {
       if (transactionType == null) return false;
 
       final createdBy = stock.clientAuditDetails?.createdBy;
@@ -102,6 +102,8 @@ class CustomMinNumberPageState extends LocalizedState<CustomMinNumberPage> {
             createdBy == currentUserUuid;
       }
     }).toList();
+
+    filteredResult = filteredResult.reversed.toList();
 
     Logger().i("Filtered Stock Count: ${filteredResult.length}");
     Logger().i(
@@ -197,9 +199,9 @@ class CustomMinNumberPageState extends LocalizedState<CustomMinNumberPage> {
                               style: textTheme.headingL),
                           const SizedBox(height: 16.0),
                           SizedBox(
-                            height: MediaQuery.of(context).size.height * 0.7,
+                            height: MediaQuery.of(context).size.height * 0.65,
                             child: ListView.builder(
-                              reverse: true,
+                              // reverse: true,
                               itemCount: groupedEntries.length,
                               itemBuilder: (context, index) {
                                 final mrn = groupedEntries[index].key;
