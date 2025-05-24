@@ -325,6 +325,8 @@ class ReferBeneficiary {
 class HouseholdDetails {
   const HouseholdDetails();
 
+  String get selectRecordErrorMsg => 'PLEASE_SELECT_RECORD';
+
   String get addBeneficiartText => 'ADD_BENEFICIARY_TEXT';
 
   String get householdDetailsLabel => 'HOUSEHOLD_DETAILS_LABEL';

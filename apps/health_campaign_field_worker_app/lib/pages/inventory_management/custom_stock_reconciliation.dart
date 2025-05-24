@@ -532,8 +532,12 @@ class CustomStockReconciliationPageState
                                       i18.stockReconciliationDetails
                                           .stockIssued,
                                     ),
-                                    value: stockState.stockIssued
-                                        .toStringAsFixed(0),
+                                    value: stockState.stockIssued >
+                                            stockState.stockReceived
+                                        ? stockState.stockReceived
+                                            .toStringAsFixed(0)
+                                        : stockState.stockIssued
+                                            .toStringAsFixed(0),
                                     labelFlex: 5,
                                   ),
                                   const DigitDivider(),

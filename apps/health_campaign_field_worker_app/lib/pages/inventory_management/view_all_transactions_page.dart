@@ -20,6 +20,7 @@ import '../../widgets/custom_back_navigation.dart';
 import '../../widgets/localized.dart';
 import 'view_record_lga.dart';
 import 'package:collection/collection.dart';
+import '../../utils/i18_key_constants.dart' as i18_local;
 import 'package:inventory_management/utils/i18_key_constants.dart' as i18;
 
 @RoutePage()
@@ -188,7 +189,7 @@ class _ViewAllTransactionsScreenState
                       ScaffoldMessenger.of(context).showSnackBar(
                         SnackBar(
                           content: Text(localizations.translate(
-                            i18.householdDetails.selectRecordErrorMsg,
+                            i18_local.householdDetails.selectRecordErrorMsg,
                           )),
                           duration: Duration(seconds: 1),
                         ),
