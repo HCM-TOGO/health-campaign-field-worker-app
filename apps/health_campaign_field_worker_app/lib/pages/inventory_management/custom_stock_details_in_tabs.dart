@@ -166,8 +166,7 @@ class _DynamicTabsPageState extends LocalizedState<DynamicTabsPage>
             _batchNumberKey: FormControl<String>(),
             _commentsKey: FormControl<String>(),
 
-            if (context.read<RecordStockBloc>().state.entryType ==
-                StockRecordEntryType.returned) ...{
+            if (entryType == StockRecordEntryType.returned) ...{
               _unusedBlistersReturnedKey: FormControl<int>(
                   validators: InventorySingleton().isWareHouseMgr
                       ? [
@@ -207,8 +206,7 @@ class _DynamicTabsPageState extends LocalizedState<DynamicTabsPage>
                           Validators.min(0),
                           Validators.max(10000),
                         ]),
-            }
-            else ...{
+            } else ...{
               _unusedBlistersReturnedKey: FormControl<int>(),
               _partiallyUsedBlistersReturnedKey: FormControl<int>(),
               _wastedBlistersReturnedKey: FormControl<int>(),
@@ -425,6 +423,9 @@ class _DynamicTabsPageState extends LocalizedState<DynamicTabsPage>
     StockRecordEntryType entryType = stockState.entryType;
     bool isLastTab = _tabController.index == _tabController.length - 1;
     String quantityCountLabel;
+    String unusedQuantityCountLabel = 'unusedQuantityCountLabel';
+    String partiallyUsedQuantityCountLabel = 'partiallyUsedQuantityCountLabel';
+    String wastedQuantityCountLabel = 'wastedQuantityCountLabel';
     String pageTitle;
 
     switch (entryType) {
@@ -454,8 +455,20 @@ class _DynamicTabsPageState extends LocalizedState<DynamicTabsPage>
         if (productName == "Blue VAS" || productName == "Red VAS") {
           quantityCountLabel =
               i18_local.stockDetails.quantityCapsuleReturnedLabel;
+          unusedQuantityCountLabel =
+              i18_local.stockDetails.quantityCapsuleUnusedReturnedLabel;
+          partiallyUsedQuantityCountLabel =
+              i18_local.stockDetails.quantityCapsulePartiallyUsedReturnedLabel;
+          wastedQuantityCountLabel =
+              i18_local.stockDetails.quantityCapsuleWastedReturnedLabel;
         } else {
           quantityCountLabel = i18.stockDetails.quantityReturnedLabel;
+          unusedQuantityCountLabel =
+              i18_local.stockDetails.quantityUnusedReturnedLabel;
+          partiallyUsedQuantityCountLabel =
+              i18_local.stockDetails.quantityPartiallyUsedReturnedLabel;
+          wastedQuantityCountLabel =
+              i18_local.stockDetails.quantityWastedReturnedLabel;
         }
         break;
       case StockRecordEntryType.loss:
@@ -593,7 +606,9 @@ class _DynamicTabsPageState extends LocalizedState<DynamicTabsPage>
                                 control.invalid && control.touched,
                             builder: (field) {
                               return LabeledField(
-                                label: "Quantity of Unused Blister’s returned",
+                                label: localizations.translate(
+                                  unusedQuantityCountLabel,
+                                ),
                                 isRequired: true,
                                 child: BaseDigitFormInput(
                                   errorMessage: field.errorText,
@@ -634,8 +649,9 @@ class _DynamicTabsPageState extends LocalizedState<DynamicTabsPage>
                                 control.invalid && control.touched,
                             builder: (field) {
                               return LabeledField(
-                                label:
-                                    "Quantity of Partially Used Blister’s returned",
+                                label: localizations.translate(
+                                  partiallyUsedQuantityCountLabel,
+                                ),
                                 isRequired: true,
                                 child: BaseDigitFormInput(
                                   errorMessage: field.errorText,
@@ -676,7 +692,9 @@ class _DynamicTabsPageState extends LocalizedState<DynamicTabsPage>
                                 control.invalid && control.touched,
                             builder: (field) {
                               return LabeledField(
-                                label: "Quantity of Wasted Blister’s returned",
+                                label: localizations.translate(
+                                  wastedQuantityCountLabel,
+                                ),
                                 isRequired: true,
                                 child: BaseDigitFormInput(
                                   errorMessage: field.errorText,
@@ -809,8 +827,13 @@ class _DynamicTabsPageState extends LocalizedState<DynamicTabsPage>
                                     .control(_partiallyUsedBlistersReturnedKey)
                                     .value +
                                 form.control(_wastedBlistersReturnedKey).value;
-                        if(form.control(_transactionQuantityKey).value == 0) {
-                          await DigitToast.show(context ,options: DigitToastOptions("Sum of the total quantity returned must be greater than 0", true, theme));
+                        if (form.control(_transactionQuantityKey).value == 0) {
+                          await DigitToast.show(context,
+                              options: DigitToastOptions(
+                                  localizations.translate(i18_local.stockDetails
+                                      .quantityReturnedMinSumError),
+                                  true,
+                                  theme));
                           return;
                         }
                         form.markAllAsTouched();
@@ -872,55 +895,6 @@ class _DynamicTabsPageState extends LocalizedState<DynamicTabsPage>
     final currentStock = _tabStocks[productName]!;
 
     final theme = Theme.of(context);
-
-    _tabStocks[productName] = currentStock.copyWith(
-      quantity: form.control(_transactionQuantityKey).value?.toString() != "0"
-          ? form.control(_transactionQuantityKey).value?.toString()
-          : (_forms[productName]?.value)?["quantity"] as String?,
-      wayBillNumber: form.control(_waybillNumberKey).value?.toString() ??
-          (_forms[productName]?.value)?["waybillNumber"] as String?,
-      transactionReason:
-          form.control(_transactionReasonKey).value?.toString() ??
-              transactionReason,
-      additionalFields: currentStock.additionalFields?.copyWith(
-        fields: [
-          ...(currentStock.additionalFields?.fields ?? []),
-          if (entryType == StockRecordEntryType.returned) ...[
-            AdditionalField(
-                'unusedBlistersReturned',
-                _forms[productName]
-                    ?.control(_unusedBlistersReturnedKey)
-                    ?.value
-                    ?.toString()),
-            AdditionalField(
-                'partiallyUsedBlistersReturned',
-                _forms[productName]
-                    ?.control(_partiallyUsedBlistersReturnedKey)
-                    ?.value
-                    ?.toString()),
-            AdditionalField(
-                'wastedBlistersReturned',
-                _forms[productName]
-                    ?.control(_wastedBlistersReturnedKey)
-                    ?.value
-                    ?.toString()),
-          ],
-          if (form.control(_batchNumberKey).value != null) ...[
-            AdditionalField('batchNumber', form.control(_batchNumberKey).value),
-          ] else if ((_forms[productName]?.value)?["batchNumberKey"] !=
-              null) ...[
-            AdditionalField(
-                'batchNumber', (_forms[productName]?.value)?["batchNumberKey"]),
-          ],
-          if (form.control(_commentsKey).value != null) ...[
-            AdditionalField('comments', form.control(_commentsKey).value),
-          ] else if ((_forms[productName]?.value)?["comments"] != null) ...[
-            AdditionalField(
-                'comments', (_forms[productName]?.value)?["comments"]),
-          ]
-        ],
-      ),
-    );
 
     bool isSubtracted = (entryType == StockRecordEntryType.dispatch ||
         entryType == StockRecordEntryType.returned);
@@ -985,6 +959,64 @@ class _DynamicTabsPageState extends LocalizedState<DynamicTabsPage>
       );
       return false;
     }
+
+    _tabStocks[productName] = currentStock.copyWith(
+      quantity: form.control(_transactionQuantityKey).value?.toString() != "0"
+          ? form.control(_transactionQuantityKey).value?.toString()
+          : (_forms[productName]?.value)?["quantity"] as String?,
+      wayBillNumber: form.control(_waybillNumberKey).value?.toString() ??
+          (_forms[productName]?.value)?["waybillNumber"] as String?,
+      transactionReason:
+          form.control(_transactionReasonKey).value?.toString() ??
+              transactionReason,
+      additionalFields: currentStock.additionalFields?.copyWith(
+        fields: [
+          ...(currentStock.additionalFields?.fields ?? []),
+          if (entryType == StockRecordEntryType.returned) ...[
+            AdditionalField(
+                'unusedBlistersReturned',
+                form.control(_unusedBlistersReturnedKey).value?.toString() ??
+                    // _forms[productName]
+                    //     ?.control(_unusedBlistersReturnedKey)
+                    //     ?.value
+                    //     ?.toString() ??
+                    '0'),
+            AdditionalField(
+                'partiallyUsedBlistersReturned',
+                form
+                        .control(_partiallyUsedBlistersReturnedKey)
+                        .value
+                        ?.toString() ??
+                    // _forms[productName]
+                    //     ?.control(_partiallyUsedBlistersReturnedKey)
+                    //     ?.value
+                    //     ?.toString() ??
+                    '0'),
+            AdditionalField(
+                'wastedBlistersReturned',
+                form.control(_wastedBlistersReturnedKey).value?.toString() ??
+                    // _forms[productName]
+                    //     ?.control(_wastedBlistersReturnedKey)
+                    //     ?.value
+                    //     ?.toString() ??
+                    '0'),
+          ],
+          if (form.control(_batchNumberKey).value != null) ...[
+            AdditionalField('batchNumber', form.control(_batchNumberKey).value),
+          ] else if ((_forms[productName]?.value)?["batchNumberKey"] !=
+              null) ...[
+            AdditionalField(
+                'batchNumber', (_forms[productName]?.value)?["batchNumberKey"]),
+          ],
+          if (form.control(_commentsKey).value != null) ...[
+            AdditionalField('comments', form.control(_commentsKey).value),
+          ] else if ((_forms[productName]?.value)?["comments"] != null) ...[
+            AdditionalField(
+                'comments', (_forms[productName]?.value)?["comments"]),
+          ]
+        ],
+      ),
+    );
 
     final recordStock = context.read<RecordStockBloc>().state;
     context.read<RecordStockBloc>().add(
