@@ -8,6 +8,7 @@ import 'package:digit_ui_components/theme/digit_extended_theme.dart';
 import 'package:digit_ui_components/widgets/molecules/digit_card.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:health_campaign_field_worker_app/blocs/auth/auth.dart';
 import 'package:health_campaign_field_worker_app/data/repositories/local/inventory_management/custom_stock.dart';
 import 'package:health_campaign_field_worker_app/utils/utils.dart';
 import 'package:health_campaign_field_worker_app/widgets/action_card/min_number_card.dart';
@@ -53,12 +54,19 @@ class CustomMinNumberPageState extends LocalizedState<CustomMinNumberPage> {
         context.read<LocalRepository<StockModel, StockSearchModel>>()
             as CustomStockLocalRepository;
 
+    final authState = context.read<AuthBloc>().state;
+
+    if (authState is! AuthAuthenticatedState) {
+      Logger().e("User not authenticated");
+      return;
+    }
+
+    final currentUserUuid = authState.userModel.uuid;
+
     final result = await repository.search(StockSearchModel());
 
-    // Define correct values
     String? transactionType;
     String? transactionReason;
-    dynamic dateCreated;
 
     if (widget.type == StockRecordEntryType.returned) {
       transactionType = 'RECEIVED';
@@ -69,24 +77,31 @@ class CustomMinNumberPageState extends LocalizedState<CustomMinNumberPage> {
       transactionType = 'DISPATCHED';
     }
 
+    for (final stock in result) {
+      final createdBy = stock.clientAuditDetails?.createdBy;
+      final isMatch = createdBy == currentUserUuid;
+      Logger().d(
+          "Stock Created By: $createdBy | Current User: $currentUserUuid | Match: $isMatch");
+    }
+
     final filteredResult = result.where((stock) {
       if (transactionType == null) return false;
 
-      if ((widget.type == StockRecordEntryType.dispatch)) {
-        Logger().d("This is stock ${stock.clientAuditDetails?.createdBy}");
-        return stock.transactionType == transactionType;
+      final createdBy = stock.clientAuditDetails?.createdBy;
+
+      if (widget.type == StockRecordEntryType.dispatch) {
+        return stock.transactionType == transactionType &&
+            createdBy == currentUserUuid;
       } else if (widget.type == StockRecordEntryType.receipt) {
-        Logger().d("This is stock ${stock.clientAuditDetails?.createdBy}");
         return stock.transactionType == transactionType &&
-            stock.transactionReason != 'RETURNED';
+            stock.transactionReason != 'RETURNED' &&
+            createdBy == currentUserUuid;
       } else {
-        Logger().d("This is stock ${stock.clientAuditDetails?.createdBy}");
         return stock.transactionType == transactionType &&
-            stock.transactionReason == transactionReason;
+            stock.transactionReason == transactionReason &&
+            createdBy == currentUserUuid;
       }
     }).toList();
-
-    filteredResult.reversed.toList();
 
     Logger().i("Filtered Stock Count: ${filteredResult.length}");
     Logger().i(
