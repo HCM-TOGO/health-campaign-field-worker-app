@@ -518,8 +518,10 @@ class CustomStockReconciliationPageState
                                     label: localizations.translate(i18
                                         .stockReconciliationDetails
                                         .stockOnHand),
-                                    value: stockState.stockInHand
-                                        .toStringAsFixed(0),
+                                    value: stockState.stockInHand < 0
+                                        ? 0.toStringAsFixed(0)
+                                        : stockState.stockInHand
+                                            .toStringAsFixed(0),
                                     labelFlex: 5,
                                   ),
                                   InfoCard(
