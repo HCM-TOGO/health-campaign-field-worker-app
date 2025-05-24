@@ -449,6 +449,10 @@ class StockDetails {
 
   String get quantityCapsuleReceivedLabel =>
       'STOCK_DETAILS_CAPSULE_QUANTITY_RECEIVED';
+  String get totalQuantityBlistersReceivedLabel =>
+      'STOCK_DETAILS_ACTUAL_BLISTERS_QUANTITY_RECEIVED';
+  String get totalQuantityCapsuleReceivedLabel =>
+      'STOCK_DETAILS_ACTUAL_CAPSULE_QUANTITY_RECEIVED';
 
   String get quantityCapsuleSentLabel => 'STOCK_DETAILS_CAPSULE_QUANTITY_SENT';
 
