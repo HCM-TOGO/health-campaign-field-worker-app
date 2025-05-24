@@ -68,7 +68,7 @@ class CustomMinNumberPageState extends LocalizedState<CustomMinNumberPage> {
       transactionType = 'DISPATCHED';
     }
 
-    final filteredResult = result.where((stock) {
+    List<StockModel> filteredResult = result.where((stock) {
       if (transactionType == null) return false;
 
       if ((widget.type == StockRecordEntryType.dispatch)) {
@@ -82,7 +82,7 @@ class CustomMinNumberPageState extends LocalizedState<CustomMinNumberPage> {
       }
     }).toList();
 
-    filteredResult.reversed.toList();
+    filteredResult = filteredResult.reversed.toList();
 
     Logger().i("Filtered Stock Count: ${filteredResult.length}");
     Logger().i(
@@ -177,9 +177,9 @@ class CustomMinNumberPageState extends LocalizedState<CustomMinNumberPage> {
                               style: textTheme.headingL),
                           const SizedBox(height: 16.0),
                           SizedBox(
-                            height: MediaQuery.of(context).size.height * 0.7,
+                            height: MediaQuery.of(context).size.height * 0.65,
                             child: ListView.builder(
-                              reverse: true,
+                              // reverse: true,
                               itemCount: groupedEntries.length,
                               itemBuilder: (context, index) {
                                 final mrn = groupedEntries[index].key;
@@ -196,11 +196,10 @@ class CustomMinNumberPageState extends LocalizedState<CustomMinNumberPage> {
                                 final compressed =
                                     zlib.encode(utf8.encode(jsonStr));
                                 final encoded = base64Url.encode(compressed);
-                              return Padding(
+                                return Padding(
                                   padding: const EdgeInsets.all(8.0),
                                   child: GestureDetector(
                                     onTap: () {
-                                      
                                       setState(() {
                                         if (selectedMRN == mrn) {
                                           selectedMRN = null;
@@ -246,7 +245,6 @@ class CustomMinNumberPageState extends LocalizedState<CustomMinNumberPage> {
                                           ? null
                                           : stocks.first.wayBillNumber ?? "",
                                       isSelected: isSelected,
-
                                     ),
                                   ),
                                 );

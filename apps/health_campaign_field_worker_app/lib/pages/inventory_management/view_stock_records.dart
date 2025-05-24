@@ -1,4 +1,5 @@
 import 'package:auto_route/auto_route.dart';
+import 'package:digit_data_model/data/local_store/sql_store/tables/package_tables/stock.dart';
 import 'package:digit_data_model/data_model.dart';
 import 'package:digit_ui_components/digit_components.dart';
 import 'package:digit_ui_components/widgets/atoms/input_wrapper.dart';
@@ -8,6 +9,7 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:inventory_management/blocs/record_stock.dart';
 import 'package:inventory_management/models/entities/stock.dart';
 import 'package:inventory_management/utils/i18_key_constants.dart' as i18;
+import '../../utils/i18_key_constants.dart' as i18_local;
 import 'package:inventory_management/utils/utils.dart';
 import 'package:registration_delivery/widgets/localized.dart';
 
@@ -88,6 +90,68 @@ class _ViewStockRecordsPageState extends LocalizedState<ViewStockRecordsPage>
 
   Widget _buildStockRecordTab(StockModel stock) {
     final senderIdToShowOnTab = stock.senderId;
+    String productName = stock.additionalFields?.fields
+            .firstWhere(
+              (field) => field.key == 'productName',
+              orElse: () => AdditionalField('productName', ''),
+            )
+            .value
+            ?.toString() ??
+        '';
+    StockRecordEntryType entryType = widget.entryType;
+
+    String quantityCountLabel;
+    String unusedQuantityCountLabel = 'unusedQuantityCountLabel';
+    String partiallyUsedQuantityCountLabel = 'partiallyUsedQuantityCountLabel';
+    String wastedQuantityCountLabel = 'wastedQuantityCountLabel';
+
+    switch (entryType) {
+      case StockRecordEntryType.receipt:
+        if (productName == "Blue VAS" || productName == "Red VAS") {
+          quantityCountLabel =
+              i18_local.stockDetails.quantityCapsuleReceivedLabel;
+        } else {
+          quantityCountLabel = i18.stockDetails.quantityReceivedLabel;
+        }
+        break;
+      case StockRecordEntryType.dispatch:
+        if (productName == "Blue VAS" || productName == "Red VAS") {
+          quantityCountLabel = InventorySingleton().isWareHouseMgr
+              ? i18_local.stockDetails.quantityCapsuleSentLabel
+              : i18_local.stockDetails.quantityCapsuleReturnedLabel;
+        } else {
+          quantityCountLabel = InventorySingleton().isWareHouseMgr
+              ? i18.stockDetails.quantitySentLabel
+              : i18.stockDetails.quantityReturnedLabel;
+        }
+        break;
+      case StockRecordEntryType.returned:
+        if (productName == "Blue VAS" || productName == "Red VAS") {
+          quantityCountLabel =
+              i18_local.stockDetails.quantityCapsuleReturnedLabel;
+          unusedQuantityCountLabel =
+              i18_local.stockDetails.quantityCapsuleUnusedReturnedLabel;
+          partiallyUsedQuantityCountLabel =
+              i18_local.stockDetails.quantityCapsulePartiallyUsedReturnedLabel;
+          wastedQuantityCountLabel =
+              i18_local.stockDetails.quantityCapsuleWastedReturnedLabel;
+        } else {
+          quantityCountLabel = i18.stockDetails.quantityReturnedLabel;
+          unusedQuantityCountLabel =
+              i18_local.stockDetails.quantityUnusedReturnedLabel;
+          partiallyUsedQuantityCountLabel =
+              i18_local.stockDetails.quantityPartiallyUsedReturnedLabel;
+          wastedQuantityCountLabel =
+              i18_local.stockDetails.quantityWastedReturnedLabel;
+        }
+        break;
+      case StockRecordEntryType.loss:
+        quantityCountLabel = i18.stockDetails.quantityLostLabel;
+        break;
+      case StockRecordEntryType.damaged:
+        quantityCountLabel = i18.stockDetails.quantityDamagedLabel;
+        break;
+    }
 
     return SingleChildScrollView(
       padding: const EdgeInsets.all(16),
@@ -188,87 +252,87 @@ class _ViewStockRecordsPageState extends LocalizedState<ViewStockRecordsPage>
 
                   // Quantity
                   Offstage(
-                    offstage: (stock.additionalFields?.fields ?? [])
-                        .any((e) => e.key == "unusedBlistersReturned"),
-                    child:
-
-                  InputField(
-                    type: InputType.text,
-                    label: (stock.additionalFields?.fields ?? [])
-                            .any((e) => e.key == "quantityReceived")
-                        ? 'Issued Quantity *'
-                        : 'Quantity *',
-                    initialValue: (stock.additionalFields?.fields ?? [])
-                            .any((e) => e.key == "quantityReceived")
-                        ? (stock.additionalFields?.fields ?? [])
-                            .firstWhere(
-                              (e) => e.key == "quantitySent",
-                              orElse: () =>
-                                  const AdditionalField('quantitySent', ''),
-                            )
-                            .value
-                            ?.toString()
-                        : stock.quantity ?? '',
-                    isDisabled: true,
-                    readOnly: true,
-                  )),
+                      offstage: (stock.additionalFields?.fields ?? [])
+                          .any((e) => e.key == "unusedBlistersReturned"),
+                      child: InputField(
+                        type: InputType.text,
+                        label: (stock.additionalFields?.fields ?? [])
+                                .any((e) => e.key == "quantityReceived")
+                            ? 'Issued Quantity *'
+                            : 'Quantity *',
+                        initialValue: (stock.additionalFields?.fields ?? [])
+                                .any((e) => e.key == "quantityReceived")
+                            ? (stock.additionalFields?.fields ?? [])
+                                .firstWhere(
+                                  (e) => e.key == "quantitySent",
+                                  orElse: () =>
+                                      const AdditionalField('quantitySent', ''),
+                                )
+                                .value
+                                ?.toString()
+                            : stock.quantity ?? '',
+                        isDisabled: true,
+                        readOnly: true,
+                      )),
                   Offstage(
-                    offstage: !(stock.additionalFields?.fields ?? [])
-                        .any((e) => e.key == "unusedBlistersReturned"),
-                    child:
-
-                  Column(
-                    children: [
-                      InputField(
-                        type: InputType.text,
-                        label: 'Unused Quantity *',
-                        initialValue: (stock.additionalFields?.fields ?? [])
-                              .firstWhere(
-                                (e) => e.key == "unusedBlistersReturned",
-                                orElse: () => const AdditionalField(
-                                    'unusedBlistersReturned', ''),
-                              )
-                              .value
-                              ?.toString() ??
-                          '',
-                        isDisabled: true,
-                        readOnly: true,
-                      ),
-                       const SizedBox(height: 12),
-                       InputField(
-                        type: InputType.text,
-                        label: 'Partially Used Quantity *',
-                        initialValue: (stock.additionalFields?.fields ?? [])
-                              .firstWhere(
-                                (e) => e.key == "partiallyUsedBlistersReturned",
-                                orElse: () => const AdditionalField(
-                                    'partiallyUsedBlistersReturned', ''),
-                              )
-                              .value
-                              ?.toString() ??
-                          '',
-                        isDisabled: true,
-                        readOnly: true,
-                      ),
-                       const SizedBox(height: 12),
-                       InputField(
-                        type: InputType.text,
-                        label: 'Wasted Quantity *',
-                        initialValue: (stock.additionalFields?.fields ?? [])
-                              .firstWhere(
-                                (e) => e.key == "wastedBlistersReturned",
-                                orElse: () => const AdditionalField(
-                                    'wastedBlistersReturned', ''),
-                              )
-                              .value
-                              ?.toString() ??
-                          '',
-                        isDisabled: true,
-                        readOnly: true,
-                      ),
-                       
-                    ],
-                  )),
+                      offstage: !(stock.additionalFields?.fields ?? [])
+                          .any((e) => e.key == "unusedBlistersReturned"),
+                      child: Column(
+                        children: [
+                          InputField(
+                            type: InputType.text,
+                            label:
+                                '${localizations.translate(unusedQuantityCountLabel)} *',
+                            initialValue: (stock.additionalFields?.fields ?? [])
+                                    .firstWhere(
+                                      (e) => e.key == "unusedBlistersReturned",
+                                      orElse: () => const AdditionalField(
+                                          'unusedBlistersReturned', ''),
+                                    )
+                                    .value
+                                    ?.toString() ??
+                                '',
+                            isDisabled: true,
+                            readOnly: true,
+                          ),
+                          const SizedBox(height: 12),
+                          InputField(
+                            type: InputType.text,
+                            label:
+                                '${localizations.translate(partiallyUsedQuantityCountLabel)} *',
+                            initialValue: (stock.additionalFields?.fields ?? [])
+                                    .firstWhere(
+                                      (e) =>
+                                          e.key ==
+                                          "partiallyUsedBlistersReturned",
+                                      orElse: () => const AdditionalField(
+                                          'partiallyUsedBlistersReturned', ''),
+                                    )
+                                    .value
+                                    ?.toString() ??
+                                '',
+                            isDisabled: true,
+                            readOnly: true,
+                          ),
+                          const SizedBox(height: 12),
+                          InputField(
+                            type: InputType.text,
+                            label:
+                                '${localizations.translate(wastedQuantityCountLabel)} *',
+                            initialValue: (stock.additionalFields?.fields ?? [])
+                                    .firstWhere(
+                                      (e) => e.key == "wastedBlistersReturned",
+                                      orElse: () => const AdditionalField(
+                                          'wastedBlistersReturned', ''),
+                                    )
+                                    .value
+                                    ?.toString() ??
+                                '',
+                            isDisabled: true,
+                            readOnly: true,
+                          ),
+                        ],
+                      )),
                   const SizedBox(height: 12),
                   Offstage(
                     offstage: !(stock.additionalFields?.fields ?? [])
