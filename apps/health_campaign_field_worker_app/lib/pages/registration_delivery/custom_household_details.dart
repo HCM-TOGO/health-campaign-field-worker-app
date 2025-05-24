@@ -199,6 +199,7 @@ class CustomHouseHoldDetailsPageState
                               );
 
                               household = household.copyWith(
+                                  memberCount: 5,
                                   rowVersion: 1,
                                   tenantId:
                                       RegistrationDeliverySingleton().tenantId,
