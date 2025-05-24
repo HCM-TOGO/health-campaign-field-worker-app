@@ -228,17 +228,16 @@ class _ViewStockRecordsCDDPageState
                     redVasCount: redVasCount,
                   ),
                 );
-            await Future.delayed(const Duration(milliseconds: 500));
           }
         }
-
-        context.router.push(
-          CustomAcknowledgementRoute(
-              mrnNumber: widget.mrnNumber,
-              stockRecords: updatedStocks,
-              entryType: StockRecordEntryType.receipt),
-        );
       }
+      await Future.delayed(const Duration(milliseconds: 500));
+      context.router.push(
+        CustomAcknowledgementRoute(
+            mrnNumber: widget.mrnNumber,
+            stockRecords: updatedStocks,
+            entryType: StockRecordEntryType.receipt),
+      );
     }
   }
 
