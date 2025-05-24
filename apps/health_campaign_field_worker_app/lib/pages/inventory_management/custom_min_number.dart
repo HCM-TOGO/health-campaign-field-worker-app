@@ -8,6 +8,7 @@ import 'package:digit_ui_components/theme/digit_extended_theme.dart';
 import 'package:digit_ui_components/widgets/molecules/digit_card.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:health_campaign_field_worker_app/blocs/auth/auth.dart';
 import 'package:health_campaign_field_worker_app/data/repositories/local/inventory_management/custom_stock.dart';
 import 'package:health_campaign_field_worker_app/utils/utils.dart';
 import 'package:health_campaign_field_worker_app/widgets/action_card/min_number_card.dart';
@@ -53,9 +54,17 @@ class CustomMinNumberPageState extends LocalizedState<CustomMinNumberPage> {
         context.read<LocalRepository<StockModel, StockSearchModel>>()
             as CustomStockLocalRepository;
 
+    final authState = context.read<AuthBloc>().state;
+
+    if (authState is! AuthAuthenticatedState) {
+      Logger().e("User not authenticated");
+      return;
+    }
+
+    final currentUserUuid = authState.userModel.uuid;
+
     final result = await repository.search(StockSearchModel());
 
-    // Define correct values
     String? transactionType;
     String? transactionReason;
 
@@ -68,21 +77,31 @@ class CustomMinNumberPageState extends LocalizedState<CustomMinNumberPage> {
       transactionType = 'DISPATCHED';
     }
 
-    List<StockModel> filteredResult = result.where((stock) {
+    for (final stock in result) {
+      final createdBy = stock.clientAuditDetails?.createdBy;
+      final isMatch = createdBy == currentUserUuid;
+      Logger().d(
+          "Stock Created By: $createdBy | Current User: $currentUserUuid | Match: $isMatch");
+    }
+
+    final filteredResult = result.where((stock) {
       if (transactionType == null) return false;
 
-      if ((widget.type == StockRecordEntryType.dispatch)) {
-        return stock.transactionType == transactionType;
+      final createdBy = stock.clientAuditDetails?.createdBy;
+
+      if (widget.type == StockRecordEntryType.dispatch) {
+        return stock.transactionType == transactionType &&
+            createdBy == currentUserUuid;
       } else if (widget.type == StockRecordEntryType.receipt) {
         return stock.transactionType == transactionType &&
-            stock.transactionReason != 'RETURNED';
+            stock.transactionReason != 'RETURNED' &&
+            createdBy == currentUserUuid;
       } else {
         return stock.transactionType == transactionType &&
-            stock.transactionReason == transactionReason;
+            stock.transactionReason == transactionReason &&
+            createdBy == currentUserUuid;
       }
     }).toList();
-
-    filteredResult = filteredResult.reversed.toList();
 
     Logger().i("Filtered Stock Count: ${filteredResult.length}");
     Logger().i(
@@ -127,6 +146,7 @@ class CustomMinNumberPageState extends LocalizedState<CustomMinNumberPage> {
             ],
           ),
           footer: SizedBox(
+            height: 130,
             child: DigitCard(
               margin: const EdgeInsets.fromLTRB(0, spacer2, 0, 0),
               children: [
@@ -177,9 +197,9 @@ class CustomMinNumberPageState extends LocalizedState<CustomMinNumberPage> {
                               style: textTheme.headingL),
                           const SizedBox(height: 16.0),
                           SizedBox(
-                            height: MediaQuery.of(context).size.height * 0.65,
+                            height: MediaQuery.of(context).size.height * 0.7,
                             child: ListView.builder(
-                              // reverse: true,
+                              reverse: true,
                               itemCount: groupedEntries.length,
                               itemBuilder: (context, index) {
                                 final mrn = groupedEntries[index].key;
