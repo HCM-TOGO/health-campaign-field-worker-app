@@ -455,6 +455,15 @@ class StockDetails {
   String get quantityCapsuleReturnedLabel =>
       'STOCK_DETAILS_CAPSULE_QUANTITY_RETURNED';
 
+  String get quantityCapsuleUnusedReturnedLabel =>
+      'STOCK_DETAILS_CAPSULE_UNUSED_QUANTITY_RETURNED';
+
+  String get quantityCapsulePartiallyUsedReturnedLabel =>
+      'STOCK_DETAILS_CAPSULE_PARTIAL_QUANTITY_RETURNED';
+
+  String get quantityCapsuleWastedReturnedLabel =>
+      'STOCK_DETAILS_CAPSULE_WASTED_QUANTITY_RETURNED';
+
   String get batchNumberLabel {
     return 'STOCK_DETAILS_BATCH_NUMBER';
   }
@@ -464,11 +473,17 @@ class StockDetails {
   String get quantityUnusedReturnedLabel =>
       'STOCK_DETAILS_UNUSED_QUANTITY_RETURNED';
 
-  String get quantityPartialReturnedLabel =>
+  String get quantityPartiallyUsedReturnedLabel =>
       'STOCK_DETAILS_PARTIAL_QUANTITY_RETURNED';
+
+  String get quantityWastedReturnedLabel =>
+      'STOCK_DETAILS_WASTED_QUANTITY_RETURNED';
 
   String get quantityReturnedMaxError =>
       'STOCK_DETAILS_RETURNED_MAX_QUANTITY_ERROR';
+
+  String get quantityReturnedMinSumError =>
+      'STOCK_DETAILS_RETURNED_MIN_SUM_ERROR';
 
   String get productRequired => 'STOCK_DETAILS_PRODUCT_IS_REQUIRED';
 
@@ -1314,6 +1329,8 @@ class IndividualDetails {
   String get yearsAndMonthsErrorText => 'ERR_YEARS_AND_MONTHS';
 
   String get linkVoucherToIndividual => 'LINK_VOUCHER_TO_INDIVIDUAL';
+
+  String get yearsAndMonthsErrorTextUpdate => 'ERR_YEARS_AND_MONTHS_UPDATE';
 }
 
 class BeneficiaryDetails {

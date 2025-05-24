@@ -572,7 +572,7 @@ class CustomIndividualDetailsPageState
                               i18.individualDetails.separatorLabelText,
                             ),
                             yearsAndMonthsErrMsg: localizations.translate(
-                              i18.individualDetails.yearsAndMonthsErrorText,
+                              i18_local.individualDetails.yearsAndMonthsErrorTextUpdate,
                             ),
                             initialDate: before150Years,
                             onChangeOfFormControl: (formControl) {
@@ -581,10 +581,12 @@ class CustomIndividualDetailsPageState
 
                               digits.DigitDOBAge age =
                                   digits.DigitDateUtils.calculateAge(value);
-                              if ((age.years == 0 && age.months == 0) ||
-                                  age.months > 11 ||
-                                  (age.years >= 150 && age.months >= 0)) {
-                                formControl.setErrors({'': true});
+                              // Allow only between 3 to 59 months for cycle 1
+                              final ageInMonths = age.years * 12 + age.months;
+                              if (ageInMonths < 3 || ageInMonths > 59) {
+                                widget.isHeadOfHousehold ? 
+                                formControl.removeError('')
+                                : formControl.setErrors({'': true});
                               } else {
                                 formControl.removeError('');
                               }

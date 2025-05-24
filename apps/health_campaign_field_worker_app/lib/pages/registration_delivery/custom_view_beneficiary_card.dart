@@ -173,12 +173,14 @@ class CustomViewBeneficiaryCardState
           referralData,
           currentCycle,
         );
+
+        final isIneligibleForSMC = util_local.checkBeneficiaryInEligibleSMC(taskData);
+        final isIneligibleForVAS = util_local.checkBeneficiaryInEligibleVAS(taskData);
+
         final isSMCDelivered =
-            util_local.checkStatusSMC(taskData, currentCycle);
+            !util_local.checkStatusSMC(taskData, currentCycle);
         final isVASDelivered =
-            util_local.checkStatusVAS(taskData, currentCycle);
-        print(
-            "The current status of SMC and VAS is $isSMCDelivered and $isVASDelivered $ageInMonths");
+            !util_local.checkStatusVAS(taskData, currentCycle);
 
         final isStatusReset = checkStatus(taskData, currentCycle);
 
@@ -196,6 +198,8 @@ class CustomViewBeneficiaryCardState
             getTableCellText(
               CustomStatusKeys(
                   isNotEligible,
+                  isIneligibleForSMC,
+                  isIneligibleForVAS,
                   isBeneficiaryRefused,
                   isBeneficiaryReferred,
                   isStatusReset,
@@ -206,7 +210,7 @@ class CustomViewBeneficiaryCardState
             cellKey: 'delivery',
             style: TextStyle(
               color: getTableCellTextColor(
-                isNotEligible: isNotEligible,
+                isNotEligible: isNotEligible || isIneligibleForVAS || isIneligibleForSMC,
                 taskdata: taskData,
                 isBeneficiaryRefused:
                     isBeneficiaryRefused || isBeneficiaryReferred,
@@ -396,7 +400,7 @@ class CustomViewBeneficiaryCardState
     CustomStatusKeys statusKeys,
     List<TaskModel>? taskData,
   ) {
-    if (statusKeys.isNotEligible) {
+    if (statusKeys.isNotEligible || statusKeys.isIneligibleForSMC || statusKeys.isIneligibleForVAS) {
       return localizations.translate(
           i18.householdOverView.householdOverViewNotEligibleIconLabel);
     } else if (statusKeys.isBeneficiaryReferred) {
@@ -463,6 +467,8 @@ class CustomViewBeneficiaryCardState
 
 class CustomStatusKeys {
   bool isNotEligible;
+  bool isIneligibleForSMC;
+  bool isIneligibleForVAS;
   bool isBeneficiaryRefused;
   bool isBeneficiaryReferred;
   bool isStatusReset;
@@ -470,6 +476,8 @@ class CustomStatusKeys {
   bool isSMCDelivered;
   CustomStatusKeys(
       this.isNotEligible,
+      this.isIneligibleForSMC,
+      this.isIneligibleForVAS,
       this.isBeneficiaryRefused,
       this.isBeneficiaryReferred,
       this.isStatusReset,
