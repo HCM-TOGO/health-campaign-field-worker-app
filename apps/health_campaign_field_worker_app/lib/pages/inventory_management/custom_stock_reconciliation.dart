@@ -1,3 +1,5 @@
+
+
 import 'package:auto_route/auto_route.dart';
 import 'package:digit_components/widgets/atoms/digit_toaster.dart';
 import 'package:digit_data_model/data_model.dart';
@@ -286,7 +288,7 @@ class CustomStockReconciliationPageState
                                             ),
                                           ) as bool;
 
-                                          if (submit ?? false) {
+                                          if (submit) {
                                             bloc.add(
                                               StockReconciliationCreateEvent(
                                                 model,
@@ -436,46 +438,36 @@ class CustomStockReconciliationPageState
                                                       localizations.translate(
                                                     i18.common.noMatchFound,
                                                   ),
-                                                  items: productVariants
-                                                      .map((variant) {
+                                                  items: productVariants.map((variant) {
                                                     return DropdownItem(
-                                                      name: localizations
-                                                          .translate(
+                                                      name: localizations.translate(
                                                         variant.sku ??
                                                             variant.id,
                                                       ),
                                                       code: variant.id,
                                                     );
                                                   }).toList(),
-                                                  onSelect: (value) {
-                                                    field.control
-                                                        .markAsTouched();
-
-                                                    /// Find the selected product variant model by matching the id
-                                                    final selectedVariant =
-                                                        productVariants
-                                                            .firstWhere(
-                                                      (variant) =>
-                                                          variant.id ==
-                                                          value.code,
-                                                    );
-
-                                                    /// Update the form control with the selected product variant model
-                                                    field.control.value =
-                                                        selectedVariant;
-
-                                                    ctx
-                                                        .read<
-                                                            StockReconciliationBloc>()
-                                                        .add(
-                                                          StockReconciliationSelectProductEvent(
-                                                            value.code,
-                                                            isDistributor: InventorySingleton()
-                                                                    .isDistributor! &&
-                                                                !InventorySingleton()
-                                                                    .isWareHouseMgr!,
+                                                  selectedOption: (field.control.value != null)
+                                                      ? DropdownItem(
+                                                          name: localizations.translate(
+                                                            (field.control.value as ProductVariantModel).sku ??
+                                                                (field.control.value as ProductVariantModel).id,
                                                           ),
-                                                        );
+                                                          code: (field.control.value as ProductVariantModel).id)
+                                                      : const DropdownItem(name: '', code: ''),
+                                                  onSelect: (value) {
+                                                    field.control.markAsTouched();
+                                                    final selectedVariant = productVariants.firstWhere(
+                                                      (variant) => variant.id == value.code,
+                                                    );
+                                                    field.control.value = selectedVariant;
+                                                    ctx.read<StockReconciliationBloc>().add(
+                                                      StockReconciliationSelectProductEvent(
+                                                        value.code,
+                                                        isDistributor: InventorySingleton().isDistributor! &&
+                                                            !InventorySingleton().isWareHouseMgr!,
+                                                      ),
+                                                    );
                                                   },
                                                 ),
                                               );
