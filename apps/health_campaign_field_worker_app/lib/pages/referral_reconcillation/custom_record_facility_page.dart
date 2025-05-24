@@ -70,12 +70,15 @@ class _CustomReferralFacilityPageState
     return BlocConsumer<ProjectFacilityBloc, ProjectFacilityState>(
       listener: (context, state) {
         state.whenOrNull(
-          empty: () => false,
+          empty: () => const CircularProgressIndicator(),
+          loading: () => const CircularProgressIndicator(),
         );
       },
       builder: (ctx, facilityState) {
         return facilityState.maybeWhen(
-          orElse: () => const SizedBox.shrink(),
+          orElse: () => const Scaffold(
+            body: Center(child: CircularProgressIndicator()),
+          ),
           fetched: (facilities) {
             final projectFacilities = facilities
                 .where((e) => e.id != 'N/A' && e.id != 'Delivery Team')
@@ -396,8 +399,8 @@ class _CustomReferralFacilityPageState
                     ),
                   );
           },
-          loading: () => const Center(
-            child: CircularProgressIndicator(),
+          loading: () => const Scaffold(
+            body: Center(child: CircularProgressIndicator()),
           ),
           empty: () => Center(
             child: Text(

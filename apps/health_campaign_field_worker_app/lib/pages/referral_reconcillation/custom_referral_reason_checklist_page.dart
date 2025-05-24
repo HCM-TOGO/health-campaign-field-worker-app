@@ -126,8 +126,20 @@ class _CustomReferralReasonChecklistPageState
                               return;
                             }
                             final itemsAttributes = initialAttributes;
+                            final parentIndexes = <int>[];
+                            for (int i = 0;
+                                i < initialAttributes!.length;
+                                i++) {
+                              if (initialAttributes![i]
+                                      .code!
+                                      .split('.')
+                                      .length ==
+                                  3) {
+                                parentIndexes.add(i);
+                              }
+                            }
 
-                            for (int i = 0; i < controller.length; i++) {
+                            for (int i in parentIndexes) {
                               if (itemsAttributes?[i].required == true &&
                                   ((itemsAttributes?[i].dataType ==
                                               'SingleValueList' &&
@@ -497,7 +509,8 @@ class _CustomReferralReasonChecklistPageState
                                             .map((e) => Column(
                                                   children: [
                                                     DigitCheckbox(
-                                                      label: e,
+                                                      label: localizations
+                                                          .translate(e),
                                                       value: controller[index]
                                                           .text
                                                           .split('.')

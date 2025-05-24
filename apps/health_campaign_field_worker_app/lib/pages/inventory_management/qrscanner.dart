@@ -1,5 +1,6 @@
 import 'dart:convert';
 import 'dart:io';
+import 'package:digit_data_model/data_model.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:logger/logger.dart';
@@ -61,6 +62,15 @@ class _QRScannerPageState extends LocalizedState<QRScannerPage> {
         }
         stockList.add(model);
       }
+
+      final mrnNumber = stockList.first.additionalFields?.fields
+            .firstWhere(
+              (field) => field.key == 'materialNoteNumber',
+              orElse: () => const AdditionalField('materialNoteNumber', ''),
+            )
+            .value
+            ?.toString() ??
+        'N/A';
 
       if (stockList.isNotEmpty) {
         final shouldSubmit = await dialog.DigitDialog.show<bool>(
