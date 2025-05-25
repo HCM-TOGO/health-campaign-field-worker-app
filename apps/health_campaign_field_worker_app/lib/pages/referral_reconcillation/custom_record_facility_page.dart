@@ -523,9 +523,16 @@ class _CustomReferralFacilityPageState
       ),
       _evaluationFacilityKey: FormControl<String>(
         value: referralState.mapOrNull(
-          create: (value) => localizations.translate(
-            'FAC_${mappedFacility.id.toString()}',
-          ),
+          create: (value) => value.viewOnly
+              ? localizations.translate(
+                  'FAC_${facilities.where(
+                        (e) => e.id == value.hfReferralModel?.projectFacilityId,
+                      ).first.facilityId}',
+                )
+              : localizations.translate(
+                  'FAC_${facilities.where((e) => e.boundaryCode ==
+                   ReferralReconSingleton().boundary?.boundaryCode).first.facilityId}',
+                ),
         ),
         validators: [Validators.required],
       ),
