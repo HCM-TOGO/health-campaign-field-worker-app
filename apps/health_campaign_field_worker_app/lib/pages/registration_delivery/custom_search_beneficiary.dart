@@ -702,16 +702,16 @@ class _CustomSearchBeneficiaryPageState
                           descriptionText +=
                               "\n ${localizations.translate(i18_local.beneficiaryDetails.spaq2DoseUnit)}";
                         }
-                        // if (blueVas == 0) {
-                        //   descriptionText +=
-                        //       "\n ${localizations.translate(i18_local.beneficiaryDetails.blueVasZeroQuantity)}";
-                        // }
-                        // if (redVas == 0) {
-                        //   descriptionText +=
-                        //       "\n ${localizations.translate(i18_local.beneficiaryDetails.redVasZeroQuantity)}";
-                        // }
+                        if (blueVas == 0) {
+                          descriptionText +=
+                              "\n ${localizations.translate(i18_local.beneficiaryDetails.blueVasZeroQuantity)}";
+                        }
+                        if (redVas == 0) {
+                          descriptionText +=
+                              "\n ${localizations.translate(i18_local.beneficiaryDetails.redVasZeroQuantity)}";
+                        }
 
-                        if ((spaq1 > 0 || spaq2 > 0)) {
+                        if ((spaq1 > 0 || spaq2 > 0 || blueVas > 0 || redVas > 0)) {
                           FocusManager.instance.primaryFocus?.unfocus();
                           context.read<DigitScannerBloc>().add(
                                 const DigitScannerEvent.handleScanner(),
@@ -737,7 +737,7 @@ class _CustomSearchBeneficiaryPageState
                                 Navigator.of(popupContext).pop(false);
                               },
                               description: descriptionText,
-                              type: PopUpType.simple,
+                              type: PopUpType.alert,
                               actions: [
                                 DigitButton(
                                   label: localizations.translate(
