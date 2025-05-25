@@ -12,7 +12,8 @@ import 'package:digit_ui_components/widgets/molecules/show_pop_up.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:intl/intl.dart';
-import 'package:inventory_management/inventory_management.dart';
+import 'package:inventory_management/inventory_management.dart'
+    hide CustomValidator;
 import 'package:inventory_management/router/inventory_router.gm.dart';
 import 'package:reactive_forms/reactive_forms.dart';
 
@@ -28,6 +29,7 @@ import 'package:inventory_management/widgets/component_wrapper/product_variant_b
 
 import '../../utils/constants.dart';
 import '../../utils/extensions/extensions.dart';
+import '../../utils/utils.dart' show CustomValidator;
 
 @RoutePage()
 class CustomStockReconciliationPage extends LocalizedStatefulWidget {
@@ -135,20 +137,20 @@ class CustomStockReconciliationPageState
                                           if (int.tryParse(form
                                                       .control(_manualCountKey)
                                                       .value) !=
-                                                  // ignore: avoid_dynamic_calls
                                                   stockState.stockInHand &&
                                               (form
-                                                      .control(
-                                                          _reconciliationCommentsKey)
-                                                      .value
-                                                      // ignore: avoid_dynamic_calls
-                                                      ?.isEmpty ||
+                                                          .control(
+                                                            _reconciliationCommentsKey,
+                                                          )
+                                                          .value ==
+                                                      null ||
                                                   form
                                                           .control(
-                                                              _reconciliationCommentsKey)
+                                                            _reconciliationCommentsKey,
+                                                          )
                                                           .value
-                                                          .trim() ==
-                                                      '')) {
+                                                          .length <
+                                                      2)) {
                                             // ignore: avoid_dynamic_calls
                                             DigitToast.show(
                                               context,

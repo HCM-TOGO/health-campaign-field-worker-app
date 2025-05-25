@@ -825,16 +825,6 @@ class _DynamicTabsPageState extends LocalizedState<DynamicTabsPage>
                       : localizations.translate(i18.common.coreCommonNext),
                 ),
                 const SizedBox(height: 12),
-                // DigitButton(
-                //   type: DigitButtonType.secondary,
-                //   size: DigitButtonSize.large,
-                //   onPressed: () {
-                //     // Secondary action if needed
-                //   },
-                //   label: localizations.translate(
-                //     i18.common.coreCommonCancel,
-                //   ),
-                // ),
               ],
             )
           ],
@@ -862,56 +852,70 @@ class _DynamicTabsPageState extends LocalizedState<DynamicTabsPage>
     final redVasCount = context.redVas;
 
     // Custom logic based on productName
-    if (productName == Constants.spaq1 && isSubtracted && ss > spaq1Count) {
-      await DigitToast.show(
-        context,
-        options: DigitToastOptions(
-            localizations.translate((entryType == StockRecordEntryType.dispatch)
-                ? i18_local.beneficiaryDetails.validationForExcessStockDispatch
-                : i18_local.beneficiaryDetails.validationForExcessStockReturn),
-            true,
-            theme),
-      );
-      return false;
-    } else if (productName == Constants.spaq2 &&
-        isSubtracted &&
-        ss > spaq2Count) {
-      await DigitToast.show(
-        context,
-        options: DigitToastOptions(
-            localizations.translate((entryType == StockRecordEntryType.dispatch)
-                ? i18_local.beneficiaryDetails.validationForExcessStockDispatch
-                : i18_local.beneficiaryDetails.validationForExcessStockReturn),
-            true,
-            theme),
-      );
-      return false;
-    } else if (productName == Constants.blueVAS &&
-        isSubtracted &&
-        ss > blueVasCount) {
-      await DigitToast.show(
-        context,
-        options: DigitToastOptions(
-            localizations.translate((entryType == StockRecordEntryType.dispatch)
-                ? i18_local.beneficiaryDetails.validationForExcessStockDispatch
-                : i18_local.beneficiaryDetails.validationForExcessStockReturn),
-            true,
-            theme),
-      );
-      return false;
-    } else if (productName == Constants.redVAS &&
-        isSubtracted &&
-        ss > redVasCount) {
-      await DigitToast.show(
-        context,
-        options: DigitToastOptions(
-            localizations.translate((entryType == StockRecordEntryType.dispatch)
-                ? i18_local.beneficiaryDetails.validationForExcessStockDispatch
-                : i18_local.beneficiaryDetails.validationForExcessStockReturn),
-            true,
-            theme),
-      );
-      return false;
+    if (InventorySingleton().isDistributor) {
+      if (productName == Constants.spaq1 && isSubtracted && ss > spaq1Count) {
+        await DigitToast.show(
+          context,
+          options: DigitToastOptions(
+              localizations.translate(
+                  (entryType == StockRecordEntryType.dispatch)
+                      ? i18_local
+                          .beneficiaryDetails.validationForExcessStockDispatch
+                      : i18_local
+                          .beneficiaryDetails.validationForExcessStockReturn),
+              true,
+              theme),
+        );
+        return false;
+      } else if (productName == Constants.spaq2 &&
+          isSubtracted &&
+          ss > spaq2Count) {
+        await DigitToast.show(
+          context,
+          options: DigitToastOptions(
+              localizations.translate(
+                  (entryType == StockRecordEntryType.dispatch)
+                      ? i18_local
+                          .beneficiaryDetails.validationForExcessStockDispatch
+                      : i18_local
+                          .beneficiaryDetails.validationForExcessStockReturn),
+              true,
+              theme),
+        );
+        return false;
+      } else if (productName == Constants.blueVAS &&
+          isSubtracted &&
+          ss > blueVasCount) {
+        await DigitToast.show(
+          context,
+          options: DigitToastOptions(
+              localizations.translate(
+                  (entryType == StockRecordEntryType.dispatch)
+                      ? i18_local
+                          .beneficiaryDetails.validationForExcessStockDispatch
+                      : i18_local
+                          .beneficiaryDetails.validationForExcessStockReturn),
+              true,
+              theme),
+        );
+        return false;
+      } else if (productName == Constants.redVAS &&
+          isSubtracted &&
+          ss > redVasCount) {
+        await DigitToast.show(
+          context,
+          options: DigitToastOptions(
+              localizations.translate(
+                  (entryType == StockRecordEntryType.dispatch)
+                      ? i18_local
+                          .beneficiaryDetails.validationForExcessStockDispatch
+                      : i18_local
+                          .beneficiaryDetails.validationForExcessStockReturn),
+              true,
+              theme),
+        );
+        return false;
+      }
     }
 
     _tabStocks[productName] = currentStock.copyWith(
@@ -970,8 +974,6 @@ class _DynamicTabsPageState extends LocalizedState<DynamicTabsPage>
             stockModel: currentStock,
           ),
         );
-
-    final isDistributor = context.isDistributor;
 
     return true;
   }
@@ -1083,15 +1085,6 @@ class _DynamicTabsPageState extends LocalizedState<DynamicTabsPage>
               redVasCount: redVasCount,
             ),
           );
-
-      //   Navigator.of(context).push(
-      //     MaterialPageRoute(
-      //       builder: (context) => CustomAcknowledgementPage(
-      //         mrnNumber: _sharedMRN,
-      //         stockRecords: _tabStocks.values.toList(),
-      //       ),
-      //     ),
-      //   );
     }
   }
 
