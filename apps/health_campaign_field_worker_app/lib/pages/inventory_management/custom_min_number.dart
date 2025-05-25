@@ -2,6 +2,7 @@ import 'dart:convert';
 import 'dart:io';
 
 import 'package:auto_route/auto_route.dart';
+import 'package:collection/collection.dart';
 import 'package:digit_data_model/data_model.dart';
 import 'package:digit_ui_components/digit_components.dart';
 import 'package:digit_ui_components/theme/digit_extended_theme.dart';
@@ -64,7 +65,8 @@ class CustomMinNumberPageState extends LocalizedState<CustomMinNumberPage> {
 
     final currentUserUuid = authState.userModel.uuid;
 
-    final result = await repository.search(StockSearchModel());
+    final result =
+        await repository.search(StockSearchModel(), context.loggedInUserUuid);
 
     String? transactionType;
     String? transactionReason;
@@ -112,8 +114,6 @@ class CustomMinNumberPageState extends LocalizedState<CustomMinNumberPage> {
 
     setState(() {
       stockList = filteredResult;
-
-      Logger().d("This is the stocklist ${stockList.last}");
     });
   }
 
@@ -142,140 +142,150 @@ class CustomMinNumberPageState extends LocalizedState<CustomMinNumberPage> {
     List<StockModel> finalStocks = [];
 
     return Scaffold(
-      bottomSheet: SizedBox(
-        child: DigitCard(
-          margin: const EdgeInsets.fromLTRB(0, spacer2, 0, 0),
+      body: GestureDetector(
+        onTap: () => FocusScope.of(context).unfocus(),
+        child: ScrollableContent(
+          header: const Column(
+            children: [
+              CustomBackNavigationHelpHeaderWidget(showHelp: false),
+            ],
+          ),
+          footer: SizedBox(
+            height: 130,
+            child: DigitCard(
+              margin: const EdgeInsets.fromLTRB(0, spacer2, 0, 0),
+              children: [
+                DigitButton(
+                  type: DigitButtonType.primary,
+                  mainAxisSize: MainAxisSize.max,
+                  size: DigitButtonSize.large,
+                  label: localizations.translate(
+                    i18.householdDetails.actionLabel,
+                  ),
+                  onPressed: () {
+                    if (selectedMRN != null && selectedStockList.isNotEmpty) {
+                      context.router.push(
+                        ViewStockRecordsRoute(
+                          mrnNumber: selectedMRN!,
+                          stockRecords: selectedStockList,
+                        ),
+                      );
+                    } else {
+                      ScaffoldMessenger.of(context).showSnackBar(
+                        SnackBar(
+                          content: Text(localizations.translate(
+                            i18_local.householdDetails.selectRecordErrorMsg,
+                          )),
+                          duration: Duration(seconds: 1),
+                        ),
+                      );
+                    }
+                  },
+                ),
+              ],
+            ),
+          ),
           children: [
-            DigitButton(
-              type: DigitButtonType.primary,
-              mainAxisSize: MainAxisSize.max,
-              size: DigitButtonSize.large,
-              label: localizations.translate(
-                i18.householdDetails.actionLabel,
+            Container(
+              decoration: BoxDecoration(
+                color: Colors.white,
+                borderRadius: BorderRadius.circular(spacer2),
               ),
-              onPressed: () {
-                if (selectedMRN != null && selectedStockList.isNotEmpty) {
-                  context.router.push(
-                    ViewStockRecordsRoute(
-                      mrnNumber: selectedMRN!,
-                      stockRecords: selectedStockList,
-                    ),
-                  );
-                } else {
-                  ScaffoldMessenger.of(context).showSnackBar(
-                    SnackBar(
-                      content: Text(localizations.translate(
-                        i18_local.householdDetails.selectRecordErrorMsg,
-                      )),
-                      duration: Duration(seconds: 1),
-                    ),
-                  );
-                }
-              },
+              margin: const EdgeInsets.all(spacer2),
+              child: Padding(
+                padding: const EdgeInsets.all(8.0),
+                child: groupedEntries.isEmpty
+                    ? const Center(child: Text("No transactions found."))
+                    : Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          const SizedBox(height: 16.0),
+                          Text("Select the MRN number",
+                              style: textTheme.headingL),
+                          const SizedBox(height: 16.0),
+                          SizedBox(
+                            height: MediaQuery.of(context).size.height * 0.65,
+                            child: ListView.builder(
+                              // reverse: true,
+                              itemCount: groupedEntries.length,
+                              itemBuilder: (context, index) {
+                                final mrn = groupedEntries[index].key;
+                                finalStocks = [];
+                                for (StockModel stockModel
+                                    in groupedEntries[index].value) {
+                                  finalStocks
+                                      .add(condenseStockObject(stockModel));
+                                }
+                                final stocks = groupedEntries[index].value;
+                                final isSelected = selectedMRN == mrn;
+                                final jsonStr = jsonEncode(finalStocks);
+
+                                final compressed =
+                                    zlib.encode(utf8.encode(jsonStr));
+                                final encoded = base64Url.encode(compressed);
+                                return Padding(
+                                  padding: const EdgeInsets.all(8.0),
+                                  child: GestureDetector(
+                                    onTap: () {
+                                      setState(() {
+                                        if (selectedMRN == mrn) {
+                                          selectedMRN = null;
+                                          selectedStockList = [];
+                                        } else {
+                                          selectedMRN = mrn;
+                                          selectedStockList = stocks;
+                                        }
+                                      });
+                                    },
+                                    child: MinNumberCard(
+                                      data: encoded,
+                                      entryType: widget.type,
+                                      minNumber: mrn,
+                                      cddCode: stocks
+                                              .first.additionalFields?.fields
+                                              .firstWhereOrNull((e) =>
+                                                  e.key == 'distributorName')
+                                              ?.value ??
+                                          "",
+                                      date: formatDateFromMillis(stocks.first
+                                              .auditDetails?.createdTime ??
+                                          0),
+                                      items: stocks.map((s) {
+                                        final name = (s.additionalFields?.fields
+                                                    .firstWhere(
+                                                        (f) =>
+                                                            f.key ==
+                                                            'productName',
+                                                        orElse: () =>
+                                                            const AdditionalField(
+                                                                '', ''))
+                                                    .value ??
+                                                'N/A')
+                                            .toString();
+                                        final quantity =
+                                            (s.quantity ?? 0).toString();
+                                        return {
+                                          'name': name,
+                                          'quantity': quantity,
+                                        };
+                                      }).toList(),
+                                      waybillNumber: InventorySingleton()
+                                              .isDistributor
+                                          ? null
+                                          : stocks.first.wayBillNumber ?? "",
+                                      isSelected: isSelected,
+                                    ),
+                                  ),
+                                );
+                              },
+                            ),
+                          ),
+                        ],
+                      ),
+              ),
             ),
           ],
         ),
-      ),
-      body: Column(
-        children: [
-          const CustomBackNavigationHelpHeaderWidget(showHelp: false),
-          Container(
-            decoration: BoxDecoration(
-              color: Colors.white,
-              borderRadius: BorderRadius.circular(spacer2),
-            ),
-            margin: const EdgeInsets.all(spacer2),
-            child: Padding(
-              padding: const EdgeInsets.all(8.0),
-              child: groupedEntries.isEmpty
-                  ? const Center(child: Text("No transactions found."))
-                  : Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        const SizedBox(height: 16.0),
-                        Text("Select the MRN number",
-                            style: textTheme.headingL),
-                        const SizedBox(height: 16.0),
-                        SizedBox(
-                          height: MediaQuery.of(context).size.height * 0.65,
-                          child: ListView.builder(
-                            // reverse: true,
-                            itemCount: groupedEntries.length,
-                            itemBuilder: (context, index) {
-                              final mrn = groupedEntries[index].key;
-                              finalStocks = [];
-                              for (StockModel stockModel
-                                  in groupedEntries[index].value) {
-                                finalStocks
-                                    .add(condenseStockObject(stockModel));
-                              }
-                              final stocks = groupedEntries[index].value;
-                              final isSelected = selectedMRN == mrn;
-                              final jsonStr = jsonEncode(finalStocks);
-
-                              final compressed =
-                                  zlib.encode(utf8.encode(jsonStr));
-                              final encoded = base64Url.encode(compressed);
-                              return Padding(
-                                padding: const EdgeInsets.all(8.0),
-                                child: GestureDetector(
-                                  onTap: () {
-                                    setState(() {
-                                      if (selectedMRN == mrn) {
-                                        selectedMRN = null;
-                                        selectedStockList = [];
-                                      } else {
-                                        selectedMRN = mrn;
-                                        selectedStockList = stocks;
-                                      }
-                                    });
-                                  },
-                                  child: MinNumberCard(
-                                    data: encoded,
-                                    minNumber: mrn,
-                                    cddCode: InventorySingleton()
-                                            .loggedInUser
-                                            ?.name ??
-                                        stocks.first.senderId ??
-                                        "",
-                                    date: formatDateFromMillis(stocks
-                                            .first.auditDetails?.createdTime ??
-                                        0),
-                                    items: stocks.map((s) {
-                                      final name = (s.additionalFields?.fields
-                                                  .firstWhere(
-                                                      (f) =>
-                                                          f.key ==
-                                                          'productName',
-                                                      orElse: () =>
-                                                          const AdditionalField(
-                                                              '', ''))
-                                                  .value ??
-                                              'N/A')
-                                          .toString();
-                                      final quantity =
-                                          (s.quantity ?? 0).toString();
-                                      return {
-                                        'name': name,
-                                        'quantity': quantity,
-                                      };
-                                    }).toList(),
-                                    waybillNumber:
-                                        InventorySingleton().isDistributor
-                                            ? null
-                                            : stocks.first.wayBillNumber ?? "",
-                                    isSelected: isSelected,
-                                  ),
-                                ),
-                              );
-                            },
-                          ),
-                        ),
-                      ],
-                    ),
-            ),
-          ),
-        ],
       ),
     );
   }

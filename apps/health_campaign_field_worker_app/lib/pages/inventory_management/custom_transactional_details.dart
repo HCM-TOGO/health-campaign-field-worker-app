@@ -662,7 +662,7 @@ class CustomTransactionalDetailsPageState
                                                             quantity.toString(),
                                                           ),
                                                           AdditionalField(
-                                                            'partial_quantity',
+                                                            'partialBlistersReturned',
                                                             partialQuantity
                                                                 .toString(),
                                                           ),

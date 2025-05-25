@@ -14,7 +14,6 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:intl/intl.dart';
 import 'package:inventory_management/inventory_management.dart';
 import 'package:inventory_management/router/inventory_router.gm.dart';
-import 'package:inventory_management/utils/extensions/extensions.dart';
 import 'package:reactive_forms/reactive_forms.dart';
 
 import 'package:inventory_management/utils/i18_key_constants.dart' as i18;
@@ -26,6 +25,9 @@ import 'package:inventory_management/blocs/stock_reconciliation.dart';
 import 'package:inventory_management/widgets/back_navigation_help_header.dart';
 import 'package:inventory_management/widgets/component_wrapper/facility_bloc_wrapper.dart';
 import 'package:inventory_management/widgets/component_wrapper/product_variant_bloc_wrapper.dart';
+
+import '../../utils/constants.dart';
+import '../../utils/extensions/extensions.dart';
 
 @RoutePage()
 class CustomStockReconciliationPage extends LocalizedStatefulWidget {
@@ -91,10 +93,10 @@ class CustomStockReconciliationPageState
                     dateOfReconciliation: DateTime.now(),
                   ),
                   stockRepository:
-                      context.repository<StockModel, StockSearchModel>(context),
+                      context.repository<StockModel, StockSearchModel>(),
                   stockReconciliationRepository: context.repository<
                       StockReconciliationModel,
-                      StockReconciliationSearchModel>(context),
+                      StockReconciliationSearchModel>(),
                 ),
                 child: BlocConsumer<StockReconciliationBloc,
                     StockReconciliationState>(
@@ -224,20 +226,26 @@ class CustomStockReconciliationPageState
                                             auditDetails: AuditDetails(
                                               createdBy: InventorySingleton()
                                                   .loggedInUserUuid,
-                                              createdTime: context
-                                                  .millisecondsSinceEpoch(),
+                                              createdTime:
+                                                  ContextUtilityExtensions(
+                                                          context)
+                                                      .millisecondsSinceEpoch(),
                                             ),
                                             clientAuditDetails:
                                                 ClientAuditDetails(
                                               createdBy: InventorySingleton()
                                                   .loggedInUserUuid,
-                                              createdTime: context
-                                                  .millisecondsSinceEpoch(),
+                                              createdTime:
+                                                  ContextUtilityExtensions(
+                                                          context)
+                                                      .millisecondsSinceEpoch(),
                                               lastModifiedBy:
                                                   InventorySingleton()
                                                       .loggedInUserUuid,
-                                              lastModifiedTime: context
-                                                  .millisecondsSinceEpoch(),
+                                              lastModifiedTime:
+                                                  ContextUtilityExtensions(
+                                                          context)
+                                                      .millisecondsSinceEpoch(),
                                             ),
                                           );
 
@@ -341,6 +349,66 @@ class CustomStockReconciliationPageState
                                                 ),
                                             fetched:
                                                 (facilities, allFacilities) {
+                                              if (context.selectedProject
+                                                      .address?.boundaryType ==
+                                                  Constants
+                                                      .stateBoundaryLevel) {
+                                                List<FacilityModel>
+                                                    filteredFacilities =
+                                                    facilities
+                                                        .where(
+                                                          (element) =>
+                                                              element.usage ==
+                                                              Constants
+                                                                  .stateFacility,
+                                                        )
+                                                        .toList();
+                                                facilities =
+                                                    filteredFacilities.isEmpty
+                                                        ? facilities
+                                                        : filteredFacilities;
+                                              } else if (context.selectedProject
+                                                      .address?.boundaryType ==
+                                                  Constants.lgaBoundaryLevel) {
+                                                List<FacilityModel>
+                                                    filteredFacilities =
+                                                    facilities
+                                                        .where(
+                                                          (element) =>
+                                                              element.usage ==
+                                                              Constants
+                                                                  .lgaFacility,
+                                                        )
+                                                        .toList();
+                                                facilities =
+                                                    filteredFacilities.isEmpty
+                                                        ? facilities
+                                                        : filteredFacilities;
+                                              } else {
+                                                List<FacilityModel>
+                                                    filteredFacilities =
+                                                    facilities
+                                                        .where(
+                                                          (element) =>
+                                                              element.usage ==
+                                                              Constants
+                                                                  .healthFacility,
+                                                        )
+                                                        .toList();
+                                                facilities =
+                                                    filteredFacilities.isEmpty
+                                                        ? facilities
+                                                        : filteredFacilities;
+                                              }
+                                              final teamFacilities = [
+                                                FacilityModel(
+                                                  id: 'Delivery Team',
+                                                  name: 'Delivery Team',
+                                                ),
+                                              ];
+                                              teamFacilities.addAll(
+                                                facilities,
+                                              );
                                               return Column(
                                                 children: [
                                                   InkWell(

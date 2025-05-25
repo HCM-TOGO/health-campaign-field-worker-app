@@ -1,13 +1,17 @@
 import 'dart:convert';
 import 'dart:io';
+import 'package:collection/collection.dart';
 import 'package:digit_data_model/data_model.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:inventory_management/models/entities/transaction_reason.dart';
+import 'package:inventory_management/models/entities/transaction_type.dart';
 import 'package:logger/logger.dart';
 import 'package:mobile_scanner/mobile_scanner.dart';
 import 'package:inventory_management/blocs/record_stock.dart';
 import 'package:inventory_management/models/entities/stock.dart';
 import 'package:inventory_management/widgets/localized.dart';
+import '../../data/repositories/local/inventory_management/custom_stock.dart';
 import '../../router/app_router.dart';
 import '../../utils/extensions/extensions.dart';
 import 'package:digit_components/widgets/digit_dialog.dart' as dialog;
@@ -43,6 +47,13 @@ class _QRScannerPageState extends LocalizedState<QRScannerPage> {
 
     Logger().d('📦 Scanned: $code');
 
+    final repository =
+        context.read<LocalRepository<StockModel, StockSearchModel>>()
+            as CustomStockLocalRepository;
+
+    List<StockModel> receivedResult;
+    List<StockModel> result = [];
+
     try {
       // if (!Platform.isAndroid && !Platform.isIOS && code == 'test') {
       //   code = _generateTestQRData();
@@ -52,25 +63,46 @@ class _QRScannerPageState extends LocalizedState<QRScannerPage> {
       final decompressed = utf8.decode(zlib.decode(compressed));
       final decodedJson = jsonDecode(decompressed);
       Logger().d('📦 Decompressed: $decodedJson');
-
       List<StockModel> stockList = [];
+
+      final mrnNumber = stockList.first.additionalFields?.fields
+              .firstWhere(
+                (field) => field.key == 'materialNoteNumber',
+                orElse: () => const AdditionalField('materialNoteNumber', ''),
+              )
+              .value
+              ?.toString() ??
+          'N/A';
+
+      receivedResult = await repository.search(StockSearchModel(
+          transactionType: [TransactionType.received.toValue()],
+          transactionReason: [TransactionReason.received.toValue()],
+          receiverId: [context.loggedInUserUuid]));
+
+      for (StockModel stockModel in receivedResult) {
+        String minStock = stockModel.additionalFields?.fields
+                .firstWhere(
+                  (field) => field.key == 'materialNoteNumber',
+                  orElse: () => const AdditionalField('materialNoteNumber', ''),
+                )
+                .value
+                ?.toString() ??
+            'N/A';
+        if (minStock == mrnNumber) {
+          _showError('Stock already received');
+          return;
+        }
+      }
+
       for (String item in decodedJson) {
         StockModel model = StockModelMapper.fromJson(item);
         if (model.receiverId != context.loggedInUserUuid) {
           _showError('This QR code is not applicable for your account');
           return;
         }
+        // dssfsf
         stockList.add(model);
       }
-
-      final mrnNumber = stockList.first.additionalFields?.fields
-            .firstWhere(
-              (field) => field.key == 'materialNoteNumber',
-              orElse: () => const AdditionalField('materialNoteNumber', ''),
-            )
-            .value
-            ?.toString() ??
-        'N/A';
 
       if (stockList.isNotEmpty) {
         final shouldSubmit = await dialog.DigitDialog.show<bool>(

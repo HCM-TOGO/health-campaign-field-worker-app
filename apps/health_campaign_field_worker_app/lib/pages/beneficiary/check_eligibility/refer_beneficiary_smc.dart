@@ -191,6 +191,9 @@ class CustomReferBeneficiarySMCPageState
                                     if (submit == null || !submit) {
                                       return;
                                     }
+                                    if (healthFacilities.isEmpty) {
+                                      return;
+                                    }
                                     clickedStatus.value = true;
                                     final reason = reasons.first;
 
@@ -232,7 +235,8 @@ class CustomReferBeneficiarySMCPageState
                                               referralReasons,
                                               reasons.join(","),
                                             ),
-                                            const AdditionalField('referralType', 'smcReferred')
+                                            const AdditionalField(
+                                                'referralType', 'smcReferred')
                                           ],
                                         ),
                                       ),
@@ -387,7 +391,8 @@ class CustomReferBeneficiarySMCPageState
                           ),
                           Column(children: [
                             DigitDateFormPicker(
-                              margin: const EdgeInsets.symmetric(vertical: spacer2),
+                              margin:
+                                  const EdgeInsets.symmetric(vertical: spacer2),
                               isEnabled: false,
                               formControlName: _dateOfReferralKey,
                               label: localizations.translate(
@@ -459,12 +464,15 @@ class CustomReferBeneficiarySMCPageState
         validators: [Validators.required],
       ),
       _referredToKey: FormControl<String>(
-        value: healthFacilities
-            .where((e) =>
-                e.boundaryCode == context.loggedInUserModel?.boundaryCode)
-            .first
-            .id
-            .toString(),
+        value: healthFacilities.isNotEmpty
+            ? localizations.translate('FAC_${healthFacilities.first.id}')
+            : null,
+        // value: healthFacilities
+        //     .where((e) =>
+        //         e.boundaryCode == context.loggedInUserModel?.boundaryCode)
+        //     .first
+        //     .id
+        //     .toString(),
         validators: [
           Validators.required,
         ],

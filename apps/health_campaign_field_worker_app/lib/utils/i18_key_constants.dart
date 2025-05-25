@@ -22,6 +22,7 @@ const individualDetails = IndividualDetails();
 const beneficiaryDetails = BeneficiaryDetails();
 const stockDetails = StockDetails();
 const inventoryReportDetails = InventoryReportDetails();
+const stockReconciliationDetails = StockReconciliationDetails();
 
 const selectStockShowcase = SelectStockShowcase();
 const warehouseDetailsShowcase = WarehouseDetailsShowcase();
@@ -72,6 +73,9 @@ class Common {
   String get coreCommonReasonRequired => 'CORE_COMMON_REASON_REQUIRED';
 
   String get coreCommonOthersRequired => 'CORE_COMMON_OTHERS_REQUIRED';
+
+  String get coreCommonConsentReasonRequired =>
+      'CORE_COMMON_CONSENT_REASON_REQUIRED';
 
   String get corecommonclose => 'CORE_COMMON_CLOSE';
 
@@ -447,7 +451,12 @@ class HomeShowcase {
 class StockDetails {
   const StockDetails();
 
+  String get selectTransactingPartyReturnedFrom =>
+      'STOCK_DETAILS_RETURNED_FROM';
+
   String get cddCodeLabel => 'CDD_CODE_LABEL';
+
+  String get returnedTo => 'STOCK_DETAILS_RETURNED_TO';
 
   String get quantityCapsuleReceivedLabel =>
       'STOCK_DETAILS_CAPSULE_QUANTITY_RECEIVED';
@@ -497,6 +506,12 @@ class StockDetails {
 
   String get recordStockReturnedDescription =>
       'STOCK_DETAILS_RECORD_STOCK_RETURNED_DESCRIPTION';
+}
+
+class StockReconciliationDetails {
+  const StockReconciliationDetails();
+
+  String get commentRequiredError => 'RECONCILIATION_COMMENT_IS_REQUIRED';
 }
 
 class InventoryReportDetails {
@@ -1344,7 +1359,8 @@ class BeneficiaryDetails {
 
   String get validationForExcessStockDispatch =>
       "ERROR_VALIDATION_FOR_EXCESS_STOCK_DISPATCH";
-  String get searchbybeneficiaryidtextupdate => 'SEARCH_BY_BENEFICIARY_ID_TEXT_UPDATE';
+  String get searchbybeneficiaryidtextupdate =>
+      'SEARCH_BY_BENEFICIARY_ID_TEXT_UPDATE';
   String get validationForExcessStockReturn =>
       "ERROR_VALIDATION_FOR_EXCESS_STOCK_RETURN";
   String get errorHeader => "ERROR_VALIDATION_HEADER";
@@ -1445,6 +1461,7 @@ class BeneficiaryDetails {
   String get recordCycle => 'BENEFICIARY_DETAILS_RECORD_CYCLE';
 
   String get currentSmcCycleLabel => 'BENEFICIARY_DETAILS_CURRENT_SMC_CYCLE';
+  String get noHealthFacilityError => 'NO_HEALTH_FACILITY_ERROR';
 }
 
 class PrivacyPolicy {

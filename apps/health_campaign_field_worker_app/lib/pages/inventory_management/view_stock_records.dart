@@ -13,6 +13,9 @@ import '../../utils/i18_key_constants.dart' as i18_local;
 import 'package:inventory_management/utils/utils.dart';
 import 'package:registration_delivery/widgets/localized.dart';
 
+import '../../utils/extensions/extensions.dart';
+import '../../utils/utils.dart';
+
 @RoutePage()
 class ViewStockRecordsPage extends LocalizedStatefulWidget {
   final String mrnNumber;
@@ -197,10 +200,17 @@ class _ViewStockRecordsPageState extends LocalizedState<ViewStockRecordsPage>
                   const SizedBox(height: 8),
                   Row(
                     children: [
-                      const Expanded(child: Text('Received From')),
+                      // const Expanded(child: Text('Received From')),
                       Expanded(
-                          child: Text(localizations
-                              .translate('FAC_$senderIdToShowOnTab'))),
+                        //     child: Text(localizations
+                        //         .translate('FAC_$senderIdToShowOnTab'))),
+                        child: Text(localizations.translate(getEntryTypeLabel(
+                            widget.stockRecords.firstOrNull))),
+                      ),
+                      Expanded(
+                          child: Text(localizations.translate(
+                              getSecondaryPartyValue(
+                                  widget.stockRecords.firstOrNull)))),
                     ],
                   ),
                 ],
@@ -300,11 +310,9 @@ class _ViewStockRecordsPageState extends LocalizedState<ViewStockRecordsPage>
                                 '${localizations.translate(partiallyUsedQuantityCountLabel)} *',
                             initialValue: (stock.additionalFields?.fields ?? [])
                                     .firstWhere(
-                                      (e) =>
-                                          e.key ==
-                                          "partiallyUsedBlistersReturned",
+                                      (e) => e.key == "partialBlistersReturned",
                                       orElse: () => const AdditionalField(
-                                          'partiallyUsedBlistersReturned', ''),
+                                          'partialBlistersReturned', ''),
                                     )
                                     .value
                                     ?.toString() ??
