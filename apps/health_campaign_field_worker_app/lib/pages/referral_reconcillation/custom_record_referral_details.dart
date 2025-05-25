@@ -17,12 +17,14 @@ import 'package:referral_reconciliation/utils/extensions/extensions.dart';
 import 'package:survey_form/survey_form.dart';
 
 import 'package:referral_reconciliation/utils/i18_key_constants.dart' as i18;
+import '../../utils/i18_key_constants.dart' as i18_local;
 import 'package:referral_reconciliation/blocs/referral_recon_record.dart';
 import 'package:referral_reconciliation/blocs/referral_recon_service_definition.dart';
 import 'package:referral_reconciliation/models/entities/hf_referral.dart';
 import 'package:referral_reconciliation/utils/utils.dart';
 import 'package:referral_reconciliation/widgets/localized.dart';
 import '../../router/app_router.dart';
+import '../../widgets/registration_delivery/custom_labeled_field.dart';
 
 @RoutePage()
 class CustomRecordReferralDetailsPage extends LocalizedStatefulWidget {
@@ -152,8 +154,7 @@ class _CustomRecordReferralDetailsPageState
                                                         .control(
                                                             _referralReason)
                                                         .setErrors({'': true});
-                                                  }
-                                                  else if (form
+                                                  } else if (form
                                                           .control(
                                                               _beneficiaryIdKey)
                                                           .value ==
@@ -164,7 +165,7 @@ class _CustomRecordReferralDetailsPageState
                                                             _beneficiaryIdKey)
                                                         .setErrors({'': true});
                                                   }
-                                                  
+
                                                   form.markAllAsTouched();
 
                                                   if (viewOnly) {
@@ -823,12 +824,11 @@ class _CustomRecordReferralDetailsPageState
                                               control.invalid &&
                                               control.touched,
                                           builder: (field) {
-                                            return LabeledField(
+                                            return CustomLabeledField(
                                               isRequired: true,
                                               label: localizations.translate(
-                                                i18.referralReconciliation
-                                                    .beneficiaryIdLabel,
-                                              ),
+                                                  i18_local.beneficiaryDetails
+                                                      .beneficiaryId).toString(),
                                               child: DigitTextFormInput(
                                                 onChange: (val) => {
                                                   form

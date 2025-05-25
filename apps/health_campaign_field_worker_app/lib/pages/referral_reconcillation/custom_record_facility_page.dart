@@ -88,7 +88,7 @@ class _CustomReferralFacilityPageState
                     e.boundaryCode ==
                     ReferralReconSingleton().boundary?.boundaryCode)
                 .first
-                .id
+                .facilityId
                 .toString();
 
             return facilities.isNotEmpty
@@ -479,12 +479,13 @@ class _CustomReferralFacilityPageState
         value: referralState.mapOrNull(
           create: (value) => value.viewOnly
               ? localizations.translate(
-                  'PJ_FAC_${facilities.where(
+                  'FAC_${facilities.where(
                         (e) => e.id == value.hfReferralModel?.projectFacilityId,
-                      ).first.id.toString()}',
+                      ).first.facilityId}',
                 )
               : localizations.translate(
-                  'PJ_FAC_${facilities.where((e) => e.boundaryCode == ReferralReconSingleton().boundary?.boundaryCode).first.id.toString()}',
+                  'FAC_${facilities.where((e) => e.boundaryCode ==
+                   ReferralReconSingleton().boundary?.boundaryCode).first.facilityId}',
                 ),
         ),
         validators: [Validators.required],
