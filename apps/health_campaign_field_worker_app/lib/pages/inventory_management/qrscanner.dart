@@ -155,7 +155,7 @@ class _QRScannerPageState extends LocalizedState<QRScannerPage> {
   Widget build(BuildContext context) {
     return Scaffold(
         appBar: AppBar(
-          title: Text(localizations.translate('qr_scanner_title')),
+          title: Text(localizations.translate('Scan QR Code')),
           actions: [
             IconButton(
               icon: const Icon(Icons.flash_on),
