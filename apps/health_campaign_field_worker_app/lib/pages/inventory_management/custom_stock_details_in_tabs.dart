@@ -852,71 +852,71 @@ class _DynamicTabsPageState extends LocalizedState<DynamicTabsPage>
     final redVasCount = context.redVas;
 
     // Custom logic based on productName
-    if (InventorySingleton().isDistributor) {
-      if (productName == Constants.spaq1 && isSubtracted && ss > spaq1Count) {
-        await DigitToast.show(
-          context,
-          options: DigitToastOptions(
-              localizations.translate(
-                  (entryType == StockRecordEntryType.dispatch)
-                      ? i18_local
-                          .beneficiaryDetails.validationForExcessStockDispatch
-                      : i18_local
-                          .beneficiaryDetails.validationForExcessStockReturn),
-              true,
-              theme),
-        );
-        return false;
-      } else if (productName == Constants.spaq2 &&
-          isSubtracted &&
-          ss > spaq2Count) {
-        await DigitToast.show(
-          context,
-          options: DigitToastOptions(
-              localizations.translate(
-                  (entryType == StockRecordEntryType.dispatch)
-                      ? i18_local
-                          .beneficiaryDetails.validationForExcessStockDispatch
-                      : i18_local
-                          .beneficiaryDetails.validationForExcessStockReturn),
-              true,
-              theme),
-        );
-        return false;
-      } else if (productName == Constants.blueVAS &&
-          isSubtracted &&
-          ss > blueVasCount) {
-        await DigitToast.show(
-          context,
-          options: DigitToastOptions(
-              localizations.translate(
-                  (entryType == StockRecordEntryType.dispatch)
-                      ? i18_local
-                          .beneficiaryDetails.validationForExcessStockDispatch
-                      : i18_local
-                          .beneficiaryDetails.validationForExcessStockReturn),
-              true,
-              theme),
-        );
-        return false;
-      } else if (productName == Constants.redVAS &&
-          isSubtracted &&
-          ss > redVasCount) {
-        await DigitToast.show(
-          context,
-          options: DigitToastOptions(
-              localizations.translate(
-                  (entryType == StockRecordEntryType.dispatch)
-                      ? i18_local
-                          .beneficiaryDetails.validationForExcessStockDispatch
-                      : i18_local
-                          .beneficiaryDetails.validationForExcessStockReturn),
-              true,
-              theme),
-        );
-        return false;
-      }
-    }
+    // if (entryType == StockRecordEntryType.dispatch) {
+    //   if (productName == Constants.spaq1 && isSubtracted && ss > spaq1Count) {
+    //     await DigitToast.show(
+    //       context,
+    //       options: DigitToastOptions(
+    //           localizations.translate(
+    //               (entryType == StockRecordEntryType.dispatch)
+    //                   ? i18_local
+    //                       .beneficiaryDetails.validationForExcessStockDispatch
+    //                   : i18_local
+    //                       .beneficiaryDetails.validationForExcessStockReturn),
+    //           true,
+    //           theme),
+    //     );
+    //     return false;
+    //   } else if (productName == Constants.spaq2 &&
+    //       isSubtracted &&
+    //       ss > spaq2Count) {
+    //     await DigitToast.show(
+    //       context,
+    //       options: DigitToastOptions(
+    //           localizations.translate(
+    //               (entryType == StockRecordEntryType.dispatch)
+    //                   ? i18_local
+    //                       .beneficiaryDetails.validationForExcessStockDispatch
+    //                   : i18_local
+    //                       .beneficiaryDetails.validationForExcessStockReturn),
+    //           true,
+    //           theme),
+    //     );
+    //     return false;
+    //   } else if (productName == Constants.blueVAS &&
+    //       isSubtracted &&
+    //       ss > blueVasCount) {
+    //     await DigitToast.show(
+    //       context,
+    //       options: DigitToastOptions(
+    //           localizations.translate(
+    //               (entryType == StockRecordEntryType.dispatch)
+    //                   ? i18_local
+    //                       .beneficiaryDetails.validationForExcessStockDispatch
+    //                   : i18_local
+    //                       .beneficiaryDetails.validationForExcessStockReturn),
+    //           true,
+    //           theme),
+    //     );
+    //     return false;
+    //   } else if (productName == Constants.redVAS &&
+    //       isSubtracted &&
+    //       ss > redVasCount) {
+    //     await DigitToast.show(
+    //       context,
+    //       options: DigitToastOptions(
+    //           localizations.translate(
+    //               (entryType == StockRecordEntryType.dispatch)
+    //                   ? i18_local
+    //                       .beneficiaryDetails.validationForExcessStockDispatch
+    //                   : i18_local
+    //                       .beneficiaryDetails.validationForExcessStockReturn),
+    //           true,
+    //           theme),
+    //     );
+    //     return false;
+    //   }
+    // }
 
     _tabStocks[productName] = currentStock.copyWith(
       quantity: form.control(_transactionQuantityKey).value?.toString() != "0"
@@ -1013,11 +1013,11 @@ class _DynamicTabsPageState extends LocalizedState<DynamicTabsPage>
               Navigator.of(
                 popupContext,
               ).pop(true);
-              (context.router.parent() as StackRouter).maybePop();
-              context.router.push(CustomAcknowledgementRoute(
-                  mrnNumber: _sharedMRN,
-                  stockRecords: _tabStocks.values.toList(),
-                  entryType: entryType));
+              // (context.router.parent() as StackRouter).maybePop();
+              // context.router.push(CustomAcknowledgementRoute(
+              //     mrnNumber: _sharedMRN,
+              //     stockRecords: _tabStocks.values.toList(),
+              //     entryType: entryType));
             },
             type: DigitButtonType.primary,
             size: DigitButtonSize.large,
@@ -1044,8 +1044,102 @@ class _DynamicTabsPageState extends LocalizedState<DynamicTabsPage>
 
       int blueVasCount = 0;
       int redVasCount = 0;
+
+      int currentSpaq1Count = context.spaq1;
+      int currentSpaq2Count = context.spaq2;
+      int currentBlueVasCount = context.blueVas;
+      int currentRedVasCount = context.redVas;
+
       // Loop through all stocks and dispatch individual events
       for (final stockModel in _tabStocks.values) {
+        final ss = int.parse(stockModel.quantity.toString());
+
+        int quantityWasted = int.parse(stockModel.additionalFields?.fields
+                .firstWhereOrNull(
+                    (element) => element.key == 'wastedBlistersReturned')
+                ?.value
+                ?.toString() ??
+            '0');
+
+        final totalQty =
+            ((entryType == StockRecordEntryType.dispatch) ? ss * -1 : ss) -
+                quantityWasted;
+
+        String? productName = stockModel.additionalFields?.fields
+            .firstWhereOrNull((element) => element.key == 'productName')
+            ?.value;
+
+        // Accumulate quantities based on product
+        if (productName == Constants.spaq1) {
+          spaq1Count = totalQty;
+        } else if (productName == Constants.spaq2) {
+          spaq2Count = totalQty;
+        } else if (productName == Constants.blueVAS) {
+          blueVasCount = totalQty;
+        } else if (productName == Constants.redVAS) {
+          redVasCount = totalQty;
+        }
+
+        if (entryType == StockRecordEntryType.dispatch) {
+          if (productName == Constants.spaq1 &&
+              (currentSpaq1Count + totalQty < 0)) {
+            await DigitToast.show(
+              context,
+              options: DigitToastOptions(
+                  localizations.translate(context.isCDD
+                      ? i18_local
+                          .beneficiaryDetails.validationForExcessStockReturn
+                      : i18_local
+                          .beneficiaryDetails.validationForExcessStockDispatch),
+                  true,
+                  theme),
+            );
+            return;
+          } else if (productName == Constants.spaq2 &&
+              (currentSpaq2Count + totalQty < 0)) {
+            await DigitToast.show(
+              context,
+              options: DigitToastOptions(
+                  localizations.translate(context.isCDD
+                      ? i18_local
+                          .beneficiaryDetails.validationForExcessStockReturn
+                      : i18_local
+                          .beneficiaryDetails.validationForExcessStockDispatch),
+                  true,
+                  theme),
+            );
+            return;
+          } else if (productName == Constants.blueVAS &&
+              (currentBlueVasCount + totalQty < 0)) {
+            await DigitToast.show(
+              context,
+              options: DigitToastOptions(
+                  localizations.translate(context.isCDD
+                      ? i18_local
+                          .beneficiaryDetails.validationForExcessStockReturn
+                      : i18_local
+                          .beneficiaryDetails.validationForExcessStockDispatch),
+                  true,
+                  theme),
+            );
+            return;
+          } else if (productName == Constants.redVAS &&
+              (currentRedVasCount + totalQty < 0)) {
+            await DigitToast.show(
+              context,
+              options: DigitToastOptions(
+                  localizations.translate(context.isCDD
+                      ? i18_local
+                          .beneficiaryDetails.validationForExcessStockReturn
+                      : i18_local
+                          .beneficiaryDetails.validationForExcessStockDispatch),
+                  true,
+                  theme),
+            );
+            return;
+          }
+        }
+
         context.read<RecordStockBloc>().add(
               RecordStockSaveStockDetailsEvent(
                 stockModel: stockModel,
@@ -1054,27 +1148,6 @@ class _DynamicTabsPageState extends LocalizedState<DynamicTabsPage>
         context.read<RecordStockBloc>().add(
               const RecordStockCreateStockEntryEvent(),
             );
-
-        final ss = int.parse(stockModel.quantity.toString());
-        final totalQty = (entryType == StockRecordEntryType.dispatch ||
-                entryType == StockRecordEntryType.returned)
-            ? ss * -1
-            : ss;
-
-        String? productName = stockModel.additionalFields?.fields
-            .firstWhereOrNull((element) => element.key == 'productName')
-            ?.value;
-
-        // Accumulate quantities based on product
-        if (productName == Constants.spaq1) {
-          spaq1Count += totalQty;
-        } else if (productName == Constants.spaq2) {
-          spaq2Count += totalQty;
-        } else if (productName == Constants.blueVAS) {
-          blueVasCount += totalQty;
-        } else if (productName == Constants.redVAS) {
-          redVasCount += totalQty;
-        }
       }
 
       context.read<AuthBloc>().add(
@@ -1085,6 +1158,13 @@ class _DynamicTabsPageState extends LocalizedState<DynamicTabsPage>
               redVasCount: redVasCount,
             ),
           );
+
+      (context.router.parent() as StackRouter).maybePop();
+
+      context.router.push(CustomAcknowledgementRoute(
+          mrnNumber: _sharedMRN,
+          stockRecords: _tabStocks.values.toList(),
+          entryType: entryType));
     }
   }
 
