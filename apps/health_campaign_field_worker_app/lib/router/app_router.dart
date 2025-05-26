@@ -98,6 +98,7 @@ import '../pages/checklist/custom_survey_form_preview.dart';
 import '../pages/checklist/custom_survey_form_boundary_view.dart';
 import '../pages/checklist/custom_survey_form_acknowledgement.dart';
 import '../pages/checklist/custom_survey_form_wrapper.dart';
+import '../pages/beneficiary/check_eligibility/zero_dose_check.dart';
 
 part 'app_router.gr.dart';
 
@@ -436,6 +437,10 @@ class AppRouter extends _$AppRouter {
                   RedirectRoute(
                     path: 'delivery-summary',
                     redirectTo: 'custom-delivery-summary',
+                  ),
+                  AutoRoute(
+                    page: ZeroDoseCheckRoute.page,
+                    path: 'zero-dose-check',
                   ),
                 ],
               ),

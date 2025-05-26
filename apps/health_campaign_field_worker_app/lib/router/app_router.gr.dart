@@ -150,13 +150,13 @@ abstract class _$AppRouter extends RootStackRouter {
       );
     },
     CustomDeliverySummaryRoute.name: (routeData) {
-      final args = routeData.argsAs<CustomDeliverySummaryRouteArgs>(
-          orElse: () => const CustomDeliverySummaryRouteArgs());
+      final args = routeData.argsAs<CustomDeliverySummaryRouteArgs>();
       return AutoRoutePage<dynamic>(
         routeData: routeData,
         child: CustomDeliverySummaryPage(
           key: args.key,
           appLocalizations: args.appLocalizations,
+          eligibilityAssessmentType: args.eligibilityAssessmentType,
         ),
       );
     },
@@ -705,6 +705,7 @@ abstract class _$AppRouter extends RootStackRouter {
         routeData: routeData,
         child: ViewAllTransactionsScreen(
           key: args.key,
+          appLocalizations: args.appLocalizations,
           warehouseId: args.warehouseId,
         ),
       );
@@ -750,6 +751,18 @@ abstract class _$AppRouter extends RootStackRouter {
       return AutoRoutePage<dynamic>(
         routeData: routeData,
         child: const ViewTransactionsScreen(),
+      );
+    },
+    ZeroDoseCheckRoute.name: (routeData) {
+      final args = routeData.argsAs<ZeroDoseCheckRouteArgs>();
+      return AutoRoutePage<dynamic>(
+        routeData: routeData,
+        child: ZeroDoseCheckPage(
+          key: args.key,
+          appLocalizations: args.appLocalizations,
+          eligibilityAssessmentType: args.eligibilityAssessmentType,
+          isEditing: args.isEditing,
+        ),
       );
     },
     ...InventoryRoute().pagesMap,
@@ -1259,12 +1272,14 @@ class CustomDeliverySummaryRoute
   CustomDeliverySummaryRoute({
     Key? key,
     RegistrationDeliveryLocalization? appLocalizations,
+    required EligibilityAssessmentType eligibilityAssessmentType,
     List<PageRouteInfo>? children,
   }) : super(
           CustomDeliverySummaryRoute.name,
           args: CustomDeliverySummaryRouteArgs(
             key: key,
             appLocalizations: appLocalizations,
+            eligibilityAssessmentType: eligibilityAssessmentType,
           ),
           initialChildren: children,
         );
@@ -1279,15 +1294,18 @@ class CustomDeliverySummaryRouteArgs {
   const CustomDeliverySummaryRouteArgs({
     this.key,
     this.appLocalizations,
+    required this.eligibilityAssessmentType,
   });
 
   final Key? key;
 
   final RegistrationDeliveryLocalization? appLocalizations;
 
+  final EligibilityAssessmentType eligibilityAssessmentType;
+
   @override
   String toString() {
-    return 'CustomDeliverySummaryRouteArgs{key: $key, appLocalizations: $appLocalizations}';
+    return 'CustomDeliverySummaryRouteArgs{key: $key, appLocalizations: $appLocalizations, eligibilityAssessmentType: $eligibilityAssessmentType}';
   }
 }
 
@@ -3270,12 +3288,14 @@ class ViewAllTransactionsRoute
     extends PageRouteInfo<ViewAllTransactionsRouteArgs> {
   ViewAllTransactionsRoute({
     Key? key,
+    AppLocalizations? appLocalizations,
     required String? warehouseId,
     List<PageRouteInfo>? children,
   }) : super(
           ViewAllTransactionsRoute.name,
           args: ViewAllTransactionsRouteArgs(
             key: key,
+            appLocalizations: appLocalizations,
             warehouseId: warehouseId,
           ),
           initialChildren: children,
@@ -3290,16 +3310,19 @@ class ViewAllTransactionsRoute
 class ViewAllTransactionsRouteArgs {
   const ViewAllTransactionsRouteArgs({
     this.key,
+    this.appLocalizations,
     required this.warehouseId,
   });
 
   final Key? key;
 
+  final AppLocalizations? appLocalizations;
+
   final String? warehouseId;
 
   @override
   String toString() {
-    return 'ViewAllTransactionsRouteArgs{key: $key, warehouseId: $warehouseId}';
+    return 'ViewAllTransactionsRouteArgs{key: $key, appLocalizations: $appLocalizations, warehouseId: $warehouseId}';
   }
 }
 
@@ -3466,4 +3489,52 @@ class ViewTransactionsRoute extends PageRouteInfo<void> {
   static const String name = 'ViewTransactionsRoute';
 
   static const PageInfo<void> page = PageInfo<void>(name);
+}
+
+/// generated route for
+/// [ZeroDoseCheckPage]
+class ZeroDoseCheckRoute extends PageRouteInfo<ZeroDoseCheckRouteArgs> {
+  ZeroDoseCheckRoute({
+    Key? key,
+    RegistrationDeliveryLocalization? appLocalizations,
+    required EligibilityAssessmentType eligibilityAssessmentType,
+    bool isEditing = false,
+    List<PageRouteInfo>? children,
+  }) : super(
+          ZeroDoseCheckRoute.name,
+          args: ZeroDoseCheckRouteArgs(
+            key: key,
+            appLocalizations: appLocalizations,
+            eligibilityAssessmentType: eligibilityAssessmentType,
+            isEditing: isEditing,
+          ),
+          initialChildren: children,
+        );
+
+  static const String name = 'ZeroDoseCheckRoute';
+
+  static const PageInfo<ZeroDoseCheckRouteArgs> page =
+      PageInfo<ZeroDoseCheckRouteArgs>(name);
+}
+
+class ZeroDoseCheckRouteArgs {
+  const ZeroDoseCheckRouteArgs({
+    this.key,
+    this.appLocalizations,
+    required this.eligibilityAssessmentType,
+    this.isEditing = false,
+  });
+
+  final Key? key;
+
+  final RegistrationDeliveryLocalization? appLocalizations;
+
+  final EligibilityAssessmentType eligibilityAssessmentType;
+
+  final bool isEditing;
+
+  @override
+  String toString() {
+    return 'ZeroDoseCheckRouteArgs{key: $key, appLocalizations: $appLocalizations, eligibilityAssessmentType: $eligibilityAssessmentType, isEditing: $isEditing}';
+  }
 }
