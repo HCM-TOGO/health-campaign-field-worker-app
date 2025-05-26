@@ -292,20 +292,60 @@ class CustomMemberCard extends StatelessWidget {
               ),
             ),
             onPressed: () async {
-              final bloc = context.read<HouseholdOverviewBloc>();
-              bloc.add(
-                HouseholdOverviewEvent.selectedIndividual(
-                  individualModel: individual,
-                ),
-              );
+              final spaq1 = context.spaq1;
+              final spaq2 = context.spaq2;
 
-              if ((smcTasks ?? []).isEmpty) {
-                context.router.push(
-                  EligibilityChecklistViewRoute(
-                    projectBeneficiaryClientReferenceId:
-                        projectBeneficiaryClientReferenceId,
-                    individual: individual,
-                    eligibilityAssessmentType: EligibilityAssessmentType.smc,
+              if (spaq1 > 0 && spaq2 > 0) {
+                final bloc = context.read<HouseholdOverviewBloc>();
+                bloc.add(
+                  HouseholdOverviewEvent.selectedIndividual(
+                    individualModel: individual,
+                  ),
+                );
+
+                if ((smcTasks ?? []).isEmpty) {
+                  context.router.push(
+                    EligibilityChecklistViewRoute(
+                      projectBeneficiaryClientReferenceId:
+                          projectBeneficiaryClientReferenceId,
+                      individual: individual,
+                      eligibilityAssessmentType: EligibilityAssessmentType.smc,
+                    ),
+                  );
+                }
+              } else {
+                String descriptionText = localizations.translate(
+                  i18_local.beneficiaryDetails.insufficientStockMessage,
+                );
+
+                if (spaq1 == 0) {
+                  descriptionText +=
+                      "\n${localizations.translate(i18_local.beneficiaryDetails.spaq1DoseUnit)}";
+                }
+                if (spaq2 == 0) {
+                  descriptionText +=
+                      "\n${localizations.translate(i18_local.beneficiaryDetails.spaq2DoseUnit)}";
+                }
+
+                DigitDialog.show(
+                  context,
+                  options: DigitDialogOptions(
+                    titleText: localizations.translate(
+                      i18_local.beneficiaryDetails.insufficientStockHeading,
+                    ),
+                    titleIcon: Icon(
+                      Icons.warning,
+                      color: DigitTheme.instance.colorScheme.error,
+                    ),
+                    contentText: descriptionText,
+                    primaryAction: DigitDialogActions(
+                      label: localizations.translate(
+                        i18_local.beneficiaryDetails.backToHouseholdDetails,
+                      ),
+                      action: (ctx) {
+                        Navigator.of(ctx, rootNavigator: true).pop();
+                      },
+                    ),
                   ),
                 );
               }
@@ -451,26 +491,65 @@ class CustomMemberCard extends StatelessWidget {
               ),
             ),
             onPressed: () async {
-              final bloc = context.read<HouseholdOverviewBloc>();
-              bloc.add(
-                HouseholdOverviewEvent.selectedIndividual(
-                  individualModel: individual,
-                ),
-              );
+              int blueVas = context.blueVas;
+              int redVas = context.redVas;
+              if (blueVas > 0 && redVas > 0) {
+                final bloc = context.read<HouseholdOverviewBloc>();
+                bloc.add(
+                  HouseholdOverviewEvent.selectedIndividual(
+                    individualModel: individual,
+                  ),
+                );
 
-              if ((vasTasks ?? []).isEmpty) {
-                // context.router.push(
-                //   CustomBeneficiaryDetailsRoute(
-                //     eligibilityAssessmentType:
-                //         EligibilityAssessmentType.smc,
-                //   ),
-                // );
-                context.router.push(
-                  EligibilityChecklistViewRoute(
-                    projectBeneficiaryClientReferenceId:
-                        projectBeneficiaryClientReferenceId,
-                    individual: individual,
-                    eligibilityAssessmentType: EligibilityAssessmentType.vas,
+                if ((vasTasks ?? []).isEmpty) {
+                  // context.router.push(
+                  //   CustomBeneficiaryDetailsRoute(
+                  //     eligibilityAssessmentType:
+                  //         EligibilityAssessmentType.smc,
+                  //   ),
+                  // );
+                  context.router.push(
+                    EligibilityChecklistViewRoute(
+                      projectBeneficiaryClientReferenceId:
+                          projectBeneficiaryClientReferenceId,
+                      individual: individual,
+                      eligibilityAssessmentType: EligibilityAssessmentType.vas,
+                    ),
+                  );
+                }
+              } else {
+                String descriptionText = localizations.translate(
+                  i18_local.beneficiaryDetails.insufficientStockMessage,
+                );
+
+                if (blueVas == 0) {
+                  descriptionText +=
+                      "\n ${localizations.translate(i18_local.beneficiaryDetails.blueVasZeroQuantity)}";
+                }
+                if (redVas == 0) {
+                  descriptionText +=
+                      "\n ${localizations.translate(i18_local.beneficiaryDetails.redVasZeroQuantity)}";
+                }
+
+                DigitDialog.show(
+                  context,
+                  options: DigitDialogOptions(
+                    titleText: localizations.translate(
+                      i18_local.beneficiaryDetails.insufficientStockHeading,
+                    ),
+                    titleIcon: Icon(
+                      Icons.warning,
+                      color: DigitTheme.instance.colorScheme.error,
+                    ),
+                    contentText: descriptionText,
+                    primaryAction: DigitDialogActions(
+                      label: localizations.translate(
+                        i18_local.beneficiaryDetails.backToHouseholdDetails,
+                      ),
+                      action: (ctx) {
+                        Navigator.of(ctx, rootNavigator: true).pop();
+                      },
+                    ),
                   ),
                 );
               }

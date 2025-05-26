@@ -58,7 +58,10 @@ class CustomWarehouseDetailsPageState
           validators: isDistributor ? [] : [Validators.required],
         ),
         _teamCodeKey: FormControl<String>(
-          value: stockState.primaryId ?? context.loggedInUserUuid,
+          value: stockState.primaryId ??
+              context.loggedInUser.userName.toString() +
+                  Constants.pipeSeparator +
+                  context.loggedInUserUuid,
           validators: isDistributor ? [Validators.required] : [],
         ),
       });
@@ -250,19 +253,17 @@ class CustomWarehouseDetailsPageState
                                                                     .toString(),
                                                               )
                                                             : facility,
-                                                        primaryId:
-                                                            InventorySingleton()
-                                                                    .isDistributor
-                                                                ? teamCode ?? ''
-                                                                : facility.id,
-                                                        primaryType: (InventorySingleton()
-                                                                        .isDistributor! &&
-                                                                    !InventorySingleton()
-                                                                        .isWareHouseMgr! &&
-                                                                    deliveryTeamSelected) ||
-                                                                deliveryTeamSelected
-                                                            ? "STAFF"
-                                                            : "WAREHOUSE",
+                                                        primaryId: InventorySingleton()
+                                                                .isDistributor
+                                                            ? (teamCode ?? '')
+                                                                .split(Constants
+                                                                    .pipeSeparator)
+                                                                .last
+                                                            : facility.id,
+                                                        primaryType:
+                                                            context.isCDD
+                                                                ? "STAFF"
+                                                                : "WAREHOUSE",
                                                       ),
                                                     );
                                                     if ((InventorySingleton()
@@ -283,19 +284,30 @@ class CustomWarehouseDetailsPageState
                                                         CustomStockDetailsRoute(),
                                                       );
                                                     } else {
-                                                      context.router.push(
-                                                          ViewAllTransactionsRoute(
-                                                              warehouseId:
-                                                                  InventorySingleton()
-                                                                          .isDistributor
-                                                                      ? teamCode
-                                                                      : selectedFacilityId));
+                                                      context.router.push(ViewAllTransactionsRoute(
+                                                          warehouseId: InventorySingleton()
+                                                                  .isDistributor
+                                                              ? (teamCode ?? '')
+                                                                  .split(Constants
+                                                                      .pipeSeparator)
+                                                                  .last
+                                                              : selectedFacilityId));
                                                     }
                                                   }
                                                 },
                                         );
                                       },
                                     ),
+                                    if (InventorySingleton().isDistributor &&
+                                        stockState.entryType !=
+                                            StockRecordEntryType.dispatch)
+                                      DigitButton(
+                                        label: "Scan Resource",
+                                        onPressed: _handleSubmission,
+                                        type: DigitButtonType.primary,
+                                        mainAxisSize: MainAxisSize.max,
+                                        size: DigitButtonSize.large,
+                                      ),
                                   ]),
                             ),
                             children: [
@@ -339,7 +351,8 @@ class CustomWarehouseDetailsPageState
                                             cancelText: localizations.translate(
                                               i18.common.coreCommonCancel,
                                             ),
-                                            initialValue: DateFormat('dd MMM yyyy')
+                                            initialValue: DateFormat(
+                                                    'dd MMM yyyy')
                                                 .format(field.control.value),
                                             readOnly: true,
                                           );
@@ -350,8 +363,9 @@ class CustomWarehouseDetailsPageState
                                           return InputField(
                                             isRequired: true,
                                             type: InputType.text,
-                                            label:
-                                                '${localizations.translate(i18.warehouseDetails.administrativeUnit)} *',
+                                            label: localizations.translate(i18
+                                                .warehouseDetails
+                                                .administrativeUnit),
                                             initialValue: field.control.value,
                                             readOnly: true,
                                           );
@@ -431,7 +445,8 @@ class CustomWarehouseDetailsPageState
                                               type: InputType.text,
                                               isDisabled: true,
                                               label: localizations.translate(
-                                                i18_local.stockDetails.cddCodeLabel,
+                                                i18_local
+                                                    .stockDetails.cddCodeLabel,
                                               ),
                                               initialValue: form
                                                   .control(_teamCodeKey)
@@ -458,5 +473,11 @@ class CustomWarehouseDetailsPageState
           barCode: [],
           qrCode: [],
         ));
+  }
+
+  void _handleSubmission() {
+    if (InventorySingleton().isDistributor) {
+      context.router.push(QRScannerRoute());
+    }
   }
 }

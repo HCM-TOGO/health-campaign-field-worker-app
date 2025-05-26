@@ -486,7 +486,11 @@ class CustomIndividualDetailsPageState
                       children: [
                         Text(
                           localizations.translate(
-                            i18.individualDetails.individualsDetailsLabelText,
+                            widget.isHeadOfHousehold
+                                ? i18_local
+                                    .individualDetails.caregiverDetailsLabelText
+                                : i18_local.individualDetails
+                                    .individualsDetailsLabelTextNewUpdate,
                           ),
                           style: textTheme.headingXl.copyWith(
                             color: theme.colorTheme.text.primary,
@@ -501,7 +505,7 @@ class CustomIndividualDetailsPageState
                                 validationMessages: {
                                   'required': (object) =>
                                       localizations.translate(
-                                        '${i18.individualDetails.nameLabelText}_IS_REQUIRED',
+                                        '${widget.isHeadOfHousehold ? i18_local.individualDetails.caregiverNameLabelText : i18.individualDetails.nameLabelText}_IS_REQUIRED',
                                       ),
                                   'maxLength': (object) => localizations
                                       .translate(i18.common.maxCharsRequired)
@@ -514,7 +518,11 @@ class CustomIndividualDetailsPageState
                                 },
                                 builder: (field) => LabeledField(
                                   label: localizations.translate(
-                                    i18.individualDetails.nameLabelText,
+                                    widget.isHeadOfHousehold
+                                        ? i18_local.individualDetails
+                                            .caregiverNameLabelText
+                                        : i18_local.individualDetails
+                                            .nameLabelTextNewUpdate,
                                   ),
                                   isRequired: true,
                                   child: DigitTextFormInput(
@@ -543,7 +551,8 @@ class CustomIndividualDetailsPageState
                                     ? localizations.translate(i18
                                         .individualDetails.clfCheckboxLabelText)
                                     : localizations.translate(
-                                        i18.individualDetails.checkboxLabelText,
+                                        i18_local.individualDetails
+                                            .checkboxLabelTextUpdate,
                                       ),
                                 value: widget.isHeadOfHousehold,
                                 readOnly: widget.isHeadOfHousehold,
@@ -571,7 +580,8 @@ class CustomIndividualDetailsPageState
                               i18.individualDetails.separatorLabelText,
                             ),
                             yearsAndMonthsErrMsg: localizations.translate(
-                              i18.individualDetails.yearsAndMonthsErrorText,
+                              i18_local.individualDetails
+                                  .yearsAndMonthsErrorTextUpdate,
                             ),
                             initialDate: before150Years,
                             onChangeOfFormControl: (formControl) {
@@ -580,10 +590,12 @@ class CustomIndividualDetailsPageState
 
                               digits.DigitDOBAge age =
                                   digits.DigitDateUtils.calculateAge(value);
-                              if ((age.years == 0 && age.months == 0) ||
-                                  age.months > 11 ||
-                                  (age.years >= 150 && age.months >= 0)) {
-                                formControl.setErrors({'': true});
+                              // Allow only between 3 to 59 months for cycle 1
+                              final ageInMonths = age.years * 12 + age.months;
+                              if (ageInMonths < 3 || ageInMonths > 59) {
+                                widget.isHeadOfHousehold
+                                    ? formControl.removeError('')
+                                    : formControl.setErrors({'': true});
                               } else {
                                 formControl.removeError('');
                               }
@@ -694,6 +706,10 @@ class CustomIndividualDetailsPageState
                                 'required': (_) => localizations.translate(
                                       i18.common.corecommonRequired,
                                     ),
+                                'mobileNumber': (object) =>
+                                    localizations.translate(i18_local
+                                        .individualDetails
+                                        .mobileNumberLengthValidationMessage),
                                 'minLength': (object) =>
                                     localizations.translate(i18_local
                                         .individualDetails
@@ -899,11 +915,9 @@ class CustomIndividualDetailsPageState
       _genderKey: FormControl<String>(value: getGenderOptions(individual)),
       _mobileNumberKey:
           FormControl<String>(value: individual?.mobileNumber, validators: [
-        Validators.delegate(
-            (validator) => CustomValidator.validMobileNumber(validator)),
-        // Validators.pattern(Constants.mobileNumberRegExp,
-        //     validationMessage:
-        //         localizations.translate(i18.common.coreCommonMobileNumber)),
+        Validators.delegate((validator) =>
+            local_utils.CustomValidator.validMobileNumber(validator)),
+
         Validators.minLength(11),
         Validators.maxLength(11),
         if (widget.isHeadOfHousehold) Validators.required,

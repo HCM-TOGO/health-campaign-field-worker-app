@@ -218,10 +218,14 @@ class _CustomSearchReferralReconciliationsPageState
                         builder: (context, state) {
                           final router = context.router;
 
-                          VoidCallback? onPressed;
-
-                          onPressed = () {
-                            FocusManager.instance.primaryFocus?.unfocus();
+                          return DigitButton(
+                            size: DigitButtonSize.large,
+                            label: localizations.translate(
+                              i18.referralReconciliation.createReferralLabel,
+                            ),
+                            mainAxisSize: MainAxisSize.max,
+                            onPressed: () {
+                              FocusManager.instance.primaryFocus?.unfocus();
                             final bloc = context.read<SearchReferralsBloc>();
                             router.push(
                               CustomHFCreateReferralWrapperRoute(
@@ -239,17 +243,6 @@ class _CustomSearchReferralReconciliationsPageState
                             bloc.add(
                               const SearchReferralsClearEvent(),
                             );
-                          };
-                          return DigitButton(
-                            size: DigitButtonSize.large,
-                            label: localizations.translate(
-                              i18.referralReconciliation.createReferralLabel,
-                            ),
-                            mainAxisSize: MainAxisSize.max,
-                            onPressed: () {
-                              if (onPressed != null) {
-                                onPressed();
-                              }
                             },
                             type: DigitButtonType.primary,
                           );

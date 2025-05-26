@@ -145,6 +145,9 @@ class CustomReferBeneficiaryVASPageState
                                   if (!form.valid) {
                                     return;
                                   } else {
+                                    if (healthFacilities.isEmpty) {
+                                      return;
+                                    }
                                     clickedStatus.value = true;
                                     final reason = reasons.first;
 
@@ -186,6 +189,8 @@ class CustomReferBeneficiaryVASPageState
                                               referralReasons,
                                               reasons.join(","),
                                             ),
+                                            const AdditionalField(
+                                                'referralType', 'vasReferred')
                                           ],
                                         ),
                                       ),
@@ -444,12 +449,9 @@ class CustomReferBeneficiaryVASPageState
         validators: [Validators.required],
       ),
       _referredToKey: FormControl<String>(
-        value: healthFacilities
-            .where((e) =>
-                e.boundaryCode == context.loggedInUserModel?.boundaryCode)
-            .first
-            .id
-            .toString(),
+        value: healthFacilities.isNotEmpty
+            ? localizations.translate('FAC_${healthFacilities.first.id}')
+            : null,
         validators: [
           Validators.required,
         ],

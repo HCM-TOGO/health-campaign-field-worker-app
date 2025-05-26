@@ -42,18 +42,77 @@ class ViewStockRecordsLGAPage extends LocalizedStatefulWidget {
 class _ViewStockRecordsLGAPageState
     extends LocalizedState<ViewStockRecordsLGAPage> {
   late final FormGroup _form;
+  late final Map<String, int> _issuedQuantities;
+  bool _commentsRequired = false;
 
   @override
   void initState() {
     super.initState();
+    _issuedQuantities = {
+      for (final stock in widget.stockRecords)
+        stock.additionalFields?.fields
+                .firstWhereOrNull((f) => f.key == 'productName')
+                ?.value
+                .toString() ??
+            '': int.tryParse(stock.quantity ?? '0') ?? 0
+    };
     _form = FormGroup({
       'quantityReceived': FormControl<int>(
         validators: [
           Validators.required,
           Validators.min(1),
+          Validators.delegate((control) {
+            final productName = widget
+                    .stockRecords.first.additionalFields?.fields
+                    .firstWhereOrNull((f) => f.key == 'productName')
+                    ?.value
+                    .toString() ??
+                '';
+            final issued = _issuedQuantities[productName] ?? 0;
+            final received = control.value ?? 0;
+            if (received > issued) {
+              return {'maxIssued': true};
+            }
+            return null;
+          })
         ],
       ),
       'comments': FormControl<String>(),
+    });
+    _form.control('quantityReceived').valueChanges.listen((value) {
+      final received = value ?? 0;
+      final productName = widget.stockRecords.first.additionalFields?.fields
+              .firstWhereOrNull((f) => f.key == 'productName')
+              ?.value
+              .toString() ??
+          '';
+      final issued = _issuedQuantities[productName] ?? 0;
+      final required = received < issued;
+      if (_commentsRequired != required) {
+        setState(() {
+          _commentsRequired = required;
+        });
+      }
+    });
+    _form.control('comments').setValidators([
+      Validators.delegate((control) {
+        final received = _form.control('quantityReceived').value ?? 0;
+        final productName = widget.stockRecords.first.additionalFields?.fields
+                .firstWhereOrNull((f) => f.key == 'productName')
+                ?.value
+                .toString() ??
+            '';
+        final issued = _issuedQuantities[productName] ?? 0;
+        if (received < issued &&
+            (control.value == null || control.value.isEmpty)) {
+          control.markAllAsTouched();
+          return {'requiredIfShort': true};
+        }
+        return null;
+      })
+    ]);
+    _form.control('quantityReceived').valueChanges.listen((value) {
+      _form.control('comments').updateValueAndValidity();
     });
     final recordStockBloc = BlocProvider.of<RecordStockBloc>(context);
   }
@@ -74,6 +133,10 @@ class _ViewStockRecordsLGAPageState
               field.key != 'quantityReceived' && field.key != 'comments'),
           AdditionalField('quantityReceived',
               _form.control('quantityReceived').value.toString()),
+          AdditionalField(
+            'quantitySent',
+            stock.quantity ?? '',
+          ),
           if (_form.control('comments').value != null)
             AdditionalField('comments', _form.control('comments').value),
         ];
@@ -112,54 +175,55 @@ class _ViewStockRecordsLGAPageState
         context.read<RecordStockBloc>().add(
               const RecordStockCreateStockEntryEvent(),
             );
-        if (InventorySingleton().isDistributor) {
-          final totalQty =
-              int.parse(_form.control('quantityReceived').value.toString());
+        // if (InventorySingleton().isDistributor) {
+        final totalQty =
+            int.parse(_form.control('quantityReceived').value.toString());
 
-          int spaq1Count = context.spaq1;
-          int spaq2Count = context.spaq2;
+        int spaq1Count = context.spaq1;
+        int spaq2Count = context.spaq2;
 
-          int blueVasCount = context.blueVas;
-          int redVasCount = context.redVas;
-          String productName = stock.additionalFields?.fields
-              .firstWhereOrNull((element) => element.key == "productName")
-              ?.value;
-          // Custom logic based on productName
-          if (productName == Constants.spaq1) {
-            spaq1Count = totalQty;
-            spaq2Count = 0;
-            redVasCount = 0;
-            blueVasCount = 0;
-          } else if (productName == Constants.spaq2) {
-            spaq2Count = totalQty;
-            spaq1Count = 0;
-            redVasCount = 0;
-            blueVasCount = 0;
-          } else if (productName == Constants.blueVAS) {
-            blueVasCount = totalQty;
-            spaq1Count = 0;
-            spaq2Count = 0;
-            redVasCount = 0;
-          } else {
-            blueVasCount = 0;
-            spaq1Count = 0;
-            spaq2Count = 0;
-            redVasCount = totalQty;
-          }
-          context.read<AuthBloc>().add(
-                AuthAddSpaqCountsEvent(
-                  spaq1Count: spaq1Count,
-                  spaq2Count: spaq2Count,
-                  blueVasCount: blueVasCount,
-                  redVasCount: redVasCount,
-                ),
-              );
-          // _tabController.animateTo(_tabController.index + 1);
-
-          context.read<RecordStockBloc>().add(
-                const RecordStockCreateStockEntryEvent(),
-              );
+        int blueVasCount = context.blueVas;
+        int redVasCount = context.redVas;
+        String productName = stock.additionalFields?.fields
+            .firstWhereOrNull((element) => element.key == "productName")
+            ?.value;
+        // Custom logic based on productName
+        if (productName == Constants.spaq1) {
+          spaq1Count = totalQty;
+          spaq2Count = 0;
+          redVasCount = 0;
+          blueVasCount = 0;
+        } else if (productName == Constants.spaq2) {
+          spaq2Count = totalQty;
+          spaq1Count = 0;
+          redVasCount = 0;
+          blueVasCount = 0;
+        } else if (productName == Constants.blueVAS) {
+          blueVasCount = totalQty;
+          spaq1Count = 0;
+          spaq2Count = 0;
+          redVasCount = 0;
+        } else {
+          blueVasCount = 0;
+          spaq1Count = 0;
+          spaq2Count = 0;
+          redVasCount = totalQty;
         }
+        context.read<AuthBloc>().add(
+              AuthAddSpaqCountsEvent(
+                spaq1Count: spaq1Count,
+                spaq2Count: spaq2Count,
+                blueVasCount: blueVasCount,
+                redVasCount: redVasCount,
+              ),
+            );
+        await Future.delayed(const Duration(milliseconds: 500));
+        // _tabController.animateTo(_tabController.index + 1);
+
+        context.read<RecordStockBloc>().add(
+              const RecordStockCreateStockEntryEvent(),
+            );
+        // }
       }
 
       context.router.push(
@@ -179,13 +243,15 @@ class _ViewStockRecordsLGAPageState
     //using the same as downloaded stock data
     // and this flow is for stock receipt for LGA
     final senderIdToShowOnTab = widget.stockRecords.first.senderId;
-    
+    bool commentRequired = false;
 
     return Scaffold(
       body: ScrollableContent(
-        header: const Column(children: [
-          CustomBackNavigationHelpHeaderWidget(),
-        ],),
+        header: const Column(
+          children: [
+            CustomBackNavigationHelpHeaderWidget(),
+          ],
+        ),
         children: [
           ReactiveForm(
             formGroup: _form,
@@ -315,12 +381,19 @@ class _ViewStockRecordsLGAPageState
                                     'required': (_) => 'Quantity is required',
                                     'min': (_) => 'Must be at least 1',
                                     'number': (_) => 'Must be a valid number',
+                                    'maxIssued': (_) =>
+                                        'Received quantity cannot be more than issued quantity',
                                   },
                                 ),
                                 const SizedBox(height: 12),
                                 ReactiveWrapperField(
                                   formControlName: 'comments',
+                                  validationMessages: {
+                                    'requiredIfShort': (_) =>
+                                        'Comments are required if quantity received is less than issued',
+                                  },
                                   builder: (field) => InputField(
+                                    isRequired: _commentsRequired,
                                     type: InputType.textArea,
                                     label: 'Comments',
                                     errorMessage: field.errorText,

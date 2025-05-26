@@ -49,7 +49,7 @@ class CustomManageStocksPageState
     return Scaffold(
       body: ScrollableContent(
         header: const CustomBackNavigationHelpHeaderWidget(
-          showHelp: true,
+          showHelp: false,
         ),
         children: [
           Column(
@@ -223,18 +223,18 @@ class CustomManageStocksPageState
               children: [
                 GestureDetector(
                   onTap: () {
-                    if (InventorySingleton().isDistributor) {
-                      context.router.push(QRScannerRoute());
-                      Navigator.of(context).pop();
-                    } else {
-                      context.router.push(
-                        RecordStockWrapperRoute(
-                          type: StockRecordEntryType.receipt,
-                        ),
-                      );
+                    // todo commenting the code to remove qr scanner mandatorily
+                    // if (InventorySingleton().isDistributor) {
+                    //   context.router.push(QRScannerRoute());
+                    //   Navigator.of(context).pop();
+                    // } else {
+                    context.router.push(
+                      RecordStockWrapperRoute(
+                        type: StockRecordEntryType.receipt,
+                      ),
+                    );
 
-                      Navigator.of(context).pop();
-                    }
+                    Navigator.of(context).pop();
                   },
                   child: Container(
                     width: double.infinity,
@@ -328,19 +328,19 @@ class CustomManageStocksPageState
               children: [
                 GestureDetector(
                   onTap: () {
-                    if (context.isCDD) {
-                      context.router.push(
-                        RecordStockWrapperRoute(
-                          type: StockRecordEntryType.returned,
-                        ),
-                      );
-                    } else {
-                      context.router.push(
-                        RecordStockWrapperRoute(
-                          type: StockRecordEntryType.dispatch,
-                        ),
-                      );
-                    }
+                    // if (context.isCDD) {
+                    context.router.push(
+                      RecordStockWrapperRoute(
+                        type: StockRecordEntryType.dispatch,
+                      ),
+                    );
+                    // } else {
+                    //   context.router.push(
+                    //     RecordStockWrapperRoute(
+                    //       type: StockRecordEntryType.dispatch,
+                    //     ),
+                    //   );
+                    // }
                     Navigator.of(context).pop();
                   },
                   child: Container(
@@ -366,7 +366,7 @@ class CustomManageStocksPageState
                           Text(
                             "Create New Transaction",
                             style: TextStyle(
-                              fontSize: 20,
+                              fontSize: 16,
                               color: Colors.orange[800],
                               fontWeight: FontWeight.bold,
                             ),
@@ -379,19 +379,20 @@ class CustomManageStocksPageState
                 const SizedBox(height: 16), // Add spacing between buttons
                 GestureDetector(
                   onTap: () {
-                    if (context.isCDD) {
-                      context.router.push(
-                        CustomMinNumberRoute(
-                          type: StockRecordEntryType.returned,
-                        ),
-                      );
-                    } else {
-                      context.router.push(
-                        CustomMinNumberRoute(
-                          type: StockRecordEntryType.dispatch,
-                        ),
-                      );
-                    }
+                    // if (context.isCDD) {
+                    context.router.push(
+                      CustomMinNumberRoute(
+                        type: StockRecordEntryType.dispatch,
+                      ),
+                    );
+                    // }
+                    // else {
+                    //   context.router.push(
+                    //     CustomMinNumberRoute(
+                    //       type: StockRecordEntryType.dispatch,
+                    //     ),
+                    //   );
+                    // }
                     Navigator.of(context).pop();
                   },
                   child: Container(
