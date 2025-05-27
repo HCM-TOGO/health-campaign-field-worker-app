@@ -306,259 +306,272 @@ class ZeroDoseCheckPageState extends LocalizedState<ZeroDoseCheckPage> {
                             ),
                           ),
                           children: [
-                            ReactiveFormBuilder(
-                              form: () =>
-                                  buildForm(context, productVariants, variant),
-                              builder: (context, form, child) {
-                                return Column(
-                                  children: [
-                                    DigitCard(
-                                      margin: const EdgeInsets.all(spacer2),
-                                      child: Column(
+                            DigitCard(
+                              margin: const EdgeInsets.all(spacer2),
+                              child: Column(
+                                children: [
+                                  ReactiveFormBuilder(
+                                    form: () => buildForm(
+                                        context, productVariants, variant),
+                                    builder: (context, form, child) {
+                                      return Column(
+                                        crossAxisAlignment:
+                                            CrossAxisAlignment.start,
                                         children: [
-                                          Text(
-                                            widget.eligibilityAssessmentType ==
-                                                    EligibilityAssessmentType
-                                                        .smc
-                                                ? localizations.translate(i18_local
-                                                    .deliverIntervention
-                                                    .deliverInterventionSMCLabel)
-                                                : localizations.translate(i18_local
-                                                    .deliverIntervention
-                                                    .deliverInterventionVASLabel),
-                                            style: theme.textTheme.headlineLarge
-                                                ?.copyWith(
-                                                    color: theme.colorTheme.text
-                                                        .primary),
-                                          ),
-                                          if (RegistrationDeliverySingleton()
-                                                  .beneficiaryType ==
-                                              BeneficiaryType.individual)
-                                            ReactiveWrapperField(
-                                              formControlName:
-                                                  _doseAdministrationKey,
-                                              builder: (field) => LabeledField(
-                                                label: localizations.translate(
-                                                    i18.deliverIntervention
-                                                        .currentCycle),
-                                                child: DigitTextFormInput(
-                                                  readOnly: true,
-                                                  keyboardType:
-                                                      TextInputType.number,
-                                                  initialValue: form
-                                                      .control(
-                                                          _doseAdministrationKey)
-                                                      .value,
-                                                ),
-                                              ),
+                                          Padding(
+                                            padding:
+                                                const EdgeInsets.only(left: 8),
+                                            child: Text(
+                                              'Zero Dose Checking',
+                                              style: theme
+                                                  .textTheme.displayMedium
+                                                  ?.copyWith(
+                                                      fontWeight:
+                                                          FontWeight.bold),
+                                              textAlign: TextAlign.left,
                                             ),
-                                          ReactiveWrapperField(
-                                            formControlName:
-                                                _dateOfAdministrationKey,
-                                            builder: (field) => LabeledField(
-                                              label: localizations.translate(
-                                                  i18_local.householdDetails
-                                                      .dateOfAdministrationLabel),
-                                              child: DigitDateFormInput(
-                                                readOnly: true,
-                                                initialValue: DateFormat(
-                                                        'dd MMM yyyy')
-                                                    .format(form
-                                                        .control(
-                                                            _dateOfAdministrationKey)
-                                                        .value)
-                                                    .toString(),
-                                                confirmText:
-                                                    localizations.translate(i18
-                                                        .common.coreCommonOk),
-                                                cancelText:
-                                                    localizations.translate(i18
-                                                        .common
-                                                        .coreCommonCancel),
-                                              ),
+                                          ),
+                                          const SizedBox(
+                                            height: 8,
+                                          ),
+                                          Padding(
+                                            padding: const EdgeInsets.all(8),
+                                            child: Column(
+                                              children: [
+                                                if (RegistrationDeliverySingleton()
+                                                        .beneficiaryType ==
+                                                    BeneficiaryType.individual)
+                                                  ReactiveWrapperField(
+                                                    formControlName:
+                                                        _doseAdministrationKey,
+                                                    builder: (field) =>
+                                                        LabeledField(
+                                                      label: localizations
+                                                          .translate(i18
+                                                              .deliverIntervention
+                                                              .currentCycle),
+                                                      child: DigitTextFormInput(
+                                                        readOnly: true,
+                                                        keyboardType:
+                                                            TextInputType
+                                                                .number,
+                                                        initialValue: form
+                                                            .control(
+                                                                _doseAdministrationKey)
+                                                            .value,
+                                                      ),
+                                                    ),
+                                                  ),
+                                                ReactiveWrapperField(
+                                                  formControlName:
+                                                      _dateOfAdministrationKey,
+                                                  builder: (field) =>
+                                                      LabeledField(
+                                                    label: localizations
+                                                        .translate(i18_local
+                                                            .householdDetails
+                                                            .dateOfAdministrationLabel),
+                                                    child: DigitDateFormInput(
+                                                      readOnly: true,
+                                                      initialValue: DateFormat(
+                                                              'dd MMM yyyy')
+                                                          .format(form
+                                                              .control(
+                                                                  _dateOfAdministrationKey)
+                                                              .value)
+                                                          .toString(),
+                                                      confirmText: localizations
+                                                          .translate(i18.common
+                                                              .coreCommonOk),
+                                                      cancelText: localizations
+                                                          .translate(i18.common
+                                                              .coreCommonCancel),
+                                                    ),
+                                                  ),
+                                                ),
+                                              ],
                                             ),
                                           ),
                                         ],
-                                      ),
-                                    ),
-                                  ],
-                                );
-                              },
-                            ),
-                            const SizedBox(
-                              height: 8,
-                            ),
-                            Form(
-                              key: checklistFormKey,
-                              child: DigitCard(
-                                child: Column(
-                                  crossAxisAlignment: CrossAxisAlignment.start,
-                                  children: [
-                                    Padding(
-                                      padding: const EdgeInsets.only(left: 8),
-                                      child: Text(
-                                        localizations.translate(
-                                          selectedServiceDefinition!.code
-                                              .toString(),
-                                        ),
-                                        style: theme.textTheme.displayMedium,
-                                        textAlign: TextAlign.left,
-                                      ),
-                                    ),
-                                    ...initialAttributes!.map((e) {
-                                      int index =
-                                          (initialAttributes ?? []).indexOf(e);
+                                      );
+                                    },
+                                  ),
+                                  Form(
+                                    key: checklistFormKey,
+                                    child: Column(
+                                      crossAxisAlignment:
+                                          CrossAxisAlignment.start,
+                                      children: [
+                                        ...initialAttributes!.map((e) {
+                                          int index = (initialAttributes ?? [])
+                                              .indexOf(e);
 
-                                      return Column(children: [
-                                        if (e.dataType == 'String' &&
-                                            !(e.code ?? '').contains('.')) ...[
-                                          DigitTextField(
-                                            autoValidation: AutovalidateMode
-                                                .onUserInteraction,
-                                            isRequired: true,
-                                            controller: controller[index],
-                                            validator: (value) {
-                                              if (((value == null ||
-                                                      value == '') &&
-                                                  e.required == true)) {
-                                                return localizations.translate(
-                                                  i18_local.common
-                                                      .corecommonRequired,
-                                                );
-                                              }
-                                              if (e.regex != null) {
-                                                return (RegExp(e.regex!)
-                                                        .hasMatch(value!))
-                                                    ? null
-                                                    : localizations.translate(
-                                                        "${e.code}_REGEX");
-                                              }
+                                          return Column(children: [
+                                            if (e.dataType == 'String' &&
+                                                !(e.code ?? '')
+                                                    .contains('.')) ...[
+                                              DigitTextField(
+                                                autoValidation: AutovalidateMode
+                                                    .onUserInteraction,
+                                                isRequired: true,
+                                                controller: controller[index],
+                                                validator: (value) {
+                                                  if (((value == null ||
+                                                          value == '') &&
+                                                      e.required == true)) {
+                                                    return localizations
+                                                        .translate(
+                                                      i18_local.common
+                                                          .corecommonRequired,
+                                                    );
+                                                  }
+                                                  if (e.regex != null) {
+                                                    return (RegExp(e.regex!)
+                                                            .hasMatch(value!))
+                                                        ? null
+                                                        : localizations.translate(
+                                                            "${e.code}_REGEX");
+                                                  }
 
-                                              return null;
-                                            },
-                                            label: localizations.translate(
-                                              '${selectedServiceDefinition?.code}.${e.code}',
-                                            ),
-                                          ),
-                                        ] else if (e.dataType == 'Number' &&
-                                            !(e.code ?? '').contains('.')) ...[
-                                          DigitTextField(
-                                            autoValidation: AutovalidateMode
-                                                .onUserInteraction,
-                                            textStyle:
-                                                theme.textTheme.headlineMedium,
-                                            textInputType: TextInputType.number,
-                                            inputFormatter: [
-                                              FilteringTextInputFormatter.allow(
-                                                RegExp(
-                                                  "[0-9]",
+                                                  return null;
+                                                },
+                                                label: localizations.translate(
+                                                  '${selectedServiceDefinition?.code}.${e.code}',
                                                 ),
                                               ),
-                                            ],
-                                            validator: (value) {
-                                              if (((value == null ||
-                                                      value == '') &&
-                                                  e.required == true)) {
-                                                return localizations.translate(
-                                                  i18_local.common
-                                                      .corecommonRequired,
-                                                );
-                                              }
-                                              if (e.regex != null) {
-                                                return (RegExp(e.regex!)
-                                                        .hasMatch(value!))
-                                                    ? null
-                                                    : localizations.translate(
-                                                        "${e.code}_REGEX");
-                                              }
-
-                                              return null;
-                                            },
-                                            controller: controller[index],
-                                            label: '${localizations.translate(
-                                                  '${selectedServiceDefinition?.code}.${e.code}',
-                                                ).trim()} ${e.required == true ? '*' : ''}',
-                                          ),
-                                        ] else if (e.dataType ==
-                                                'MultiValueList' &&
-                                            !(e.code ?? '').contains('.')) ...[
-                                          Align(
-                                            alignment: Alignment.topLeft,
-                                            child: Padding(
-                                              padding: const EdgeInsets.all(8),
-                                              child: Column(
-                                                children: [
-                                                  Text(
-                                                    '${localizations.translate(
-                                                      '${selectedServiceDefinition?.code}.${e.code}',
-                                                    )} ${e.required == true ? '*' : ''}',
-                                                    style: theme.textTheme
-                                                        .headlineSmall,
+                                            ] else if (e.dataType == 'Number' &&
+                                                !(e.code ?? '')
+                                                    .contains('.')) ...[
+                                              DigitTextField(
+                                                autoValidation: AutovalidateMode
+                                                    .onUserInteraction,
+                                                textStyle: theme
+                                                    .textTheme.headlineMedium,
+                                                textInputType:
+                                                    TextInputType.number,
+                                                inputFormatter: [
+                                                  FilteringTextInputFormatter
+                                                      .allow(
+                                                    RegExp(
+                                                      "[0-9]",
+                                                    ),
                                                   ),
                                                 ],
+                                                validator: (value) {
+                                                  if (((value == null ||
+                                                          value == '') &&
+                                                      e.required == true)) {
+                                                    return localizations
+                                                        .translate(
+                                                      i18_local.common
+                                                          .corecommonRequired,
+                                                    );
+                                                  }
+                                                  if (e.regex != null) {
+                                                    return (RegExp(e.regex!)
+                                                            .hasMatch(value!))
+                                                        ? null
+                                                        : localizations.translate(
+                                                            "${e.code}_REGEX");
+                                                  }
+
+                                                  return null;
+                                                },
+                                                controller: controller[index],
+                                                label: '${localizations.translate(
+                                                      '${selectedServiceDefinition?.code}.${e.code}',
+                                                    ).trim()} ${e.required == true ? '*' : ''}',
                                               ),
-                                            ),
-                                          ),
-                                          BlocBuilder<ServiceBloc,
-                                              ServiceState>(
-                                            builder: (context, state) {
-                                              return Column(
-                                                children: e.values!
-                                                    .map((e) =>
-                                                        DigitCheckboxTile(
-                                                          label: e,
-                                                          value:
-                                                              controller[index]
+                                            ] else if (e.dataType ==
+                                                    'MultiValueList' &&
+                                                !(e.code ?? '')
+                                                    .contains('.')) ...[
+                                              Align(
+                                                alignment: Alignment.topLeft,
+                                                child: Padding(
+                                                  padding:
+                                                      const EdgeInsets.all(8),
+                                                  child: Column(
+                                                    children: [
+                                                      Text(
+                                                        '${localizations.translate(
+                                                          '${selectedServiceDefinition?.code}.${e.code}',
+                                                        )} ${e.required == true ? '*' : ''}',
+                                                        style: theme.textTheme
+                                                            .headlineSmall,
+                                                      ),
+                                                    ],
+                                                  ),
+                                                ),
+                                              ),
+                                              BlocBuilder<ServiceBloc,
+                                                  ServiceState>(
+                                                builder: (context, state) {
+                                                  return Column(
+                                                    children: e.values!
+                                                        .map((e) =>
+                                                            DigitCheckboxTile(
+                                                              label: e,
+                                                              value: controller[
+                                                                      index]
                                                                   .text
                                                                   .split('.')
                                                                   .contains(e),
-                                                          onChanged: (value) {
-                                                            final String ele;
-                                                            var val =
-                                                                controller[
-                                                                        index]
-                                                                    .text
-                                                                    .split('.');
-                                                            if (val
-                                                                .contains(e)) {
-                                                              val.remove(e);
-                                                              ele =
-                                                                  val.join(".");
-                                                            } else {
-                                                              ele =
-                                                                  "${controller[index].text}.$e";
-                                                            }
-                                                            controller[index]
-                                                                    .value =
-                                                                TextEditingController
-                                                                    .fromValue(
-                                                              TextEditingValue(
-                                                                text: ele,
-                                                              ),
-                                                            ).value;
-                                                          },
-                                                        ))
-                                                    .toList(),
-                                              );
-                                            },
-                                          ),
-                                        ] else if (e.dataType ==
-                                            'SingleValueList') ...[
-                                          if (!(e.code ?? '').contains('.'))
-                                            DigitCard(
-                                              // Replace with your desired widget
-                                              child: _buildChecklist(
-                                                e,
-                                                index,
-                                                selectedServiceDefinition,
-                                                context,
+                                                              onChanged:
+                                                                  (value) {
+                                                                final String
+                                                                    ele;
+                                                                var val =
+                                                                    controller[
+                                                                            index]
+                                                                        .text
+                                                                        .split(
+                                                                            '.');
+                                                                if (val
+                                                                    .contains(
+                                                                        e)) {
+                                                                  val.remove(e);
+                                                                  ele =
+                                                                      val.join(
+                                                                          ".");
+                                                                } else {
+                                                                  ele =
+                                                                      "${controller[index].text}.$e";
+                                                                }
+                                                                controller[index]
+                                                                        .value =
+                                                                    TextEditingController
+                                                                        .fromValue(
+                                                                  TextEditingValue(
+                                                                    text: ele,
+                                                                  ),
+                                                                ).value;
+                                                              },
+                                                            ))
+                                                        .toList(),
+                                                  );
+                                                },
                                               ),
-                                            ),
-                                        ],
-                                      ]);
-                                    }),
-                                  ],
-                                ),
+                                            ] else if (e.dataType ==
+                                                'SingleValueList') ...[
+                                              if (!(e.code ?? '').contains('.'))
+                                                DigitCard(
+                                                  // Replace with your desired widget
+                                                  child: _buildChecklist(
+                                                    e,
+                                                    index,
+                                                    selectedServiceDefinition,
+                                                    context,
+                                                  ),
+                                                ),
+                                            ],
+                                          ]);
+                                        }),
+                                      ],
+                                    ),
+                                  ),
+                                  // ),
+                                ],
                               ),
                             ),
                           ],
