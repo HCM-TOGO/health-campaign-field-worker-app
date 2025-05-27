@@ -19,6 +19,7 @@ import 'package:intl/intl.dart';
 import 'package:reactive_forms/reactive_forms.dart';
 
 import '../../../utils/i18_key_constants.dart' as i18;
+// import 'package:';
 import '../../../utils/utils.dart' show CustomValidator;
 import '../../../widgets/header/back_navigation_help_header.dart';
 import '../../../widgets/localized.dart';
@@ -420,7 +421,7 @@ class CustomComplaintsDetailsPageState
                                   i18.complaints.validationMinLengthError),
                               'maxLength': (object) => localizations
                                   .translate(i18.common.maxCharsRequired)
-                                  .replaceAll('{}', '11'),
+                                  .replaceAll('{}', '8'),
                             },
                             builder: (field) {
                               return LabeledField(
@@ -482,7 +483,7 @@ class CustomComplaintsDetailsPageState
                                   i18.complaints.validationMinLengthError),
                               'maxLength': (object) => localizations
                                   .translate(i18.common.maxCharsRequired)
-                                  .replaceAll('{}', '11'),
+                                  .replaceAll('{}', '8'),
                             },
                             builder: (field) {
                               return LabeledField(
@@ -580,8 +581,8 @@ class CustomComplaintsDetailsPageState
           Validators.required,
           Validators.delegate(
               (validator) => CustomValidator.validMobileNumber(validator)),
-          Validators.minLength(11),
-          Validators.maxLength(11)
+          Validators.minLength(8),
+          Validators.maxLength(8)
         ],
       ),
       _supervisorName: FormControl<String>(
@@ -597,6 +598,8 @@ class CustomComplaintsDetailsPageState
               (validator) => CustomValidator.validMobileNumber(validator)),
           // Validators.maxLength(11),
           // Validators.minLength(11),
+          // Validators.maxLength(8),
+          // Validators.minLength(8),
         ],
       ),
       _complaintDescription: FormControl<String>(
