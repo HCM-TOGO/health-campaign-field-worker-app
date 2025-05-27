@@ -414,7 +414,7 @@ class CustomComplaintsDetailsPageState
                             validationMessages: {
                               'mobileNumber': (object) =>
                                   localizations.translate(i18.individualDetails
-                                      .mobileNumberInvalidFormatValidationMessageUpdate),
+                                      .mobileNumberInvalidFormatValidationMessage),
                               'required': (object) => localizations.translate(
                                   i18.complaints.validationRequiredError),
                               'minLength': (object) => localizations.translate(
@@ -477,7 +477,7 @@ class CustomComplaintsDetailsPageState
                               'mobileNumber': (object) =>
                                   localizations.translate(
                                     i18.individualDetails
-                                        .mobileNumberInvalidFormatValidationMessageUpdate,
+                                        .mobileNumberInvalidFormatValidationMessage,
                                   ),
                               'minLength': (object) => localizations.translate(
                                   i18.complaints.validationMinLengthError),
