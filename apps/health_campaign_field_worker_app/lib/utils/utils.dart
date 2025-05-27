@@ -86,13 +86,13 @@ class CustomValidator {
 
     const pattern = r'[0-9]';
 
-    if (control.value.toString().length != 11) {
+    if (control.value.toString().length != 8) {
       return {'mobileNumber': true};
     }
 
     if (RegExp(pattern).hasMatch(control.value.toString())) return null;
 
-    if (control.value.toString().length < 11) return {'mobileNumber': true};
+    if (control.value.toString().length < 8) return {'mobileNumber': true};
 
     return {'mobileNumber': true};
   }
@@ -348,7 +348,7 @@ Map<String, dynamic>? customValidMobileNumber(
     return null; // Optional field
   }
 
-  const pattern = r'^\d{11}$'; // Exactly 11 digits
+  const pattern = r'^\d{8}$'; // Exactly 8 digits
 
   if (RegExp(pattern).hasMatch(control.value.toString())) {
     return null; // Valid

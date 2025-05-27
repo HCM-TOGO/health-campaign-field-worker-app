@@ -1337,6 +1337,9 @@ class IndividualDetails {
   String get mobileNumberInvalidFormatValidationMessage =>
       'INDIVIDUAL_DETAILS_INVALID_MOBILE_NUMBER';
 
+  String get mobileNumberInvalidFormatValidationMessageUpdate =>
+      'INDIVIDUAL_DETAILS_INVALID_MOBILE_NUMBER_TEXT';
+
   String get mobileNumberLengthValidationMessage =>
       'INDIVIDUAL_DETAILS_MOBILE_NUMBER_LENGTH';
 
