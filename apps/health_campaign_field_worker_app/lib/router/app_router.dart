@@ -32,6 +32,7 @@ import '../pages/beneficiary/check_eligibility/household_acknowledgement_smc.dar
 import '../pages/beneficiary/check_eligibility/inventory_facility_selection_smc.dart';
 import '../pages/beneficiary/check_eligibility/refer_beneficiary_smc.dart';
 import '../pages/beneficiary/check_eligibility/refer_beneficiary_vas.dart';
+import '../pages/beneficiary/check_eligibility/vaccine_selection_page.dart';
 import '../pages/inventory_management/view_record_lga.dart';
 import '../pages/registration_delivery/custom_complaints_details.dart';
 import '../pages/boundary_selection.dart';
@@ -98,6 +99,7 @@ import '../pages/checklist/custom_survey_form_preview.dart';
 import '../pages/checklist/custom_survey_form_boundary_view.dart';
 import '../pages/checklist/custom_survey_form_acknowledgement.dart';
 import '../pages/checklist/custom_survey_form_wrapper.dart';
+import '../pages/beneficiary/check_eligibility/vaccine_selection_page.dart';
 import '../pages/beneficiary/check_eligibility/zero_dose_check.dart';
 
 part 'app_router.gr.dart';
@@ -409,6 +411,7 @@ class AppRouter extends _$AppRouter {
                     page: CustomSplashAcknowledgementRoute.page,
                     path: 'splash-acknowledgement',
                   ),
+                  AutoRoute(page: VaccineSelectionRoute.page, path: 'vaccine-selection'),
                   // RedirectRoute(
                   //   path: 'splash-acknowledgement',
                   //   redirectTo: 'custom-splash-acknowledgement',
