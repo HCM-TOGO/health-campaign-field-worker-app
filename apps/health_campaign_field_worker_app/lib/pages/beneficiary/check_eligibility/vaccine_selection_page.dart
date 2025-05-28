@@ -8,6 +8,7 @@ import 'package:digit_ui_components/services/location_bloc.dart';
 import 'package:digit_ui_components/widgets/molecules/digit_card.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:registration_delivery/registration_delivery.dart';
 import '../../../models/entities/roles_type.dart';
 import 'package:registration_delivery/blocs/household_overview/household_overview.dart';
 import 'package:survey_form/survey_form.dart';
@@ -22,14 +23,12 @@ import 'package:digit_data_model/data_model.dart';
 import '../../../widgets/custom_back_navigation.dart';
 import '../../../widgets/showcase/showcase_wrappers.dart';
 import 'package:registration_delivery/utils/i18_key_constants.dart' as i18;
+import 'package:digit_components/widgets/atoms/checkbox_icon.dart';
 
 @RoutePage()
 class VaccineSelectionPage extends LocalizedStatefulWidget {
-  final IndividualModel? individual;
   const VaccineSelectionPage(
-      {super.key,
-      this.individual,
-      super.appLocalizations});
+      {super.key, super.appLocalizations});
 
   @override
   State<VaccineSelectionPage> createState() => _VaccineSelectionPageState();
@@ -60,28 +59,34 @@ class _VaccineSelectionPageState extends LocalizedState<VaccineSelectionPage> {
 
   @override
   Widget build(BuildContext context) {
+    final dob =
+        context.read<HouseholdOverviewBloc>().state.selectedIndividual?.dateOfBirth;
     final theme = Theme.of(context);
-    final vaccineList = [
-      "BCG",
-      "VPO-0",
-      "Penta-1",
-      "VPO-1",
-      "Rota-1",
-      "PCV13-1",
-      "VPO-2",
-      "Penta-2",
-      "Rota-2",
-      "PCV13-2",
-      "VPO-3",
-      "Penta-3",
-      "PCV13-3",
-      "VPI-1",
-      "RR-1",
-      "VAA",
-      "VPI-2",
-      "RR-2",
-      "Men A"
-    ];
+    // final years = DigitDateUtils.getYears
+    final ageInDays = calculateAgeInDaysFromDob(dob!);
+    final deliverState = context.read<DeliverInterventionBloc>().state;
+    const Map<String, int> vaccineAgeMap = {
+      'BCG': 1,
+      'VPO-0': 1,
+      'Penta-1': 45,
+      'VPO-1': 45,
+      'Rota-1': 45,
+      'PCV13-1': 45,
+      'VPO-2': 75,
+      'Penta-2': 75,
+      'Rota-2': 75,
+      'PCV13-2': 75,
+      'VPO-3': 105,
+      'Penta-3': 105,
+      'PCV13-3': 105,
+      'VPI-1': 270,
+      'RR-1': 270,
+      'VAA': 270,
+      'VPI-2': 450,
+      'RR-2': 450,
+      'Men A': 450,
+    };
+
     return PopScope(
         canPop: true,
         child: Scaffold(body: BlocBuilder<LocationBloc, LocationState>(
@@ -119,9 +124,10 @@ class _VaccineSelectionPageState extends LocalizedState<VaccineSelectionPage> {
                     serviceDefinitionFetch: (value) {
                       return ScrollableContent(
                         header: const Column(children: [
-                            CustomBackNavigationHelpHeaderWidget(
-                              showHelp: false,
-                      )]),
+                          CustomBackNavigationHelpHeaderWidget(
+                            showHelp: false,
+                          )
+                        ]),
                         enableFixedDigitButton: true,
                         footer: DigitCard(
                           margin: const EdgeInsets.fromLTRB(0, kPadding, 0, 0),
@@ -277,7 +283,6 @@ class _VaccineSelectionPageState extends LocalizedState<VaccineSelectionPage> {
                                   ),
                                 );
                                 if (shouldSubmit ?? false) {
-
                                   final router = context.router;
                                   submitTriggered = true;
 
@@ -287,13 +292,15 @@ class _VaccineSelectionPageState extends LocalizedState<VaccineSelectionPage> {
                                           submitTriggered: true,
                                         ),
                                       );
-                                  context.router.push(CustomDoseAdministeredRoute(eligibilityAssessmentType:EligibilityAssessmentType.smc));
-                                    
+                                  context.router.push(
+                                      CustomDoseAdministeredRoute(
+                                          eligibilityAssessmentType:
+                                              EligibilityAssessmentType.smc));
                                 }
                               },
                               child: Text(
-                                localizations.translate(
-                                    i18.common.coreCommonSubmit),
+                                localizations
+                                    .translate(i18.common.coreCommonSubmit),
                               ),
                             )
                           ],
@@ -302,97 +309,104 @@ class _VaccineSelectionPageState extends LocalizedState<VaccineSelectionPage> {
                           Form(
                             key: checklistFormKey, //assigning key to form
                             child: DigitCard(
-                              children: [Column(
-                                  crossAxisAlignment: CrossAxisAlignment.start,
-                                  children: [
-                                    Padding(
-                                      padding: const EdgeInsets.only(left: 8),
-                                      child: Text(
-                                        localizations.translate(
-                                          selectedServiceDefinition!.code
-                                              .toString(),
+                              children: [
+                                Column(
+                                    crossAxisAlignment:
+                                        CrossAxisAlignment.start,
+                                    children: [
+                                      Text("Vaccins Details", style: theme.textTheme.headlineLarge,),
+                                      Padding(
+                                        padding: const EdgeInsets.only(left: 8),
+                                        child: Text(
+                                          localizations.translate(
+                                            selectedServiceDefinition!.code
+                                                .toString(),
+                                          ),
+                                          style: theme.textTheme.displayMedium,
+                                          textAlign: TextAlign.left,
                                         ),
-                                        style: theme.textTheme.displayMedium,
-                                        textAlign: TextAlign.left,
                                       ),
-                                    ),
-                                    ...initialAttributes!.map((
-                                      e,
-                                    ) {
-                                      int index =
-                                          (initialAttributes ?? []).indexOf(e);
+                                      ...initialAttributes!.map((
+                                        e,
+                                      ) {
+                                        int index = (initialAttributes ?? [])
+                                            .indexOf(e);
 
-                                      return Column(children: [
-                                        if (e.dataType ==
-                                                'MultiValueList' &&
-                                            !(e.code ?? '').contains('.')) ...[
-                                          Align(
-                                            alignment: Alignment.topLeft,
-                                            child: Padding(
-                                              padding: const EdgeInsets.all(8),
-                                              child: Column(
-                                                children: [
-                                                  Text(
-                                                    '${localizations.translate(
-                                                      '${selectedServiceDefinition?.code}.${e.code}',
-                                                    )} ${e.required == true ? '*' : ''}',
-                                                    style: theme.textTheme
-                                                        .headlineSmall,
-                                                  ),
-                                                ],
+                                        return Column(children: [
+                                          if (e.dataType == 'MultiValueList' &&
+                                              !(e.code ?? '')
+                                                  .contains('.')) ...[
+                                            Align(
+                                              alignment: Alignment.topLeft,
+                                              child: Padding(
+                                                padding:
+                                                    const EdgeInsets.all(8),
+                                                child: Column(
+                                                  children: [
+                                                    Text(
+                                                      '${localizations.translate(
+                                                        '${selectedServiceDefinition?.code}.${e.code}',
+                                                      )} ${e.required == true ? '*' : ''}',
+                                                      style: theme.textTheme
+                                                          .headlineSmall,
+                                                    ),
+                                                  ],
+                                                ),
                                               ),
                                             ),
-                                          ),
-                                          BlocBuilder<ServiceBloc,
-                                              ServiceState>(
-                                            builder: (context, state) {
-                                              return Column(
-                                                children: e.values!
-                                                    .map((e) =>
-                                                        DigitCheckboxTile(
-                                                          label: e,
-                                                          value:
+                                            BlocBuilder<ServiceBloc,
+                                                ServiceState>(
+                                              builder: (context, state) {
+                                                return Column(
+                                                  children: e.values!
+                                                      .map((e) =>
+                                                          CustomDigitCheckboxTile(
+                                                            label: e,
+                                                            isDisabled: vaccineAgeMap[e]! <= ageInDays,
+                                                            value: controller[
+                                                                    index]
+                                                                .text
+                                                                .split('.')
+                                                                .contains(e),
+                                                            onChanged: (value) {
+                                                              final String ele;
+                                                              var val =
+                                                                  controller[
+                                                                          index]
+                                                                      .text
+                                                                      .split(
+                                                                          '.');
+                                                              if (val.contains(
+                                                                  e)) {
+                                                                val.remove(e);
+                                                                ele = val
+                                                                    .join(".");
+                                                              } else {
+                                                                ele =
+                                                                    "${controller[index].text}.$e";
+                                                              }
                                                               controller[index]
-                                                                  .text
-                                                                  .split('.')
-                                                                  .contains(e),
-                                                          onChanged: (value) {
-                                                            final String ele;
-                                                            var val =
-                                                                controller[
-                                                                        index]
-                                                                    .text
-                                                                    .split('.');
-                                                            if (val
-                                                                .contains(e)) {
-                                                              val.remove(e);
-                                                              ele =
-                                                                  val.join(".");
-                                                            } else {
-                                                              ele =
-                                                                  "${controller[index].text}.$e";
-                                                            }
-                                                            controller[index]
-                                                                    .value =
-                                                                TextEditingController
-                                                                    .fromValue(
-                                                              TextEditingValue(
-                                                                text: ele,
-                                                              ),
-                                                            ).value;
-                                                          },
-                                                        ))
-                                                    .toList(),
-                                              );
-                                            },
-                                          ),
-                                        ]
-                                      ]);
-                                    }).toList(),
-                                    const SizedBox(
-                                      height: 15,
-                                    ),
-                                  ])],
+                                                                      .value =
+                                                                  TextEditingController
+                                                                      .fromValue(
+                                                                TextEditingValue(
+                                                                  text: ele,
+                                                                ),
+                                                              ).value;
+                                                            },
+                                                          ))
+                                                      .toList(),
+                                                );
+                                              },
+                                            ),
+                                          ]
+                                        ]);
+                                      }).toList(),
+                                      const SizedBox(
+                                        height: 15,
+                                      ),
+                                    ])
+                              ],
                             ),
                           ),
                         ],
@@ -405,4 +419,66 @@ class _VaccineSelectionPageState extends LocalizedState<VaccineSelectionPage> {
           );
         })));
   }
+}
+
+
+class CustomDigitCheckboxTile extends StatelessWidget {
+  final bool value;
+  final String label;
+  final ValueChanged<bool>? onChanged;
+  final EdgeInsets? margin;
+  final EdgeInsets? padding;
+  final bool isDisabled; // 1. Add parameter
+
+  const CustomDigitCheckboxTile({
+    this.value = false,
+    required this.label,
+    this.onChanged,
+    this.padding,
+    this.margin,
+    this.isDisabled = false, // 2. Add to constructor
+    super.key,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    return Padding(
+      padding: padding ?? const EdgeInsets.all(0),
+      child: InkWell(
+        onTap: isDisabled ? null : () => onChanged?.call(!value), // 3. Disable tap
+        child: Padding(
+          padding: const EdgeInsets.only(left: 0, bottom: kPadding * 2),
+          child: Row(
+            mainAxisAlignment: MainAxisAlignment.start,
+            children: [
+              value
+                  ? const CheckboxIcon(
+                      value: true,// 3. Disabled color
+                    )
+                  : const CheckboxIcon(
+                    ),
+              const SizedBox(width: kPadding * 2),
+              Expanded(
+                child: Text(
+                  label,
+                  style: Theme.of(context).textTheme.bodyLarge?.copyWith(
+                        color: isDisabled
+                            ? Colors.grey
+                            : Theme.of(context).textTheme.bodyLarge?.color,
+                      ),
+                ),
+              ),
+            ],
+          ),
+        ),
+      ),
+    );
+  }
+}
+
+int calculateAgeInDaysFromDob(String dobString) {
+  final dob = DigitDateUtils.getFormattedDateToDateTime(dobString);
+  if (dob == null) return 0;
+  final now = DateTime.now();
+  return now.difference(dob).inDays;
 }
