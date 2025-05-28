@@ -699,6 +699,12 @@ abstract class _$AppRouter extends RootStackRouter {
         ),
       );
     },
+    VaccineSelectionRoute.name: (routeData) {
+      return AutoRoutePage<dynamic>(
+        routeData: routeData,
+        child: const VaccineSelectionPage(),
+      );
+    },
     ViewAllTransactionsRoute.name: (routeData) {
       final args = routeData.argsAs<ViewAllTransactionsRouteArgs>();
       return AutoRoutePage<dynamic>(
@@ -3280,6 +3286,20 @@ class UserQRDetailsRouteArgs {
   String toString() {
     return 'UserQRDetailsRouteArgs{key: $key, appLocalizations: $appLocalizations}';
   }
+}
+
+/// generated route for
+/// [VaccineSelectionPage]
+class VaccineSelectionRoute extends PageRouteInfo<void> {
+  const VaccineSelectionRoute({List<PageRouteInfo>? children})
+      : super(
+          VaccineSelectionRoute.name,
+          initialChildren: children,
+        );
+
+  static const String name = 'VaccineSelectionRoute';
+
+  static const PageInfo<void> page = PageInfo<void>(name);
 }
 
 /// generated route for
