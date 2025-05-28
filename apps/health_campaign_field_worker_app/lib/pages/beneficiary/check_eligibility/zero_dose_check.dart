@@ -25,6 +25,7 @@ import 'package:reactive_forms/reactive_forms.dart';
 import 'package:group_radio_button/group_radio_button.dart';
 // import 'package:registration_delivery/models/entities/status.dart';
 import 'package:registration_delivery/registration_delivery.dart';
+import 'package:registration_delivery/router/registration_delivery_router.gm.dart';
 import 'package:registration_delivery/utils/i18_key_constants.dart' as i18;
 import 'package:registration_delivery/utils/utils.dart';
 import 'package:registration_delivery/widgets/localized.dart';
@@ -267,13 +268,11 @@ class ZeroDoseCheckPageState extends LocalizedState<ZeroDoseCheckPage> {
                                   context,
                                   options: DigitDialogOptions(
                                     titleText: localizations.translate(
-                                      i18_local.checklist
-                                          .submitButtonDialogLabelText,
+                                      i18.deliverIntervention.dialogTitle,
                                     ),
                                     content: Text(localizations
                                         .translate(
-                                          i18_local.checklist
-                                              .checklistDialogDynamicDescription,
+                                          i18.deliverIntervention.dialogContent,
                                         )
                                         .replaceFirst('{}', '')),
                                     primaryAction: DigitDialogActions(
@@ -282,20 +281,149 @@ class ZeroDoseCheckPageState extends LocalizedState<ZeroDoseCheckPage> {
                                             .checklistDialogPrimaryAction,
                                       ),
                                       action: (ctx) {
+                                        final referenceId = IdGen.i.identifier;
+                                        List<ServiceAttributesModel>
+                                            attributes = [];
+                                        for (int i = 0;
+                                            i < controller.length;
+                                            i++) {
+                                          final attribute = initialAttributes;
+
+                                          attributes.add(ServiceAttributesModel(
+                                            auditDetails: AuditDetails(
+                                              createdBy:
+                                                  context.loggedInUserUuid,
+                                              createdTime: context
+                                                  .millisecondsSinceEpoch(),
+                                            ),
+                                            attributeCode:
+                                                '${attribute?[i].code}',
+                                            dataType: attribute?[i].dataType,
+                                            clientReferenceId:
+                                                IdGen.i.identifier,
+                                            referenceId: referenceId,
+                                            value: attribute?[i].dataType !=
+                                                    'SingleValueList'
+                                                ? controller[i]
+                                                        .text
+                                                        .toString()
+                                                        .trim()
+                                                        .isNotEmpty
+                                                    ? controller[i]
+                                                        .text
+                                                        .toString()
+                                                    : ''
+                                                : visibleChecklistIndexes
+                                                        .contains(i)
+                                                    ? controller[i]
+                                                        .text
+                                                        .toString()
+                                                    : i18_local.checklist
+                                                        .notSelectedKey,
+                                            rowVersion: 1,
+                                            tenantId: attribute?[i].tenantId,
+                                            additionalFields:
+                                                ServiceAttributesAdditionalFields(
+                                              version: 1,
+                                              // TODO: This needs to be done after adding locationbloc
+                                              fields: [
+                                                AdditionalField(
+                                                  'latitude',
+                                                  latitude,
+                                                ),
+                                                AdditionalField(
+                                                  'longitude',
+                                                  longitude,
+                                                ),
+                                              ],
+                                            ),
+                                          ));
+                                        }
+
+                                        context.read<ServiceBloc>().add(
+                                              ServiceCreateEvent(
+                                                serviceModel: ServiceModel(
+                                                  createdAt: DigitDateUtils
+                                                      .getDateFromTimestamp(
+                                                    DateTime.now()
+                                                        .toLocal()
+                                                        .millisecondsSinceEpoch,
+                                                    dateFormat: Constants
+                                                        .checklistViewDateFormat,
+                                                  ),
+                                                  tenantId:
+                                                      selectedServiceDefinition!
+                                                          .tenantId,
+                                                  clientId: referenceId,
+                                                  serviceDefId:
+                                                      selectedServiceDefinition
+                                                          ?.id,
+                                                  attributes: attributes,
+                                                  rowVersion: 1,
+                                                  accountId: context.projectId,
+                                                  auditDetails: AuditDetails(
+                                                    createdBy: context
+                                                        .loggedInUserUuid,
+                                                    createdTime: DateTime.now()
+                                                        .millisecondsSinceEpoch,
+                                                  ),
+                                                  clientAuditDetails:
+                                                      ClientAuditDetails(
+                                                    createdBy: context
+                                                        .loggedInUserUuid,
+                                                    createdTime: context
+                                                        .millisecondsSinceEpoch(),
+                                                    lastModifiedBy: context
+                                                        .loggedInUserUuid,
+                                                    lastModifiedTime: context
+                                                        .millisecondsSinceEpoch(),
+                                                  ),
+                                                  additionalDetails: {
+                                                    "boundaryCode":
+                                                        context.boundary.code
+                                                  },
+                                                ),
+                                              ),
+                                            );
                                         Navigator.of(
                                           context,
                                           rootNavigator: true,
                                         ).pop(true);
                                       },
                                     ),
+                                    secondaryAction:
+                                        widget.eligibilityAssessmentType ==
+                                                EligibilityAssessmentType.smc
+                                            ? DigitDialogActions(
+                                                label: localizations.translate(
+                                                  i18_local.checklist
+                                                      .checklistDialogSecondaryAction,
+                                                ),
+                                                action: (context) {
+                                                  Navigator.of(
+                                                    context,
+                                                    rootNavigator: true,
+                                                  ).pop(false);
+                                                },
+                                              )
+                                            : null,
                                   ),
                                 );
                                 if (shouldSubmit ?? false) {
                                   if (context.mounted) {
                                     final router = context.router;
-                                    router.push(CustomBeneficiaryDetailsRoute(
-                                        eligibilityAssessmentType:
-                                            widget.eligibilityAssessmentType));
+                                    // router.push(const VaccineSelectionRoute());
+                                    // router.push(CustomBeneficiaryDetailsRoute(
+                                    //     eligibilityAssessmentType:
+                                    //         widget.eligibilityAssessmentType));
+                                    router.popUntilRouteWithName(
+                                        BeneficiaryWrapperRoute.name);
+                                    router.push(
+                                      CustomSplashAcknowledgementRoute(
+                                          enableBackToSearch: false,
+                                          eligibilityAssessmentType:
+                                              widget.eligibilityAssessmentType),
+                                    );
                                   }
                                 }
                               },
