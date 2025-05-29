@@ -433,6 +433,26 @@ class CustomStockReconciliationPageState
                                                       code: variant.id,
                                                     );
                                                   }).toList(),
+                                                  selectedOption: (field
+                                                              .control.value !=
+                                                          null)
+                                                      ? DropdownItem(
+                                                          name: localizations
+                                                              .translate(
+                                                            (field.control.value
+                                                                        as ProductVariantModel)
+                                                                    .sku ??
+                                                                (field.control
+                                                                            .value
+                                                                        as ProductVariantModel)
+                                                                    .id,
+                                                          ),
+                                                          code: (field.control
+                                                                      .value
+                                                                  as ProductVariantModel)
+                                                              .id)
+                                                      : const DropdownItem(
+                                                          name: '', code: ''),
                                                   onSelect: (value) {
                                                     field.control
                                                         .markAsTouched();

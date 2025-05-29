@@ -1072,6 +1072,23 @@ class CustomStockDetailsPageState
                                                 field.control.value =
                                                     value.name;
                                               },
+                                              selectedOption: (form
+                                                          .control(
+                                                              _typeOfTransportKey)
+                                                          .value !=
+                                                      null)
+                                                  ? DropdownItem(
+                                                      name: localizations
+                                                          .translate(form
+                                                              .control(
+                                                                  _typeOfTransportKey)
+                                                              .value),
+                                                      code: form
+                                                          .control(
+                                                              _typeOfTransportKey)
+                                                          .value)
+                                                  : const DropdownItem(
+                                                      name: '', code: ''),
                                             ),
                                           );
                                         },
