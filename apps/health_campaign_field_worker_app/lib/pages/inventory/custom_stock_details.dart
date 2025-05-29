@@ -831,12 +831,12 @@ class CustomStockDetailsPageState
                                                         .read<AuthBloc>()
                                                         .add(
                                                           AuthAddSpaqCountsEvent(
-                                                            spaq1Count: spaqL1 +
+                                                            spaq1Count:
                                                                 int.parse(
-                                                                  quantity
-                                                                      .toString(),
-                                                                ),
-                                                            spaq2Count: spaqL2,
+                                                              quantity
+                                                                  .toString(),
+                                                            ),
+                                                            spaq2Count: 0,
                                                           ),
                                                         );
                                                   } else {
@@ -844,12 +844,12 @@ class CustomStockDetailsPageState
                                                         .read<AuthBloc>()
                                                         .add(
                                                           AuthAddSpaqCountsEvent(
-                                                            spaq1Count: spaqL1,
-                                                            spaq2Count: spaqL2 +
+                                                            spaq1Count: 0,
+                                                            spaq2Count:
                                                                 int.parse(
-                                                                  quantity
-                                                                      .toString(),
-                                                                ),
+                                                              quantity
+                                                                  .toString(),
+                                                            ),
                                                           ),
                                                         );
                                                   }
@@ -860,14 +860,17 @@ class CustomStockDetailsPageState
                                                       context.spaq1;
                                                   int spaqLocal2 =
                                                       context.spaq2;
+
                                                   if (isSpaq1) {
-                                                    spaqLocal1 -= int.parse(
-                                                      quantity.toString(),
-                                                    );
+                                                    spaqLocal1 = int.parse(
+                                                          quantity.toString(),
+                                                        ) *
+                                                        -1;
                                                   } else {
-                                                    spaqLocal2 -= int.parse(
-                                                      quantity.toString(),
-                                                    );
+                                                    spaqLocal2 = int.parse(
+                                                          quantity.toString(),
+                                                        ) *
+                                                        -1;
                                                   }
                                                   context.read<AuthBloc>().add(
                                                         AuthAddSpaqCountsEvent(
