@@ -93,366 +93,326 @@ class CustomDoseAdministeredPageState
       child: PopScope(
         canPop: false,
         child: Scaffold(
-          body: SafeArea(
-            child: BlocBuilder<LocationBloc, LocationState>(
-              builder: (context, locationState) {
-                return ScrollableContent(
-                  enableFixedDigitButton: true,
-                  header: const Column(children: [
-                    BackNavigationHelpHeaderWidget(
-                      showBackNavigation: false,
-                      showHelp: false,
-                    ),
-                  ]),
-                  footer: DigitCard(
-                      margin: const EdgeInsets.only(top: spacer2),
-                      children: [
-                        ValueListenableBuilder(
-                          valueListenable: clickedStatus,
-                          builder: (context, bool isClicked, _) {
-                            return DigitButton(
-                              label: localizations
-                                  .translate(i18.common.coreCommonNext),
-                              type: DigitButtonType.primary,
-                              size: DigitButtonSize.large,
-                              mainAxisSize: MainAxisSize.max,
-                              isDisabled: isClicked ||
-                                  !(_checkbox1 && _checkbox2 && _checkbox3),
-                              onPressed: () {
-                                final doseAdministered = true;
-                                final lat = locationState.latitude;
-                                final long = locationState.longitude;
-                                clickedStatus.value = true;
-                                final bloc = context
-                                    .read<DeliverInterventionBloc>()
-                                    .state;
-                                final event =
-                                    context.read<DeliverInterventionBloc>();
+          body: BlocBuilder<LocationBloc, LocationState>(
+            builder: (context, locationState) {
+              return ScrollableContent(
+                enableFixedDigitButton: true,
+                header: const Column(children: [
+                  BackNavigationHelpHeaderWidget(
+                    showBackNavigation: false,
+                    showHelp: false,
+                  ),
+                ]),
+                footer: DigitCard(
+                    margin: const EdgeInsets.only(top: spacer2),
+                    children: [
+                      ValueListenableBuilder(
+                        valueListenable: clickedStatus,
+                        builder: (context, bool isClicked, _) {
+                          return DigitButton(
+                            label: localizations
+                                .translate(i18.common.coreCommonNext),
+                            type: DigitButtonType.primary,
+                            size: DigitButtonSize.large,
+                            mainAxisSize: MainAxisSize.max,
+                            isDisabled: isClicked,
+                            onPressed: () {
+                              final doseAdministered = true;
+                              final lat = locationState.latitude;
+                              final long = locationState.longitude;
+                              clickedStatus.value = true;
+                              final bloc =
+                                  context.read<DeliverInterventionBloc>().state;
+                              final event =
+                                  context.read<DeliverInterventionBloc>();
 
-                                if (doseAdministered == true &&
-                                    context.mounted) {
-                                  // Iterate through future deliveries
+                              if (doseAdministered == true && context.mounted) {
+                                // Iterate through future deliveries
 
-                                  for (var e in bloc.futureDeliveries!) {
-                                    int doseIndex = e.id;
-                                    final clientReferenceId =
-                                        IdGen.i.identifier;
-                                    final address = bloc.oldTask?.address;
-                                    // Create and dispatch a DeliverInterventionSubmitEvent with a new TaskModel
-                                    event.add(DeliverInterventionSubmitEvent(
-                                      task: TaskModel(
-                                        projectId:
+                                for (var e in bloc.futureDeliveries!) {
+                                  int doseIndex = e.id;
+                                  final clientReferenceId = IdGen.i.identifier;
+                                  final address = bloc.oldTask?.address;
+                                  // Create and dispatch a DeliverInterventionSubmitEvent with a new TaskModel
+                                  event.add(DeliverInterventionSubmitEvent(
+                                    task: TaskModel(
+                                      projectId: RegistrationDeliverySingleton()
+                                          .projectId,
+                                      address: address?.copyWith(
+                                        relatedClientReferenceId:
+                                            clientReferenceId,
+                                        id: null,
+                                      ),
+                                      status: Status.delivered.toValue(),
+                                      clientReferenceId: clientReferenceId,
+                                      projectBeneficiaryClientReferenceId: bloc
+                                          .oldTask
+                                          ?.projectBeneficiaryClientReferenceId,
+                                      tenantId: RegistrationDeliverySingleton()
+                                          .tenantId,
+                                      rowVersion: 1,
+                                      auditDetails: AuditDetails(
+                                        createdBy:
                                             RegistrationDeliverySingleton()
-                                                .projectId,
-                                        address: address?.copyWith(
-                                          relatedClientReferenceId:
-                                              clientReferenceId,
-                                          id: null,
-                                        ),
-                                        status: Status.delivered.toValue(),
-                                        clientReferenceId: clientReferenceId,
-                                        projectBeneficiaryClientReferenceId: bloc
-                                            .oldTask
-                                            ?.projectBeneficiaryClientReferenceId,
-                                        tenantId:
+                                                .loggedInUserUuid!,
+                                        createdTime:
+                                            context.millisecondsSinceEpoch(),
+                                      ),
+                                      clientAuditDetails: ClientAuditDetails(
+                                        createdBy:
                                             RegistrationDeliverySingleton()
-                                                .tenantId,
-                                        rowVersion: 1,
-                                        auditDetails: AuditDetails(
-                                          createdBy:
-                                              RegistrationDeliverySingleton()
-                                                  .loggedInUserUuid!,
-                                          createdTime:
-                                              context.millisecondsSinceEpoch(),
-                                        ),
-                                        clientAuditDetails: ClientAuditDetails(
-                                          createdBy:
-                                              RegistrationDeliverySingleton()
-                                                  .loggedInUserUuid!,
-                                          createdTime:
-                                              context.millisecondsSinceEpoch(),
-                                        ),
-                                        resources: fetchProductVariant(
-                                                e,
-                                                overViewBloc.selectedIndividual,
-                                                overViewBloc
-                                                    .householdMemberWrapper
-                                                    .household)
-                                            ?.productVariants
-                                            ?.map((variant) =>
-                                                TaskResourceModel(
-                                                  clientReferenceId:
-                                                      IdGen.i.identifier,
-                                                  tenantId:
+                                                .loggedInUserUuid!,
+                                        createdTime:
+                                            context.millisecondsSinceEpoch(),
+                                      ),
+                                      resources: fetchProductVariant(
+                                              e,
+                                              overViewBloc.selectedIndividual,
+                                              overViewBloc
+                                                  .householdMemberWrapper
+                                                  .household)
+                                          ?.productVariants
+                                          ?.map((variant) => TaskResourceModel(
+                                                clientReferenceId:
+                                                    IdGen.i.identifier,
+                                                tenantId:
+                                                    RegistrationDeliverySingleton()
+                                                        .tenantId,
+                                                taskclientReferenceId:
+                                                    clientReferenceId,
+                                                quantity:
+                                                    variant.quantity.toString(),
+                                                productVariantId:
+                                                    variant.productVariantId,
+                                                isDelivered: true,
+                                                auditDetails: AuditDetails(
+                                                  createdBy:
                                                       RegistrationDeliverySingleton()
-                                                          .tenantId,
-                                                  taskclientReferenceId:
-                                                      clientReferenceId,
-                                                  quantity: variant.quantity
-                                                      .toString(),
-                                                  productVariantId:
-                                                      variant.productVariantId,
-                                                  isDelivered: true,
-                                                  auditDetails: AuditDetails(
-                                                    createdBy:
-                                                        RegistrationDeliverySingleton()
-                                                            .loggedInUserUuid!,
-                                                    createdTime: context
-                                                        .millisecondsSinceEpoch(),
-                                                  ),
-                                                  clientAuditDetails:
-                                                      ClientAuditDetails(
-                                                    createdBy:
-                                                        RegistrationDeliverySingleton()
-                                                            .loggedInUserUuid!,
-                                                    createdTime: context
-                                                        .millisecondsSinceEpoch(),
-                                                  ),
-                                                ))
-                                            .toList(),
-                                        additionalFields: TaskAdditionalFields(
-                                          version: 1,
-                                          fields: [
-                                            AdditionalField(
-                                              AdditionalFieldsType
-                                                  .dateOfDelivery
-                                                  .toValue(),
-                                              DateTime.now()
-                                                  .millisecondsSinceEpoch
-                                                  .toString(),
-                                            ),
-                                            AdditionalField(
-                                              AdditionalFieldsType
-                                                  .dateOfAdministration
-                                                  .toValue(),
-                                              DateTime.now()
-                                                  .millisecondsSinceEpoch
-                                                  .toString(),
-                                            ),
-                                            AdditionalField(
-                                              AdditionalFieldsType
-                                                  .dateOfVerification
-                                                  .toValue(),
-                                              DateTime.now()
-                                                  .millisecondsSinceEpoch
-                                                  .toString(),
-                                            ),
-                                            AdditionalField(
-                                              AdditionalFieldsType.cycleIndex
-                                                  .toValue(),
-                                              "0${bloc.cycle}",
-                                            ),
-                                            AdditionalField(
-                                              AdditionalFieldsType.doseIndex
-                                                  .toValue(),
-                                              "0$doseIndex",
-                                            ),
-                                            AdditionalField(
-                                              AdditionalFieldsType
-                                                  .deliveryStrategy
-                                                  .toValue(),
-                                              e.deliveryStrategy,
-                                            ),
-                                            if (lat != null)
-                                              AdditionalField(
-                                                AdditionalFieldsType.latitude
-                                                    .toValue(),
-                                                lat,
-                                              ),
-                                            if (long != null)
-                                              AdditionalField(
-                                                AdditionalFieldsType.longitude
-                                                    .toValue(),
-                                                long,
-                                              ),
-                                            AdditionalField(
-                                              additional_fields_local
-                                                  .AdditionalFieldsType
-                                                  .deliveryType
-                                                  .toValue(),
-                                              widget.eligibilityAssessmentType ==
-                                                      EligibilityAssessmentType
-                                                          .smc
-                                                  ? EligibilityAssessmentStatus
-                                                      .smcDone.name
-                                                  : EligibilityAssessmentStatus
-                                                      .vasDone.name,
-                                            ),
-                                          ],
-                                        ),
-                                      ),
-                                      isEditing: false,
-                                      boundaryModel:
-                                          RegistrationDeliverySingleton()
-                                              .boundary!,
-                                    ));
-                                  }
-
-                                  final reloadState =
-                                      context.read<HouseholdOverviewBloc>();
-
-                                  Future.delayed(
-                                    const Duration(milliseconds: 1000),
-                                    () {
-                                      reloadState
-                                          .add(HouseholdOverviewReloadEvent(
-                                        projectId:
-                                            RegistrationDeliverySingleton()
-                                                .projectId!,
-                                        projectBeneficiaryType:
-                                            RegistrationDeliverySingleton()
-                                                .beneficiaryType!,
-                                      ));
-                                    },
-                                  ).then((value) => context.router.popAndPush(
-                                        CustomHouseholdAcknowledgementRoute(
-                                          enableViewHousehold: true,
-                                          eligibilityAssessmentType:
-                                              widget.eligibilityAssessmentType,
-                                        ),
-                                      ));
-                                }
-                              },
-                            );
-                          },
-                        ),
-                      ]),
-                  children: [
-                    BlocBuilder<HouseholdOverviewBloc, HouseholdOverviewState>(
-                      builder: (context, state) {
-                        String name =
-                            state.selectedIndividual?.name?.givenName ?? "";
-                        String beneficiaryId = state
-                                .selectedIndividual?.identifiers
-                                ?.lastWhereOrNull((e) =>
-                                    e.identifierType ==
-                                    IdentifierTypes.uniqueBeneficiaryID
-                                        .toValue())
-                                ?.identifierId ??
-                            "";
-                        return DigitCard(
-                            margin: const EdgeInsets.only(
-                                top: spacer2, bottom: spacer2),
-                            children: [
-                              Text(
-                                localizations.translate(
-                                  i18.deliverIntervention
-                                      .wasTheDoseAdministered,
-                                ),
-                                style: textTheme.headingXl,
-                              ),
-                              Column(
-                                children: [
-                                  ListTile(
-                                    title: Text(
-                                      localizations.translate(
-                                        i18_local.deliverIntervention
-                                            .doseCompletionChecksText1,
-                                      ),
-                                    ),
-                                    leading: SizedBox(
-                                      width: 24,
-                                      height: 24,
-                                      child: Align(
-                                        alignment: Alignment.centerLeft,
-                                        child: DigitCheckbox(
-                                          value: _checkbox1,
-                                          onChanged: (bool? value) => setState(
-                                              () =>
-                                                  _checkbox1 = value ?? false),
-                                        ),
-                                      ),
-                                    ),
-                                    contentPadding: EdgeInsets.zero,
-                                    horizontalTitleGap: 8,
-                                    minLeadingWidth: 24,
-                                    minVerticalPadding: 0,
-                                  ),
-                                  ListTile(
-                                    title: Text.rich(
-                                      TextSpan(
-                                        text:
-                                            '${localizations.translate(i18_local.deliverIntervention.doseCompletionChecksText2)} ',
-                                        style: const TextStyle(
-                                            color: Colors.black),
-                                        children: [
-                                          TextSpan(
-                                            text: beneficiaryId,
-                                            style: const TextStyle(
-                                                color: Color.fromARGB(
-                                                    255, 245, 56, 42),
-                                                fontWeight: FontWeight.bold),
+                                                          .loggedInUserUuid!,
+                                                  createdTime: context
+                                                      .millisecondsSinceEpoch(),
+                                                ),
+                                                clientAuditDetails:
+                                                    ClientAuditDetails(
+                                                  createdBy:
+                                                      RegistrationDeliverySingleton()
+                                                          .loggedInUserUuid!,
+                                                  createdTime: context
+                                                      .millisecondsSinceEpoch(),
+                                                ),
+                                              ))
+                                          .toList(),
+                                      additionalFields: TaskAdditionalFields(
+                                        version: 1,
+                                        fields: [
+                                          AdditionalField(
+                                            AdditionalFieldsType.dateOfDelivery
+                                                .toValue(),
+                                            DateTime.now()
+                                                .millisecondsSinceEpoch
+                                                .toString(),
                                           ),
-                                          TextSpan(
-                                            text:
-                                                ' ${localizations.translate(i18_local.deliverIntervention.doseCompletionChecksText3)} ',
+                                          AdditionalField(
+                                            AdditionalFieldsType
+                                                .dateOfAdministration
+                                                .toValue(),
+                                            DateTime.now()
+                                                .millisecondsSinceEpoch
+                                                .toString(),
                                           ),
-                                          TextSpan(
-                                            text: name,
-                                            style: const TextStyle(
-                                                color: Color.fromARGB(
-                                                    255, 245, 56, 42),
-                                                fontWeight: FontWeight.bold),
+                                          AdditionalField(
+                                            AdditionalFieldsType
+                                                .dateOfVerification
+                                                .toValue(),
+                                            DateTime.now()
+                                                .millisecondsSinceEpoch
+                                                .toString(),
                                           ),
-                                          TextSpan(
-                                            text:
-                                                ' (${localizations.translate(i18_local.deliverIntervention.doseCompletionChecksText4)})',
+                                          AdditionalField(
+                                            AdditionalFieldsType.cycleIndex
+                                                .toValue(),
+                                            "0${bloc.cycle}",
+                                          ),
+                                          AdditionalField(
+                                            AdditionalFieldsType.doseIndex
+                                                .toValue(),
+                                            "0$doseIndex",
+                                          ),
+                                          AdditionalField(
+                                            AdditionalFieldsType
+                                                .deliveryStrategy
+                                                .toValue(),
+                                            e.deliveryStrategy,
+                                          ),
+                                          if (lat != null)
+                                            AdditionalField(
+                                              AdditionalFieldsType.latitude
+                                                  .toValue(),
+                                              lat,
+                                            ),
+                                          if (long != null)
+                                            AdditionalField(
+                                              AdditionalFieldsType.longitude
+                                                  .toValue(),
+                                              long,
+                                            ),
+                                          AdditionalField(
+                                            additional_fields_local
+                                                .AdditionalFieldsType
+                                                .deliveryType
+                                                .toValue(),
+                                            widget.eligibilityAssessmentType ==
+                                                    EligibilityAssessmentType
+                                                        .smc
+                                                ? EligibilityAssessmentStatus
+                                                    .smcDone.name
+                                                : EligibilityAssessmentStatus
+                                                    .vasDone.name,
                                           ),
                                         ],
                                       ),
                                     ),
-                                    leading: SizedBox(
-                                      width: 24,
-                                      height: 24,
-                                      child: Align(
-                                        alignment: Alignment.centerLeft,
-                                        child: DigitCheckbox(
-                                          value: _checkbox2,
-                                          onChanged: (bool? value) => setState(
-                                              () =>
-                                                  _checkbox2 = value ?? false),
-                                        ),
+                                    isEditing: false,
+                                    boundaryModel:
+                                        RegistrationDeliverySingleton()
+                                            .boundary!,
+                                  ));
+                                }
+
+                                final reloadState =
+                                    context.read<HouseholdOverviewBloc>();
+
+                                Future.delayed(
+                                  const Duration(milliseconds: 1000),
+                                  () {
+                                    reloadState
+                                        .add(HouseholdOverviewReloadEvent(
+                                      projectId: RegistrationDeliverySingleton()
+                                          .projectId!,
+                                      projectBeneficiaryType:
+                                          RegistrationDeliverySingleton()
+                                              .beneficiaryType!,
+                                    ));
+                                  },
+                                ).then((value) => context.router.popAndPush(
+                                      CustomHouseholdAcknowledgementRoute(
+                                        enableViewHousehold: true,
+                                        eligibilityAssessmentType:
+                                            widget.eligibilityAssessmentType,
                                       ),
-                                    ),
-                                    contentPadding: EdgeInsets.zero,
-                                    horizontalTitleGap: 8,
-                                    minLeadingWidth: 24,
-                                    minVerticalPadding: 0,
-                                  ),
-                                  ListTile(
-                                    title: Text(
-                                      localizations.translate(
-                                        i18_local.deliverIntervention
-                                            .doseCompletionChecksText5,
-                                      ),
-                                    ),
-                                    leading: SizedBox(
-                                      width: 24,
-                                      height: 24,
-                                      child: Align(
-                                        alignment: Alignment.centerLeft,
-                                        child: DigitCheckbox(
-                                          value: _checkbox3,
-                                          onChanged: (bool? value) => setState(
-                                              () =>
-                                                  _checkbox3 = value ?? false),
-                                        ),
-                                      ),
-                                    ),
-                                    contentPadding: EdgeInsets.zero,
-                                    horizontalTitleGap: 8,
-                                    minLeadingWidth: 24,
-                                    minVerticalPadding: 0,
-                                  ),
-                                ],
+                                    ));
+                              }
+                            },
+                          );
+                        },
+                      ),
+                    ]),
+                children: [
+                  BlocBuilder<HouseholdOverviewBloc, HouseholdOverviewState>(
+                    builder: (context, state) {
+                      String name =
+                          state.selectedIndividual?.name?.givenName ?? "";
+                      String beneficiaryId = state
+                              .selectedIndividual?.identifiers
+                              ?.lastWhereOrNull((e) =>
+                                  e.identifierType ==
+                                  IdentifierTypes.uniqueBeneficiaryID.toValue())
+                              ?.identifierId ??
+                          "";
+                      return DigitCard(
+                          margin: const EdgeInsets.only(
+                              top: spacer2, bottom: spacer2),
+                          children: [
+                            Text(
+                              localizations.translate(
+                                i18.deliverIntervention.wasTheDoseAdministered,
                               ),
-                            ]);
-                      },
-                    ),
-                  ],
-                );
-              },
-            ),
+                              style: textTheme.headingXl,
+                            ),
+                            Column(
+                              children: [
+                                ListTile(
+                                  title: Text(
+                                    localizations.translate(
+                                      i18_local.deliverIntervention
+                                          .doseCompletionChecksText1,
+                                    ),
+                                  ),
+                                  leading: const Text("1."),
+                                  horizontalTitleGap: 0,
+                                  minLeadingWidth: 24,
+                                  minVerticalPadding: 0,
+                                ),
+                                ListTile(
+                                  title: Text.rich(
+                                    TextSpan(
+                                      text:
+                                          '${localizations.translate(i18_local.deliverIntervention.doseCompletionChecksText2)} ',
+                                      style:
+                                          const TextStyle(color: Colors.black),
+                                      children: [
+                                        TextSpan(
+                                          text: beneficiaryId,
+                                          style: const TextStyle(
+                                              color: Color.fromARGB(
+                                                  255, 245, 56, 42),
+                                              fontWeight: FontWeight.bold),
+                                        ),
+                                        TextSpan(
+                                          text:
+                                              ' ${localizations.translate(i18_local.deliverIntervention.doseCompletionChecksText3)} ',
+                                        ),
+                                        TextSpan(
+                                          text: name,
+                                          style: const TextStyle(
+                                              color: Color.fromARGB(
+                                                  255, 245, 56, 42),
+                                              fontWeight: FontWeight.bold),
+                                        ),
+                                        TextSpan(
+                                          text:
+                                              ' (${localizations.translate(i18_local.deliverIntervention.doseCompletionChecksText4)})',
+                                        ),
+                                      ],
+                                    ),
+                                  ),
+                                  leading: const Text("2."),
+                                  horizontalTitleGap: 0,
+                                  minLeadingWidth: 24,
+                                  minVerticalPadding: 0,
+                                ),
+                                ListTile(
+                                  title: Text(
+                                    localizations.translate(
+                                      i18_local.deliverIntervention
+                                          .doseCompletionChecksText5,
+                                    ),
+                                  ),
+                                  leading: const Text("3."),
+                                  horizontalTitleGap: 0,
+                                  minLeadingWidth: 24,
+                                  minVerticalPadding: 0,
+                                ),
+                                ListTile(
+                                  title: Text(
+                                    localizations.translate(
+                                      i18_local.deliverIntervention
+                                          .doseCompletionChecksText6,
+                                    ),
+                                  ),
+                                  leading: const Text("4."),
+                                  horizontalTitleGap: 0,
+                                  minLeadingWidth: 24,
+                                  minVerticalPadding: 0,
+                                ),
+                              ],
+                            ),
+                          ]);
+                    },
+                  ),
+                ],
+              );
+            },
           ),
         ),
       ),
