@@ -34,7 +34,6 @@ import '../pages/beneficiary/check_eligibility/inventory_facility_selection_smc.
 import '../pages/beneficiary/check_eligibility/refer_beneficiary_smc.dart';
 import '../pages/beneficiary/check_eligibility/refer_beneficiary_vas.dart';
 import '../pages/beneficiary/check_eligibility/vaccine_selection_page.dart';
-import '../pages/inventory_management/view_record_lga.dart';
 import '../pages/registration_delivery/custom_complaints_details.dart';
 import '../pages/boundary_selection.dart';
 import '../pages/home.dart';
