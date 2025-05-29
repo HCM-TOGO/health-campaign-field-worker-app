@@ -114,6 +114,14 @@ class Constants {
   static const String blueVAS = "Blue VAS";
   static const String redVAS = "Red VAS";
 
+  // for reportSummary
+
+  static const String registered = "registered";
+  static const String administered = "administered";
+  static const String refusals = "refusals";
+  static const String tablet_3_11 = "tablet_3_11";
+  static const String tablet_12_59 = "tablet_12_59";
+
   // todo enable before cycle2
   static const bool isDownSyncEnabled = false;
   static const String dashboardAnalyticsPath =

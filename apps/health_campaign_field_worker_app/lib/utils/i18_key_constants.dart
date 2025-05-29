@@ -407,6 +407,10 @@ class HomeShowcase {
     return 'WAREHOUSE_MANAGER_HOME_SHOWCASE_STOCK_RECONCILIATION';
   }
 
+   String get summaryReport {
+    return 'HOME_SUMMARY_LABEL';
+  }
+
   String get warehouseManagerFileComplaint {
     return 'WAREHOUSE_MANAGER_HOME_SHOWCASE_FILE_COMPLAINT';
   }
@@ -882,6 +886,7 @@ class Home {
   const Home();
 
   String get beneficiaryLabel => 'HOME_BENEFICIARY_LABEL';
+  String get summaryLabel => 'HOME_SUMMARY_LABEL';
 
   String get beneficiaryDistributionLabel =>
       'HOME_BENEFICIARY_DISTRIBUTION_LABEL';

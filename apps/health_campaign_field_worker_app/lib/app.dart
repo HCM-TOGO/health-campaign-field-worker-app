@@ -10,6 +10,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:inventory_management/blocs/record_stock.dart';
 import 'package:inventory_management/models/entities/stock.dart';
+import 'package:inventory_management/models/entities/stock_reconciliation.dart';
 import 'package:inventory_management/utils/utils.dart';
 import 'package:isar/isar.dart';
 import 'package:location/location.dart';
@@ -20,6 +21,7 @@ import 'package:survey_form/survey_form.dart';
 
 import 'blocs/app_initialization/app_initialization.dart';
 import 'blocs/auth/auth.dart';
+import 'blocs/inventory_management/custom_summary_report_bloc.dart';
 import 'blocs/inventory_management/stock_bloc.dart';
 import 'blocs/localization/localization.dart';
 import 'blocs/project/project.dart';
@@ -262,6 +264,22 @@ class MainApplicationState extends State<MainApplication>
 
                     return MultiBlocProvider(
                       providers: [
+                        BlocProvider(
+                          create: (context) => SummaryReportBloc(
+                            individualRepository: context.repository<
+                                IndividualModel, IndividualSearchModel>(),
+                            householdMemberRepository: context.repository<
+                                HouseholdMemberModel,
+                                HouseholdMemberSearchModel>(),
+                            taskDataRepository: context
+                                .repository<TaskModel, TaskSearchModel>(),
+                            stockRepository: context
+                                .repository<StockModel, StockSearchModel>(),
+                            stockReconciliationRepository: context.repository<
+                                StockReconciliationModel,
+                                StockReconciliationSearchModel>(),
+                          ),
+                        ),
                         BlocProvider(
                             create: (_) => IndividualGlobalSearchSMCBloc(
                                 userUid: RegistrationDeliverySingleton()

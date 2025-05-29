@@ -382,19 +382,29 @@ class _HomePageState extends LocalizedState<HomePage> {
           icon: Icons.store_mall_directory,
           label: i18.home.manageStockLabel,
           onPressed: () {
-            context.read<AppInitializationBloc>().state.maybeWhen(
-                  orElse: () {},
-                  initialized: (
-                    AppConfiguration appConfiguration,
-                    _,
-                    __,
-                  ) {
-                    context.router.push(ManageStocksRoute());
-                  },
-                );
+            // context.read<AppInitializationBloc>().state.maybeWhen(
+            //       orElse: () {},
+            //       initialized: (
+            //         AppConfiguration appConfiguration,
+            //         _,
+            //         __,
+            //       ) {
+            //         context.router.push(ManageStocksRoute());
+            //       },
+            //     );
+            context.router.push(CustomSummaryReportRoute());
           },
         ),
       ),
+      // i18.home.summaryLabel: homeShowcaseData.summaryReport.buildWith(
+      //   child: HomeItemCard(
+      //     icon: Icons.summarize,
+      //     label: i18.home.summaryLabel,
+      //     onPressed: () {
+      //       // context.router.push(CustomSummaryReportRoute());
+      //     },
+      //   ),
+      // ),
       i18.home.stockReconciliationLabel:
           homeShowcaseData.wareHouseManagerStockReconciliation.buildWith(
         child: HomeItemCard(
@@ -528,6 +538,7 @@ class _HomePageState extends LocalizedState<HomePage> {
       // INFO : Need to add showcase keys of package Here
       i18.home.manageAttendanceLabel:
           homeShowcaseData.manageAttendance.showcaseKey,
+      i18.home.summaryLabel: homeShowcaseData.summaryReport.showcaseKey,
 
       i18.home.beneficiaryReferralLabel:
           homeShowcaseData.hfBeneficiaryReferral.showcaseKey,
@@ -564,6 +575,7 @@ class _HomePageState extends LocalizedState<HomePage> {
       i18.home.fileComplaint,
       i18.home.db,
       i18.home.dashboard,
+      i18.home.summaryLabel,
     ];
 
     final List<String> filteredLabels = homeItemsLabel

@@ -492,6 +492,17 @@ abstract class _$AppRouter extends RootStackRouter {
         ),
       );
     },
+    CustomSummaryReportRoute.name: (routeData) {
+      final args = routeData.argsAs<CustomSummaryReportRouteArgs>(
+          orElse: () => const CustomSummaryReportRouteArgs());
+      return AutoRoutePage<dynamic>(
+        routeData: routeData,
+        child: CustomSummaryReportPage(
+          key: args.key,
+          appLocalizations: args.appLocalizations,
+        ),
+      );
+    },
     CustomSurveyFormAcknowledgementRoute.name: (routeData) {
       final args = routeData.argsAs<CustomSurveyFormAcknowledgementRouteArgs>(
           orElse: () => const CustomSurveyFormAcknowledgementRouteArgs());
@@ -705,6 +716,7 @@ abstract class _$AppRouter extends RootStackRouter {
         routeData: routeData,
         child: ViewAllTransactionsScreen(
           key: args.key,
+          appLocalizations: args.appLocalizations,
           warehouseId: args.warehouseId,
         ),
       );
@@ -2533,6 +2545,45 @@ class CustomSummaryRouteArgs {
 }
 
 /// generated route for
+/// [CustomSummaryReportPage]
+class CustomSummaryReportRoute
+    extends PageRouteInfo<CustomSummaryReportRouteArgs> {
+  CustomSummaryReportRoute({
+    Key? key,
+    AppLocalizations? appLocalizations,
+    List<PageRouteInfo>? children,
+  }) : super(
+          CustomSummaryReportRoute.name,
+          args: CustomSummaryReportRouteArgs(
+            key: key,
+            appLocalizations: appLocalizations,
+          ),
+          initialChildren: children,
+        );
+
+  static const String name = 'CustomSummaryReportRoute';
+
+  static const PageInfo<CustomSummaryReportRouteArgs> page =
+      PageInfo<CustomSummaryReportRouteArgs>(name);
+}
+
+class CustomSummaryReportRouteArgs {
+  const CustomSummaryReportRouteArgs({
+    this.key,
+    this.appLocalizations,
+  });
+
+  final Key? key;
+
+  final AppLocalizations? appLocalizations;
+
+  @override
+  String toString() {
+    return 'CustomSummaryReportRouteArgs{key: $key, appLocalizations: $appLocalizations}';
+  }
+}
+
+/// generated route for
 /// [CustomSurveyFormAcknowledgementPage]
 class CustomSurveyFormAcknowledgementRoute
     extends PageRouteInfo<CustomSurveyFormAcknowledgementRouteArgs> {
@@ -3270,12 +3321,14 @@ class ViewAllTransactionsRoute
     extends PageRouteInfo<ViewAllTransactionsRouteArgs> {
   ViewAllTransactionsRoute({
     Key? key,
+    AppLocalizations? appLocalizations,
     required String? warehouseId,
     List<PageRouteInfo>? children,
   }) : super(
           ViewAllTransactionsRoute.name,
           args: ViewAllTransactionsRouteArgs(
             key: key,
+            appLocalizations: appLocalizations,
             warehouseId: warehouseId,
           ),
           initialChildren: children,
@@ -3290,16 +3343,19 @@ class ViewAllTransactionsRoute
 class ViewAllTransactionsRouteArgs {
   const ViewAllTransactionsRouteArgs({
     this.key,
+    this.appLocalizations,
     required this.warehouseId,
   });
 
   final Key? key;
 
+  final AppLocalizations? appLocalizations;
+
   final String? warehouseId;
 
   @override
   String toString() {
-    return 'ViewAllTransactionsRouteArgs{key: $key, warehouseId: $warehouseId}';
+    return 'ViewAllTransactionsRouteArgs{key: $key, appLocalizations: $appLocalizations, warehouseId: $warehouseId}';
   }
 }
 
