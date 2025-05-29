@@ -186,6 +186,9 @@ class CustomDeliverInterventionPageState
     TaskModel taskModel,
     DeliverInterventionState deliverState,
   ) async {
+    // TODO: Uncomment the following lines if you want to submit the task model here only
+    // Currently it's been shifted to the CustomDeliverySummary page
+
     // context.read<DeliverInterventionBloc>().add(
     //       DeliverInterventionSubmitEvent(
     //         task: deliverState.oldTask ?? taskModel,
