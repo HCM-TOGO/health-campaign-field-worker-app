@@ -233,11 +233,9 @@ class MainApplicationState extends State<MainApplication>
                     final localizationModulesList = appConfig.backendInterface;
                     var firstLanguage;
                     firstLanguage = appConfig.languages?.lastOrNull?.value;
-
                     final selectedLocale =
                         AppSharedPreferences().getSelectedLocale ??
                             firstLanguage;
-                    AppSharedPreferences().setSelectedLocale("en_NG");
                     LocalizationParams().setLocale(Locale(selectedLocale));
                     final languages = appConfig.languages;
 

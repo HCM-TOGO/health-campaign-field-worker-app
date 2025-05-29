@@ -5,6 +5,7 @@ import 'package:digit_ui_components/utils/component_utils.dart';
 import 'package:digit_ui_components/widgets/molecules/language_selection_card.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:logger/logger.dart';
 import 'package:package_info_plus/package_info_plus.dart';
 
 import '../blocs/app_initialization/app_initialization.dart';
@@ -51,6 +52,9 @@ class _LanguageSelectionPageState extends State<LanguageSelectionPage> {
                 final languages = state.appConfiguration.languages;
                 final localizationModulesList =
                     state.appConfiguration.backendInterface?.interfaces;
+
+                Logger().d(localizationModulesList);
+
                 if (languages == null) {
                   return const Offstage();
                 }

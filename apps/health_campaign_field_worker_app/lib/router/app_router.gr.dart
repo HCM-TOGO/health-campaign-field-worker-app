@@ -705,6 +705,7 @@ abstract class _$AppRouter extends RootStackRouter {
         routeData: routeData,
         child: ViewAllTransactionsScreen(
           key: args.key,
+          appLocalizations: args.appLocalizations,
           warehouseId: args.warehouseId,
         ),
       );
@@ -3270,12 +3271,14 @@ class ViewAllTransactionsRoute
     extends PageRouteInfo<ViewAllTransactionsRouteArgs> {
   ViewAllTransactionsRoute({
     Key? key,
+    AppLocalizations? appLocalizations,
     required String? warehouseId,
     List<PageRouteInfo>? children,
   }) : super(
           ViewAllTransactionsRoute.name,
           args: ViewAllTransactionsRouteArgs(
             key: key,
+            appLocalizations: appLocalizations,
             warehouseId: warehouseId,
           ),
           initialChildren: children,
@@ -3290,16 +3293,19 @@ class ViewAllTransactionsRoute
 class ViewAllTransactionsRouteArgs {
   const ViewAllTransactionsRouteArgs({
     this.key,
+    this.appLocalizations,
     required this.warehouseId,
   });
 
   final Key? key;
 
+  final AppLocalizations? appLocalizations;
+
   final String? warehouseId;
 
   @override
   String toString() {
-    return 'ViewAllTransactionsRouteArgs{key: $key, warehouseId: $warehouseId}';
+    return 'ViewAllTransactionsRouteArgs{key: $key, appLocalizations: $appLocalizations, warehouseId: $warehouseId}';
   }
 }
 
