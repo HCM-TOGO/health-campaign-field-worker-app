@@ -76,6 +76,8 @@ class ZeroDoseCheckPageState extends LocalizedState<ZeroDoseCheckPage> {
   List<int> visibleChecklistIndexes = [];
   GlobalKey<FormState> checklistFormKey = GlobalKey<FormState>();
   Map<String?, String> responses = {};
+  final String yes = "YES";
+  final String no = "NO";
 
   // List of controllers for form elements
   final List _controllers = [];
@@ -190,11 +192,7 @@ class ZeroDoseCheckPageState extends LocalizedState<ZeroDoseCheckPage> {
               builder: (context, householdOverviewState) {
                 double? latitude = locationState.latitude;
                 double? longitude = locationState.longitude;
-                String eligibilityAssessment =
-                    widget.eligibilityAssessmentType ==
-                            EligibilityAssessmentType.smc
-                        ? "ELIGIBLITY_ASSESSMENT"
-                        : "ELIGIBLITY_ASSESSMENT_2";
+                String zeroDoseAssessment = "ZERODOSE_ASSESSMENT";
                 return BlocBuilder<ServiceDefinitionBloc,
                     ServiceDefinitionState>(
                   builder: (context, state) {
@@ -203,7 +201,7 @@ class ZeroDoseCheckPageState extends LocalizedState<ZeroDoseCheckPage> {
                         selectedServiceDefinition = value.serviceDefinitionList
                             .where(
                                 (element) => element.code.toString().contains(
-                                      '${context.selectedProject.name}.$eligibilityAssessment.${context.isCommunityDistributor ? RolesType.communityDistributor.toValue() : RolesType.healthFacilitySupervisor.toValue()}',
+                                      '${context.selectedProject.name}.$zeroDoseAssessment.${context.isCommunityDistributor ? RolesType.communityDistributor.toValue() : ''}',
                                     ))
                             .toList()
                             .firstOrNull;
@@ -239,10 +237,23 @@ class ZeroDoseCheckPageState extends LocalizedState<ZeroDoseCheckPage> {
                                 kPadding, 0, kPadding, 0),
                             child: DigitElevatedButton(
                               onPressed: () async {
+                                submitTriggered = true;
                                 final isValid =
                                     checklistFormKey.currentState?.validate();
                                 if (!isValid!) {
                                   return;
+                                }
+                                final itemsAttributes = initialAttributes;
+
+                                for (int i = 0; i < controller.length; i++) {
+                                  if (itemsAttributes?[i].required == true &&
+                                      (itemsAttributes?[i].dataType ==
+                                              'SingleValueList' &&
+                                          visibleChecklistIndexes
+                                              .any((e) => e == i) &&
+                                          (controller[i].text == ''))) {
+                                    return;
+                                  }
                                 }
                                 for (int i = 0; i < controller.length; i++) {
                                   var attributeCode =
@@ -264,6 +275,111 @@ class ZeroDoseCheckPageState extends LocalizedState<ZeroDoseCheckPage> {
                                           : i18_local.checklist.notSelectedKey;
                                   responses[attributeCode] = value;
                                 }
+
+                                bool zeroDose = isZeroDose(responses);
+                                bool incompletementVaccine =
+                                    isIncompletementVaccine(
+                                  responses,
+                                );
+
+                                // TODO: Uncomment this block when the vaccine selection page is complete
+
+                                // if (!zeroDose && !incompletementVaccine) {
+                                //   final referenceId = IdGen.i.identifier;
+                                //   List<ServiceAttributesModel> attributes = [];
+                                //   for (int i = 0; i < controller.length; i++) {
+                                //     final attribute = initialAttributes;
+
+                                //     attributes.add(ServiceAttributesModel(
+                                //       auditDetails: AuditDetails(
+                                //         createdBy: context.loggedInUserUuid,
+                                //         createdTime:
+                                //             context.millisecondsSinceEpoch(),
+                                //       ),
+                                //       attributeCode: '${attribute?[i].code}',
+                                //       dataType: attribute?[i].dataType,
+                                //       clientReferenceId: IdGen.i.identifier,
+                                //       referenceId: referenceId,
+                                //       value: attribute?[i].dataType !=
+                                //               'SingleValueList'
+                                //           ? controller[i]
+                                //                   .text
+                                //                   .toString()
+                                //                   .trim()
+                                //                   .isNotEmpty
+                                //               ? controller[i].text.toString()
+                                //               : ''
+                                //           : visibleChecklistIndexes.contains(i)
+                                //               ? controller[i].text.toString()
+                                //               : i18_local
+                                //                   .checklist.notSelectedKey,
+                                //       rowVersion: 1,
+                                //       tenantId: attribute?[i].tenantId,
+                                //       additionalFields:
+                                //           ServiceAttributesAdditionalFields(
+                                //         version: 1,
+                                //         // TODO: This needs to be done after adding locationbloc
+                                //         fields: [
+                                //           AdditionalField(
+                                //             'latitude',
+                                //             latitude,
+                                //           ),
+                                //           AdditionalField(
+                                //             'longitude',
+                                //             longitude,
+                                //           ),
+                                //         ],
+                                //       ),
+                                //     ));
+                                //   }
+
+                                //   context.read<ServiceBloc>().add(
+                                //         ServiceCreateEvent(
+                                //           serviceModel: ServiceModel(
+                                //             createdAt: DigitDateUtils
+                                //                 .getDateFromTimestamp(
+                                //               DateTime.now()
+                                //                   .toLocal()
+                                //                   .millisecondsSinceEpoch,
+                                //               dateFormat: Constants
+                                //                   .checklistViewDateFormat,
+                                //             ),
+                                //             tenantId: selectedServiceDefinition!
+                                //                 .tenantId,
+                                //             clientId: referenceId,
+                                //             serviceDefId:
+                                //                 selectedServiceDefinition?.id,
+                                //             attributes: attributes,
+                                //             rowVersion: 1,
+                                //             accountId: context.projectId,
+                                //             auditDetails: AuditDetails(
+                                //               createdBy:
+                                //                   context.loggedInUserUuid,
+                                //               createdTime: DateTime.now()
+                                //                   .millisecondsSinceEpoch,
+                                //             ),
+                                //             clientAuditDetails:
+                                //                 ClientAuditDetails(
+                                //               createdBy:
+                                //                   context.loggedInUserUuid,
+                                //               createdTime: context
+                                //                   .millisecondsSinceEpoch(),
+                                //               lastModifiedBy:
+                                //                   context.loggedInUserUuid,
+                                //               lastModifiedTime: context
+                                //                   .millisecondsSinceEpoch(),
+                                //             ),
+                                //             additionalDetails: {
+                                //               "boundaryCode":
+                                //                   context.boundary.code
+                                //             },
+                                //           ),
+                                //         ),
+                                //       );
+
+                                //   context.router
+                                //       .push(const VaccineSelectionRoute());
+                                // } else {
                                 final shouldSubmit = await DigitDialog.show(
                                   context,
                                   options: DigitDialogOptions(
@@ -412,10 +528,6 @@ class ZeroDoseCheckPageState extends LocalizedState<ZeroDoseCheckPage> {
                                 if (shouldSubmit ?? false) {
                                   if (context.mounted) {
                                     final router = context.router;
-                                    // router.push(const VaccineSelectionRoute());
-                                    // router.push(CustomBeneficiaryDetailsRoute(
-                                    //     eligibilityAssessmentType:
-                                    //         widget.eligibilityAssessmentType));
                                     router.popUntilRouteWithName(
                                         BeneficiaryWrapperRoute.name);
                                     router.push(
@@ -425,7 +537,16 @@ class ZeroDoseCheckPageState extends LocalizedState<ZeroDoseCheckPage> {
                                               widget.eligibilityAssessmentType),
                                     );
                                   }
+
+                                  submitTriggered = true;
+                                  context.read<ServiceBloc>().add(
+                                        const ServiceSurveyFormEvent(
+                                          value: '',
+                                          submitTriggered: true,
+                                        ),
+                                      );
                                 }
+                                // }
                               },
                               child: Text(
                                 localizations.translate(
@@ -450,7 +571,10 @@ class ZeroDoseCheckPageState extends LocalizedState<ZeroDoseCheckPage> {
                                             padding:
                                                 const EdgeInsets.only(left: 8),
                                             child: Text(
-                                              'Zero Dose Checking',
+                                              localizations.translate(
+                                                i18_local.deliverIntervention
+                                                    .zeroDoseCheckLabel,
+                                              ),
                                               style: theme
                                                   .textTheme.displayMedium
                                                   ?.copyWith(
@@ -719,7 +843,6 @@ class ZeroDoseCheckPageState extends LocalizedState<ZeroDoseCheckPage> {
   // ignore: long-parameter-list
 
   // This method builds a form used for delivering interventions.
-
   FormGroup buildForm(
     BuildContext context,
     List<DeliveryProductVariant>? productVariants,
@@ -1017,9 +1140,11 @@ class ZeroDoseCheckPageState extends LocalizedState<ZeroDoseCheckPage> {
             childItem.code!.startsWith('$parentCode.$parentControllerValue.')))
           Card(
             margin: const EdgeInsets.only(bottom: 8.0, left: 4.0, right: 4.0),
-            color: countDots(matchingChildItem.code ?? '') % 4 == 2
-                ? const Color.fromRGBO(238, 238, 238, 1)
-                : const DigitColors().white,
+            color:
+                // countDots(matchingChildItem.code ?? '') % 4 == 2
+                //     ? const Color.fromRGBO(238, 238, 238, 1)
+                //     :
+                const DigitColors().white,
             child: _buildChecklist(
               matchingChildItem,
               initialAttributes?.indexOf(matchingChildItem) ??
@@ -1046,16 +1171,16 @@ class ZeroDoseCheckPageState extends LocalizedState<ZeroDoseCheckPage> {
     return nextCheckLists;
   }
 
-  int countDots(String inputString) {
-    int dotCount = 0;
-    for (int i = 0; i < inputString.length; i++) {
-      if (inputString[i] == '.') {
-        dotCount++;
-      }
-    }
+  // int countDots(String inputString) {
+  //   int dotCount = 0;
+  //   for (int i = 0; i < inputString.length; i++) {
+  //     if (inputString[i] == '.') {
+  //       dotCount++;
+  //     }
+  //   }
 
-    return dotCount;
-  }
+  //   return dotCount;
+  // }
 
   Future<bool> _onBackPressed(BuildContext context) async {
     bool? shouldNavigateBack = await showDialog<bool>(
@@ -1093,5 +1218,46 @@ class ZeroDoseCheckPageState extends LocalizedState<ZeroDoseCheckPage> {
     );
 
     return shouldNavigateBack ?? false;
+  }
+
+  bool isZeroDose(
+    Map<String?, String> responses,
+  ) {
+    var isZeroDose = false;
+    var q1Key = "ZDAQ1";
+    var q2Key = "ZDAQ1.NO.Q2A";
+    var q3Key = "ZDAQ1.NO.Q2A.YES.Q2AA";
+
+    if (responses.isNotEmpty) {
+      if (responses.containsKey(q1Key) && responses[q1Key]!.isNotEmpty) {
+        isZeroDose = responses[q1Key] == no ? true : false;
+      }
+      if (isZeroDose &&
+          (responses.containsKey(q2Key) && responses[q2Key]!.isNotEmpty)) {
+        isZeroDose = responses[q2Key] == no ? true : false;
+      }
+      if (!isZeroDose &&
+          (responses.containsKey(q3Key) && responses[q3Key]!.isNotEmpty)) {
+        isZeroDose = responses[q3Key] == no ? true : false;
+      }
+    }
+
+    return isZeroDose;
+  }
+
+  bool isIncompletementVaccine(
+    Map<String?, String> responses,
+  ) {
+    var isIncomplete = false;
+    var q3Key = "ZDAQ1.NO.Q2A.YES.Q2AA";
+
+    if (responses.isNotEmpty) {
+      if (!isIncomplete &&
+          (responses.containsKey(q3Key) && responses[q3Key]!.isNotEmpty)) {
+        isIncomplete = responses[q3Key] == yes ? true : false;
+      }
+    }
+
+    return isIncomplete;
   }
 }

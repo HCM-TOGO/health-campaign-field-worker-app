@@ -222,6 +222,8 @@ class DeliverIntervention {
       'DELIVER_INTERVENTION_DOSE_COMPLETION_CHECKS_TEXT4';
   String get doseCompletionChecksText5 =>
       'DELIVER_INTERVENTION_DOSE_COMPLETION_CHECKS_TEXT5';
+  String get doseCompletionChecksText6 =>
+      'DELIVER_INTERVENTION_DOSE_COMPLETION_CHECKS_TEXT6';
 
   String get quantityAdministratedLabel => 'QUANTITY_ADMINISTRATED_LABEL';
 
@@ -237,6 +239,8 @@ class DeliverIntervention {
   String get doseadministeredby => 'DOSE_ADMINISTERED_BY_LABEL';
   String get proceedToVASLabel => 'PROCEED_TO_VAS_LABEL';
   String get proceedToVASDescription => 'PROCEED_TO_VAS_DESCRIPTION';
+
+  String get zeroDoseCheckLabel => 'DELIVER_INTERVENTION_ZERO_DOSE_CHECK_LABEL';
 }
 
 class Checklist {
