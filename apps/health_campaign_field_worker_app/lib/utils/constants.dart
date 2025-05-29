@@ -112,8 +112,6 @@ class Constants {
 
   static const String spaq1 = "SPAQ 1";
   static const String spaq2 = "SPAQ 2";
-  static const String blueVAS = "Blue VAS";
-  static const String redVAS = "Red VAS";
 
   // todo enable before cycle2
   static const bool isDownSyncEnabled = false;
@@ -306,8 +304,7 @@ class Constants {
     SyncServiceSingleton().setRegistries(SyncServiceRegistry());
     SyncServiceSingleton().registries?.registerSyncRegistries({
       DataModelType.complaints: (remote) => CustomSyncRegistry(remote),
-  
-  });
+    });
     ClosedHouseholdSingleton().setTenantId(envConfig.variables.tenantId);
     AttendanceSingleton().setTenantId(envConfig.variables.tenantId);
     InventorySingleton().setTenantId(tenantId: envConfig.variables.tenantId);

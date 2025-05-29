@@ -295,10 +295,13 @@ class _CustomSearchBeneficiaryPageState
                                             Row(
                                               children: [
                                                 Padding(
-                                                  padding: const EdgeInsets.all(spacer2),
+                                                  padding: const EdgeInsets.all(
+                                                      spacer2),
                                                   child: DigitSwitch(
-                                                    label: localizations.translate(
-                                                        i18_local.beneficiaryDetails.searchbybeneficiaryidtextupdate),
+                                                    label: localizations
+                                                        .translate(i18_local
+                                                            .beneficiaryDetails
+                                                            .searchbybeneficiaryidtextupdate),
                                                     value:
                                                         isSearchByBeneficaryIdEnabled,
                                                     onChanged: (value) {
@@ -317,8 +320,10 @@ class _CustomSearchBeneficiaryPageState
                                                             value;
                                                         isProximityEnabled =
                                                             false;
-                                                        searchController.clear();
-                                                        blocWrapper.clearEvent();
+                                                        searchController
+                                                            .clear();
+                                                        blocWrapper
+                                                            .clearEvent();
                                                       });
                                                     },
                                                   ),
@@ -687,8 +692,6 @@ class _CustomSearchBeneficiaryPageState
                       onPressed: () {
                         int spaq1 = context.spaq1;
                         int spaq2 = context.spaq2;
-                        int blueVas = context.blueVas;
-                        int redVas = context.redVas;
 
                         String descriptionText = localizations.translate(
                             i18_local
@@ -702,61 +705,54 @@ class _CustomSearchBeneficiaryPageState
                           descriptionText +=
                               "\n ${localizations.translate(i18_local.beneficiaryDetails.spaq2DoseUnit)}";
                         }
-                        if (blueVas == 0) {
-                          descriptionText +=
-                              "\n ${localizations.translate(i18_local.beneficiaryDetails.blueVasZeroQuantity)}";
-                        }
-                        if (redVas == 0) {
-                          descriptionText +=
-                              "\n ${localizations.translate(i18_local.beneficiaryDetails.redVasZeroQuantity)}";
-                        }
 
-                        if ((spaq1 > 0 || spaq2 > 0 || blueVas > 0 || redVas > 0)) {
-                          FocusManager.instance.primaryFocus?.unfocus();
-                          context.read<DigitScannerBloc>().add(
-                                const DigitScannerEvent.handleScanner(),
-                              );
-                          context.router
-                              .push(CustomBeneficiaryRegistrationWrapperRoute(
-                            initialState: BeneficiaryRegistrationCreateState(
-                              searchQuery: searchHouseholdsState.searchQuery,
-                            ),
-                          ));
-                          searchController.clear();
-                          selectedFilters = [];
-                          customSearchHouseholdsBloc.add(
-                            const SearchHouseholdsClearEvent(),
-                          );
-                        } else {
-                          showCustomPopup(
-                            context: context,
-                            builder: (popupContext) => Popup(
-                              title: localizations.translate(i18_local
-                                  .beneficiaryDetails.insufficientStockHeading),
-                              onOutsideTap: () {
-                                Navigator.of(popupContext).pop(false);
-                              },
-                              description: descriptionText,
-                              type: PopUpType.alert,
-                              actions: [
-                                DigitButton(
-                                  label: localizations.translate(
-                                    i18_local.beneficiaryDetails.goToHome,
-                                  ),
-                                  onPressed: () {
-                                    Navigator.of(
-                                      popupContext,
-                                      rootNavigator: true,
-                                    ).pop();
-//
-                                  },
-                                  type: DigitButtonType.primary,
-                                  size: DigitButtonSize.large,
-                                ),
-                              ],
-                            ),
-                          );
-                        }
+                        // if ((spaq1 > 0 ||
+                        //     spaq2 > 0 ||
+                        //     redVas > 0)) {
+                        FocusManager.instance.primaryFocus?.unfocus();
+                        context.read<DigitScannerBloc>().add(
+                              const DigitScannerEvent.handleScanner(),
+                            );
+                        context.router
+                            .push(CustomBeneficiaryRegistrationWrapperRoute(
+                          initialState: BeneficiaryRegistrationCreateState(
+                            searchQuery: searchHouseholdsState.searchQuery,
+                          ),
+                        ));
+                        searchController.clear();
+                        selectedFilters = [];
+                        customSearchHouseholdsBloc.add(
+                          const SearchHouseholdsClearEvent(),
+                        );
+                        // } else {
+                        //   showCustomPopup(
+                        //     context: context,
+                        //     builder: (popupContext) => Popup(
+                        //       title: localizations.translate(i18_local
+                        //           .beneficiaryDetails.insufficientStockHeading),
+                        //       onOutsideTap: () {
+                        //         Navigator.of(popupContext).pop(false);
+                        //       },
+                        //       description: descriptionText,
+                        //       type: PopUpType.alert,
+                        //       actions: [
+                        //         DigitButton(
+                        //           label: localizations.translate(
+                        //             i18_local.beneficiaryDetails.goToHome,
+                        //           ),
+                        //           onPressed: () {
+                        //             Navigator.of(
+                        //               popupContext,
+                        //               rootNavigator: true,
+                        //             ).pop();
+                        //           },
+                        //           type: DigitButtonType.primary,
+                        //           size: DigitButtonSize.large,
+                        //         ),
+                        //       ],
+                        //     ),
+                        //   );
+                        // }
                       },
                     );
                   },

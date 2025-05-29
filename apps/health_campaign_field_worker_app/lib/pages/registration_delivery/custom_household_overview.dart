@@ -1069,8 +1069,6 @@ class _CustomHouseholdOverviewPageState
                                     onPressed: () {
                                       int spaq1 = context.spaq1;
                                       int spaq2 = context.spaq2;
-                                      int blueVas = context.blueVas;
-                                      int redVas = context.redVas;
                                       String descriptionText =
                                           localizations.translate(i18_local
                                               .beneficiaryDetails
@@ -1083,19 +1081,9 @@ class _CustomHouseholdOverviewPageState
                                         descriptionText +=
                                             "\n ${localizations.translate(i18_local.beneficiaryDetails.spaq2DoseUnit)}";
                                       }
-                                      if (blueVas == 0) {
-                                        descriptionText +=
-                                            "\n ${localizations.translate(i18_local.beneficiaryDetails.blueVasZeroQuantity)}";
-                                      }
-                                      if (redVas == 0) {
-                                        descriptionText +=
-                                            "\n ${localizations.translate(i18_local.beneficiaryDetails.redVasZeroQuantity)}";
-                                      }
 
                                       if (context.spaq1 > 0 ||
-                                          context.spaq2 > 0 ||
-                                          context.blueVas > 0 ||
-                                          context.redVas > 0) {
+                                          context.spaq2 > 0) {
                                         addIndividual(
                                           context,
                                           state

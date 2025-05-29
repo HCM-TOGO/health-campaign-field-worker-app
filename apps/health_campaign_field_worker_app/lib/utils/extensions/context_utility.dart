@@ -188,8 +188,6 @@ extension ContextUtilityExtensions on BuildContext {
         individualId,
         spaq1,
         spaq2,
-        blueVas,
-        redVas,
       ) {
         return userModel.roles;
       },
@@ -213,8 +211,6 @@ extension ContextUtilityExtensions on BuildContext {
         individualId,
         spaq1,
         spaq2,
-        blueVas,
-        redVas,
       ) {
         return individualId;
       },
@@ -255,8 +251,6 @@ extension ContextUtilityExtensions on BuildContext {
         individualId,
         spaq1,
         spaq2,
-        blueVas,
-        redVas,
       ) {
         return userModel;
       },
@@ -302,8 +296,6 @@ extension ContextUtilityExtensions on BuildContext {
         individualId,
         spaq1,
         spaq2,
-        blueVas,
-        redVas,
       ) {
         return spaq1;
       },
@@ -327,8 +319,6 @@ extension ContextUtilityExtensions on BuildContext {
         individualId,
         spaq1,
         spaq2,
-        blueVas,
-        redVas,
       ) {
         return spaq2;
       },
@@ -339,58 +329,6 @@ extension ContextUtilityExtensions on BuildContext {
     }
 
     return spaq2;
-  }
-
-//vas
-
-  int get blueVas {
-    final authBloc = _get<AuthBloc>();
-    final blueVas = authBloc.state.whenOrNull(
-      authenticated: (
-        accessToken,
-        refreshToken,
-        userModel,
-        actionsWrapper,
-        individualId,
-        spaq1,
-        spaq2,
-        blueVas,
-        redVas,
-      ) {
-        return blueVas;
-      },
-    );
-
-    if (blueVas == null) {
-      return 0;
-    }
-
-    return blueVas;
-  }
-
-  int get redVas {
-    final authBloc = _get<AuthBloc>();
-    final redVas = authBloc.state.whenOrNull(
-      authenticated: (
-        accessToken,
-        refreshToken,
-        userModel,
-        actionsWrapper,
-        individualId,
-        spaq1,
-        spaq2,
-        blueVas,
-        redVas,
-      ) {
-        return redVas;
-      },
-    );
-
-    if (redVas == null) {
-      return 0;
-    }
-
-    return redVas;
   }
 
   bool get isCommunityDistributor {

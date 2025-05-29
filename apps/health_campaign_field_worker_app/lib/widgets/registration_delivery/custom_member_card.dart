@@ -111,10 +111,8 @@ class CustomMemberCard extends StatelessWidget {
     List<TaskModel>? smcTasks = _getSMCStatusData();
     List<TaskModel>? vasTasks = _getVACStatusData();
     bool isBeneficiaryReferredSMC = checkBeneficiaryReferredSMC(smcTasks);
-    bool isBeneficiaryReferredVAS = checkBeneficiaryReferredVAS(vasTasks);
 
     bool isBeneficiaryInEligibleSMC = checkBeneficiaryInEligibleSMC(smcTasks);
-    bool isBeneficiaryInEligibleVAS = checkBeneficiaryInEligibleVAS(vasTasks);
 
     final theme = Theme.of(context);
     if (isHead) {
@@ -131,10 +129,7 @@ class CustomMemberCard extends StatelessWidget {
       );
     }
     if ((isSMCDelivered ||
-        isVASDelivered ||
         isBeneficiaryReferredSMC ||
-        isBeneficiaryReferredVAS ||
-        isBeneficiaryInEligibleVAS ||
         isBeneficiaryInEligibleSMC)) {
       return Column(
         children: [
@@ -162,34 +157,6 @@ class CustomMemberCard extends StatelessWidget {
                         : DigitTheme.instance.colorScheme.onSurfaceVariant,
                 iconColor:
                     (isBeneficiaryReferredSMC || isBeneficiaryInEligibleSMC)
-                        ? DigitTheme.instance.colorScheme.error
-                        : DigitTheme.instance.colorScheme.onSurfaceVariant,
-              ),
-            ),
-          if (isVASDelivered ||
-              isBeneficiaryReferredVAS ||
-              isBeneficiaryInEligibleVAS)
-            Align(
-              alignment: Alignment.centerLeft,
-              child: DigitIconButton(
-                icon: Icons.check_circle,
-                iconText: localizations.translate(
-                  isBeneficiaryInEligibleVAS
-                      ? i18_local.householdOverView
-                          .householdOverViewBeneficiaryInEligibleVASLabel
-                      : isBeneficiaryReferredVAS
-                          ? i18_local.householdOverView
-                              .householdOverViewBeneficiaryReferredVASLabel
-                          : i18_local.householdOverView
-                              .householdOverViewVASDeliveredIconLabel,
-                ),
-                iconSize: 20,
-                iconTextColor:
-                    (isBeneficiaryReferredVAS || isBeneficiaryInEligibleVAS)
-                        ? DigitTheme.instance.colorScheme.error
-                        : DigitTheme.instance.colorScheme.onSurfaceVariant,
-                iconColor:
-                    (isBeneficiaryReferredVAS || isBeneficiaryInEligibleVAS)
                         ? DigitTheme.instance.colorScheme.error
                         : DigitTheme.instance.colorScheme.onSurfaceVariant,
               ),
@@ -260,20 +227,16 @@ class CustomMemberCard extends StatelessWidget {
     List<TaskModel>? vasTasks = _getVACStatusData();
     final doseStatus = checkStatus(smcTasks, context.selectedCycle);
     bool smcAssessmentPendingStatus = assessmentSMCPending(smcTasks);
-    bool vasAssessmentPendingStatus = assessmentVASPending(vasTasks);
     bool isBeneficiaryReferredSMC = checkBeneficiaryReferredSMC(smcTasks);
-    bool isBeneficiaryReferredVAS = checkBeneficiaryReferredVAS(vasTasks);
 
     bool isBeneficiaryInEligibleSMC = checkBeneficiaryInEligibleSMC(smcTasks);
-    bool isBeneficiaryInEligibleVAS = checkBeneficiaryInEligibleVAS(vasTasks);
 
     final redosePendingStatus = smcAssessmentPendingStatus
         ? true
         : redosePending(smcTasks, context.selectedCycle);
     if ((isNotEligibleSMC || isBeneficiaryIneligible) && !doseStatus)
       return const Offstage();
-    if (isNotEligibleSMC ||
-        (!vasAssessmentPendingStatus && !redosePendingStatus)) {
+    if (isNotEligibleSMC || (!redosePendingStatus)) {
       return const Offstage();
     }
     return Column(
@@ -474,12 +437,8 @@ class CustomMemberCard extends StatelessWidget {
             },
           ),
         if ((!smcAssessmentPendingStatus ||
-                isBeneficiaryReferredSMC ||
-                isBeneficiaryInEligibleSMC) &&
-            vasAssessmentPendingStatus &&
-            !isBeneficiaryReferredVAS &&
-            !isBeneficiaryInEligibleVAS &&
-            !isNotEligibleVAS)
+            isBeneficiaryReferredSMC ||
+            isBeneficiaryInEligibleSMC))
           DigitElevatedButton(
             child: Center(
               child: Text(
@@ -491,9 +450,7 @@ class CustomMemberCard extends StatelessWidget {
               ),
             ),
             onPressed: () async {
-              int blueVas = context.blueVas;
-              int redVas = context.redVas;
-              if (blueVas > 0 && redVas > 0) {
+              if (true) {
                 final bloc = context.read<HouseholdOverviewBloc>();
                 bloc.add(
                   HouseholdOverviewEvent.selectedIndividual(
@@ -521,15 +478,6 @@ class CustomMemberCard extends StatelessWidget {
                 String descriptionText = localizations.translate(
                   i18_local.beneficiaryDetails.insufficientStockMessage,
                 );
-
-                if (blueVas == 0) {
-                  descriptionText +=
-                      "\n ${localizations.translate(i18_local.beneficiaryDetails.blueVasZeroQuantity)}";
-                }
-                if (redVas == 0) {
-                  descriptionText +=
-                      "\n ${localizations.translate(i18_local.beneficiaryDetails.redVasZeroQuantity)}";
-                }
 
                 DigitDialog.show(
                   context,

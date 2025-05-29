@@ -184,9 +184,6 @@ class HouseholdOverView {
       'HOUSEHOLD_OVER_VIEW_BENEFICIARY_INELIGIBLE_SMC_LABEL';
   String get householdOverViewBeneficiaryInEligibleVASLabel =>
       'HOUSEHOLD_OVER_VIEW_BENEFICIARY_INELIGIBLE_VAS_LABEL';
-
-  String get householdOverViewBeneficiaryReferredVASLabel =>
-      'HOUSEHOLD_OVER_VIEW_BENEFICIARY_REFERRED_VAS_LABEL';
 }
 
 class DeliverIntervention {

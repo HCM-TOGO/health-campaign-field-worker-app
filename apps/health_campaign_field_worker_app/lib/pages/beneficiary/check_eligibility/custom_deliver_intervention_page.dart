@@ -128,25 +128,17 @@ class CustomDeliverInterventionPageState
 
     int spaq1 = 0;
     int spaq2 = 0;
-    int blueVas = 0;
-    int redVas = 0;
 
     if (productvariantList!.first?.sku! == Constants.spaq1) {
       spaq1 = int.parse(qty) * -1;
     } else if (productvariantList!.first?.sku! == Constants.spaq2) {
       spaq2 = int.parse(qty) * -1;
-    } else if (productvariantList!.first?.sku! == Constants.blueVAS) {
-      blueVas = int.parse(qty) * -1;
-    } else {
-      redVas = int.parse(qty) * -1;
     }
 
     context.read<AuthBloc>().add(
           AuthAddSpaqCountsEvent(
             spaq1Count: spaq1,
             spaq2Count: spaq2,
-            blueVasCount: blueVas,
-            redVasCount: redVas,
           ),
         );
 
