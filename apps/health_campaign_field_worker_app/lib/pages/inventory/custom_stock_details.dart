@@ -1,5 +1,6 @@
 import 'package:auto_route/auto_route.dart';
 import 'package:collection/collection.dart';
+import 'package:digit_components/widgets/atoms/digit_toaster.dart';
 import 'package:digit_data_model/data_model.dart';
 import 'package:digit_scanner/blocs/scanner.dart';
 import 'package:digit_scanner/pages/qr_scanner.dart';
@@ -24,9 +25,11 @@ import 'package:inventory_management/blocs/product_variant.dart';
 import 'package:inventory_management/blocs/record_stock.dart';
 import 'package:inventory_management/widgets/back_navigation_help_header.dart';
 
+import '../../blocs/auth/auth.dart';
 import '../../router/app_router.dart';
 import '../../utils/constants.dart';
 import '../../utils/extensions/extensions.dart';
+import '../../utils/i18_key_constants.dart' as i18_local;
 
 @RoutePage()
 class CustomStockDetailsPage extends LocalizedStatefulWidget {
@@ -44,36 +47,54 @@ class CustomStockDetailsPageState
   static const _productVariantKey = 'productVariant';
   static const _secondaryPartyKey = 'secondaryParty';
   static const _transactionQuantityKey = 'quantity';
+  static const _partialBlistersKey = 'partialBlistersReturned';
+  static const _wastedBlistersKey = 'wastedBlistersReturned';
   static const _transactionReasonKey = 'transactionReason';
   static const _waybillNumberKey = 'waybillNumber';
   static const _waybillQuantityKey = 'waybillQuantity';
   static const _vehicleNumberKey = 'vehicleNumber';
   static const _typeOfTransportKey = 'typeOfTransport';
+  static const _batchNumberKey = 'batchNumber';
+
   static const _commentsKey = 'comments';
   static const _deliveryTeamKey = 'deliveryTeam';
+  static const _supervisorKey = 'supervisor';
+
+  static int maxQuantity = 100000000;
+  static int minQuantity = 0;
   bool deliveryTeamSelected = false;
   String? selectedFacilityId;
+  bool isSpaq1 = true;
   List<InventoryTransportTypes> transportTypes = [];
 
   List<GS1Barcode> scannedResources = [];
   TextEditingController controller1 = TextEditingController();
 
-  FormGroup _form(StockRecordEntryType stockType) {
+  List<ValidatorFunction> partialBlistersQuantityValidator = [];
+  List<ValidatorFunction> batchNumberValidators = [];
+  List<ValidatorFunction> wastedBlistersQuantityValidator = [];
+
+  FormGroup _form(bool isDistributor, bool isHealthFacilitySupervisor,
+      StockRecordEntryType entryType) {
+    deliveryTeamSelected = context.isHealthFacilitySupervisor &&
+        entryType != StockRecordEntryType.receipt;
     return fb.group({
       _productVariantKey: FormControl<ProductVariantModel>(),
       _secondaryPartyKey: FormControl<String>(
-        validators: [Validators.required],
+        validators: [],
       ),
       _transactionQuantityKey: FormControl<int>(validators: [
         Validators.number(),
         Validators.required,
-        Validators.min(0),
+        Validators.min(1),
         Validators.max(10000),
       ]),
       _transactionReasonKey: FormControl<String>(),
       _waybillNumberKey: FormControl<String>(
         validators: [Validators.minLength(2), Validators.maxLength(200)],
       ),
+      _partialBlistersKey: FormControl<int>(),
+      _wastedBlistersKey: FormControl<int>(),
       _waybillQuantityKey: FormControl<String>(),
       _vehicleNumberKey: FormControl<String>(),
       _typeOfTransportKey: FormControl<String>(),
@@ -96,6 +117,7 @@ class CustomStockDetailsPageState
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
     final textTheme = theme.digitTextTheme(context);
+    final isDistributor = context.isDistributor;
 
     bool isWareHouseMgr = InventorySingleton().isWareHouseMgr;
     final isHealthFacilitySupervisor = context.isHealthFacilitySupervisor;
@@ -120,9 +142,9 @@ class CustomStockDetailsPageState
                 stockState.mapOrNull(
                   persisted: (value) {
                     final parent = context.router.parent() as StackRouter;
-                    parent.replace(
-                      CustomInventoryAcknowledgementRoute(),
-                    );
+                    // parent.replace(
+                    //   CustomInventoryAcknowledgementRoute(),
+                    // );
                   },
                 );
               },
@@ -130,9 +152,13 @@ class CustomStockDetailsPageState
                 StockRecordEntryType entryType = stockState.entryType;
 
                 const module = i18.stockDetails;
+                final isWarehouseMgr = context.isWarehouseMgr;
+                deliveryTeamSelected = context.isHealthFacilitySupervisor &&
+                    entryType != StockRecordEntryType.receipt;
 
                 String pageTitle;
                 String quantityCountLabel;
+                String transactionPartyLabel;
                 String? transactionReasonLabel;
                 String? transactionReason;
                 String transactionType;
@@ -142,23 +168,58 @@ class CustomStockDetailsPageState
                 switch (entryType) {
                   case StockRecordEntryType.receipt:
                     pageTitle = module.receivedPageTitle;
+                    transactionPartyLabel =
+                        module.selectTransactingPartyReceived;
                     quantityCountLabel = module.quantityReceivedLabel;
                     transactionType = TransactionType.received.toValue();
 
                     break;
                   case StockRecordEntryType.dispatch:
-                    pageTitle = module.issuedPageTitle;
-                    quantityCountLabel = module.quantitySentLabel;
+                    pageTitle = isDistributor
+                        ? module.returnedPageTitle
+                        : module.issuedPageTitle;
+                    // quantityCountLabel = module.quantitySentLabel;
+                    transactionPartyLabel = isDistributor
+                        ? module.selectTransactingPartyReturned
+                        : module.selectTransactingPartyIssued;
+                    quantityCountLabel = isDistributor
+                        ? module.quantityReturnedLabel
+                        : module.quantitySentLabel;
                     transactionType = TransactionType.dispatched.toValue();
+
+                    if (context.isDistributor) {
+                      wastedBlistersQuantityValidator = [
+                        Validators.required,
+                        Validators.min(minQuantity),
+                        Validators.max(maxQuantity),
+                      ];
+
+                      partialBlistersQuantityValidator = [
+                        Validators.required,
+                        Validators.min(minQuantity),
+                        Validators.max(maxQuantity),
+                      ];
+
+                      batchNumberValidators = [];
+                    }
 
                     break;
                   case StockRecordEntryType.returned:
                     pageTitle = module.returnedPageTitle;
+                    transactionPartyLabel =
+                        module.selectTransactingPartyReturned;
                     quantityCountLabel = module.quantityReturnedLabel;
                     transactionType = TransactionType.received.toValue();
+                    partialBlistersQuantityValidator = [
+                      Validators.required,
+                      Validators.min(minQuantity),
+                      Validators.max(maxQuantity),
+                    ];
                     break;
                   case StockRecordEntryType.loss:
                     pageTitle = module.lostPageTitle;
+                    transactionPartyLabel =
+                        module.selectTransactingPartyReceivedFromLost;
                     quantityCountLabel = module.quantityLostLabel;
                     transactionReasonLabel = module.transactionReasonLost;
                     transactionType = TransactionType.dispatched.toValue();
@@ -170,6 +231,8 @@ class CustomStockDetailsPageState
                     break;
                   case StockRecordEntryType.damaged:
                     pageTitle = module.damagedPageTitle;
+                    transactionPartyLabel =
+                        module.selectTransactingPartyReceivedFromDamaged;
                     quantityCountLabel = module.quantityDamagedLabel;
                     transactionReasonLabel = module.transactionReasonDamaged;
                     transactionType = TransactionType.dispatched.toValue();
@@ -184,7 +247,8 @@ class CustomStockDetailsPageState
                 transactionReasonLabel ??= '';
 
                 return ReactiveFormBuilder(
-                  form: () => _form(entryType),
+                  form: () => _form(
+                      isDistributor, isHealthFacilitySupervisor, entryType),
                   builder: (context, form, child) {
                     return BlocBuilder<DigitScannerBloc, DigitScannerState>(
                         builder: (context, scannerState) {
@@ -253,6 +317,7 @@ class CustomStockDetailsPageState
                                                         .toString(),
                                                   )
                                                 : null;
+
                                         final deliveryTeamName = form
                                             .control(_deliveryTeamKey)
                                             .value as String?;
@@ -359,6 +424,24 @@ class CustomStockDetailsPageState
                                             final hasLocationData =
                                                 lat != null && lng != null;
 
+                                            final transportType = form
+                                                .control(
+                                                  _typeOfTransportKey,
+                                                )
+                                                .value as String?;
+
+                                            final partialBlisters = form
+                                                .control(
+                                                  _partialBlistersKey,
+                                                )
+                                                .value;
+
+                                            final wastedBlisters = form
+                                                .control(
+                                                  _wastedBlistersKey,
+                                                )
+                                                .value;
+
                                             final comments = form
                                                 .control(_commentsKey)
                                                 .value as String?;
@@ -366,6 +449,33 @@ class CustomStockDetailsPageState
                                             final deliveryTeamName = form
                                                 .control(_deliveryTeamKey)
                                                 .value as String?;
+
+                                            if ((entryType ==
+                                                        StockRecordEntryType
+                                                            .returned &&
+                                                    isHealthFacilitySupervisor &&
+                                                    quantity == 0 &&
+                                                    partialBlisters == 0) ||
+                                                (entryType ==
+                                                        StockRecordEntryType
+                                                            .dispatch &&
+                                                    isDistributor &&
+                                                    quantity == 0 &&
+                                                    partialBlisters == 0 &&
+                                                    wastedBlisters == 0)) {
+                                              DigitToast.show(
+                                                context,
+                                                options: DigitToastOptions(
+                                                  localizations.translate(
+                                                    i18.common.minValue,
+                                                  ),
+                                                  true,
+                                                  theme,
+                                                ),
+                                              );
+
+                                              return;
+                                            }
 
                                             String? senderId;
                                             String? senderType;
@@ -582,10 +692,203 @@ class CustomStockDetailsPageState
                                               ),
                                             ) as bool;
 
-                                            if (submit ?? false) {
+                                            if (submit && context.mounted) {
+                                              if (isDistributor) {
+                                                int spaq1 = 0;
+                                                int spaq2 = 0;
+
+                                                int totalQuantity = 0;
+
+                                                totalQuantity = entryType ==
+                                                        StockRecordEntryType
+                                                            .dispatch
+                                                    ? ((quantity != null
+                                                                ? int.parse(
+                                                                    quantity
+                                                                        .toString(),
+                                                                  )
+                                                                : 0) +
+                                                            (wastedBlisters !=
+                                                                    null
+                                                                ? int.parse(
+                                                                    wastedBlisters
+                                                                        .toString(),
+                                                                  )
+                                                                : 0)) *
+                                                        -1
+                                                    : quantity != null
+                                                        ? int.parse(
+                                                            quantity.toString(),
+                                                          )
+                                                        : 0;
+
+                                                if (isSpaq1) {
+                                                  spaq1 = totalQuantity;
+                                                } else {
+                                                  spaq2 = totalQuantity;
+                                                }
+
+                                                if (entryType ==
+                                                    StockRecordEntryType
+                                                        .dispatch) {
+                                                  if (productVariant.sku ==
+                                                          Constants.spaq1 &&
+                                                      (spaq1 + totalQuantity <
+                                                          0)) {
+                                                    await DigitToast.show(
+                                                      context,
+                                                      options: DigitToastOptions(
+                                                          localizations.translate(context
+                                                                  .isCDD
+                                                              ? i18_local
+                                                                  .beneficiaryDetails
+                                                                  .validationForExcessStockReturn
+                                                              : i18_local
+                                                                  .beneficiaryDetails
+                                                                  .validationForExcessStockDispatch),
+                                                          true,
+                                                          theme),
+                                                    );
+                                                    return;
+                                                  } else if (productVariant
+                                                              .sku ==
+                                                          Constants.spaq2 &&
+                                                      (spaq2 + totalQuantity <
+                                                          0)) {
+                                                    await DigitToast.show(
+                                                      context,
+                                                      options: DigitToastOptions(
+                                                          localizations.translate(context
+                                                                  .isCDD
+                                                              ? i18_local
+                                                                  .beneficiaryDetails
+                                                                  .validationForExcessStockReturn
+                                                              : i18_local
+                                                                  .beneficiaryDetails
+                                                                  .validationForExcessStockDispatch),
+                                                          true,
+                                                          theme),
+                                                    );
+                                                    return;
+                                                  }
+                                                }
+
+                                                context.read<AuthBloc>().add(
+                                                      AuthAddSpaqCountsEvent(
+                                                        spaq1Count: spaq1,
+                                                        spaq2Count: spaq2,
+                                                      ),
+                                                    );
+                                              } else {
+                                                if (entryType ==
+                                                    StockRecordEntryType
+                                                        .dispatch) {
+                                                  if (isSpaq1 &&
+                                                      quantity >
+                                                          context.spaq1) {
+                                                    await DigitToast.show(
+                                                      context,
+                                                      options: DigitToastOptions(
+                                                          localizations.translate(context
+                                                                  .isCDD
+                                                              ? i18_local
+                                                                  .beneficiaryDetails
+                                                                  .validationForExcessStockReturn
+                                                              : i18_local
+                                                                  .beneficiaryDetails
+                                                                  .validationForExcessStockDispatch),
+                                                          true,
+                                                          theme),
+                                                    );
+                                                    return;
+                                                  } else if (!isSpaq1 &&
+                                                      quantity >
+                                                          context.spaq2) {
+                                                    await DigitToast.show(
+                                                      context,
+                                                      options: DigitToastOptions(
+                                                          localizations.translate(context
+                                                                  .isCDD
+                                                              ? i18_local
+                                                                  .beneficiaryDetails
+                                                                  .validationForExcessStockReturn
+                                                              : i18_local
+                                                                  .beneficiaryDetails
+                                                                  .validationForExcessStockDispatch),
+                                                          true,
+                                                          theme),
+                                                    );
+                                                    return;
+                                                  }
+                                                }
+                                                if (entryType ==
+                                                    StockRecordEntryType
+                                                        .receipt) {
+                                                  int spaqL1 = context.spaq1;
+                                                  int spaqL2 = context.spaq2;
+                                                  if (isSpaq1) {
+                                                    context
+                                                        .read<AuthBloc>()
+                                                        .add(
+                                                          AuthAddSpaqCountsEvent(
+                                                            spaq1Count: spaqL1 +
+                                                                int.parse(
+                                                                  quantity
+                                                                      .toString(),
+                                                                ),
+                                                            spaq2Count: spaqL2,
+                                                          ),
+                                                        );
+                                                  } else {
+                                                    context
+                                                        .read<AuthBloc>()
+                                                        .add(
+                                                          AuthAddSpaqCountsEvent(
+                                                            spaq1Count: spaqL1,
+                                                            spaq2Count: spaqL2 +
+                                                                int.parse(
+                                                                  quantity
+                                                                      .toString(),
+                                                                ),
+                                                          ),
+                                                        );
+                                                  }
+                                                } else if (entryType ==
+                                                    StockRecordEntryType
+                                                        .dispatch) {
+                                                  int spaqLocal1 =
+                                                      context.spaq1;
+                                                  int spaqLocal2 =
+                                                      context.spaq2;
+                                                  if (isSpaq1) {
+                                                    spaqLocal1 -= int.parse(
+                                                      quantity.toString(),
+                                                    );
+                                                  } else {
+                                                    spaqLocal2 -= int.parse(
+                                                      quantity.toString(),
+                                                    );
+                                                  }
+                                                  context.read<AuthBloc>().add(
+                                                        AuthAddSpaqCountsEvent(
+                                                            spaq1Count:
+                                                                spaqLocal1,
+                                                            spaq2Count:
+                                                                spaqLocal2),
+                                                      );
+                                                }
+                                              }
+
                                               bloc.add(
                                                 const RecordStockCreateStockEntryEvent(),
                                               );
+
+                                              (context.router.parent()
+                                                      as StackRouter)
+                                                  .maybePop();
+
+                                              context.router.push(
+                                                  CustomInventoryAcknowledgementRoute());
                                             }
                                           });
                                         }
@@ -662,6 +965,12 @@ class CustomStockDetailsPageState
                                                 /// Update the form control with the selected product variant model
                                                 field.control.value =
                                                     selectedVariant;
+                                                isSpaq1 = selectedVariant.sku !=
+                                                        null &&
+                                                    selectedVariant.sku!
+                                                        .contains(
+                                                      Constants.spaq1,
+                                                    );
                                               },
                                               selectedOption: (form
                                                           .control(
@@ -1157,86 +1466,6 @@ class CustomStockDetailsPageState
                                       },
                                     );
                                   }),
-                              scannerState.barCodes.isEmpty
-                                  ? DigitButton(
-                                      mainAxisSize: MainAxisSize.max,
-                                      size: DigitButtonSize.large,
-                                      type: DigitButtonType.secondary,
-                                      onPressed: () {
-                                        //[TODO: Add route to auto_route]
-                                        Navigator.of(context).push(
-                                          MaterialPageRoute(
-                                            builder: (context) =>
-                                                const DigitScannerPage(
-                                              quantity: 5,
-                                              isGS1code: true,
-                                              singleValue: false,
-                                            ),
-                                            settings: const RouteSettings(
-                                                name: '/qr-scanner'),
-                                          ),
-                                        );
-                                      },
-                                      prefixIcon: Icons.qr_code,
-                                      label: localizations.translate(
-                                        i18.common.scanBales,
-                                      ),
-                                    )
-                                  : Column(children: [
-                                      Row(
-                                        mainAxisAlignment:
-                                            MainAxisAlignment.spaceBetween,
-                                        children: [
-                                          Align(
-                                            alignment: Alignment.centerLeft,
-                                            child: Text(
-                                              localizations.translate(i18
-                                                  .stockDetails
-                                                  .scannedResources),
-                                              style: DigitTheme
-                                                  .instance
-                                                  .mobileTheme
-                                                  .textTheme
-                                                  .labelSmall,
-                                            ),
-                                          ),
-                                          Padding(
-                                            padding: const EdgeInsets.only(
-                                              bottom: spacer4,
-                                            ),
-                                            child: IconButton(
-                                              alignment: Alignment.centerRight,
-                                              color: theme
-                                                  .colorTheme.primary.primary1,
-                                              icon: const Icon(Icons.edit),
-                                              onPressed: () {
-                                                //[TODO: Add route to auto_route]
-                                                Navigator.of(context).push(
-                                                  MaterialPageRoute(
-                                                    builder: (context) =>
-                                                        const DigitScannerPage(
-                                                      quantity: 5,
-                                                      isGS1code: true,
-                                                      singleValue: false,
-                                                    ),
-                                                    settings:
-                                                        const RouteSettings(
-                                                            name:
-                                                                '/qr-scanner'),
-                                                  ),
-                                                );
-                                              },
-                                            ),
-                                          ),
-                                        ],
-                                      ),
-                                      ...scannedResources.map((e) => Align(
-                                            alignment: Alignment.centerLeft,
-                                            child: Text(e
-                                                .elements.values.first.data
-                                                .toString()),
-                                          ))
-                                    ])
                             ],
                           ),
                         ],
