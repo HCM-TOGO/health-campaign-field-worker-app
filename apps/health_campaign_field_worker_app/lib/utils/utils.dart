@@ -84,7 +84,7 @@ class CustomValidator {
       return null;
     }
 
-    const pattern = r'^\d{9,10}$'; // 9 or 10 digits only
+    const pattern = r'^\d{8,9}$'; // 9 or 10 digits only
 
     if (RegExp(pattern).hasMatch(control.value.toString())) {
       return null; // Valid

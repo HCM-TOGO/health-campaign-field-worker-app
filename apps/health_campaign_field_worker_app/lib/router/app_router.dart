@@ -44,6 +44,7 @@ import '../pages/project_facility_selection.dart';
 import '../pages/project_selection.dart';
 import '../pages/qr_details_page.dart';
 import '../pages/registration_delivery/caregiver_consent.dart';
+import '../pages/registration_delivery/qrscanner.dart';
 import '../pages/registration_delivery/custom_beneficiary_acknowledgement.dart';
 import '../pages/registration_delivery/custom_beneficiary_registration_wrapper.dart';
 import '../pages/registration_delivery/custom_household_details.dart';
@@ -135,6 +136,10 @@ class AppRouter extends _$AppRouter {
         AutoRoute(page: HomeRoute.page, path: 'home'),
         AutoRoute(page: ProfileRoute.page, path: 'profile'),
         AutoRoute(page: UserQRDetailsRoute.page, path: 'user-qr-code'),
+        AutoRoute(
+          page: QRScannerRoute.page,
+          path: 'qr-scanner',
+        ),
         // AutoRoute(
         //   page: CustomManageStocksRoute.page,
         //   path: 'custom-manage-stocks',
