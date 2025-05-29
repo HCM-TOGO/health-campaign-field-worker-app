@@ -1,7 +1,9 @@
+import 'package:closed_household/router/closed_household_router.dart';
 import 'package:attendance_management/router/attendance_router.dart';
 import 'package:attendance_management/router/attendance_router.gm.dart';
 import 'package:complaints/router/complaints_router.dart';
 import 'package:complaints/router/complaints_router.gm.dart';
+import 'package:flutter_local_notifications/flutter_local_notifications.dart';
 import 'package:health_campaign_field_worker_app/blocs/registration_delivery/custom_beneficairy_registration.dart';
 import 'package:referral_reconciliation/pages/search_referral_reconciliations.dart';
 import 'package:referral_reconciliation/router/referral_reconciliation_router.gm.dart';
@@ -32,6 +34,7 @@ import '../pages/beneficiary/check_eligibility/household_acknowledgement_smc.dar
 import '../pages/beneficiary/check_eligibility/inventory_facility_selection_smc.dart';
 import '../pages/beneficiary/check_eligibility/refer_beneficiary_smc.dart';
 import '../pages/beneficiary/check_eligibility/refer_beneficiary_vas.dart';
+import '../pages/beneficiary/check_eligibility/vaccine_selection_page.dart';
 import '../pages/inventory_management/view_record_lga.dart';
 import '../pages/registration_delivery/custom_complaints_details.dart';
 import '../pages/boundary_selection.dart';
@@ -98,6 +101,10 @@ import '../pages/checklist/custom_survey_form_preview.dart';
 import '../pages/checklist/custom_survey_form_boundary_view.dart';
 import '../pages/checklist/custom_survey_form_acknowledgement.dart';
 import '../pages/checklist/custom_survey_form_wrapper.dart';
+import '../pages/beneficiary/check_eligibility/vaccine_selection_page.dart';
+import '../pages/beneficiary/check_eligibility/zero_dose_check.dart';
+import 'package:closed_household/closed_household.dart';
+import 'package:closed_household/router/closed_household_router.gm.dart';
 
 part 'app_router.gr.dart';
 
@@ -110,6 +117,7 @@ part 'app_router.gr.dart';
     AttendanceRoute,
     ComplaintsRoute,
     SurveyFormRoute,
+    ClosedHouseholdPackageRoute,
   ],
 )
 class AppRouter extends _$AppRouter {
@@ -167,6 +175,23 @@ class AppRouter extends _$AppRouter {
           path: 'beneficiary-downsync-report',
         ),
         // INFO : Need to add Router of package Here
+        AutoRoute(
+            page: ClosedHouseholdWrapperRoute.page,
+            path: 'closed-household-wrapper',
+            children: [
+              AutoRoute(
+                page: ClosedHouseholdDetailsRoute.page,
+                path: 'closed-household-details',
+                initial: true,
+              ),
+              AutoRoute(
+                  page: ClosedHouseholdSummaryRoute.page,
+                  path: 'closed-household-summary'),
+              AutoRoute(
+                  page: ClosedHouseholdAcknowledgementRoute.page,
+                  path: 'closed-household-acknowledgement'),
+            ]),
+
         // Attendance Route
         AutoRoute(
           page: ManageAttendanceRoute.page,
@@ -408,6 +433,9 @@ class AppRouter extends _$AppRouter {
                     page: CustomSplashAcknowledgementRoute.page,
                     path: 'splash-acknowledgement',
                   ),
+                  AutoRoute(
+                      page: VaccineSelectionRoute.page,
+                      path: 'vaccine-selection'),
                   // RedirectRoute(
                   //   path: 'splash-acknowledgement',
                   //   redirectTo: 'custom-splash-acknowledgement',
@@ -436,6 +464,10 @@ class AppRouter extends _$AppRouter {
                   RedirectRoute(
                     path: 'delivery-summary',
                     redirectTo: 'custom-delivery-summary',
+                  ),
+                  AutoRoute(
+                    page: ZeroDoseCheckRoute.page,
+                    path: 'zero-dose-check',
                   ),
                 ],
               ),

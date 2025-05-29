@@ -186,55 +186,58 @@ class CustomDeliverInterventionPageState
     TaskModel taskModel,
     DeliverInterventionState deliverState,
   ) async {
-    context.read<DeliverInterventionBloc>().add(
-          DeliverInterventionSubmitEvent(
-            task: deliverState.oldTask ?? taskModel,
-            isEditing: (deliverState.tasks ?? []).isNotEmpty &&
-                    RegistrationDeliverySingleton().beneficiaryType ==
-                        BeneficiaryType.household
-                ? true
-                : false,
-            boundaryModel: RegistrationDeliverySingleton().boundary!,
-          ),
-        );
+    // context.read<DeliverInterventionBloc>().add(
+    //       DeliverInterventionSubmitEvent(
+    //         task: deliverState.oldTask ?? taskModel,
+    //         isEditing: (deliverState.tasks ?? []).isNotEmpty &&
+    //                 RegistrationDeliverySingleton().beneficiaryType ==
+    //                     BeneficiaryType.household
+    //             ? true
+    //             : false,
+    //         boundaryModel: RegistrationDeliverySingleton().boundary!,
+    //       ),
+    //     );
 
-    ProjectTypeModel? projectTypeModel =
-        widget.eligibilityAssessmentType == EligibilityAssessmentType.smc
-            ? RegistrationDeliverySingleton()
-                .selectedProject
-                ?.additionalDetails
-                ?.projectType
-            : RegistrationDeliverySingleton()
-                .selectedProject
-                ?.additionalDetails
-                ?.additionalProjectType;
+    // ProjectTypeModel? projectTypeModel =
+    //     widget.eligibilityAssessmentType == EligibilityAssessmentType.smc
+    //         ? RegistrationDeliverySingleton()
+    //             .selectedProject
+    //             ?.additionalDetails
+    //             ?.projectType
+    //         : RegistrationDeliverySingleton()
+    //             .selectedProject
+    //             ?.additionalDetails
+    //             ?.additionalProjectType;
 
-    if (deliverState.futureDeliveries != null &&
-        deliverState.futureDeliveries!.isNotEmpty &&
-        projectTypeModel?.cycles?.isNotEmpty == true) {
-      context.router.popUntilRouteWithName(BeneficiaryWrapperRoute.name);
-      context.router.push(
-        CustomSplashAcknowledgementRoute(
-            enableBackToSearch: false,
-            eligibilityAssessmentType: widget.eligibilityAssessmentType),
-      );
-    } else {
-      final reloadState = context.read<HouseholdOverviewBloc>();
+    // if (deliverState.futureDeliveries != null &&
+    //     deliverState.futureDeliveries!.isNotEmpty &&
+    //     projectTypeModel?.cycles?.isNotEmpty == true) {
+    //   context.router.popUntilRouteWithName(BeneficiaryWrapperRoute.name);
+    //   context.router.push(
+    //     CustomSplashAcknowledgementRoute(
+    //         enableBackToSearch: false,
+    //         eligibilityAssessmentType: widget.eligibilityAssessmentType),
+    //   );
+    // } else {
+    //   final reloadState = context.read<HouseholdOverviewBloc>();
 
-      reloadState.add(
-        HouseholdOverviewReloadEvent(
-          projectId: RegistrationDeliverySingleton().projectId!,
-          projectBeneficiaryType:
-              RegistrationDeliverySingleton().beneficiaryType!,
-        ),
-      );
-      context.router.popAndPush(
-        CustomHouseholdAcknowledgementRoute(
-          enableViewHousehold: true,
-          eligibilityAssessmentType: widget.eligibilityAssessmentType,
-        ),
-      );
-    }
+    //   reloadState.add(
+    //     HouseholdOverviewReloadEvent(
+    //       projectId: RegistrationDeliverySingleton().projectId!,
+    //       projectBeneficiaryType:
+    //           RegistrationDeliverySingleton().beneficiaryType!,
+    //     ),
+    //   );
+    //   context.router.popAndPush(
+    //     CustomHouseholdAcknowledgementRoute(
+    //       enableViewHousehold: true,
+    //       eligibilityAssessmentType: widget.eligibilityAssessmentType,
+    //     ),
+    //   );
+    // }
+    context.router.popAndPush(CustomDeliverySummaryRoute(
+      eligibilityAssessmentType: widget.eligibilityAssessmentType,
+    ));
   }
 
   @override
@@ -439,85 +442,85 @@ class CustomDeliverInterventionPageState
                                                               type: ToastType
                                                                   .error);
                                                         } else {
-                                                          final shouldSubmit =
-                                                              await dialog
-                                                                      .DigitDialog
-                                                                  .show<bool>(
-                                                            context,
-                                                            options: dialog
-                                                                .DigitDialogOptions(
-                                                              titleText:
-                                                                  localizations
-                                                                      .translate(
-                                                                i18.deliverIntervention
-                                                                    .dialogTitle,
-                                                              ),
-                                                              contentText:
-                                                                  localizations
-                                                                      .translate(
-                                                                i18.deliverIntervention
-                                                                    .dialogContent,
-                                                              ),
-                                                              primaryAction: dialog
-                                                                  .DigitDialogActions(
-                                                                label: localizations
-                                                                    .translate(
-                                                                  i18.common
-                                                                      .coreCommonSubmit,
-                                                                ),
-                                                                action: (ctx) {
-                                                                  Navigator.of(
-                                                                          ctx,
-                                                                          rootNavigator:
-                                                                              true)
-                                                                      .pop(
-                                                                          true);
-                                                                },
-                                                              ),
-                                                              secondaryAction:
-                                                                  dialog
-                                                                      .DigitDialogActions(
-                                                                label: localizations
-                                                                    .translate(
-                                                                  i18.common
-                                                                      .coreCommonGoback,
-                                                                ),
-                                                                action: (ctx) {
-                                                                  Navigator.of(
-                                                                          ctx,
-                                                                          rootNavigator:
-                                                                              true)
-                                                                      .pop(
-                                                                          false);
-                                                                },
-                                                              ),
-                                                            ),
-                                                          );
+                                                          // final shouldSubmit =
+                                                          //     await dialog
+                                                          //             .DigitDialog
+                                                          //         .show<bool>(
+                                                          //   context,
+                                                          //   options: dialog
+                                                          //       .DigitDialogOptions(
+                                                          //     titleText:
+                                                          //         localizations
+                                                          //             .translate(
+                                                          //       i18.deliverIntervention
+                                                          //           .dialogTitle,
+                                                          //     ),
+                                                          //     contentText:
+                                                          //         localizations
+                                                          //             .translate(
+                                                          //       i18.deliverIntervention
+                                                          //           .dialogContent,
+                                                          //     ),
+                                                          //     primaryAction: dialog
+                                                          //         .DigitDialogActions(
+                                                          //       label: localizations
+                                                          //           .translate(
+                                                          //         i18.common
+                                                          //             .coreCommonSubmit,
+                                                          //       ),
+                                                          //       action: (ctx) {
+                                                          //         Navigator.of(
+                                                          //                 ctx,
+                                                          //                 rootNavigator:
+                                                          //                     true)
+                                                          //             .pop(
+                                                          //                 true);
+                                                          //       },
+                                                          //     ),
+                                                          //     secondaryAction:
+                                                          //         dialog
+                                                          //             .DigitDialogActions(
+                                                          //       label: localizations
+                                                          //           .translate(
+                                                          //         i18.common
+                                                          //             .coreCommonGoback,
+                                                          //       ),
+                                                          //       action: (ctx) {
+                                                          //         Navigator.of(
+                                                          //                 ctx,
+                                                          //                 rootNavigator:
+                                                          //                     true)
+                                                          //             .pop(
+                                                          //                 false);
+                                                          //       },
+                                                          //     ),
+                                                          //   ),
+                                                          // );
 
                                                           // Check the result of the dialog
-                                                          if (shouldSubmit ??
-                                                              false) {
-                                                            if (context
-                                                                .mounted) {
-                                                              // vas
+                                                          // if (shouldSubmit ??
+                                                          //     false) {
+                                                          //   if (context
+                                                          //       .mounted) {
+                                                          // vas
 
-                                                              context
-                                                                  .read<
-                                                                      LocationBloc>()
-                                                                  .add(
-                                                                      const LoadLocationEvent());
-                                                              handleLocationState(
-                                                                locationState,
-                                                                context,
-                                                                deliveryInterventionState,
-                                                                form,
-                                                                householdMemberWrapper,
-                                                                projectBeneficiary!
-                                                                    .first,
-                                                              );
-                                                            }
-                                                          }
+                                                          context
+                                                              .read<
+                                                                  LocationBloc>()
+                                                              .add(
+                                                                  const LoadLocationEvent());
+                                                          handleLocationState(
+                                                            locationState,
+                                                            context,
+                                                            deliveryInterventionState,
+                                                            form,
+                                                            householdMemberWrapper,
+                                                            projectBeneficiary!
+                                                                .first,
+                                                          );
                                                         }
+                                                        //   }
+                                                        // }
                                                       },
                                                     );
                                                   });

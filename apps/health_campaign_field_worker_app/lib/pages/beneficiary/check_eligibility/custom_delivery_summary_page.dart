@@ -22,11 +22,16 @@ import 'package:registration_delivery/widgets/localized.dart';
 import 'package:registration_delivery/utils/i18_key_constants.dart' as i18;
 import 'package:registration_delivery/utils/utils.dart';
 
+import '../../../router/app_router.dart';
+import '../../../utils/app_enums.dart';
+
 @RoutePage()
 class CustomDeliverySummaryPage extends LocalizedStatefulWidget {
+  final EligibilityAssessmentType eligibilityAssessmentType;
   const CustomDeliverySummaryPage({
     super.key,
     super.appLocalizations,
+    required this.eligibilityAssessmentType,
   });
 
   @override
@@ -82,7 +87,7 @@ class CustomDeliverySummaryPageState
                       builder: (context, bool isClicked, _) {
                         return DigitButton(
                           label: localizations
-                              .translate(i18.common.coreCommonNext),
+                              .translate(i18.common.coreCommonSubmit),
                           type: DigitButtonType.primary,
                           size: DigitButtonSize.large,
                           mainAxisSize: MainAxisSize.max,
@@ -136,21 +141,34 @@ class CustomDeliverySummaryPageState
                                       ),
                                     );
 
+                                ProjectTypeModel? projectTypeModel =
+                                    widget.eligibilityAssessmentType ==
+                                            EligibilityAssessmentType.smc
+                                        ? RegistrationDeliverySingleton()
+                                            .selectedProject
+                                            ?.additionalDetails
+                                            ?.projectType
+                                        : RegistrationDeliverySingleton()
+                                            .selectedProject
+                                            ?.additionalDetails
+                                            ?.additionalProjectType;
+
                                 if (deliverState.futureDeliveries != null &&
                                     deliverState.futureDeliveries!.isNotEmpty &&
-                                    RegistrationDeliverySingleton()
-                                            .projectType
-                                            ?.cycles
-                                            ?.isNotEmpty ==
+                                    projectTypeModel?.cycles?.isNotEmpty ==
                                         true) {
-                                  context.router.popUntilRouteWithName(
-                                    BeneficiaryWrapperRoute.name,
-                                  );
-                                  context.router.push(
-                                    SplashAcknowledgementRoute(
-                                      enableBackToSearch: false,
-                                    ),
-                                  );
+                                  // context.router.popUntilRouteWithName(
+                                  //   BeneficiaryWrapperRoute.name,
+                                  // );
+                                  context.router.popAndPush(
+                                      // CustomSplashAcknowledgementRoute(
+                                      //     enableBackToSearch: false,
+                                      //     eligibilityAssessmentType:
+                                      //         widget.eligibilityAssessmentType),
+                                      ZeroDoseCheckRoute(
+                                    eligibilityAssessmentType:
+                                        widget.eligibilityAssessmentType,
+                                  ));
                                 } else {
                                   final reloadState =
                                       context.read<HouseholdOverviewBloc>();
@@ -181,47 +199,47 @@ class CustomDeliverySummaryPageState
                 SliverToBoxAdapter(
                   child: Column(
                     children: [
-                      DigitCard(
-                          margin: const EdgeInsets.all(spacer2),
-                          children: [
-                            LabelValueSummary(
-                                padding: EdgeInsets.zero,
-                                heading: localizations.translate(i18
-                                    .householdLocation
-                                    .householdLocationLabelText),
-                                headingStyle: textTheme.headingL.copyWith(
-                                  color: theme.colorTheme.primary.primary2,
-                                ),
-                                withDivider: false,
-                                items: [
-                                  LabelValueItem(
-                                      label: localizations.translate(
-                                          i18.householdLocation.villageLabel),
-                                      value: localizations.translate(
-                                          deliverState
-                                                  .householdMemberWrapper
-                                                  ?.household
-                                                  ?.address
-                                                  ?.locality
-                                                  ?.code ??
-                                              i18.common.coreCommonNA),
-                                      isInline: true,
-                                      labelFlex: 5,
-                                      padding: const EdgeInsets.only(
-                                          bottom: spacer2)),
-                                  LabelValueItem(
-                                      label: localizations.translate(i18
-                                          .householdLocation.landmarkFormLabel),
-                                      value: deliverState.householdMemberWrapper
-                                              ?.household?.address?.landmark ??
-                                          localizations.translate(
-                                              i18.common.coreCommonNA),
-                                      isInline: true,
-                                      labelFlex: 5,
-                                      padding:
-                                          const EdgeInsets.only(top: spacer2)),
-                                ]),
-                          ]),
+                      // DigitCard(
+                      //   margin: const EdgeInsets.all(spacer2),
+                      //   children: [
+                      //     LabelValueSummary(
+                      //         padding: EdgeInsets.zero,
+                      //         heading: localizations.translate(i18
+                      //             .householdLocation
+                      //             .householdLocationLabelText),
+                      //         headingStyle: textTheme.headingL.copyWith(
+                      //           color: theme.colorTheme.primary.primary2,
+                      //         ),
+                      //         withDivider: false,
+                      //         items: [
+                      //           LabelValueItem(
+                      //               label: localizations.translate(
+                      //                   i18.householdLocation.villageLabel),
+                      //               value: localizations.translate(deliverState
+                      //                       .householdMemberWrapper
+                      //                       ?.household
+                      //                       ?.address
+                      //                       ?.locality
+                      //                       ?.code ??
+                      //                   i18.common.coreCommonNA),
+                      //               isInline: true,
+                      //               labelFlex: 5,
+                      //               padding:
+                      //                   const EdgeInsets.only(bottom: spacer2)),
+                      //           LabelValueItem(
+                      //               label: localizations.translate(i18
+                      //                   .householdLocation.landmarkFormLabel),
+                      //               value: deliverState.householdMemberWrapper
+                      //                       ?.household?.address?.landmark ??
+                      //                   localizations
+                      //                       .translate(i18.common.coreCommonNA),
+                      //               isInline: true,
+                      //               labelFlex: 5,
+                      //               padding:
+                      //                   const EdgeInsets.only(top: spacer2)),
+                      //         ]),
+                      //   ],
+                      // ),
                       DigitCard(
                           margin: const EdgeInsets.all(spacer2),
                           children: [

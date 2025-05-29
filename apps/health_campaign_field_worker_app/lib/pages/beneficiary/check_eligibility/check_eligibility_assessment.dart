@@ -67,6 +67,8 @@ class _EligibilityChecklistViewPage
   GlobalKey<FormState> checklistFormKey = GlobalKey<FormState>();
   Map<String?, String> responses = {};
   final String yes = "YES";
+  final String positive = "POSITIVE";
+  final String no = "NO";
   bool triggerLocalization = false;
 
   @override
@@ -1034,51 +1036,27 @@ class _EligibilityChecklistViewPage
     var isIneligible = false;
     var q3Key = "KBEA3";
     var q5Key = "KBEA4";
-    var q6Key = "KBEA5";
-    var q7Key = "KBEA7";
+    var q6Key = "KBEA2.YES.KBEA2A.POSITIVE.KBEA2AA";
 
     Map<String, String> keyVsReason = {
-      q3Key: "NOT_ADMINISTERED_IN_PREVIOUS_CYCLE",
-      q5Key: "CHILD_ON_MEDICATION_1",
-      q6Key: "RESPIRATORY_INFECTION",
-      q7Key: "TAKEN_VITAMIN_A",
+      q3Key: "CHILD_ALLERGIC_TO_DRUGS",
+      q5Key: "TAKEN_SP_OR_CTX",
+      q6Key: "TAKEN_MALARIA_DOSE",
     };
     final individualModel = widget.individual;
 
     if (responses.isNotEmpty) {
       if (responses.containsKey(q3Key) && responses[q3Key]!.isNotEmpty) {
         isIneligible = responses[q3Key] == yes ? true : false;
-        if (individualModel != null && isIneligible) {
-          // added a try catch as a fallback
-          try {
-            final dateOfBirth = DateFormat("dd/MM/yyyy")
-                .parse(individualModel.dateOfBirth ?? '');
-            final age = DigitDateUtils.calculateAge(dateOfBirth);
-            final ageInMonths = getAgeMonths(age);
-            isIneligible = !(ageInMonths < 60);
-            if (!isIneligible) {
-              ifAdministration = true;
-            }
-          } catch (error) {
-            // if any error in parsing , will use fallback case
-            isIneligible = false;
-            ifAdministration = true;
-          }
-        }
       }
       if (!isIneligible &&
           (responses.containsKey(q5Key) && responses[q5Key]!.isNotEmpty)) {
         isIneligible = responses[q5Key] == yes ? true : false;
       }
-      //       if (!isIneligible &&
-      //     (responses.containsKey(q6Key) && responses[q6Key]!.isNotEmpty)) {
-      //   isIneligible = responses[q6Key] == yes ? true : false;
-      // }
       if (!isIneligible &&
-          (responses.containsKey(q7Key) && responses[q7Key]!.isNotEmpty)) {
-        isIneligible = responses[q7Key] == yes ? true : false;
+          (responses.containsKey(q6Key) && responses[q6Key]!.isNotEmpty)) {
+        ifAdministration = responses[q6Key] == yes ? true : false;
       }
-      // passing all the reasons which have response as true
       if (isIneligible) {
         for (var entry in responses.entries) {
           if (entry.key == q3Key || entry.key == q5Key) {
@@ -1099,20 +1077,12 @@ class _EligibilityChecklistViewPage
   ) {
     var isReferral = false;
     var q1Key = "KBEA1";
-    var q2Key = "KBEA2";
-    var q4Key = "KBEA3.NO.ADT1";
-    var q6Key = "KBEA5";
-    var q7Key = "KBEA6";
-    // var q8Key = "KBEA7";
-    // var q3Key = "KBEA3";
+    var q3Key = "KBEA2.YES.KBEA2A";
+    var q4Key = "KBEA2.YES.KBEA2A.POSITIVE.KBEA2AA";
     Map<String, String> referralKeysVsCode = {
       q1Key: "SICK",
-      q2Key: "FEVER",
-      q4Key: "DRUG_SE_PC",
-      q6Key: "RESPIRATORY_INFECTION",
-      // q7Key: "TAKEN_VITAMIN_A",
-      // q8Key: "SIDE_EFFECTS_TO_VITAMIN_A",
-      q7Key: "DRUG_SE_PC",
+      q3Key: "MALARIA_CHECK",
+      q4Key: "MALARIA_DOSE_CHECK"
     };
     // TODO Configure the reasons ,verify hardcoded strings
 
@@ -1121,26 +1091,30 @@ class _EligibilityChecklistViewPage
         isReferral = responses[q1Key] == yes ? true : false;
       }
       if (!isReferral &&
-          (responses.containsKey(q2Key) && responses[q2Key]!.isNotEmpty)) {
-        isReferral = responses[q2Key] == yes ? true : false;
+          (responses.containsKey(q3Key) && responses[q3Key]!.isNotEmpty)) {
+        isReferral = responses[q3Key] != positive ? true : false;
       }
       if (!isReferral &&
           (responses.containsKey(q4Key) && responses[q4Key]!.isNotEmpty)) {
-        isReferral = responses[q4Key] == yes ? true : false;
+        isReferral = responses[q4Key] == no ? true : false;
       }
-      if (!isReferral &&
-              (responses.containsKey(q6Key) && responses[q6Key]!.isNotEmpty)
-          // && (responses.containsKey(q7Key) && responses[q7Key]!.isNotEmpty)
-          ) {
-        isReferral = (responses[q6Key] == yes)
-            // && (responses[q7Key] == yes)
-            ? true
-            : false;
-      }
-      if (!isReferral &&
-          (responses.containsKey(q7Key) && responses[q7Key]!.isNotEmpty)) {
-        isReferral = responses[q7Key] == yes ? true : false;
-      }
+      // if (!isReferral &&
+      //     (responses.containsKey(q4Key) && responses[q4Key]!.isNotEmpty)) {
+      //   isReferral = responses[q4Key] == yes ? true : false;
+      // }
+      // if (!isReferral &&
+      //         (responses.containsKey(q6Key) && responses[q6Key]!.isNotEmpty)
+      //     // && (responses.containsKey(q7Key) && responses[q7Key]!.isNotEmpty)
+      //     ) {
+      //   isReferral = (responses[q6Key] == yes)
+      //       // && (responses[q7Key] == yes)
+      //       ? true
+      //       : false;
+      // }
+      // if (!isReferral &&
+      //     (responses.containsKey(q7Key) && responses[q7Key]!.isNotEmpty)) {
+      //   isReferral = responses[q7Key] == yes ? true : false;
+      // }
     }
     if (isReferral) {
       for (var entry in referralKeysVsCode.entries) {

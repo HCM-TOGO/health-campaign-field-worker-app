@@ -22,11 +22,15 @@ import 'package:registration_delivery/widgets/localized.dart';
 import 'package:registration_delivery/utils/i18_key_constants.dart' as i18;
 import 'package:registration_delivery/utils/utils.dart';
 
+import '../../../utils/app_enums.dart';
+
 @RoutePage()
 class CustomDeliverySummaryPage extends LocalizedStatefulWidget {
+  final EligibilityAssessmentType eligibilityAssessmentType;
   const CustomDeliverySummaryPage({
     super.key,
     super.appLocalizations,
+    required this.eligibilityAssessmentType,
   });
 
   @override
