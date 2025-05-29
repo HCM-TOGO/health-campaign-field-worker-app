@@ -69,6 +69,8 @@ class _EligibilityChecklistViewPage
   final String yes = "YES";
   final String positive = "POSITIVE";
   final String no = "NO";
+  final String negative = "NEGATIVE";
+  final String test_unavailable = "TEST_UNAVAILABLE";
   bool triggerLocalization = false;
 
   @override
@@ -1092,7 +1094,7 @@ class _EligibilityChecklistViewPage
       }
       if (!isReferral &&
           (responses.containsKey(q3Key) && responses[q3Key]!.isNotEmpty)) {
-        isReferral = responses[q3Key] != positive ? true : false;
+        isReferral = (responses[q3Key] == negative || responses[q3Key] == test_unavailable ) ? true : false;
       }
       if (!isReferral &&
           (responses.containsKey(q4Key) && responses[q4Key]!.isNotEmpty)) {
