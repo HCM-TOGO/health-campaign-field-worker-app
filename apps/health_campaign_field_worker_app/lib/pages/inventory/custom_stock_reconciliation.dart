@@ -25,6 +25,8 @@ import 'package:inventory_management/widgets/back_navigation_help_header.dart';
 import 'package:inventory_management/widgets/component_wrapper/facility_bloc_wrapper.dart';
 import 'package:inventory_management/widgets/component_wrapper/product_variant_bloc_wrapper.dart';
 
+import '../../router/app_router.dart';
+
 @RoutePage()
 class CustomStockReconciliationPage extends LocalizedStatefulWidget {
   const CustomStockReconciliationPage({
@@ -100,7 +102,7 @@ class CustomStockReconciliationPageState
                     if (!stockState.persisted) return;
 
                     context.router.replace(
-                      InventoryAcknowledgementRoute(),
+                      CustomInventoryAcknowledgementRoute(),
                     );
                   },
                   builder: (context, stockState) {
@@ -111,9 +113,7 @@ class CustomStockReconciliationPageState
                         return Scaffold(
                           body: ScrollableContent(
                             enableFixedDigitButton: true,
-                            header: const BackNavigationHelpHeaderWidget(
-                              showHelp: false,
-                            ),
+                            header: const BackNavigationHelpHeaderWidget(),
                             footer: SizedBox(
                               child: DigitCard(
                                   margin: const EdgeInsets.fromLTRB(
@@ -328,7 +328,7 @@ class CustomStockReconciliationPageState
                                                               StockReconciliationBloc>();
                                                       final facility = await context
                                                               .router
-                                                              .push(InventoryFacilitySelectionRoute(
+                                                              .push(CustomInventoryFacilitySelectionRoute(
                                                                   facilities:
                                                                       facilities))
                                                           as FacilityModel?;
@@ -509,25 +509,25 @@ class CustomStockReconciliationPageState
                                         .toStringAsFixed(0),
                                     labelFlex: 5,
                                   ),
-                                  // const DigitDivider(),
-                                  // LabelValueItem(
-                                  //   label: localizations.translate(
-                                  //     i18.stockReconciliationDetails.stockLost,
-                                  //   ),
-                                  //   value:
-                                  //       stockState.stockLost.toStringAsFixed(0),
-                                  //   labelFlex: 5,
-                                  // ),
-                                  // const DigitDivider(),
-                                  // LabelValueItem(
-                                  //   label: localizations.translate(
-                                  //     i18.stockReconciliationDetails
-                                  //         .stockDamaged,
-                                  //   ),
-                                  //   value: stockState.stockDamaged
-                                  //       .toStringAsFixed(0),
-                                  //   labelFlex: 5,
-                                  // ),
+                                  const DigitDivider(),
+                                  LabelValueItem(
+                                    label: localizations.translate(
+                                      i18.stockReconciliationDetails.stockLost,
+                                    ),
+                                    value:
+                                        stockState.stockLost.toStringAsFixed(0),
+                                    labelFlex: 5,
+                                  ),
+                                  const DigitDivider(),
+                                  LabelValueItem(
+                                    label: localizations.translate(
+                                      i18.stockReconciliationDetails
+                                          .stockDamaged,
+                                    ),
+                                    value: stockState.stockDamaged
+                                        .toStringAsFixed(0),
+                                    labelFlex: 5,
+                                  ),
                                   const DigitDivider(),
                                   LabelValueItem(
                                     label: localizations.translate(i18

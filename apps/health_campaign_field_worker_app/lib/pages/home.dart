@@ -389,7 +389,7 @@ class _HomePageState extends LocalizedState<HomePage> {
                     _,
                     __,
                   ) {
-                    context.router.push(ManageStocksRoute());
+                    context.router.push(CustomManageStocksRoute());
                   },
                 );
           },
@@ -703,8 +703,7 @@ class _HomePageState extends LocalizedState<HomePage> {
           ) {
             final appConfig = appConfiguration;
             final localizationModulesList = appConfiguration.backendInterface;
-            final selectedLocale =
-                "en_NG"; //AppSharedPreferences().getSelectedLocale;
+            final selectedLocale = AppSharedPreferences().getSelectedLocale;
             LocalizationParams()
                 .setCode(LeastLevelBoundarySingleton().boundary);
             context
@@ -894,7 +893,7 @@ void loadLocalization(
       .add(LocalizationEvent.onUpdateLocalizationIndex(
         index: appConfiguration.languages!.indexWhere((element) =>
             element.value == AppSharedPreferences().getSelectedLocale),
-        code: "en_NG", //AppSharedPreferences().getSelectedLocale!
+        code: AppSharedPreferences().getSelectedLocale!,
       ));
 }
 

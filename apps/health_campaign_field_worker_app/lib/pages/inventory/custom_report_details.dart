@@ -1,6 +1,5 @@
 import 'package:auto_route/auto_route.dart';
 import 'package:collection/collection.dart';
-import 'package:digit_data_model/data/local_store/sql_store/tables/product_variant.dart';
 import 'package:digit_data_model/data_model.dart';
 import 'package:digit_ui_components/digit_components.dart';
 import 'package:digit_ui_components/theme/digit_extended_theme.dart';
@@ -9,15 +8,15 @@ import 'package:digit_ui_components/widgets/molecules/digit_card.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:inventory_management/router/inventory_router.gm.dart';
+import 'package:inventory_management/utils/extensions/extensions.dart';
 import 'package:reactive_forms/reactive_forms.dart';
 
 import 'package:inventory_management/utils/i18_key_constants.dart' as i18;
+import 'package:inventory_management/widgets/localized.dart';
 import 'package:inventory_management/widgets/component_wrapper/facility_bloc_wrapper.dart';
 import 'package:inventory_management/widgets/component_wrapper/product_variant_bloc_wrapper.dart';
 import 'package:inventory_management/widgets/inventory/no_facilities_assigned_dialog.dart';
-import 'package:inventory_management/widgets/localized.dart';
 import 'package:inventory_management/widgets/reports/readonly_pluto_grid.dart';
-// import 'package:inventory_management/blocs/inventory_report.dart';
 import 'package:inventory_management/blocs/product_variant.dart';
 import 'package:inventory_management/blocs/stock_reconciliation.dart';
 import 'package:inventory_management/models/entities/stock.dart';
@@ -26,7 +25,7 @@ import 'package:inventory_management/utils/utils.dart';
 import 'package:inventory_management/widgets/back_navigation_help_header.dart';
 
 import '../../blocs/inventory_management/custom_inventory_report.dart';
-import '../../utils/extensions/extensions.dart';
+import '../../router/app_router.dart';
 
 @RoutePage()
 class CustomInventoryReportDetailsPage extends LocalizedStatefulWidget {
@@ -84,11 +83,9 @@ class CustomInventoryReportDetailsPageState
           )
         : InventoryReportLoadStockDataEvent(
             reportType: widget.reportType,
-            facilityId: context.isCDD
-                ? context.loggedInUserUuid
-                : form.control(_facilityKey).value != null
-                    ? selectedFacilityId!
-                    : '',
+            facilityId: form.control(_facilityKey).value != null
+                ? selectedFacilityId!
+                : '',
             productVariantId: form.control(_productVariantKey).value != null
                 ? (form.control(_productVariantKey).value
                         as ProductVariantModel)
@@ -109,7 +106,6 @@ class CustomInventoryReportDetailsPageState
     return fb.group({
       _facilityKey: FormControl<String>(
         validators: [Validators.required],
-        value: context.isCDD ? context.loggedInUserUuid : null,
       ),
       _productVariantKey: FormControl<ProductVariantModel>(),
     });
@@ -122,8 +118,9 @@ class CustomInventoryReportDetailsPageState
     return BlocProvider<CustomInventoryReportBloc>(
       create: (context) => CustomInventoryReportBloc(
         stockReconciliationRepository: context.repository<
-            StockReconciliationModel, StockReconciliationSearchModel>(),
-        stockRepository: context.repository<StockModel, StockSearchModel>(),
+            StockReconciliationModel, StockReconciliationSearchModel>(context),
+        stockRepository:
+            context.repository<StockModel, StockSearchModel>(context),
       ),
       child: Scaffold(
         bottomNavigationBar: DigitCard(
@@ -154,9 +151,7 @@ class CustomInventoryReportDetailsPageState
             return ScrollableContent(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                const BackNavigationHelpHeaderWidget(
-                  showHelp: false,
-                ),
+                const BackNavigationHelpHeaderWidget(),
                 Container(
                   padding: const EdgeInsets.all(spacer2),
                   child: Align(
@@ -184,19 +179,19 @@ class CustomInventoryReportDetailsPageState
                                 projectId: InventorySingleton().projectId,
                                 dateOfReconciliation: DateTime.now(),
                               ),
-                              stockRepository: context
-                                  .repository<StockModel, StockSearchModel>(),
+                              stockRepository: context.repository<StockModel,
+                                  StockSearchModel>(context),
                               stockReconciliationRepository: context.repository<
                                   StockReconciliationModel,
-                                  StockReconciliationSearchModel>(),
+                                  StockReconciliationSearchModel>(context),
                             ),
                             child: BlocConsumer<StockReconciliationBloc,
                                 StockReconciliationState>(
                               listener: (context, stockState) {
                                 if (!stockState.persisted) return;
 
-                                context.router
-                                    .replace(InventoryAcknowledgementRoute());
+                                context.router.replace(
+                                    CustomInventoryAcknowledgementRoute());
                               },
                               builder: (context, stockState) {
                                 return Column(
@@ -234,7 +229,7 @@ class CustomInventoryReportDetailsPageState
 
                                                     final facility = await context
                                                             .router
-                                                            .push(InventoryFacilitySelectionRoute(
+                                                            .push(CustomInventoryFacilitySelectionRoute(
                                                                 facilities:
                                                                     facilities))
                                                         as FacilityModel?;
@@ -358,35 +353,11 @@ class CustomInventoryReportDetailsPageState
                                                           field.control.value =
                                                               selectedVariant;
 
-                                                          form
-                                                              .control(
-                                                                  _productVariantKey)
-                                                              .updateValue(
-                                                                  selectedVariant);
-
                                                           handleSelection(
                                                               form,
                                                               context.read<
                                                                   CustomInventoryReportBloc>());
                                                         },
-                                                        selectedOption: (form
-                                                                    .control(
-                                                                        _productVariantKey)
-                                                                    .value !=
-                                                                null)
-                                                            ? DropdownItem(
-                                                                name: localizations.translate((form.control(_productVariantKey).value
-                                                                            as ProductVariantModel)
-                                                                        .sku ??
-                                                                    (form.control(_productVariantKey).value
-                                                                            as ProductVariantModel)
-                                                                        .id),
-                                                                code: (form.control(_productVariantKey).value
-                                                                        as ProductVariantModel)
-                                                                    .id)
-                                                            : const DropdownItem(
-                                                                name: '',
-                                                                code: ''),
                                                       ),
                                                     );
                                                   },
@@ -426,8 +397,6 @@ class CustomInventoryReportDetailsPageState
                                             const dateKey = 'date';
                                             const waybillKey = 'waybillNumber';
                                             const quantityKey = 'quantity';
-                                            const partialQuantityKey =
-                                                'partialQuantity';
                                             const transactingPartyKey =
                                                 'transactingParty';
 
@@ -445,23 +414,22 @@ class CustomInventoryReportDetailsPageState
                                                     width: 100,
                                                   ),
                                                   DigitGridColumn(
+                                                    label:
+                                                        localizations.translate(
+                                                      i18.inventoryReportDetails
+                                                          .waybillLabel,
+                                                    ),
+                                                    key: waybillKey,
+                                                    width: 150,
+                                                  ),
+                                                  DigitGridColumn(
                                                     label: quantityLabel,
                                                     key: quantityKey,
-                                                    width: 200,
+                                                    width: 150,
                                                   ),
-                                                  if (widget.reportType ==
-                                                      InventoryReportType
-                                                          .returned)
-                                                    DigitGridColumn(
-                                                      label: localizations.translate(i18
-                                                          .inventoryReportDetails
-                                                          .returnedQuantityLabel),
-                                                      key: partialQuantityKey,
-                                                      width: 200,
-                                                    ),
                                                   DigitGridColumn(
-                                                    label: localizations.translate(
-                                                        transactingPartyLabel),
+                                                    label:
+                                                        transactingPartyLabel,
                                                     key: transactingPartyKey,
                                                     width: 200,
                                                   ),
@@ -478,54 +446,44 @@ class CustomInventoryReportDetailsPageState
                                                             value: entry.key,
                                                           ),
                                                           DigitGridCell(
+                                                            key: waybillKey,
+                                                            value: model
+                                                                    .wayBillNumber ??
+                                                                model
+                                                                    .wayBillNumber ??
+                                                                '',
+                                                          ),
+                                                          DigitGridCell(
                                                             key: quantityKey,
                                                             value: model
                                                                     .quantity ??
                                                                 '',
                                                           ),
-                                                          if (widget
-                                                                  .reportType ==
-                                                              InventoryReportType
-                                                                  .returned)
-                                                            DigitGridCell(
-                                                              key:
-                                                                  partialQuantityKey,
-                                                              value: model.additionalFields ==
-                                                                      null
-                                                                  ? "0"
-                                                                  : model.additionalFields!
-                                                                          .fields
-                                                                          .firstWhereOrNull((e) =>
-                                                                              e.key ==
-                                                                              "partial_quantity")
-                                                                          ?.value ??
-                                                                      '',
-                                                            ),
                                                           DigitGridCell(
-                                                              key:
-                                                                  transactingPartyKey,
-                                                              value: widget.reportType ==
-                                                                          InventoryReportType
-                                                                              .receipt ||
-                                                                      widget.reportType ==
-                                                                          InventoryReportType
-                                                                              .dispatch
-                                                                  ? model.receiverId ==
-                                                                          null
-                                                                      ? localizations.translate(i18
-                                                                          .common
-                                                                          .noMatchFound)
-                                                                      : localizations
-                                                                          .translate(
-                                                                              'FAC_${model.receiverId}')
-                                                                  : model.senderId ==
-                                                                          null
-                                                                      ? localizations.translate(i18
-                                                                          .common
-                                                                          .noMatchFound)
-                                                                      : localizations
-                                                                          .translate(
-                                                                              'FAC_${model.senderId}')),
+                                                            key:
+                                                                transactingPartyKey,
+                                                            value: widget
+                                                                            .reportType ==
+                                                                        InventoryReportType
+                                                                            .receipt ||
+                                                                    widget.reportType ==
+                                                                        InventoryReportType
+                                                                            .dispatch ||
+                                                                    widget.reportType ==
+                                                                        InventoryReportType
+                                                                            .loss ||
+                                                                    widget.reportType ==
+                                                                        InventoryReportType
+                                                                            .damage
+                                                                ? model.receiverId ??
+                                                                    model
+                                                                        .receiverType ??
+                                                                    ''
+                                                                : model.senderId ??
+                                                                    model
+                                                                        .receiverType ??
+                                                                    '',
+                                                          ),
                                                         ],
                                                       ),
                                                   ],
@@ -549,6 +507,8 @@ class CustomInventoryReportDetailsPageState
                                             const receivedKey = 'received';
                                             const dispatchedKey = 'dispatched';
                                             const returnedKey = 'returned';
+                                            const damagedKey = 'damaged';
+                                            const lossKey = 'loss';
                                             const stockInHandKey =
                                                 'stockInHand';
                                             const manualCountKey =
@@ -592,6 +552,24 @@ class CustomInventoryReportDetailsPageState
                                                           .returnedCountLabel,
                                                     ),
                                                     key: returnedKey,
+                                                    width: 120,
+                                                  ),
+                                                  DigitGridColumn(
+                                                    label:
+                                                        localizations.translate(
+                                                      i18.inventoryReportDetails
+                                                          .damagedCountLabel,
+                                                    ),
+                                                    key: damagedKey,
+                                                    width: 120,
+                                                  ),
+                                                  DigitGridColumn(
+                                                    label:
+                                                        localizations.translate(
+                                                      i18.inventoryReportDetails
+                                                          .lostCountLabel,
+                                                    ),
+                                                    key: lossKey,
                                                     width: 120,
                                                   ),
                                                   DigitGridColumn(
@@ -646,6 +624,22 @@ class CustomInventoryReportDetailsPageState
                                                                 _getCountFromAdditionalDetails(
                                                               model,
                                                               'returned',
+                                                            ),
+                                                          ),
+                                                          DigitGridCell(
+                                                            key: lossKey,
+                                                            value:
+                                                                _getCountFromAdditionalDetails(
+                                                              model,
+                                                              'lost',
+                                                            ),
+                                                          ),
+                                                          DigitGridCell(
+                                                            key: damagedKey,
+                                                            value:
+                                                                _getCountFromAdditionalDetails(
+                                                              model,
+                                                              'damaged',
                                                             ),
                                                           ),
                                                           DigitGridCell(
@@ -724,9 +718,7 @@ class CustomInventoryReportDetailsPageState
         value = i18.inventoryReportDetails.receiptQuantityLabel;
         break;
       case InventoryReportType.dispatch:
-        value = context.isCDD
-            ? i18.inventoryReportDetails.returnedQuantityLabel
-            : i18.inventoryReportDetails.dispatchQuantityLabel;
+        value = i18.inventoryReportDetails.dispatchQuantityLabel;
         break;
       case InventoryReportType.returned:
         value = i18.inventoryReportDetails.returnedQuantityLabel;
@@ -750,9 +742,7 @@ class CustomInventoryReportDetailsPageState
         value = i18.inventoryReportDetails.receiptTransactingPartyLabel;
         break;
       case InventoryReportType.dispatch:
-        value = context.isCDD
-            ? i18.inventoryReportDetails.returnedTransactingPartyLabel
-            : i18.inventoryReportDetails.dispatchTransactingPartyLabel;
+        value = i18.inventoryReportDetails.dispatchTransactingPartyLabel;
         break;
       case InventoryReportType.returned:
         value = i18.inventoryReportDetails.returnedTransactingPartyLabel;

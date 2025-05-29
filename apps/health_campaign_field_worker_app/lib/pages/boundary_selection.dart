@@ -47,8 +47,6 @@ class _BoundarySelectionPageState
   late StreamSubscription syncSubscription;
   var leastLevelBoundaries;
 
-  final String setLocale = "en_NG";
-
   @override
   void initState() {
     context.syncRefresh();
@@ -125,7 +123,8 @@ class _BoundarySelectionPageState
                                           element.value ==
                                           AppSharedPreferences()
                                               .getSelectedLocale),
-                                  code: setLocale));
+                                  code: AppSharedPreferences()
+                                      .getSelectedLocale!));
                         }
                       },
                       child: ReactiveFormBuilder(
@@ -143,7 +142,8 @@ class _BoundarySelectionPageState
                                                 element.value ==
                                                 AppSharedPreferences()
                                                     .getSelectedLocale),
-                                        code: setLocale));
+                                        code: AppSharedPreferences()
+                                            .getSelectedLocale!));
                                 Future.delayed(const Duration(milliseconds: 10),
                                     () {
                                   downSyncState.maybeWhen(
@@ -526,20 +526,15 @@ class _BoundarySelectionPageState
                                                     LocalizationParams()
                                                         .setModule(
                                                             ['boundary'], true);
-                                                    context
-                                                        .read<
-                                                            LocalizationBloc>()
-                                                        .add(LocalizationEvent
-                                                            .onUpdateLocalizationIndex(
-                                                                index: appConfiguration
-                                                                    .languages!
-                                                                    .indexWhere((element) =>
-                                                                        element
-                                                                            .value ==
-                                                                        AppSharedPreferences()
-                                                                            .getSelectedLocale),
-                                                                code:
-                                                                    setLocale));
+                                                    context.read<LocalizationBloc>().add(LocalizationEvent.onUpdateLocalizationIndex(
+                                                        index: appConfiguration
+                                                            .languages!
+                                                            .indexWhere((element) =>
+                                                                element.value ==
+                                                                AppSharedPreferences()
+                                                                    .getSelectedLocale),
+                                                        code: AppSharedPreferences()
+                                                            .getSelectedLocale!));
                                                     context.router.replaceAll(
                                                         [HomeRoute()]);
                                                   }
@@ -762,7 +757,7 @@ class _BoundarySelectionPageState
           LocalizationEvent.onUpdateLocalizationIndex(
               index: appConfiguration.languages!.indexWhere((element) =>
                   element.value == AppSharedPreferences().getSelectedLocale),
-              code: setLocale));
+              code: AppSharedPreferences().getSelectedLocale!));
     }
     for (final label in labelList) {
       formControls[label] = FormControl<BoundaryModel>(
