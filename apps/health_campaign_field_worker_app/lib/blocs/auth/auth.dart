@@ -241,8 +241,6 @@ class AuthState with _$AuthState {
     String? individualId,
     final int? spaq1Count,
     final int? spaq2Count,
-    final int? blueVasCount,
-    final int? redVasCount,
   }) = AuthAuthenticatedState;
 
   const factory AuthState.error([String? error]) = AuthErrorState;
