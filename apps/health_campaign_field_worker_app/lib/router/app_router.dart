@@ -32,7 +32,6 @@ import '../pages/beneficiary/check_eligibility/custom_household_acknowledgement.
 import '../pages/beneficiary/check_eligibility/household_acknowledgement_smc.dart';
 import '../pages/beneficiary/check_eligibility/inventory_facility_selection_smc.dart';
 import '../pages/beneficiary/check_eligibility/refer_beneficiary_smc.dart';
-import '../pages/beneficiary/check_eligibility/refer_beneficiary_vas.dart';
 import '../pages/beneficiary/check_eligibility/vaccine_selection_page.dart';
 import '../pages/registration_delivery/custom_complaints_details.dart';
 import '../pages/boundary_selection.dart';
@@ -392,10 +391,7 @@ class AppRouter extends _$AppRouter {
                     page: CustomReferBeneficiarySMCRoute.page,
                     path: 'refer-beneficiary-smc',
                   ),
-                  AutoRoute(
-                    page: CustomReferBeneficiaryVASRoute.page,
-                    path: 'refer-beneficiary-vas',
-                  ),
+
                   AutoRoute(
                     page: CustomInventoryFacilitySelectionSMCRoute.page,
                     path: 'custom-inventory-select-facilities-smc',

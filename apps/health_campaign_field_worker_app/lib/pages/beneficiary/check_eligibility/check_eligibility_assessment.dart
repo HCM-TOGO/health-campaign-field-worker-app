@@ -526,25 +526,17 @@ class _EligibilityChecklistViewPage
                                               widget.eligibilityAssessmentType),
                                     );
                                   } else if (ifReferral) {
-                                    widget.eligibilityAssessmentType ==
-                                            EligibilityAssessmentType.smc
-                                        ? router.push(
-                                            CustomReferBeneficiarySMCRoute(
-                                            projectBeneficiaryClientRefId:
-                                                projectBeneficiaryClientReferenceId ??
-                                                    "",
-                                            individual: widget.individual!,
-                                            referralReasons: referralReasons,
-                                          ))
-                                        : router.push(
-                                            CustomReferBeneficiaryVASRoute(
-                                              projectBeneficiaryClientRefId:
-                                                  projectBeneficiaryClientReferenceId ??
-                                                      "",
-                                              individual: widget.individual!,
-                                              referralReasons: referralReasons,
-                                            ),
-                                          );
+                                    if (widget.eligibilityAssessmentType ==
+                                        EligibilityAssessmentType.smc) {
+                                      router
+                                          .push(CustomReferBeneficiarySMCRoute(
+                                        projectBeneficiaryClientRefId:
+                                            projectBeneficiaryClientReferenceId ??
+                                                "",
+                                        individual: widget.individual!,
+                                        referralReasons: referralReasons,
+                                      ));
+                                    }
                                   } else {
                                     router.push(CustomBeneficiaryDetailsRoute(
                                         eligibilityAssessmentType:
@@ -1094,7 +1086,10 @@ class _EligibilityChecklistViewPage
       }
       if (!isReferral &&
           (responses.containsKey(q3Key) && responses[q3Key]!.isNotEmpty)) {
-        isReferral = (responses[q3Key] == negative || responses[q3Key] == test_unavailable ) ? true : false;
+        isReferral = (responses[q3Key] == negative ||
+                responses[q3Key] == test_unavailable)
+            ? true
+            : false;
       }
       if (!isReferral &&
           (responses.containsKey(q4Key) && responses[q4Key]!.isNotEmpty)) {
