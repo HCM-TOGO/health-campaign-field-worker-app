@@ -1,3 +1,6 @@
+import 'package:closed_household/closed_household.dart';
+import 'package:closed_household/router/closed_household_router.gm.dart';
+
 import 'package:inventory_management/router/inventory_router.gm.dart';
 import 'package:recase/recase.dart';
 import 'package:referral_reconciliation/referral_reconciliation.dart';
@@ -522,10 +525,25 @@ class _HomePageState extends LocalizedState<HomePage> {
           },
         ),
       ),
+      i18.home.closedHouseHoldLabel: homeShowcaseData.closedHouseHold.buildWith(
+        child: HomeItemCard(
+          icon: Icons.home,
+          enableCustomIcon: true,
+          customIconSize: 48,
+          customIcon: Constants.closedHouseholdSvg,
+          label: i18.home.closedHouseHoldLabel,
+          onPressed: () {
+            context.router.push(const ClosedHouseholdWrapperRoute());
+          },
+        ),
+      )
     };
 
     final Map<String, GlobalKey> homeItemsShowcaseMap = {
       // INFO : Need to add showcase keys of package Here
+      i18.home.closedHouseHoldLabel:
+          homeShowcaseData.closedHouseHold.showcaseKey,
+
       i18.home.manageAttendanceLabel:
           homeShowcaseData.manageAttendance.showcaseKey,
 
@@ -552,6 +570,8 @@ class _HomePageState extends LocalizedState<HomePage> {
 
     final homeItemsLabel = <String>[
       // INFO: Need to add items label of package Here
+      i18.home.closedHouseHoldLabel,
+
       i18.home.manageAttendanceLabel,
 
       i18.home.beneficiaryReferralLabel,
@@ -582,7 +602,7 @@ class _HomePageState extends LocalizedState<HomePage> {
 
     if ((envConfig.variables.envType == EnvType.demo && kReleaseMode) ||
         envConfig.variables.envType == EnvType.uat) {
-      filteredLabels.remove(i18.home.db);
+      // filteredLabels.remove(i18.home.db);
     }
 
     final List<Widget> widgetList =
@@ -607,16 +627,11 @@ class _HomePageState extends LocalizedState<HomePage> {
                     LocalRepository<HFReferralModel, HFReferralSearchModel>>(),
 
                 context.read<
-                    LocalRepository<HFReferralModel, HFReferralSearchModel>>(),
-
-                context.read<
                     LocalRepository<AttendanceLogModel,
                         AttendanceLogSearchModel>>(),
 
                 context.read<
                     LocalRepository<PgrServiceModel, PgrServiceSearchModel>>(),
-                context.read<
-                    LocalRepository<HFReferralModel, HFReferralSearchModel>>(),
 
                 context
                     .read<LocalRepository<ServiceModel, ServiceSearchModel>>(),
@@ -651,14 +666,8 @@ class _HomePageState extends LocalizedState<HomePage> {
                     RemoteRepository<HFReferralModel, HFReferralSearchModel>>(),
 
                 context.read<
-                    RemoteRepository<HFReferralModel, HFReferralSearchModel>>(),
-
-                context.read<
                     RemoteRepository<AttendanceLogModel,
                         AttendanceLogSearchModel>>(),
-
-                context.read<
-                    RemoteRepository<HFReferralModel, HFReferralSearchModel>>(),
 
                 context.read<
                     RemoteRepository<HouseholdModel, HouseholdSearchModel>>(),
@@ -733,6 +742,12 @@ void setPackagesSingleton(BuildContext context) {
             dashboardConfigSchema ?? [], context.projectTypeCode ?? "");
         loadLocalization(context, appConfiguration);
         // INFO : Need to add singleton of package Here
+        ClosedHouseholdSingleton().setInitialData(
+          loggedInUserUuid: context.loggedInUserUuid,
+          projectId: context.projectId,
+          beneficiaryType: context.beneficiaryType,
+        );
+
         AttendanceSingleton().setInitialData(
             projectId: context.projectId,
             loggedInIndividualId: context.loggedInIndividualId ?? '',
@@ -797,8 +812,9 @@ void setPackagesSingleton(BuildContext context) {
 
         InventorySingleton().setInitialData(
           isWareHouseMgr: context.loggedInUserRoles
-              .where(
-                  (role) => role.code == RolesType.warehouseManager.toValue())
+              .where((role) =>
+                  role.code == RolesType.warehouseManager.toValue() ||
+                  role.code == RolesType.healthFacilitySupervisor.toValue())
               .toList()
               .isNotEmpty,
           isDistributor: context.loggedInUserRoles
@@ -836,8 +852,9 @@ void setPackagesSingleton(BuildContext context) {
         );
         InventorySingleton().setInitialData(
           isWareHouseMgr: context.loggedInUserRoles
-              .where(
-                  (role) => role.code == RolesType.warehouseManager.toValue())
+              .where((role) =>
+                  role.code == RolesType.warehouseManager.toValue() ||
+                  role.code == RolesType.healthFacilitySupervisor.toValue())
               .toList()
               .isNotEmpty,
           isDistributor: context.loggedInUserRoles
@@ -858,6 +875,7 @@ void setPackagesSingleton(BuildContext context) {
               .toList(),
         );
         InventorySingleton().setBoundary(boundary: context.boundary);
+        ClosedHouseholdSingleton().setBoundary(boundary: context.boundary);
         ComplaintsSingleton().setInitialData(
           tenantId: envConfig.variables.tenantId,
           loggedInUserUuid: context.loggedInUserUuid,

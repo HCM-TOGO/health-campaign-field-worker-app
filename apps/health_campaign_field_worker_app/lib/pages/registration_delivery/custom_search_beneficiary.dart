@@ -38,6 +38,7 @@ import '../../router/app_router.dart';
 import '../../../utils/i18_key_constants.dart' as i18_local;
 import '../../utils/search/global_search_parameters_smc.dart';
 import '../../widgets/showcase/showcase_wrappers.dart';
+import 'custom_view_beneficiary_card.dart';
 
 @RoutePage()
 class CustomSearchBeneficiaryPage extends LocalizedStatefulWidget {
@@ -293,33 +294,34 @@ class _CustomSearchBeneficiaryPageState
                                             ]),
                                             Row(
                                               children: [
-                                                Switch(
-                                                  value:
-                                                      isSearchByBeneficaryIdEnabled,
-                                                  onChanged: (value) {
-                                                    customSearchHouseholdsBloc
-                                                        .add(
-                                                      const SearchHouseholdsClearEvent(),
-                                                    );
-                                                    searchController.clear();
-                                                    context
-                                                        .read<
-                                                            IndividualGlobalSearchSMCBloc>()
-                                                        .add(const searchHouseholdSMCBloc
-                                                            .SearchHouseholdsSMCEvent.clear());
-                                                    setState(() {
-                                                      isSearchByBeneficaryIdEnabled =
-                                                          value;
-                                                      isProximityEnabled =
-                                                          false;
+                                                Padding(
+                                                  padding: const EdgeInsets.all(spacer2),
+                                                  child: DigitSwitch(
+                                                    label: localizations.translate(
+                                                        i18_local.beneficiaryDetails.searchbybeneficiaryidtextupdate),
+                                                    value:
+                                                        isSearchByBeneficaryIdEnabled,
+                                                    onChanged: (value) {
+                                                      customSearchHouseholdsBloc
+                                                          .add(
+                                                        const SearchHouseholdsClearEvent(),
+                                                      );
                                                       searchController.clear();
-                                                      blocWrapper.clearEvent();
-                                                    });
-                                                  },
-                                                ),
-                                                Text(
-                                                  localizations.translate(
-                                                      'SEARCH_BY_BENEFICIARY_ID'),
+                                                      context
+                                                          .read<
+                                                              IndividualGlobalSearchSMCBloc>()
+                                                          .add(const searchHouseholdSMCBloc
+                                                              .SearchHouseholdsSMCEvent.clear());
+                                                      setState(() {
+                                                        isSearchByBeneficaryIdEnabled =
+                                                            value;
+                                                        isProximityEnabled =
+                                                            false;
+                                                        searchController.clear();
+                                                        blocWrapper.clearEvent();
+                                                      });
+                                                    },
+                                                  ),
                                                 ),
                                               ],
                                             )
@@ -466,7 +468,7 @@ class _CustomSearchBeneficiaryPageState
 
                               return Container(
                                 margin: const EdgeInsets.only(bottom: spacer2),
-                                child: ViewBeneficiaryCard(
+                                child: CustomViewBeneficiaryCard(
                                   distance:
                                       isProximityEnabled ? distance : null,
                                   householdMember: householdMemberWrapper,
@@ -566,7 +568,7 @@ class _CustomSearchBeneficiaryPageState
                                 return Container(
                                   margin:
                                       const EdgeInsets.only(bottom: kPadding),
-                                  child: ViewBeneficiaryCard(
+                                  child: CustomViewBeneficiaryCard(
                                     householdMember: i,
                                     onOpenPressed: () async {
                                       final scannerBloc =
@@ -709,10 +711,7 @@ class _CustomSearchBeneficiaryPageState
                               "\n ${localizations.translate(i18_local.beneficiaryDetails.redVasZeroQuantity)}";
                         }
 
-                        if ((spaq1 > 0 ||
-                            spaq2 > 0 ||
-                            blueVas > 0 ||
-                            redVas > 0)) {
+                        if ((spaq1 > 0 || spaq2 > 0 || blueVas > 0 || redVas > 0)) {
                           FocusManager.instance.primaryFocus?.unfocus();
                           context.read<DigitScannerBloc>().add(
                                 const DigitScannerEvent.handleScanner(),
@@ -738,7 +737,7 @@ class _CustomSearchBeneficiaryPageState
                                 Navigator.of(popupContext).pop(false);
                               },
                               description: descriptionText,
-                              type: PopUpType.simple,
+                              type: PopUpType.alert,
                               actions: [
                                 DigitButton(
                                   label: localizations.translate(
@@ -759,6 +758,21 @@ class _CustomSearchBeneficiaryPageState
                           );
                         }
                       },
+                    );
+                  },
+                ),
+                BlocBuilder<CustomSearchHouseholdsBloc,
+                    CustomSearchHouseholdsState>(
+                  builder: (context, searchHouseholdsState) {
+                    return DigitButton(
+                      prefixIcon: Icons.qr_code_scanner,
+                      capitalizeLetters: false,
+                      label: "Scan QR Code",
+                      mainAxisSize: MainAxisSize.max,
+                      type: DigitButtonType.secondary,
+                      size: DigitButtonSize.large,
+                      isDisabled: false,
+                      onPressed: () {},
                     );
                   },
                 ),

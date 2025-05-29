@@ -10,11 +10,13 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 // import 'package:health_campaign_field_worker_app/pages/pages-SMC/beneficiary/custom_facility_selection_smc.dart';
 import 'package:reactive_forms/reactive_forms.dart';
+import 'package:referral_reconciliation/referral_reconciliation.dart';
 import 'package:registration_delivery/models/entities/referral.dart';
 import 'package:registration_delivery/models/entities/status.dart';
 import 'package:registration_delivery/models/entities/task.dart';
 import 'package:registration_delivery/pages/beneficiary/facility_selection.dart';
 import 'package:registration_delivery/router/registration_delivery_router.gm.dart';
+import 'package:registration_delivery/utils/utils.dart';
 import 'package:registration_delivery/widgets/inventory/no_facilities_assigned_dialog.dart';
 
 import '../../../utils/app_enums.dart';
@@ -189,6 +191,9 @@ class CustomReferBeneficiarySMCPageState
                                     if (submit == null || !submit) {
                                       return;
                                     }
+                                    if (healthFacilities.isEmpty) {
+                                      return;
+                                    }
                                     clickedStatus.value = true;
                                     final reason = reasons.first;
 
@@ -230,6 +235,8 @@ class CustomReferBeneficiarySMCPageState
                                               referralReasons,
                                               reasons.join(","),
                                             ),
+                                            const AdditionalField(
+                                                'referralType', 'smcReferred')
                                           ],
                                         ),
                                       ),
@@ -384,7 +391,8 @@ class CustomReferBeneficiarySMCPageState
                           ),
                           Column(children: [
                             DigitDateFormPicker(
-                              margin: const EdgeInsets.symmetric(vertical: spacer2),
+                              margin:
+                                  const EdgeInsets.symmetric(vertical: spacer2),
                               isEnabled: false,
                               formControlName: _dateOfReferralKey,
                               label: localizations.translate(
@@ -456,12 +464,15 @@ class CustomReferBeneficiarySMCPageState
         validators: [Validators.required],
       ),
       _referredToKey: FormControl<String>(
-        value: healthFacilities
-            .where((e) =>
-                e.boundaryCode == context.loggedInUserModel?.boundaryCode)
-            .first
-            .id
-            .toString(),
+        value: healthFacilities.isNotEmpty
+            ? localizations.translate('FAC_${healthFacilities.first.id}')
+            : null,
+        // value: healthFacilities
+        //     .where((e) =>
+        //         e.boundaryCode == context.loggedInUserModel?.boundaryCode)
+        //     .first
+        //     .id
+        //     .toString(),
         validators: [
           Validators.required,
         ],

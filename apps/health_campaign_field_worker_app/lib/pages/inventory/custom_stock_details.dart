@@ -642,9 +642,12 @@ class CustomStockDetailsPageState
                                               items: productVariants
                                                   .map((variant) {
                                                 return DropdownItem(
-                                                  name: localizations.translate(
-                                                    variant.sku ?? variant.id,
-                                                  ),
+                                                  name: localizations
+                                                      .translate(
+                                                        variant.sku ??
+                                                            variant.id,
+                                                      )
+                                                      .toUpperCase(),
                                                   code: variant.id,
                                                 );
                                               }).toList(),

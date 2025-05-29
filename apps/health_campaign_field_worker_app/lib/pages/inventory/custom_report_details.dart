@@ -12,6 +12,7 @@ import 'package:inventory_management/utils/extensions/extensions.dart';
 import 'package:reactive_forms/reactive_forms.dart';
 
 import 'package:inventory_management/utils/i18_key_constants.dart' as i18;
+import '../../utils/i18_key_constants.dart' as i18_local;
 import 'package:inventory_management/widgets/localized.dart';
 import 'package:inventory_management/widgets/component_wrapper/facility_bloc_wrapper.dart';
 import 'package:inventory_management/widgets/component_wrapper/product_variant_bloc_wrapper.dart';
@@ -26,6 +27,8 @@ import 'package:inventory_management/widgets/back_navigation_help_header.dart';
 
 import '../../blocs/inventory_management/custom_inventory_report.dart';
 import '../../router/app_router.dart';
+import '../../utils/constants.dart';
+import '../../utils/extensions/extensions.dart';
 
 @RoutePage()
 class CustomInventoryReportDetailsPage extends LocalizedStatefulWidget {
@@ -212,13 +215,91 @@ class CustomInventoryReportDetailsPageState
                                               ),
                                             ),
                                             builder: (context, state) {
-                                              final facilities =
-                                                  state.whenOrNull(
-                                                        fetched: (facilities,
-                                                                allFacilities) =>
-                                                            facilities,
-                                                      ) ??
-                                                      [];
+                                              final facilities = state
+                                                      .whenOrNull(
+                                                    fetched: (facilities,
+                                                        allfacilities) {
+                                                      if (ctx
+                                                              .selectedProject
+                                                              .address
+                                                              ?.boundaryType ==
+                                                          Constants
+                                                              .stateBoundaryLevel) {
+                                                        List<FacilityModel>
+                                                            filteredFacilities =
+                                                            facilities
+                                                                .where(
+                                                                  (element) =>
+                                                                      element
+                                                                          .usage ==
+                                                                      Constants
+                                                                          .stateFacility,
+                                                                )
+                                                                .toList();
+                                                        facilities =
+                                                            filteredFacilities
+                                                                    .isEmpty
+                                                                ? facilities
+                                                                : filteredFacilities;
+                                                      } else if (ctx
+                                                              .selectedProject
+                                                              .address
+                                                              ?.boundaryType ==
+                                                          Constants
+                                                              .lgaBoundaryLevel) {
+                                                        List<FacilityModel>
+                                                            filteredFacilities =
+                                                            facilities
+                                                                .where(
+                                                                  (element) =>
+                                                                      element
+                                                                          .usage ==
+                                                                      Constants
+                                                                          .lgaFacility,
+                                                                )
+                                                                .toList();
+                                                        facilities =
+                                                            filteredFacilities
+                                                                    .isEmpty
+                                                                ? facilities
+                                                                : filteredFacilities;
+                                                      } else {
+                                                        List<FacilityModel>
+                                                            filteredFacilities =
+                                                            facilities
+                                                                .where(
+                                                                  (element) =>
+                                                                      element
+                                                                          .usage ==
+                                                                      Constants
+                                                                          .healthFacility,
+                                                                )
+                                                                .toList();
+                                                        facilities =
+                                                            filteredFacilities
+                                                                    .isEmpty
+                                                                ? facilities
+                                                                : filteredFacilities;
+                                                      }
+                                                      final teamFacilities = [
+                                                        FacilityModel(
+                                                          id: 'Delivery Team',
+                                                          name: 'Delivery Team',
+                                                        ),
+                                                      ];
+                                                      teamFacilities.addAll(
+                                                        facilities,
+                                                      );
+
+                                                      return context
+                                                                  .isDistributor &&
+                                                              !InventorySingleton()
+                                                                  .isWareHouseMgr
+                                                          ? teamFacilities
+                                                          : facilities;
+                                                    },
+                                                  ) ??
+                                                  [];
 
                                               return InkWell(
                                                 onTap: () async {
@@ -692,7 +773,9 @@ class CustomInventoryReportDetailsPageState
         value = i18.inventoryReportDetails.receiptReportTitle;
         break;
       case InventoryReportType.dispatch:
-        value = i18.inventoryReportDetails.dispatchReportTitle;
+        value = context.isCDD
+            ? i18.inventoryReportDetails.returnedReportTitle
+            : i18.inventoryReportDetails.dispatchReportTitle;
         break;
       case InventoryReportType.returned:
         value = i18.inventoryReportDetails.returnedReportTitle;

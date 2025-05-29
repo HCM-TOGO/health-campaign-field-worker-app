@@ -20,6 +20,8 @@ import 'package:registration_delivery/models/entities/household.dart';
 import 'package:registration_delivery/router/registration_delivery_router.gm.dart';
 import 'package:registration_delivery/utils/constants.dart';
 import 'package:registration_delivery/utils/i18_key_constants.dart' as i18;
+import 'package:health_campaign_field_worker_app/utils/i18_key_constants.dart'
+    as i18_local;
 import 'package:registration_delivery/utils/utils.dart';
 import 'package:registration_delivery/widgets/back_navigation_help_header.dart';
 import 'package:registration_delivery/widgets/localized.dart';
@@ -27,6 +29,7 @@ import 'package:registration_delivery/widgets/showcase/config/showcase_constants
 import 'package:registration_delivery/widgets/showcase/showcase_button.dart';
 
 import '../../blocs/registration_delivery/custom_beneficairy_registration.dart';
+import '../../models/entities/identifier_types.dart';
 import '../../router/app_router.dart';
 import '../../utils/registration_delivery/registration_delivery_utils.dart';
 
@@ -45,19 +48,16 @@ class CustomHouseHoldDetailsPage extends LocalizedStatefulWidget {
 class CustomHouseHoldDetailsPageState
     extends LocalizedState<CustomHouseHoldDetailsPage> {
   static const _dateOfRegistrationKey = 'dateOfRegistration';
-  static const _memberCountKey = 'memberCount';
 
   // Define controllers
   final TextEditingController _pregnantWomenController =
       TextEditingController();
   final TextEditingController _childrenController = TextEditingController();
-  final TextEditingController _memberController = TextEditingController();
 
   @override
   void dispose() {
     _pregnantWomenController.dispose();
     _childrenController.dispose();
-    _memberController.dispose();
     super.dispose();
   }
 
@@ -96,10 +96,6 @@ class CustomHouseHoldDetailsPageState
       body: ReactiveFormBuilder(
         form: () => buildForm(bloc.state),
         builder: (context, form, child) {
-          if (isCommunity) {
-            _memberController.text =
-                form.control(_memberCountKey).value.toString();
-          }
           return BlocConsumer<CustomBeneficiaryRegistrationBloc,
               BeneficiaryRegistrationState>(
             listener: (context, state) {
@@ -150,9 +146,6 @@ class CustomHouseHoldDetailsPageState
                         onPressed: () {
                           form.markAllAsTouched();
                           if (!form.valid) return;
-
-                          final memberCount =
-                              form.control(_memberCountKey).value as int;
 
                           final dateOfRegistration = form
                               .control(_dateOfRegistrationKey)
@@ -206,13 +199,13 @@ class CustomHouseHoldDetailsPageState
                               );
 
                               household = household.copyWith(
+                                  memberCount: 5,
                                   rowVersion: 1,
                                   tenantId:
                                       RegistrationDeliverySingleton().tenantId,
                                   clientReferenceId:
                                       householdModel?.clientReferenceId ??
                                           IdGen.i.identifier,
-                                  memberCount: memberCount,
                                   clientAuditDetails: ClientAuditDetails(
                                     createdBy: RegistrationDeliverySingleton()
                                         .loggedInUserUuid
@@ -240,9 +233,11 @@ class CustomHouseHoldDetailsPageState
                                         context.millisecondsSinceEpoch(),
                                   ),
                                   address: addressModel,
-                                  id: householdid,
+                                  // id: householdid,
                                   additionalFields: HouseholdAdditionalFields(
-                                      version: 1, fields: []));
+                                      version: 1, fields: [
+                                        AdditionalField(IdentifierTypes.uniqueBeneficiaryID.toValue(), householdid)
+                                      ]));
 
                               bloc.add(
                                 BeneficiaryRegistrationSaveHouseholdDetailsEvent(
@@ -265,7 +260,6 @@ class CustomHouseHoldDetailsPageState
                               isHeadOfHousehold,
                             ) {
                               var household = householdModel.copyWith(
-                                  memberCount: memberCount,
                                   address: addressModel,
                                   clientAuditDetails: (householdModel
                                                   .clientAuditDetails
@@ -360,7 +354,7 @@ class CustomHouseHoldDetailsPageState
                                     i18.householdDetails.clfDetailsLabel,
                                   )
                                 : localizations.translate(
-                                    i18.householdDetails.householdDetailsLabel,
+                                    i18_local.householdDetails.dateOfHouseholdRegistrationLabelUpdate,
                                   ),
                             headingStyle: textTheme.headingXl
                                 .copyWith(color: theme.colorTheme.text.primary),
@@ -395,61 +389,6 @@ class CustomHouseHoldDetailsPageState
                             ),
                           ),
                           //[TODO: Use pregnant women form value based on project config
-
-                          householdDetailsShowcaseData
-                              .numberOfMembersLivingInHousehold
-                              .buildWith(
-                            child: ReactiveWrapperField(
-                              formControlName: _memberCountKey,
-                              builder: (field) => LabeledField(
-                                label: (RegistrationDeliverySingleton()
-                                            .householdType ==
-                                        HouseholdType.community)
-                                    ? localizations.translate(
-                                        i18.householdDetails
-                                            .noOfMembersCountCLFLabel,
-                                      )
-                                    : localizations.translate(
-                                        i18.householdDetails
-                                            .noOfMembersCountLabel,
-                                      ),
-                                child: DigitNumericFormInput(
-                                  inputFormatters: [
-                                    FilteringTextInputFormatter.digitsOnly
-                                  ],
-                                  minValue: 1,
-                                  maxValue: !isCommunity ? 30 : 1000000,
-                                  maxLength: 5,
-                                  step: 1,
-                                  editable: isCommunity,
-                                  controller:
-                                      isCommunity ? _memberController : null,
-                                  initialValue: isCommunity
-                                      ? null
-                                      : form
-                                          .control(_memberCountKey)
-                                          .value
-                                          .toString(),
-                                  onChange: (value) {
-                                    if (value.isEmpty) {
-                                      _memberController.text = '1';
-                                      form.control(_memberCountKey).value = 1;
-                                      return;
-                                    }
-                                    // Remove leading zeros
-                                    String newValue = value;
-
-                                    if (value == '0' && isCommunity) {
-                                      newValue = '1';
-                                    }
-                                    _memberController.text = newValue;
-                                    form.control(_memberCountKey).value =
-                                        int.parse(newValue);
-                                  },
-                                ),
-                              ),
-                            ),
-                          ),
                         ]),
                   ),
                 ],
@@ -478,9 +417,6 @@ class CustomHouseHoldDetailsPageState
     return fb.group(<String, Object>{
       _dateOfRegistrationKey:
           FormControl<DateTime>(value: registrationDate, validators: []),
-      _memberCountKey: FormControl<int>(
-        value: household?.memberCount ?? 1,
-      ),
     });
   }
 }

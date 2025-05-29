@@ -1,3 +1,4 @@
+import 'package:closed_household/utils/utils.dart';
 import 'package:attendance_management/attendance_management.dart';
 import 'package:complaints/data/repositories/remote/pgr_service.dart';
 import 'package:referral_reconciliation/referral_reconciliation.dart';
@@ -15,6 +16,9 @@ import 'package:flutter/material.dart';
 import 'package:inventory_management/utils/utils.dart';
 import 'package:isar/isar.dart';
 import 'package:path_provider/path_provider.dart';
+import 'package:survey_form/data/repositories/local/service.dart';
+import 'package:survey_form/data/repositories/oplog/oplog.dart';
+import 'package:survey_form/data/repositories/remote/service.dart';
 import 'package:sync_service/sync_service_lib.dart';
 
 import '../data/local_store/no_sql/schema/app_configuration.dart';
@@ -102,6 +106,7 @@ class Constants {
   static const String lgaFacility = 'District Facility';
   static const int mlPerBottle = 30;
   static const int apiCallLimit = 1000;
+  static const String pipeSeparator = '||';
 
   // for stock validation
 
@@ -171,9 +176,7 @@ class Constants {
         AttendanceLogOpLogManager(isar),
       ),
 
-      HFReferralLocalRepository(sql, HFReferralOpLogManager(isar)),
-
-      HFReferralLocalRepository(sql, HFReferralOpLogManager(isar)),
+      ServiceLocalRepository(sql, ServiceOpLogManager(isar)),
     ];
   }
 
@@ -184,16 +187,15 @@ class Constants {
     final appConfigs = await isar.appConfigurations.where().findAll();
     final config = appConfigs.firstOrNull;
 
-    final enableCrashlytics = false;
-    // config?.firebaseConfig?.enableCrashlytics ?? false;
-    // if (enableCrashlytics) {
-    //   firebase_services.initialize(
-    //     options: DefaultFirebaseOptions.currentPlatform,
-    //     onErrorMessage: (value) {
-    //       AppLogger.instance.error(title: 'CRASHLYTICS', message: value);
-    //     },
-    //   );
-    // }
+    final enableCrashlytics = config?.firebaseConfig?.enableCrashlytics ?? true;
+    if (enableCrashlytics) {
+      firebase_services.initialize(
+        options: DefaultFirebaseOptions.currentPlatform,
+        onErrorMessage: (value) {
+          AppLogger.instance.error(title: 'CRASHLYTICS', message: value);
+        },
+      );
+    }
 
     _version = version;
   }
@@ -258,10 +260,8 @@ class Constants {
           AttendanceLogRemoteRepository(dio, actionMap: actions),
         if (value == DataModelType.complaints)
           PgrServiceRemoteRepository(dio, actionMap: actions),
-        if (value == DataModelType.hFReferral)
-          HFReferralRemoteRepository(dio, actionMap: actions),
-        if (value == DataModelType.hFReferral)
-          HFReferralRemoteRepository(dio, actionMap: actions),
+        if (value == DataModelType.service)
+          ServiceRemoteRepository(dio, actionMap: actions),
       ]);
     }
 
@@ -306,7 +306,9 @@ class Constants {
     SyncServiceSingleton().setRegistries(SyncServiceRegistry());
     SyncServiceSingleton().registries?.registerSyncRegistries({
       DataModelType.complaints: (remote) => CustomSyncRegistry(remote),
-    });
+  
+  });
+    ClosedHouseholdSingleton().setTenantId(envConfig.variables.tenantId);
     AttendanceSingleton().setTenantId(envConfig.variables.tenantId);
     InventorySingleton().setTenantId(tenantId: envConfig.variables.tenantId);
     RegistrationDeliverySingleton().setTenantId(envConfig.variables.tenantId);

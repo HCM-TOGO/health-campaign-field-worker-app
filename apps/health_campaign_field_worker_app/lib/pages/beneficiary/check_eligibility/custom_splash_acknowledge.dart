@@ -55,15 +55,16 @@ class CustomSplashAcknowledgementPageState
       body: PanelCard(
         type: PanelType.success,
         actions: [
-          DigitButton(
-            label: localizations
-                .translate(i18.acknowledgementSuccess.actionLabelText),
-            type: DigitButtonType.primary,
-            size: DigitButtonSize.large,
-            onPressed: () {
-              context.router.maybePop();
-            },
-          ),
+          if (widget.enableBackToSearch == true)
+            DigitButton(
+              label: localizations
+                  .translate(i18.acknowledgementSuccess.actionLabelText),
+              type: DigitButtonType.primary,
+              size: DigitButtonSize.large,
+              onPressed: () {
+                context.router.maybePop();
+              },
+            ),
         ],
         description: localizations.translate(
           i18.acknowledgementSuccess.acknowledgementDescriptionText,

@@ -1,3 +1,5 @@
+import 'package:closed_household/blocs/app_localization.dart'
+    as closed_household_localization;
 import 'package:referral_reconciliation/blocs/app_localization.dart'
     as referral_reconciliation_localization;
 import 'package:registration_delivery/blocs/app_localization.dart'
@@ -80,6 +82,10 @@ getAppLocalizationDelegates({
     ),
     survey_form_localization.SurveyFormLocalization.getDelegate(
       LocalizationLocalRepository().returnLocalizationFromSQL(sql) as Future,
+      appConfig.languages!,
+    ),
+    closed_household_localization.ClosedHouseholdLocalization.getDelegate(
+       LocalizationLocalRepository().returnLocalizationFromSQL(sql) as Future,
       appConfig.languages!,
     ),
   ];

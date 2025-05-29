@@ -13,7 +13,8 @@ class TransactionsCard extends StatelessWidget {
   final List<Map<String, String>> items;
   final Map<String, dynamic> data;
   final String waybillNumber;
-  final Color? backgroundColor;
+  final bool? isSelected;
+  
 
   const TransactionsCard({
     super.key,
@@ -23,7 +24,8 @@ class TransactionsCard extends StatelessWidget {
     required this.items,
     required this.data,
     required this.waybillNumber,
-    this.backgroundColor,
+    required this.isSelected,
+    
   });
 
   @override
@@ -33,9 +35,13 @@ class TransactionsCard extends StatelessWidget {
 
     return Container(
       decoration: BoxDecoration(
-        color: backgroundColor ?? Colors.grey[200],
+        color: isSelected != null && isSelected!
+            ? const Color.fromARGB(255, 250, 158, 105)
+            : Colors.grey[200],
         border: Border.all(
-          color: Colors.grey[400]!,
+           color: isSelected != null && isSelected!
+              ? const Color.fromARGB(255, 223, 107, 41)
+              : Colors.grey[400]!,
           width: 1,
         ),
         borderRadius: BorderRadius.circular(8.0), // Replace spacer2 with 8.0
@@ -49,7 +55,9 @@ class TransactionsCard extends StatelessWidget {
             Container(
               width: double.infinity,
               decoration: BoxDecoration(
-                color: Colors.white,
+                color: isSelected != null && isSelected!
+                    ? const Color.fromARGB(255, 238, 190, 162)
+                    : Colors.white,
                 borderRadius: BorderRadius.circular(8.0), // Replace spacer2
               ),
               padding: const EdgeInsets.all(8.0), // Replace spacer2

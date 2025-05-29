@@ -9,12 +9,15 @@ import 'package:digit_ui_components/widgets/atoms/table_cell.dart';
 import 'package:digit_ui_components/widgets/molecules/digit_card.dart';
 import 'package:digit_ui_components/widgets/molecules/digit_table.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/widgets.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:reactive_forms/reactive_forms.dart';
 import 'package:registration_delivery/blocs/app_localization.dart';
 import 'package:registration_delivery/utils/extensions/extensions.dart';
 
 import 'package:registration_delivery/utils/i18_key_constants.dart' as i18;
+import 'package:health_campaign_field_worker_app/utils/i18_key_constants.dart'
+    as i18_local;
 import 'package:registration_delivery/blocs/delivery_intervention/deliver_intervention.dart';
 import 'package:registration_delivery/blocs/household_overview/household_overview.dart';
 import 'package:registration_delivery/models/entities/additional_fields_type.dart';
@@ -52,6 +55,10 @@ class CustomDoseAdministeredPageState
     extends LocalizedState<CustomDoseAdministeredPage> {
   bool doseAdministered = false;
   bool formSubmitted = false;
+
+  bool _checkbox1 = false;
+  bool _checkbox2 = false;
+  bool _checkbox3 = false;
 
   final clickedStatus = ValueNotifier<bool>(false);
 
@@ -324,170 +331,85 @@ class CustomDoseAdministeredPageState
                             ),
                             Column(
                               children: [
-                                const ListTile(
+                                ListTile(
                                   title: Text(
-                                    "Given 2 AQ tablets to caregiver",
+                                    localizations.translate(
+                                      i18_local.deliverIntervention
+                                          .doseCompletionChecksText1,
+                                    ),
                                   ),
-                                  leading: Text("1"),
+                                  leading: const Text("1."),
+                                  horizontalTitleGap: 0,
+                                  minLeadingWidth: 24,
+                                  minVerticalPadding: 0,
+                                ),
+                                ListTile(
+                                  title: Text.rich(
+                                    TextSpan(
+                                      text:
+                                          '${localizations.translate(i18_local.deliverIntervention.doseCompletionChecksText2)} ',
+                                      style:
+                                          const TextStyle(color: Colors.black),
+                                      children: [
+                                        TextSpan(
+                                          text: beneficiaryId,
+                                          style: const TextStyle(
+                                              color: Color.fromARGB(
+                                                  255, 245, 56, 42),
+                                              fontWeight: FontWeight.bold),
+                                        ),
+                                        TextSpan(
+                                          text:
+                                              ' ${localizations.translate(i18_local.deliverIntervention.doseCompletionChecksText3)} ',
+                                        ),
+                                        TextSpan(
+                                          text: name,
+                                          style: const TextStyle(
+                                              color: Color.fromARGB(
+                                                  255, 245, 56, 42),
+                                              fontWeight: FontWeight.bold),
+                                        ),
+                                        TextSpan(
+                                          text:
+                                              ' (${localizations.translate(i18_local.deliverIntervention.doseCompletionChecksText4)})',
+                                        ),
+                                      ],
+                                    ),
+                                  ),
+                                  leading: const Text("2."),
+                                  horizontalTitleGap: 0,
+                                  minLeadingWidth: 24,
+                                  minVerticalPadding: 0,
                                 ),
                                 ListTile(
                                   title: Text(
-                                    "Have you written this ID $beneficiaryId in the child for $name (To be used in the next cycle)",
+                                    localizations.translate(
+                                      i18_local.deliverIntervention
+                                          .doseCompletionChecksText5,
+                                    ),
                                   ),
-                                  leading: const Text("2"),
+                                  leading: const Text("3."),
+                                  horizontalTitleGap: 0,
+                                  minLeadingWidth: 24,
+                                  minVerticalPadding: 0,
                                 ),
-                                const ListTile(
+                                ListTile(
                                   title: Text(
-                                    "Given health talk on the use of SPAQ on day 2 and day 3",
+                                    localizations.translate(
+                                      i18_local.deliverIntervention
+                                          .doseCompletionChecksText6,
+                                    ),
                                   ),
-                                  leading: Text("3"),
+                                  leading: const Text("4."),
+                                  horizontalTitleGap: 0,
+                                  minLeadingWidth: 24,
+                                  minVerticalPadding: 0,
                                 ),
                               ],
                             ),
-                            // ReactiveWrapperField(
-                            //   formControlName: _doseAdministeredKey,
-                            //   builder: (field) => RadioList(
-                            //     radioDigitButtons: Constants.yesNo
-                            //         .map((e) => RadioButtonModel(
-                            //               code: e.key.toString(),
-                            //               name: localizations
-                            //                   .translate(e.label),
-                            //             ))
-                            //         .toList(),
-                            //     errorMessage: form
-                            //             .control(_doseAdministeredKey)
-                            //             .hasErrors
-                            //         ? localizations.translate(
-                            //             i18.common.corecommonRequired,
-                            //           )
-                            //         : null,
-                            //     groupValue: form
-                            //             .control(_doseAdministeredKey)
-                            //             .value
-                            //             .toString() ??
-                            //         '',
-                            //     onChanged: (val) {
-                            //       form.control(_doseAdministeredKey).value =
-                            //           val.code == 'true' ? true : false;
-                            //     },
-                            //   ),
-                            // ),
                           ]);
                     },
                   ),
-                  // BlocBuilder<ProductVariantBloc, ProductVariantState>(
-                  //   builder: (context, productState) {
-                  //     return productState.maybeWhen(
-                  //       orElse: () => const Offstage(),
-                  //       fetched: (productVariantsValue) {
-                  //         final variant = productState.whenOrNull(
-                  //           fetched: (productVariants) {
-                  //             return productVariants;
-                  //           },
-                  //         );
-
-                  //         return DigitCard(
-                  //             margin: const EdgeInsets.only(
-                  //                 top: spacer2, bottom: spacer2),
-                  //             children: [
-                  //               BlocBuilder<DeliverInterventionBloc,
-                  //                   DeliverInterventionState>(
-                  //                 builder: (context, deliveryState) {
-                  //                   List<DigitTableRow> tableDataRows =
-                  //                       deliveryState.futureDeliveries!
-                  //                           .map((e) {
-                  //                     int doseIndex = deliveryState
-                  //                             .futureDeliveries!
-                  //                             .indexOf(e) +
-                  //                         deliveryState.dose +
-                  //                         1;
-                  //                     List<String> skus = fetchProductVariant(
-                  //                             e,
-                  //                             overViewBloc.selectedIndividual,
-                  //                             overViewBloc
-                  //                                 .householdMemberWrapper
-                  //                                 .household)!
-                  //                         .productVariants!
-                  //                         .map((ele) {
-                  //                       final pv = variant!.firstWhere(
-                  //                         (element) =>
-                  //                             element.id ==
-                  //                             ele.productVariantId,
-                  //                       );
-
-                  //                       return '${ele.quantity} - ${pv.sku.toString()}';
-                  //                     }).toList();
-
-                  //                     return DigitTableRow(tableRow: [
-                  //                       DigitTableData(
-                  //                         'Dose $doseIndex',
-                  //                         cellKey: 'dose',
-                  //                       ),
-                  //                       DigitTableData(
-                  //                         skus.join(' + '),
-                  //                         cellKey: 'resources',
-                  //                       ),
-                  //                     ]);
-                  //                   }).toList();
-
-                  //                   return Column(
-                  //                     children: [
-                  //                       Align(
-                  //                         alignment: Alignment.centerLeft,
-                  //                         child: Padding(
-                  //                           padding: const EdgeInsets.only(
-                  //                             bottom: spacer2 * 2,
-                  //                           ),
-                  //                           child: Text(
-                  //                             localizations.translate(
-                  //                               i18.beneficiaryDetails
-                  //                                   .resourcesTobeProvided,
-                  //                             ),
-                  //                             style: textTheme.headingXl,
-                  //                           ),
-                  //                         ),
-                  //                       ),
-                  //                       DigitTableCard(
-                  //                         element: {
-                  //                           localizations.translate(
-                  //                             i18.beneficiaryDetails
-                  //                                 .beneficiaryAge,
-                  //                           ): localizations.translate(
-                  //                               fetchProductVariant(
-                  //                                       deliveryState
-                  //                                           .futureDeliveries
-                  //                                           ?.first,
-                  //                                       overViewBloc
-                  //                                           .selectedIndividual,
-                  //                                       overViewBloc
-                  //                                           .householdMemberWrapper
-                  //                                           .household)!
-                  //                                   .condition!),
-                  //                         },
-                  //                       ),
-                  //                       const Divider(
-                  //                         thickness: 2.0,
-                  //                       ),
-                  //                       SizedBox(
-                  //                         height: (tableDataRows.length + 1) *
-                  //                             57.5,
-                  //                         child: DigitTable(
-                  //                           enableBorder: true,
-                  //                           showPagination: false,
-                  //                           showSelectedState: false,
-                  //                           columns: headerListResource,
-                  //                           rows: tableDataRows,
-                  //                         ),
-                  //                       ),
-                  //                     ],
-                  //                   );
-                  //                 },
-                  //               ),
-                  //             ]);
-                  //       },
-                  //     );
-                  //   },
-                  // ),
                 ],
               );
             },
@@ -496,12 +418,4 @@ class CustomDoseAdministeredPageState
       ),
     );
   }
-
-  // FormGroup buildForm(BuildContext context) {
-  //   return fb.group(<String, Object>{
-  //     _doseAdministeredKey: FormControl<bool>(
-  //       value: null,
-  //     ),
-  //   });
-  // }
 }
