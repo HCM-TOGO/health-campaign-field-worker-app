@@ -331,6 +331,22 @@ extension ContextUtilityExtensions on BuildContext {
     return spaq2;
   }
 
+  bool get isWarehouseMgr {
+    try {
+      bool isWarehouseMgr = loggedInUserRoles
+          .where(
+            (role) => (role.code == RolesType.warehouseManager.toValue() ||
+                role.code == RolesType.healthFacilitySupervisor.toValue()),
+          )
+          .toList()
+          .isNotEmpty;
+
+      return isWarehouseMgr;
+    } catch (_) {
+      return false;
+    }
+  }
+
   bool get isCommunityDistributor {
     try {
       bool communityDistributor = loggedInUserRoles
