@@ -84,17 +84,13 @@ class CustomValidator {
       return null;
     }
 
-    const pattern = r'[0-9]';
+    const pattern = r'^\d{9,10}$'; // 9 or 10 digits only
 
-    if (control.value.toString().length != 8) {
-      return {'mobileNumber': true};
+    if (RegExp(pattern).hasMatch(control.value.toString())) {
+      return null; // Valid
     }
 
-    if (RegExp(pattern).hasMatch(control.value.toString())) return null;
-
-    if (control.value.toString().length < 8) return {'mobileNumber': true};
-
-    return {'mobileNumber': true};
+    return {'mobileNumber': true}; // Invalid
   }
 
   static Map<String, dynamic>? onlyAlphabets(AbstractControl<dynamic> control) {

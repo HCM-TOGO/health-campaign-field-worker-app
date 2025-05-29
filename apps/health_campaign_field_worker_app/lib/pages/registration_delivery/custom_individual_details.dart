@@ -918,8 +918,8 @@ class CustomIndividualDetailsPageState
         Validators.delegate((validator) =>
             local_utils.CustomValidator.validMobileNumber(validator)),
 
-        Validators.minLength(11),
-        Validators.maxLength(11),
+        Validators.minLength(10),
+        Validators.maxLength(10),
         if (widget.isHeadOfHousehold) Validators.required,
         // Validators.required,
       ]),
