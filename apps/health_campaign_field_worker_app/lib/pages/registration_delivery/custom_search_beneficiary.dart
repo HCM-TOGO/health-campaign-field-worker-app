@@ -161,81 +161,6 @@ class _CustomSearchBeneficiaryPageState
                                 mainAxisAlignment: MainAxisAlignment.start,
                                 crossAxisAlignment: CrossAxisAlignment.start,
                                 children: [
-                                  Padding(
-                                    padding: const EdgeInsets.all(spacer2),
-                                    child: DigitSearchBar(
-                                      controller: searchController,
-                                      icon: const SizedBox.shrink(),
-                                      hintText: (RegistrationDeliverySingleton()
-                                                  .householdType ==
-                                              HouseholdType.community)
-                                          ? localizations.translate(i18
-                                              .searchBeneficiary
-                                              .clfSearchHintText)
-                                          : localizations.translate(
-                                              i18.searchBeneficiary
-                                                  .beneficiarySearchHintText,
-                                            ),
-                                      textCapitalization:
-                                          TextCapitalization.words,
-                                      onChanged: (value) {
-                                        if (isSearchByBeneficaryIdEnabled &&
-                                            isBeneficiaryIdValid(
-                                                value.trim()) &&
-                                            searchController.text
-                                                    .trim()
-                                                    .length ==
-                                                14) {
-                                          searchByBeneficiaryId(
-                                              beneficiaryId: value.trim());
-                                        } else if (isSearchByBeneficaryIdEnabled &&
-                                            searchController.text
-                                                    .trim()
-                                                    .length <
-                                                14) {
-                                          blocWrapper.clearEvent();
-                                          context
-                                              .read<
-                                                  IndividualGlobalSearchSMCBloc>()
-                                              .add(const searchHouseholdSMCBloc
-                                                  .SearchHouseholdsSMCEvent.clear());
-                                        } else if (!isSearchByBeneficaryIdEnabled &&
-                                            (value.isEmpty ||
-                                                value.trim().length > 2)) {
-                                          triggerGlobalSearchEvent();
-                                        }
-                                      },
-                                    ),
-                                  ),
-                                  if (!isSearchByBeneficaryIdEnabled)
-                                    RegistrationDeliverySingleton()
-                                                    .searchHouseHoldFilter !=
-                                                null &&
-                                            RegistrationDeliverySingleton()
-                                                .searchHouseHoldFilter!
-                                                .isNotEmpty &&
-                                            RegistrationDeliverySingleton()
-                                                    .householdType !=
-                                                HouseholdType.community
-                                        ? Align(
-                                            alignment: Alignment.topLeft,
-                                            child: Padding(
-                                              padding:
-                                                  const EdgeInsets.all(spacer2),
-                                              child: DigitButton(
-                                                label: getFilterIconNLabel()[
-                                                    'label'],
-                                                size: DigitButtonSize.medium,
-                                                type: DigitButtonType.tertiary,
-                                                suffixIcon:
-                                                    getFilterIconNLabel()[
-                                                        'icon'],
-                                                onPressed: () =>
-                                                    showFilterDialog(),
-                                              ),
-                                            ),
-                                          )
-                                        : const Offstage(),
                                   locationState.latitude != null
                                       ? Column(
                                           children: [
@@ -296,6 +221,66 @@ class _CustomSearchBeneficiaryPageState
                                           ],
                                         )
                                       : const Offstage(),
+                                  Padding(
+                                    padding: const EdgeInsets.all(spacer2),
+                                    child: DigitSearchBar(
+                                      controller: searchController,
+                                      icon: const SizedBox.shrink(),
+                                      hintText: (RegistrationDeliverySingleton()
+                                                  .householdType ==
+                                              HouseholdType.community)
+                                          ? localizations.translate(i18
+                                              .searchBeneficiary
+                                              .clfSearchHintText)
+                                          : localizations.translate(
+                                              i18.searchBeneficiary
+                                                  .beneficiarySearchHintText,
+                                            ),
+                                      textCapitalization:
+                                          TextCapitalization.words,
+                                      onChanged: (value) {
+                                        if (isSearchByBeneficaryIdEnabled &&
+                                            isBeneficiaryIdValid(
+                                                value.trim()) &&
+                                            searchController.text
+                                                    .trim()
+                                                    .length ==
+                                                14) {
+                                          searchByBeneficiaryId(
+                                              beneficiaryId: value.trim());
+                                        } else if (isSearchByBeneficaryIdEnabled &&
+                                            searchController.text
+                                                    .trim()
+                                                    .length <
+                                                14) {
+                                          blocWrapper.clearEvent();
+                                          context
+                                              .read<
+                                                  IndividualGlobalSearchSMCBloc>()
+                                              .add(const searchHouseholdSMCBloc
+                                                  .SearchHouseholdsSMCEvent.clear());
+                                        } else if (!isSearchByBeneficaryIdEnabled &&
+                                            (value.isEmpty ||
+                                                value.trim().length > 2)) {
+                                          triggerGlobalSearchEvent();
+                                        }
+                                      },
+                                    ),
+                                  ),
+                                  Align(
+                                    alignment: Alignment.topLeft,
+                                    child: Padding(
+                                      padding: const EdgeInsets.all(spacer2),
+                                      child: DigitButton(
+                                        label: getFilterIconNLabel()['label'],
+                                        size: DigitButtonSize.medium,
+                                        type: DigitButtonType.tertiary,
+                                        suffixIcon:
+                                            getFilterIconNLabel()['icon'],
+                                        onPressed: () => showFilterDialog(),
+                                      ),
+                                    ),
+                                  ),
                                   selectedFilters.isNotEmpty
                                       ? Align(
                                           alignment: Alignment.topLeft,

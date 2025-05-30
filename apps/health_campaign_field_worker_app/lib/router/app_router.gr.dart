@@ -102,6 +102,17 @@ abstract class _$AppRouter extends RootStackRouter {
         )),
       );
     },
+    CustomClosedHouseholdSummaryRoute.name: (routeData) {
+      final args = routeData.argsAs<CustomClosedHouseholdSummaryRouteArgs>(
+          orElse: () => const CustomClosedHouseholdSummaryRouteArgs());
+      return AutoRoutePage<dynamic>(
+        routeData: routeData,
+        child: CustomClosedHouseholdSummaryPage(
+          key: args.key,
+          appLocalizations: args.appLocalizations,
+        ),
+      );
+    },
     CustomComplaintTypeRoute.name: (routeData) {
       final args = routeData.argsAs<CustomComplaintTypeRouteArgs>(
           orElse: () => const CustomComplaintTypeRouteArgs());
@@ -1051,6 +1062,45 @@ class CustomBeneficiaryRegistrationWrapperRouteArgs {
   @override
   String toString() {
     return 'CustomBeneficiaryRegistrationWrapperRouteArgs{key: $key, initialState: $initialState}';
+  }
+}
+
+/// generated route for
+/// [CustomClosedHouseholdSummaryPage]
+class CustomClosedHouseholdSummaryRoute
+    extends PageRouteInfo<CustomClosedHouseholdSummaryRouteArgs> {
+  CustomClosedHouseholdSummaryRoute({
+    Key? key,
+    ClosedHouseholdLocalization? appLocalizations,
+    List<PageRouteInfo>? children,
+  }) : super(
+          CustomClosedHouseholdSummaryRoute.name,
+          args: CustomClosedHouseholdSummaryRouteArgs(
+            key: key,
+            appLocalizations: appLocalizations,
+          ),
+          initialChildren: children,
+        );
+
+  static const String name = 'CustomClosedHouseholdSummaryRoute';
+
+  static const PageInfo<CustomClosedHouseholdSummaryRouteArgs> page =
+      PageInfo<CustomClosedHouseholdSummaryRouteArgs>(name);
+}
+
+class CustomClosedHouseholdSummaryRouteArgs {
+  const CustomClosedHouseholdSummaryRouteArgs({
+    this.key,
+    this.appLocalizations,
+  });
+
+  final Key? key;
+
+  final ClosedHouseholdLocalization? appLocalizations;
+
+  @override
+  String toString() {
+    return 'CustomClosedHouseholdSummaryRouteArgs{key: $key, appLocalizations: $appLocalizations}';
   }
 }
 
