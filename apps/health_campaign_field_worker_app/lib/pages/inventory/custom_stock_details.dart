@@ -907,13 +907,33 @@ class CustomStockDetailsPageState
                                               bloc.add(
                                                 const RecordStockCreateStockEntryEvent(),
                                               );
+                                              String descriptionText;
+                                              switch (entryType) {
+                                                case StockRecordEntryType.receipt:
+                                                descriptionText = i18_local.acknowledgementSuccess.acknowledgementDescriptionTextReceipt;
+                                                break;
+                                                case StockRecordEntryType.dispatch:
+                                                descriptionText = i18_local.acknowledgementSuccess.acknowledgementDescriptionTextDispatch;
+                                                break;
+                                                case StockRecordEntryType.returned:
+                                                descriptionText = i18_local.acknowledgementSuccess.acknowledgementDescriptionTextReturned;
+                                                break;
+                                                case StockRecordEntryType.loss:
+                                                descriptionText = i18_local.acknowledgementSuccess.acknowledgementDescriptionTextLoss;
+                                                break;
+                                                case StockRecordEntryType.damaged:
+                                                descriptionText = i18_local.acknowledgementSuccess.acknowledgementDescriptionTextDamaged;
+                                                break;
+                                                default:
+                                                descriptionText = i18.acknowledgementSuccess.acknowledgementDescriptionText;
+                                              }
 
                                               (context.router.parent()
                                                       as StackRouter)
                                                   .maybePop();
 
                                               context.router.push(
-                                                  CustomInventoryAcknowledgementRoute());
+                                                  CustomInventoryAcknowledgementRoute(description: descriptionText));
                                             }
                                           });
                                         }
