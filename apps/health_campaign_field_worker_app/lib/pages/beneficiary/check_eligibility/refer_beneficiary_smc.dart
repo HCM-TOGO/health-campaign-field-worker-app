@@ -423,7 +423,7 @@ class CustomReferBeneficiarySMCPageState
                               formControlName: _referredByKey,
                               readOnly: true,
                               label: localizations.translate(
-                                i18_local.referBeneficiary.referredByLabel,
+                                i18_local.referBeneficiary.referredToLabel,
                               ),
                               validationMessages: {
                                 'required': (_) => localizations.translate(
@@ -436,7 +436,7 @@ class CustomReferBeneficiarySMCPageState
                               formControlName: _referredToKey,
                               readOnly: true,
                               label: localizations.translate(
-                                i18_local.referBeneficiary.referredToLabel,
+                                i18_local.referBeneficiary.referredByLabel,
                               ),
                               validationMessages: {
                                 'required': (_) => localizations.translate(
