@@ -353,11 +353,14 @@ class CustomReferBeneficiarySMCPageState
                                       },
                                     ).then(
                                       (value) => context.router.popAndPush(
-                                        CustomHouseholdAcknowledgementRoute(
-                                          enableViewHousehold: true,
-                                          eligibilityAssessmentType:
-                                              EligibilityAssessmentType.vas,
-                                        ),
+                                        ZeroDoseCheckRoute(
+                                            eligibilityAssessmentType:
+                                                EligibilityAssessmentType.smc),
+                                        // CustomHouseholdAcknowledgementRoute(
+                                        //   enableViewHousehold: true,
+                                        //   eligibilityAssessmentType:
+                                        //       EligibilityAssessmentType.vas,
+                                        // ),
                                       ),
                                     );
                                   }
