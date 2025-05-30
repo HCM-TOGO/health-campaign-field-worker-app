@@ -101,34 +101,29 @@ class CustomIndividualDetailsPageState
 
     if (context.mounted) {
       if (isCreate) {
-        bloc.add(
-          BeneficiaryRegistrationCreateEvent(
-              projectId: RegistrationDeliverySingleton().projectId!,
-              userUuid: RegistrationDeliverySingleton().loggedInUserUuid!,
-              boundary: RegistrationDeliverySingleton().boundary!,
-              tag: null,
-              navigateToSummary: false),
+        router.push(CustomSummaryRoute(name: name));
+      } else {
+        customSearchHouseholdsBloc
+            .add(const CustomSearchHouseholdsEvent.clear());
+        customSearchHouseholdsBloc.add(
+          CustomSearchHouseholdsEvent.searchByHouseholdHead(
+            searchText: name.trim(),
+            projectId: RegistrationDeliverySingleton().projectId!,
+            isProximityEnabled: false,
+            maxRadius: RegistrationDeliverySingleton().maxRadius,
+            limit: customSearchHouseholdsBloc.state.limit,
+            offset: 0,
+          ),
         );
+        router.popUntil(
+            (route) => route.settings.name == SearchBeneficiaryRoute.name);
+        router.push(CustomBeneficiaryAcknowledgementRoute(
+          enableViewHousehold: true,
+          acknowledgementType: isCreate
+              ? AcknowledgementType.addHousehold
+              : AcknowledgementType.addMember,
+        ));
       }
-      router.popUntil(
-          (route) => route.settings.name == SearchBeneficiaryRoute.name);
-      customSearchHouseholdsBloc.add(const CustomSearchHouseholdsEvent.clear());
-      customSearchHouseholdsBloc.add(
-        CustomSearchHouseholdsEvent.searchByHouseholdHead(
-          searchText: name.trim(),
-          projectId: RegistrationDeliverySingleton().projectId!,
-          isProximityEnabled: false,
-          maxRadius: RegistrationDeliverySingleton().maxRadius,
-          limit: customSearchHouseholdsBloc.state.limit,
-          offset: 0,
-        ),
-      );
-      router.push(CustomBeneficiaryAcknowledgementRoute(
-        enableViewHousehold: true,
-        acknowledgementType: isCreate
-            ? AcknowledgementType.addHousehold
-            : AcknowledgementType.addMember,
-      ));
     }
   }
 

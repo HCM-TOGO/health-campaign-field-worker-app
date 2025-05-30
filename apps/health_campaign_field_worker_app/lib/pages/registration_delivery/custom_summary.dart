@@ -21,14 +21,17 @@ import 'package:registration_delivery/utils/constants.dart';
 import 'package:registration_delivery/utils/utils.dart';
 
 import '../../blocs/registration_delivery/custom_beneficairy_registration.dart';
+import '../../blocs/registration_delivery/custom_search_household.dart';
 import '../../router/app_router.dart';
 import 'custom_beneficiary_acknowledgement.dart';
 
 @RoutePage()
 class CustomSummaryPage extends LocalizedStatefulWidget {
+  final dynamic name;
   const CustomSummaryPage({
     super.key,
     super.appLocalizations,
+    required this.name,
   });
 
   @override
@@ -187,6 +190,9 @@ class CustomSummaryPageState extends LocalizedState<CustomSummaryPage> {
 
                                 if (submit ?? false) {
                                   if (context.mounted) {
+                                    final CustomSearchHouseholdsBloc
+                                        customSearchHouseholdsBloc = context
+                                            .read<CustomSearchHouseholdsBloc>();
                                     bloc.add(
                                       BeneficiaryRegistrationCreateEvent(
                                           projectId: projectId!,
@@ -197,6 +203,32 @@ class CustomSummaryPageState extends LocalizedState<CustomSummaryPage> {
                                           tag: projectBeneficiaryModel?.tag,
                                           navigateToSummary: false),
                                     );
+                                    customSearchHouseholdsBloc.add(
+                                        const CustomSearchHouseholdsEvent
+                                            .clear());
+                                    customSearchHouseholdsBloc.add(
+                                      CustomSearchHouseholdsEvent
+                                          .searchByHouseholdHead(
+                                        searchText: widget.name.trim(),
+                                        projectId: projectId!,
+                                        isProximityEnabled: false,
+                                        maxRadius:
+                                            RegistrationDeliverySingleton()
+                                                .maxRadius,
+                                        limit: customSearchHouseholdsBloc
+                                            .state.limit,
+                                        offset: 0,
+                                      ),
+                                    );
+                                    context.router.popUntil((route) =>
+                                        route.settings.name ==
+                                        SearchBeneficiaryRoute.name);
+                                    context.router.push(
+                                        CustomBeneficiaryAcknowledgementRoute(
+                                      enableViewHousehold: true,
+                                      acknowledgementType:
+                                          AcknowledgementType.addHousehold,
+                                    ));
                                   }
                                 }
                               },

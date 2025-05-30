@@ -200,47 +200,47 @@ class CustomDeliverySummaryPageState
                 SliverToBoxAdapter(
                   child: Column(
                     children: [
-                      // DigitCard(
-                      //   margin: const EdgeInsets.all(spacer2),
-                      //   children: [
-                      //     LabelValueSummary(
-                      //         padding: EdgeInsets.zero,
-                      //         heading: localizations.translate(i18
-                      //             .householdLocation
-                      //             .householdLocationLabelText),
-                      //         headingStyle: textTheme.headingL.copyWith(
-                      //           color: theme.colorTheme.primary.primary2,
-                      //         ),
-                      //         withDivider: false,
-                      //         items: [
-                      //           LabelValueItem(
-                      //               label: localizations.translate(
-                      //                   i18.householdLocation.villageLabel),
-                      //               value: localizations.translate(deliverState
-                      //                       .householdMemberWrapper
-                      //                       ?.household
-                      //                       ?.address
-                      //                       ?.locality
-                      //                       ?.code ??
-                      //                   i18.common.coreCommonNA),
-                      //               isInline: true,
-                      //               labelFlex: 5,
-                      //               padding:
-                      //                   const EdgeInsets.only(bottom: spacer2)),
-                      //           LabelValueItem(
-                      //               label: localizations.translate(i18
-                      //                   .householdLocation.landmarkFormLabel),
-                      //               value: deliverState.householdMemberWrapper
-                      //                       ?.household?.address?.landmark ??
-                      //                   localizations
-                      //                       .translate(i18.common.coreCommonNA),
-                      //               isInline: true,
-                      //               labelFlex: 5,
-                      //               padding:
-                      //                   const EdgeInsets.only(top: spacer2)),
-                      //         ]),
-                      //   ],
-                      // ),
+                      DigitCard(
+                        margin: const EdgeInsets.all(spacer2),
+                        children: [
+                          LabelValueSummary(
+                              padding: EdgeInsets.zero,
+                              heading: localizations.translate(i18
+                                  .householdLocation
+                                  .householdLocationLabelText),
+                              headingStyle: textTheme.headingL.copyWith(
+                                color: theme.colorTheme.primary.primary2,
+                              ),
+                              withDivider: false,
+                              items: [
+                                LabelValueItem(
+                                    label: localizations.translate(
+                                        i18.householdLocation.villageLabel),
+                                    value: localizations.translate(deliverState
+                                            .householdMemberWrapper
+                                            ?.household
+                                            ?.address
+                                            ?.locality
+                                            ?.code ??
+                                        i18.common.coreCommonNA),
+                                    isInline: true,
+                                    labelFlex: 5,
+                                    padding:
+                                        const EdgeInsets.only(bottom: spacer2)),
+                                LabelValueItem(
+                                    label: localizations.translate(i18
+                                        .householdLocation.landmarkFormLabel),
+                                    value: deliverState.householdMemberWrapper
+                                            ?.household?.address?.landmark ??
+                                        localizations
+                                            .translate(i18.common.coreCommonNA),
+                                    isInline: true,
+                                    labelFlex: 5,
+                                    padding:
+                                        const EdgeInsets.only(top: spacer2)),
+                              ]),
+                        ],
+                      ),
                       DigitCard(
                           margin: const EdgeInsets.all(spacer2),
                           children: [
@@ -264,110 +264,110 @@ class CustomDeliverySummaryPageState
                                       labelFlex: 5,
                                       padding: const EdgeInsets.only(
                                           bottom: spacer2)),
-                                  LabelValueItem(
-                                    label: localizations.translate(i18
-                                        .householdDetails
-                                        .noOfPregnantWomenCountLabel),
-                                    value: deliverState
-                                            .householdMemberWrapper
-                                            ?.household
-                                            ?.additionalFields
-                                            ?.fields
-                                            .where((h) =>
-                                                h.key ==
-                                                AdditionalFieldsType
-                                                    .pregnantWomen
-                                                    .toValue())
-                                            .firstOrNull
-                                            ?.value
-                                            .toString() ??
-                                        '0',
-                                    isInline: true,
-                                    labelFlex: 5,
-                                  ),
-                                  LabelValueItem(
-                                      label: localizations.translate(i18
-                                          .householdDetails
-                                          .noOfChildrenBelow5YearsLabel),
-                                      value: deliverState
-                                              .householdMemberWrapper
-                                              ?.household
-                                              ?.additionalFields
-                                              ?.fields
-                                              .where((h) =>
-                                                  h.key ==
-                                                  AdditionalFieldsType.children
-                                                      .toValue())
-                                              .firstOrNull
-                                              ?.value
-                                              .toString() ??
-                                          '0',
-                                      isInline: true,
-                                      labelFlex: 5,
-                                      padding:
-                                          const EdgeInsets.only(top: spacer2)),
+                                  //   LabelValueItem(
+                                  //     label: localizations.translate(i18
+                                  //         .householdDetails
+                                  //         .noOfPregnantWomenCountLabel),
+                                  //     value: deliverState
+                                  //             .householdMemberWrapper
+                                  //             ?.household
+                                  //             ?.additionalFields
+                                  //             ?.fields
+                                  //             .where((h) =>
+                                  //                 h.key ==
+                                  //                 AdditionalFieldsType
+                                  //                     .pregnantWomen
+                                  //                     .toValue())
+                                  //             .firstOrNull
+                                  //             ?.value
+                                  //             .toString() ??
+                                  //         '0',
+                                  //     isInline: true,
+                                  //     labelFlex: 5,
+                                  //   ),
+                                  //   LabelValueItem(
+                                  //       label: localizations.translate(i18
+                                  //           .householdDetails
+                                  //           .noOfChildrenBelow5YearsLabel),
+                                  //       value: deliverState
+                                  //               .householdMemberWrapper
+                                  //               ?.household
+                                  //               ?.additionalFields
+                                  //               ?.fields
+                                  //               .where((h) =>
+                                  //                   h.key ==
+                                  //                   AdditionalFieldsType.children
+                                  //                       .toValue())
+                                  //               .firstOrNull
+                                  //               ?.value
+                                  //               .toString() ??
+                                  //           '0',
+                                  //       isInline: true,
+                                  //       labelFlex: 5,
+                                  //       padding:
+                                  //           const EdgeInsets.only(top: spacer2)),
                                 ]),
                           ]),
-                      DigitCard(
-                          margin: const EdgeInsets.all(spacer2),
-                          children: [
-                            LabelValueSummary(
-                                padding: EdgeInsets.zero,
-                                heading: localizations.translate(
-                                    i18.householdDetails.houseDetailsLabel),
-                                headingStyle: textTheme.headingL.copyWith(
-                                  color: theme.colorTheme.primary.primary2,
-                                ),
-                                withDivider: false,
-                                items: [
-                                  LabelValueItem(
-                                      label: localizations.translate(
-                                          i18.householdDetails.noOfRoomsLabel),
-                                      value: deliverState
-                                              .householdMemberWrapper
-                                              ?.household
-                                              ?.additionalFields
-                                              ?.fields
-                                              .where((h) =>
-                                                  h.key ==
-                                                  AdditionalFieldsType.noOfRooms
-                                                      .toValue())
-                                              .firstOrNull
-                                              ?.value
-                                              .toString() ??
-                                          '0',
-                                      isInline: true,
-                                      labelFlex: 5,
-                                      padding: const EdgeInsets.only(
-                                          bottom: spacer2)),
-                                  LabelValueItem(
-                                      label: localizations.translate(
-                                          i18.householdDetails.typeOfStructure),
-                                      value: (deliverState
-                                                  .householdMemberWrapper
-                                                  ?.household
-                                                  ?.additionalFields
-                                                  ?.fields
-                                                  .where((h) =>
-                                                      h.key ==
-                                                      AdditionalFieldsType
-                                                          .houseStructureTypes
-                                                          .toValue())
-                                                  .firstOrNull
-                                                  ?.value ??
-                                              [])
-                                          .toString()
-                                          .split('|')
-                                          .map((item) =>
-                                              getLocalizedMessage(item))
-                                          .toList()
-                                          .join(', '),
-                                      isInline: true,
-                                      labelFlex: 5,
-                                      padding:
-                                          const EdgeInsets.only(top: spacer2)),
-                                ]),
-                          ]),
+                      // DigitCard(
+                      //     margin: const EdgeInsets.all(spacer2),
+                      //     children: [
+                      //       LabelValueSummary(
+                      //           padding: EdgeInsets.zero,
+                      //           heading: localizations.translate(
+                      //               i18.householdDetails.houseDetailsLabel),
+                      //           headingStyle: textTheme.headingL.copyWith(
+                      //             color: theme.colorTheme.primary.primary2,
+                      //           ),
+                      //           withDivider: false,
+                      //           items: [
+                      //             LabelValueItem(
+                      //                 label: localizations.translate(
+                      //                     i18.householdDetails.noOfRoomsLabel),
+                      //                 value: deliverState
+                      //                         .householdMemberWrapper
+                      //                         ?.household
+                      //                         ?.additionalFields
+                      //                         ?.fields
+                      //                         .where((h) =>
+                      //                             h.key ==
+                      //                             AdditionalFieldsType.noOfRooms
+                      //                                 .toValue())
+                      //                         .firstOrNull
+                      //                         ?.value
+                      //                         .toString() ??
+                      //                     '0',
+                      //                 isInline: true,
+                      //                 labelFlex: 5,
+                      //                 padding: const EdgeInsets.only(
+                      //                     bottom: spacer2)),
+                      //             LabelValueItem(
+                      //                 label: localizations.translate(
+                      //                     i18.householdDetails.typeOfStructure),
+                      //                 value: (deliverState
+                      //                             .householdMemberWrapper
+                      //                             ?.household
+                      //                             ?.additionalFields
+                      //                             ?.fields
+                      //                             .where((h) =>
+                      //                                 h.key ==
+                      //                                 AdditionalFieldsType
+                      //                                     .houseStructureTypes
+                      //                                     .toValue())
+                      //                             .firstOrNull
+                      //                             ?.value ??
+                      //                         [])
+                      //                     .toString()
+                      //                     .split('|')
+                      //                     .map((item) =>
+                      //                         getLocalizedMessage(item))
+                      //                     .toList()
+                      //                     .join(', '),
+                      //                 isInline: true,
+                      //                 labelFlex: 5,
+                      //                 padding:
+                      //                     const EdgeInsets.only(top: spacer2)),
+                      //           ]),
+                      //     ]),
                       BlocBuilder<ProductVariantBloc, ProductVariantState>(
                           builder: (context, productState) {
                         final variants = productState.whenOrNull(
