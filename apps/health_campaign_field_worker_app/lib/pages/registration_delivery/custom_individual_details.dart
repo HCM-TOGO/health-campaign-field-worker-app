@@ -81,6 +81,8 @@ class CustomIndividualDetailsPageState
   bool isEditIndividual = false;
   bool isAddIndividual = false;
   bool isBeneficaryRegistration = false;
+  String? yesNoValue;
+  bool get isRelocated => yesNoValue == 'yes';
 
   final beneficiaryType = RegistrationDeliverySingleton().beneficiaryType!;
   Set<String>? beneficiaryId;
@@ -636,7 +638,7 @@ class CustomIndividualDetailsPageState
                             }
                           },
                         ),
-                        if (isBeneficaryRegistration)
+                        if (!widget.isHeadOfHousehold)
                           DigitButton(
                             capitalizeLetters: false,
                             label: "Link QR Code to Beneficiary",
@@ -648,53 +650,57 @@ class CustomIndividualDetailsPageState
                               context.router.push(QRScannerRoute());
                             },
                           ),
-                        if (isBeneficaryRegistration)
-                          Container(
-                            decoration: BoxDecoration(
-                              border: Border.all(
-                                color: Colors.grey,
-                              ),
-                              borderRadius: BorderRadius.circular(4),
+                        if (!widget.isHeadOfHousehold)
+                          Text("Is this a relocated beneficiary?",
+                              style: TextStyle(
+                                fontSize: 16,
+                                color: theme.colorTheme.text.primary,
+                              )),
+                        Container(
+                          decoration: BoxDecoration(
+                            border: Border.all(
+                              color: Colors.grey,
                             ),
-                            margin: const EdgeInsets.symmetric(vertical: 16),
-                            child: StatefulBuilder(
-                              builder: (context, setState) {
-                                String? yesNoValue = 'yes';
-
-                                return Row(
-                                  children: [
-                                    Expanded(
-                                      child: RadioListTile<String>(
-                                        title: const Text('Yes'),
-                                        value: 'yes',
-                                        groupValue: yesNoValue,
-                                        onChanged: (value) {
-                                          setState(() {
-                                            yesNoValue = value!;
-                                          });
-                                        },
-                                      ),
-                                    ),
-                                    Expanded(
-                                      child: RadioListTile<String>(
-                                        title: const Text('No'),
-                                        value: 'no',
-                                        groupValue: yesNoValue,
-                                        onChanged: (value) {
-                                          setState(() {
-                                            yesNoValue = value!;
-                                          });
-                                        },
-                                      ),
-                                    ),
-                                  ],
-                                );
-                              },
-                            ),
+                            borderRadius: BorderRadius.circular(4),
                           ),
-                        if (isBeneficaryRegistration)
+                          child: StatefulBuilder(
+                            builder: (context, setState) {
+                              return Row(
+                                children: [
+                                  Expanded(
+                                    child: RadioListTile<String>(
+                                      title: const Text('Yes'),
+                                      value: 'yes',
+                                      groupValue: yesNoValue,
+                                      onChanged: (value) {
+                                        setState(() {
+                                          yesNoValue = value!;
+                                        });
+                                        // Force rebuild to show/hide button
+                                        this.setState(() {});
+                                      },
+                                    ),
+                                  ),
+                                  Expanded(
+                                    child: RadioListTile<String>(
+                                      title: const Text('No'),
+                                      value: 'no',
+                                      groupValue: yesNoValue,
+                                      onChanged: (value) {
+                                        setState(() {
+                                          yesNoValue = value!;
+                                        });
+                                        this.setState(() {});
+                                      },
+                                    ),
+                                  ),
+                                ],
+                              );
+                            },
+                          ),
+                        ),
+                        if (!widget.isHeadOfHousehold && isRelocated)
                           DigitButton(
-                            prefixIcon: Icons.qr_code_scanner,
                             capitalizeLetters: false,
                             label: "Previous Beneficiary QR Code",
                             mainAxisSize: MainAxisSize.max,
