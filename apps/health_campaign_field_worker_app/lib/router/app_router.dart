@@ -96,6 +96,8 @@ import '../pages/inventory/custom_report_selection.dart';
 import '../pages/inventory/custom_stock_details.dart';
 import '../pages/inventory/custom_stock_reconciliation.dart';
 import '../pages/inventory/custom_warehouse_details.dart';
+import '../pages/inventory/qr_scanner.dart';
+import 'package:digit_scanner/blocs/app_localization.dart';
 
 part 'app_router.gr.dart';
 
