@@ -12,6 +12,7 @@ import 'package:inventory_management/router/inventory_router.gm.dart';
 import 'package:reactive_forms/reactive_forms.dart';
 
 import 'package:inventory_management/utils/i18_key_constants.dart' as i18;
+import '../../router/app_router.dart';
 import '../../utils/i18_key_constants.dart' as i18_local;
 import 'package:inventory_management/widgets/component_wrapper/facility_bloc_wrapper.dart';
 import 'package:inventory_management/widgets/component_wrapper/product_variant_bloc_wrapper.dart';
@@ -314,7 +315,7 @@ class CustomInventoryReportDetailsPageState
 
                                                     final facility = await context
                                                             .router
-                                                            .push(InventoryFacilitySelectionRoute(
+                                                            .push(CustomInventoryFacilitySelectionRoute(
                                                                 facilities:
                                                                     facilities))
                                                         as FacilityModel?;
