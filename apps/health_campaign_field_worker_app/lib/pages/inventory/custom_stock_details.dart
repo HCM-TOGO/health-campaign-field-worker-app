@@ -321,8 +321,26 @@ class CustomStockDetailsPageState
                                         final deliveryTeamName = form
                                             .control(_deliveryTeamKey)
                                             .value as String?;
-
-                                        if (deliveryTeamSelected &&
+                                        if ((form
+                                                .control(_productVariantKey)
+                                                .value ==
+                                            null)) {
+                                          Toast.showToast(
+                                            context,
+                                            type: ToastType.error,
+                                            message: localizations.translate(
+                                              i18.stockDetails
+                                                  .selectProductLabel,
+                                            ),
+                                          );
+                                        } else if (controller1.text.isEmpty) {
+                                          Toast.showToast(context,
+                                              type: ToastType.error,
+                                              message:
+                                                  '${localizations.translate(
+                                                '${pageTitle}_${i18.stockReconciliationDetails.stockLabel}',
+                                              )} ?');
+                                        } else if (deliveryTeamSelected &&
                                             (form
                                                         .control(
                                                           _deliveryTeamKey,
