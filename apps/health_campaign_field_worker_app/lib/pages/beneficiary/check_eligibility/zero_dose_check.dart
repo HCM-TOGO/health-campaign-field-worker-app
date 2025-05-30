@@ -49,11 +49,13 @@ import '../../../widgets/custom_back_navigation.dart';
 class ZeroDoseCheckPage extends LocalizedStatefulWidget {
   final EligibilityAssessmentType eligibilityAssessmentType;
   final bool isEditing;
+  final bool isAdministration;
 
   const ZeroDoseCheckPage({
     super.key,
     super.appLocalizations,
     required this.eligibilityAssessmentType,
+    required this.isAdministration,
     this.isEditing = false,
   });
 
@@ -94,16 +96,6 @@ class ZeroDoseCheckPageState extends LocalizedState<ZeroDoseCheckPage> {
     super.initState();
     // context.read<LocationBloc>().add(const LoadLocationEvent());
     // super.initState();
-  }
-
-  Future<void> handleSubmit(
-    BuildContext context,
-    TaskModel taskModel,
-    DeliverInterventionState deliverState,
-  ) async {
-    context.router.popAndPush(CustomDeliverySummaryRoute(
-      eligibilityAssessmentType: widget.eligibilityAssessmentType,
-    ));
   }
 
   @override
@@ -507,22 +499,18 @@ class ZeroDoseCheckPageState extends LocalizedState<ZeroDoseCheckPage> {
                                         ).pop(true);
                                       },
                                     ),
-                                    secondaryAction:
-                                        widget.eligibilityAssessmentType ==
-                                                EligibilityAssessmentType.smc
-                                            ? DigitDialogActions(
-                                                label: localizations.translate(
-                                                  i18_local.checklist
-                                                      .checklistDialogSecondaryAction,
-                                                ),
-                                                action: (context) {
-                                                  Navigator.of(
-                                                    context,
-                                                    rootNavigator: true,
-                                                  ).pop(false);
-                                                },
-                                              )
-                                            : null,
+                                    secondaryAction: DigitDialogActions(
+                                      label: localizations.translate(
+                                        i18_local.checklist
+                                            .checklistDialogSecondaryAction,
+                                      ),
+                                      action: (context) {
+                                        Navigator.of(
+                                          context,
+                                          rootNavigator: true,
+                                        ).pop(false);
+                                      },
+                                    ),
                                   ),
                                 );
                                 if (shouldSubmit ?? false) {
@@ -530,12 +518,21 @@ class ZeroDoseCheckPageState extends LocalizedState<ZeroDoseCheckPage> {
                                     final router = context.router;
                                     router.popUntilRouteWithName(
                                         BeneficiaryWrapperRoute.name);
-                                    router.push(
-                                      CustomSplashAcknowledgementRoute(
-                                          enableBackToSearch: false,
-                                          eligibilityAssessmentType:
-                                              widget.eligibilityAssessmentType),
-                                    );
+                                    if (widget.isAdministration == true) {
+                                      router.push(
+                                        CustomSplashAcknowledgementRoute(
+                                            enableBackToSearch: false,
+                                            eligibilityAssessmentType: widget
+                                                .eligibilityAssessmentType),
+                                      );
+                                    } else {
+                                      router.push(
+                                        CustomHouseholdAcknowledgementRoute(
+                                            enableViewHousehold: true,
+                                            eligibilityAssessmentType: widget
+                                                .eligibilityAssessmentType),
+                                      );
+                                    }
                                   }
 
                                   submitTriggered = true;
