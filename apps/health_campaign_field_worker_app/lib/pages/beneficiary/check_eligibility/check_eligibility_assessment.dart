@@ -519,8 +519,10 @@ class _EligibilityChecklistViewPage
                                       const SearchHouseholdsClearEvent(),
                                     );
                                     router.push(ZeroDoseCheckRoute(
-                                        eligibilityAssessmentType:
-                                            widget.eligibilityAssessmentType));
+                                      eligibilityAssessmentType:
+                                          widget.eligibilityAssessmentType,
+                                      isAdministration: false,
+                                    ));
                                     // router.push(
                                     //   CustomHouseholdAcknowledgementRoute(
                                     //       enableViewHousehold: true,

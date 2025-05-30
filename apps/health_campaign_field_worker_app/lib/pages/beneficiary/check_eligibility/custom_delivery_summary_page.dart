@@ -168,6 +168,7 @@ class CustomDeliverySummaryPageState
                                       ZeroDoseCheckRoute(
                                     eligibilityAssessmentType:
                                         widget.eligibilityAssessmentType,
+                                    isAdministration: true,
                                   ));
                                 } else {
                                   final reloadState =
