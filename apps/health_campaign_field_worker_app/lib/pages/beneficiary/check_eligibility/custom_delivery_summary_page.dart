@@ -264,6 +264,9 @@ class CustomDeliverySummaryPageState
                                       labelFlex: 5,
                                       padding: const EdgeInsets.only(
                                           bottom: spacer2)),
+
+                                  // TODO: Uncomment if these fields are available
+
                                   //   LabelValueItem(
                                   //     label: localizations.translate(i18
                                   //         .householdDetails
@@ -308,6 +311,9 @@ class CustomDeliverySummaryPageState
                                   //           const EdgeInsets.only(top: spacer2)),
                                 ]),
                           ]),
+
+                      // TODO: Uncomment if household details card is needed and these fields are available
+
                       // DigitCard(
                       //     margin: const EdgeInsets.all(spacer2),
                       //     children: [
