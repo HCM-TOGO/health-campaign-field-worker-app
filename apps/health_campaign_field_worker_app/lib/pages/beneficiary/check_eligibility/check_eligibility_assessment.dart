@@ -833,9 +833,10 @@ class _EligibilityChecklistViewPage
                             .toList()
                         : [],
                     itemBuilder: (item) => RadioButtonBuilder(
-                      localizations.translate(
-                        'CORE_COMMON_${item.trim().toUpperCase()}',
-                      ),
+                      item.trim().toUpperCase() == 'TEST_UNAVAILABLE' ?
+                        localizations.translate("${selectedServiceDefinition?.code}.${item.trim().toUpperCase()}") :
+                        localizations.translate('CORE_COMMON_${item.trim().toUpperCase()}'),
+
                     ),
                   );
                 },
@@ -1097,29 +1098,15 @@ class _EligibilityChecklistViewPage
           (responses.containsKey(q4Key) && responses[q4Key]!.isNotEmpty)) {
         isReferral = responses[q4Key] == no ? true : false;
       }
-      // if (!isReferral &&
-      //     (responses.containsKey(q4Key) && responses[q4Key]!.isNotEmpty)) {
-      //   isReferral = responses[q4Key] == yes ? true : false;
-      // }
-      // if (!isReferral &&
-      //         (responses.containsKey(q6Key) && responses[q6Key]!.isNotEmpty)
-      //     // && (responses.containsKey(q7Key) && responses[q7Key]!.isNotEmpty)
-      //     ) {
-      //   isReferral = (responses[q6Key] == yes)
-      //       // && (responses[q7Key] == yes)
-      //       ? true
-      //       : false;
-      // }
-      // if (!isReferral &&
-      //     (responses.containsKey(q7Key) && responses[q7Key]!.isNotEmpty)) {
-      //   isReferral = responses[q7Key] == yes ? true : false;
-      // }
     }
     if (isReferral) {
       for (var entry in referralKeysVsCode.entries) {
-        if (responses.containsKey(entry.key) &&
+        if( responses.containsKey(entry.key) &&
             responses[entry.key]!.isNotEmpty) {
-          if (responses[entry.key] == yes) {
+          if ((entry.key ==q1Key && responses[q1Key] == yes) ||
+              (entry.key ==q3Key && responses[q3Key] == negative) ||
+              (entry.key ==q3Key && responses[q3Key] == test_unavailable) ||
+              (entry.key ==q4Key && responses[q4Key] == no)) {
             referralReasons.add(entry.value);
           }
         }
