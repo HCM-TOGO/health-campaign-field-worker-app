@@ -86,7 +86,8 @@ class _CustomSummaryReportState
                 child: Align(
                   alignment: Alignment.centerLeft,
                   child: Text(
-                    'Summary report',
+                    localizations
+                        .translate(i18Local.homeShowcase.summaryReport),
                     maxLines: 1,
                     style: Theme.of(context).textTheme.displayMedium,
                   ),
@@ -99,36 +100,44 @@ class _CustomSummaryReportState
                     return SizedBox(
                       height: 400,
                       child: _ReportDetailsContent(
-                        title: "title",
+                        title: localizations
+                            .translate(i18Local.homeShowcase.summaryReport),
                         data: DigitGridData(
                           columns: [
-                            const DigitGridColumn(
-                              label: "Date",
+                            DigitGridColumn(
+                              label: localizations.translate(
+                                  i18Local.homeShowcase.summaryReportDate),
                               key: _dateKey,
                               width: 120,
                             ),
-                            const DigitGridColumn(
-                              label: "Number of registered children",
+                            DigitGridColumn(
+                              label: localizations.translate(i18Local
+                                  .homeShowcase.summaryReportRegistredChildren),
                               key: _registeredChildrenKey,
                               width: 200,
                             ),
-                            const DigitGridColumn(
-                              label: "Number of administered children",
+                            DigitGridColumn(
+                              label: localizations.translate(i18Local
+                                  .homeShowcase
+                                  .summaryReportAdministredChildren),
                               key: _administeredChildrenKey,
                               width: 230,
                             ),
-                            const DigitGridColumn(
-                              label: "Number of refusals cases",
+                            DigitGridColumn(
+                              label: localizations.translate(i18Local
+                                  .homeShowcase.summaryReportRefusalsCases),
                               key: _refusalsCasesKey,
                               width: 230,
                             ),
-                            const DigitGridColumn(
-                              label: "Number of used Tablet 3-11 months",
+                            DigitGridColumn(
+                              label: localizations.translate(
+                                  i18Local.homeShowcase.summaryReportSPAQ1),
                               key: _usedTablet_3_11monthKey,
                               width: 230,
                             ),
-                            const DigitGridColumn(
-                              label: "Number of used Tablet 12s-59month",
+                            DigitGridColumn(
+                              label: localizations.translate(
+                                  i18Local.homeShowcase.summaryReportSPAQ2),
                               key: _usedTablet_12_59monthKey,
                               width: 230,
                             ),
@@ -144,28 +153,36 @@ class _CustomSummaryReportState
                                   ),
                                   DigitGridCell(
                                     key: _registeredChildrenKey,
-                                    value: (entry.value['registered'] ?? 0)
-                                        .toString(),
+                                    value:
+                                        (entry.value[Constants.registered] ?? 0)
+                                            .toString(),
                                   ),
                                   DigitGridCell(
                                     key: _administeredChildrenKey,
-                                    value: (entry.value['administered'] ?? 0)
-                                        .toString(),
+                                    value:
+                                        (entry.value[Constants.administered] ??
+                                                0)
+                                            .toString(),
                                   ),
                                   DigitGridCell(
                                     key: _refusalsCasesKey,
-                                    value: (entry.value['refusals'] ?? 0)
-                                        .toString(),
+                                    value:
+                                        (entry.value[Constants.refusals] ?? 0)
+                                            .toString(),
                                   ),
                                   DigitGridCell(
                                     key: _usedTablet_3_11monthKey,
-                                    value: (entry.value['tablet_3_11'] ?? 0)
-                                        .toString(),
+                                    value:
+                                        (entry.value[Constants.tablet_3_11] ??
+                                                0)
+                                            .toString(),
                                   ),
                                   DigitGridCell(
                                     key: _usedTablet_12_59monthKey,
-                                    value: (entry.value['tablet_12_59'] ?? 0)
-                                        .toString(),
+                                    value:
+                                        (entry.value[Constants.tablet_12_59] ??
+                                                0)
+                                            .toString(),
                                   ),
                                 ],
                               ),

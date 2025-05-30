@@ -266,18 +266,14 @@ class MainApplicationState extends State<MainApplication>
                       providers: [
                         BlocProvider(
                           create: (context) => SummaryReportBloc(
-                            individualRepository: context.repository<
-                                IndividualModel, IndividualSearchModel>(),
                             householdMemberRepository: context.repository<
                                 HouseholdMemberModel,
                                 HouseholdMemberSearchModel>(),
                             taskDataRepository: context
                                 .repository<TaskModel, TaskSearchModel>(),
-                            stockRepository: context
-                                .repository<StockModel, StockSearchModel>(),
-                            stockReconciliationRepository: context.repository<
-                                StockReconciliationModel,
-                                StockReconciliationSearchModel>(),
+                            productVariantDataRepository: context.repository<
+                                ProductVariantModel,
+                                ProductVariantSearchModel>(),
                           ),
                         ),
                         BlocProvider(

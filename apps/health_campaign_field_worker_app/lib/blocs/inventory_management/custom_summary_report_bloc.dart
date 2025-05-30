@@ -1,9 +1,10 @@
 import 'dart:async';
-import 'package:digit_data_model/utils/typedefs.dart';
+import 'package:digit_data_model/data_model.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:freezed_annotation/freezed_annotation.dart';
-import 'package:inventory_management/utils/typedefs.dart';
 import 'package:registration_delivery/models/entities/household_member.dart';
+import 'package:registration_delivery/models/entities/task.dart';
+import 'package:registration_delivery/models/entities/task_resource.dart';
 import 'package:registration_delivery/utils/typedefs.dart';
 
 import '../../utils/constants.dart';
@@ -14,17 +15,13 @@ part 'custom_summary_report_bloc.freezed.dart';
 typedef SummaryReportEmitter = Emitter<SummaryReportState>;
 
 class SummaryReportBloc extends Bloc<SummaryReportEvent, SummaryReportState> {
-  final IndividualDataRepository individualRepository;
   final HouseholdMemberDataRepository householdMemberRepository;
   final TaskDataRepository taskDataRepository;
-  final StockDataRepository stockRepository;
-  final StockReconciliationDataRepository stockReconciliationRepository;
+  final ProductVariantDataRepository productVariantDataRepository;
 
   SummaryReportBloc({
-    required this.stockRepository,
-    required this.stockReconciliationRepository,
     required this.householdMemberRepository,
-    required this.individualRepository,
+    required this.productVariantDataRepository,
     required this.taskDataRepository,
   }) : super(const SummaryReportEmptyState()) {
     on<SummaryReportLoadDataEvent>(_handleLoadDataEvent);
@@ -38,31 +35,105 @@ class SummaryReportBloc extends Bloc<SummaryReportEvent, SummaryReportState> {
     emit(const SummaryReportLoadingState());
 
     List<HouseholdMemberModel> householdMemberList = [];
+    List<TaskModel> taskList = [];
+    List<TaskModel> refusalCasesList = [];
+    List<TaskModel> administeredChildrenList = [];
+    List<ProductVariantModel> productVariantList = [];
+    List<TaskResourceModel> spaq1List = [];
+    List<TaskResourceModel> spaq2List = [];
     householdMemberList = await (householdMemberRepository)
         .search(HouseholdMemberSearchModel(isHeadOfHousehold: false));
+    taskList = await (taskDataRepository).search(TaskSearchModel());
+    productVariantList = await (productVariantDataRepository)
+        .search(ProductVariantSearchModel());
+    for (var element in taskList) {
+      if (element.status == 'ADMINISTRATION_SUCCESS') {
+        administeredChildrenList.add(element);
+      } else {
+        refusalCasesList.add(element);
+      }
+    }
 
-    Map<String, List<HouseholdMemberModel>> dateVsHouseholdMembers = {};
+    for (var task in taskList) {
+      for (var resource in task.resources!) {
+        for (var productVariant in productVariantList) {
+          if (productVariant.id == resource.productVariantId &&
+              productVariant.sku == "SPAQ 1") {
+            spaq1List.add(resource);
+          } else if (productVariant.id == resource.productVariantId &&
+              productVariant.sku == "SPAQ 2") {
+            spaq2List.add(resource);
+          }
+        }
+      }
+    }
+
+    Map<String, List<HouseholdMemberModel>> dateVsHouseholdMembersList = {};
+    Map<String, List<TaskModel>> dateVsAdministeredChilderenList = {};
+    Map<String, List<TaskModel>> dateVsRefusalCasesList = {};
+    Map<String, List<TaskResourceModel>> dateVsSpaq1List = {};
+    Map<String, List<TaskResourceModel>> dateVsSpaq2List = {};
     Set<String> uniqueDates = {};
     Map<String, int> dateVsHouseholdMembersCount = {};
+    Map<String, int> dateVsAdministeredChilderenCount = {};
+    Map<String, int> dateVsRefusalCasesCount = {};
+    Map<String, int> dateVsSpaq1Count = {};
+    Map<String, int> dateVsSpaq2Count = {};
     Map<String, Map<String, int>> dateVsEntityVsCountMap = {};
     for (var element in householdMemberList) {
       var dateKey = DigitDateUtils.getDateFromTimestamp(
           element.clientAuditDetails!.createdTime);
-      dateVsHouseholdMembers.putIfAbsent(dateKey, () => []).add(element);
+      dateVsHouseholdMembersList.putIfAbsent(dateKey, () => []).add(element);
+    }
+    for (var element in administeredChildrenList) {
+      var dateKey = DigitDateUtils.getDateFromTimestamp(
+          element.clientAuditDetails!.createdTime);
+      dateVsAdministeredChilderenList
+          .putIfAbsent(dateKey, () => [])
+          .add(element);
+    }
+    for (var element in refusalCasesList) {
+      var dateKey = DigitDateUtils.getDateFromTimestamp(
+          element.clientAuditDetails!.createdTime);
+      dateVsRefusalCasesList.putIfAbsent(dateKey, () => []).add(element);
+    }
+    for (var element in spaq1List) {
+      var dateKey = DigitDateUtils.getDateFromTimestamp(
+          element.auditDetails!.createdTime);
+      dateVsSpaq1List.putIfAbsent(dateKey, () => []).add(element);
+    }
+    for (var element in spaq2List) {
+      var dateKey = DigitDateUtils.getDateFromTimestamp(
+          element.auditDetails!.createdTime);
+      dateVsSpaq2List.putIfAbsent(dateKey, () => []).add(element);
     }
 
     // get a set of unique dates
     getUniqueSetOfDates(
-      dateVsHouseholdMembers,
+      dateVsHouseholdMembersList,
+      dateVsAdministeredChilderenList,
+      dateVsRefusalCasesList,
+      dateVsSpaq1List,
+      dateVsSpaq2List,
       uniqueDates,
     );
 
     // populate the day vs count for that day map
-    populateDateVsCountMap(dateVsHouseholdMembers, dateVsHouseholdMembersCount);
+    populateDateVsCountMap(
+        dateVsHouseholdMembersList, dateVsHouseholdMembersCount);
+    populateDateVsCountMap(
+        dateVsAdministeredChilderenList, dateVsAdministeredChilderenCount);
+    populateDateVsCountMap(dateVsRefusalCasesList, dateVsRefusalCasesCount);
+    populateDateVsCountMap(dateVsSpaq1List, dateVsSpaq1Count);
+    populateDateVsCountMap(dateVsSpaq2List, dateVsSpaq2Count);
 
     popoulateDateVsEntityCountMap(
       dateVsEntityVsCountMap,
       dateVsHouseholdMembersCount,
+      dateVsAdministeredChilderenCount,
+      dateVsRefusalCasesCount,
+      dateVsSpaq1Count,
+      dateVsSpaq2Count,
       uniqueDates,
     );
     dateVsEntityVsCountMap =
@@ -73,10 +144,18 @@ class SummaryReportBloc extends Bloc<SummaryReportEvent, SummaryReportState> {
   }
 
   void getUniqueSetOfDates(
-    Map<String, List<HouseholdMemberModel>> dateVsHouseholdMembers,
+    Map<String, List<HouseholdMemberModel>> dateVsHouseholdMembersList,
+    Map<String, List<TaskModel>> dateVsAdministeredChilderenList,
+    Map<String, List<TaskModel>> dateVsRefusalCasesList,
+    Map<String, List<TaskResourceModel>> dateVsSpaq1List,
+    Map<String, List<TaskResourceModel>> dateVsSpaq2List,
     Set<String> uniqueDates,
   ) {
-    uniqueDates.addAll(dateVsHouseholdMembers.keys.toSet());
+    uniqueDates.addAll(dateVsHouseholdMembersList.keys.toSet());
+    uniqueDates.addAll(dateVsAdministeredChilderenList.keys.toSet());
+    uniqueDates.addAll(dateVsRefusalCasesList.keys.toSet());
+    uniqueDates.addAll(dateVsSpaq1List.keys.toSet());
+    uniqueDates.addAll(dateVsSpaq2List.keys.toSet());
   }
 
   void populateDateVsCountMap(
@@ -89,6 +168,10 @@ class SummaryReportBloc extends Bloc<SummaryReportEvent, SummaryReportState> {
   void popoulateDateVsEntityCountMap(
     Map<String, Map<String, int>> dateVsEntityVsCountMap,
     Map<String, int> dateVsHouseholdMembersCount,
+    Map<String, int> dateVsAdministeredChilderenCount,
+    Map<String, int> dateVsRefusalCasesCount,
+    Map<String, int> dateVsSpaq1Count,
+    Map<String, int> dateVsSpaq2Count,
     Set<String> uniqueDates,
   ) {
     for (var date in uniqueDates) {
@@ -97,6 +180,26 @@ class SummaryReportBloc extends Bloc<SummaryReportEvent, SummaryReportState> {
           dateVsHouseholdMembersCount[date] != null) {
         var count = dateVsHouseholdMembersCount[date];
         elementVsCount[Constants.registered] = count ?? 0;
+      }
+      if (dateVsAdministeredChilderenCount.containsKey(date) &&
+          dateVsAdministeredChilderenCount[date] != null) {
+        var count = dateVsAdministeredChilderenCount[date];
+        elementVsCount[Constants.administered] = count ?? 0;
+      }
+      if (dateVsRefusalCasesCount.containsKey(date) &&
+          dateVsRefusalCasesCount[date] != null) {
+        var count = dateVsRefusalCasesCount[date];
+        elementVsCount[Constants.refusals] = count ?? 0;
+      }
+      if (dateVsSpaq1Count.containsKey(date) &&
+          dateVsSpaq1Count[date] != null) {
+        var count = dateVsSpaq1Count[date];
+        elementVsCount[Constants.tablet_3_11] = count ?? 0;
+      }
+      if (dateVsSpaq2Count.containsKey(date) &&
+          dateVsSpaq2Count[date] != null) {
+        var count = dateVsSpaq2Count[date];
+        elementVsCount[Constants.tablet_12_59] = count ?? 0;
       }
 
       dateVsEntityVsCountMap[date] = elementVsCount;

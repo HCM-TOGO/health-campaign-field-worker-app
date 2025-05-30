@@ -382,29 +382,28 @@ class _HomePageState extends LocalizedState<HomePage> {
           icon: Icons.store_mall_directory,
           label: i18.home.manageStockLabel,
           onPressed: () {
-            // context.read<AppInitializationBloc>().state.maybeWhen(
-            //       orElse: () {},
-            //       initialized: (
-            //         AppConfiguration appConfiguration,
-            //         _,
-            //         __,
-            //       ) {
-            //         context.router.push(ManageStocksRoute());
-            //       },
-            //     );
+            context.read<AppInitializationBloc>().state.maybeWhen(
+                  orElse: () {},
+                  initialized: (
+                    AppConfiguration appConfiguration,
+                    _,
+                    __,
+                  ) {
+                    context.router.push(ManageStocksRoute());
+                  },
+                );
+          },
+        ),
+      ),
+      i18.home.summaryLabel: homeShowcaseData.summaryReport.buildWith(
+        child: HomeItemCard(
+          icon: Icons.summarize,
+          label: i18.home.summaryLabel,
+          onPressed: () {
             context.router.push(CustomSummaryReportRoute());
           },
         ),
       ),
-      // i18.home.summaryLabel: homeShowcaseData.summaryReport.buildWith(
-      //   child: HomeItemCard(
-      //     icon: Icons.summarize,
-      //     label: i18.home.summaryLabel,
-      //     onPressed: () {
-      //       // context.router.push(CustomSummaryReportRoute());
-      //     },
-      //   ),
-      // ),
       i18.home.stockReconciliationLabel:
           homeShowcaseData.wareHouseManagerStockReconciliation.buildWith(
         child: HomeItemCard(
@@ -591,6 +590,7 @@ class _HomePageState extends LocalizedState<HomePage> {
         .where((f) => f != i18.home.db)
         .map((label) => homeItemsShowcaseMap[label]!)
         .toList();
+    if (context.isCDD) filteredLabels.add(i18.home.summaryLabel);
 
     if ((envConfig.variables.envType == EnvType.demo && kReleaseMode) ||
         envConfig.variables.envType == EnvType.uat) {

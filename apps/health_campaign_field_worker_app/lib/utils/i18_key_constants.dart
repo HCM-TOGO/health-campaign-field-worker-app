@@ -408,7 +408,25 @@ class HomeShowcase {
   }
 
    String get summaryReport {
-    return 'HOME_SUMMARY_LABEL';
+    return 'HOME_SHOWCASE_SUMMARY_REPORT_LABLE';
+  }
+  String get summaryReportDate {
+    return 'HOME_SHOWCASE_SUMMARY_REPORT_DATE';
+  }
+  String get summaryReportRegistredChildren {
+    return 'HOME_SHOWCASE_SUMMARY_REPORT_REGISTRED_CHILDREN';
+  }
+  String get summaryReportAdministredChildren {
+    return 'HOME_SHOWCASE_SUMMARY_REPORT_ADMINISTRED_CHILDREN';
+  }
+  String get summaryReportRefusalsCases {
+    return 'HOME_SHOWCASE_SUMMARY_REPORT_REFUALS_CASES';
+  }
+  String get summaryReportSPAQ1 {
+    return 'HOME_SHOWCASE_SUMMARY_REPORT_SPAQ1';
+  }
+  String get summaryReportSPAQ2 {
+    return 'HOME_SHOWCASE_SUMMARY_REPORT_SPAQ2';
   }
 
   String get warehouseManagerFileComplaint {
