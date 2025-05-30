@@ -477,6 +477,10 @@ class CustomStockDetailsPageState
                                               return;
                                             }
 
+                                            String secondaryKey = form
+                                                .control(_secondaryPartyKey)
+                                                .value;
+
                                             String? senderId;
                                             String? senderType;
                                             String? receiverId;
@@ -499,21 +503,39 @@ class CustomStockDetailsPageState
                                               case StockRecordEntryType
                                                     .returned:
                                                 if (deliveryTeamSelected) {
-                                                  senderId = deliveryTeamName;
+                                                  // senderId = deliveryTeamName;
                                                   senderType = "STAFF";
+                                                  senderId = secondaryKey
+                                                      .split(Constants
+                                                          .pipeSeparator)
+                                                      .last;
+
+                                                  receiverId = primaryId;
+                                                  receiverType = primaryType;
                                                 } else {
                                                   senderId = secondaryParty?.id;
                                                   senderType = "WAREHOUSE";
                                                 }
-                                                receiverId = primaryId;
+                                                receiverId = primaryId!
+                                                    .split(
+                                                        Constants.pipeSeparator)
+                                                    .last;
+                                                ;
                                                 receiverType = primaryType;
 
                                                 break;
                                               case StockRecordEntryType
                                                     .dispatch:
                                                 if (deliveryTeamSelected) {
-                                                  receiverId = deliveryTeamName;
+                                                  // receiverId = deliveryTeamName;
+                                                  // receiverType = "STAFF";
+                                                  receiverId = secondaryKey
+                                                      .split(Constants
+                                                          .pipeSeparator)
+                                                      .last;
                                                   receiverType = "STAFF";
+                                                  senderId = primaryId;
+                                                  senderType = primaryType;
                                                 } else {
                                                   receiverId =
                                                       secondaryParty?.id;
