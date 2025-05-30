@@ -1128,11 +1128,18 @@ class CustomStockDetailsPageState
                                               : entryType ==
                                                       StockRecordEntryType
                                                           .receipt
-                                                  ? facilities
+                                                  ? allFacilities
                                                       .where((element) =>
                                                           element.usage ==
                                                           Constants.lgaFacility)
                                                       .toList()
+                                                  // +
+                                                  // facilities
+                                                  //     .where((element) =>
+                                                  //         element.usage ==
+                                                  //         Constants
+                                                  //             .healthFacility)
+                                                  //     .toList()
                                                   : [];
                                         }
 
