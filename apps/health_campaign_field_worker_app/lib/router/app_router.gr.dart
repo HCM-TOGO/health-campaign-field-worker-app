@@ -718,6 +718,7 @@ abstract class _$AppRouter extends RootStackRouter {
           key: args.key,
           appLocalizations: args.appLocalizations,
           eligibilityAssessmentType: args.eligibilityAssessmentType,
+          isAdministration: args.isAdministration,
           isEditing: args.isEditing,
         ),
       );
@@ -3275,6 +3276,7 @@ class ZeroDoseCheckRoute extends PageRouteInfo<ZeroDoseCheckRouteArgs> {
     Key? key,
     RegistrationDeliveryLocalization? appLocalizations,
     required EligibilityAssessmentType eligibilityAssessmentType,
+    required bool isAdministration,
     bool isEditing = false,
     List<PageRouteInfo>? children,
   }) : super(
@@ -3283,6 +3285,7 @@ class ZeroDoseCheckRoute extends PageRouteInfo<ZeroDoseCheckRouteArgs> {
             key: key,
             appLocalizations: appLocalizations,
             eligibilityAssessmentType: eligibilityAssessmentType,
+            isAdministration: isAdministration,
             isEditing: isEditing,
           ),
           initialChildren: children,
@@ -3299,6 +3302,7 @@ class ZeroDoseCheckRouteArgs {
     this.key,
     this.appLocalizations,
     required this.eligibilityAssessmentType,
+    required this.isAdministration,
     this.isEditing = false,
   });
 
@@ -3308,10 +3312,12 @@ class ZeroDoseCheckRouteArgs {
 
   final EligibilityAssessmentType eligibilityAssessmentType;
 
+  final bool isAdministration;
+
   final bool isEditing;
 
   @override
   String toString() {
-    return 'ZeroDoseCheckRouteArgs{key: $key, appLocalizations: $appLocalizations, eligibilityAssessmentType: $eligibilityAssessmentType, isEditing: $isEditing}';
+    return 'ZeroDoseCheckRouteArgs{key: $key, appLocalizations: $appLocalizations, eligibilityAssessmentType: $eligibilityAssessmentType, isAdministration: $isAdministration, isEditing: $isEditing}';
   }
 }

@@ -596,7 +596,7 @@ class CustomIndividualDetailsPageState
                                   digits.DigitDateUtils.calculateAge(value);
                               // Allow only between 3 to 59 months for cycle 1
                               final ageInMonths = age.years * 12 + age.months;
-                              if (ageInMonths < 3 || ageInMonths > 59) {
+                              if (ageInMonths > 59) {
                                 widget.isHeadOfHousehold
                                     ? formControl.removeError('')
                                     : formControl.setErrors({'': true});
@@ -656,49 +656,50 @@ class CustomIndividualDetailsPageState
                                 fontSize: 16,
                                 color: theme.colorTheme.text.primary,
                               )),
-                        Container(
-                          decoration: BoxDecoration(
-                            border: Border.all(
-                              color: Colors.grey,
+                        if (!widget.isHeadOfHousehold)
+                          Container(
+                            decoration: BoxDecoration(
+                              border: Border.all(
+                                color: Colors.grey,
+                              ),
+                              borderRadius: BorderRadius.circular(4),
                             ),
-                            borderRadius: BorderRadius.circular(4),
-                          ),
-                          child: StatefulBuilder(
-                            builder: (context, setState) {
-                              return Row(
-                                children: [
-                                  Expanded(
-                                    child: RadioListTile<String>(
-                                      title: const Text('Yes'),
-                                      value: 'yes',
-                                      groupValue: yesNoValue,
-                                      onChanged: (value) {
-                                        setState(() {
-                                          yesNoValue = value!;
-                                        });
-                                        // Force rebuild to show/hide button
-                                        this.setState(() {});
-                                      },
+                            child: StatefulBuilder(
+                              builder: (context, setState) {
+                                return Row(
+                                  children: [
+                                    Expanded(
+                                      child: RadioListTile<String>(
+                                        title: const Text('Yes'),
+                                        value: 'yes',
+                                        groupValue: yesNoValue,
+                                        onChanged: (value) {
+                                          setState(() {
+                                            yesNoValue = value!;
+                                          });
+                                          // Force rebuild to show/hide button
+                                          this.setState(() {});
+                                        },
+                                      ),
                                     ),
-                                  ),
-                                  Expanded(
-                                    child: RadioListTile<String>(
-                                      title: const Text('No'),
-                                      value: 'no',
-                                      groupValue: yesNoValue,
-                                      onChanged: (value) {
-                                        setState(() {
-                                          yesNoValue = value!;
-                                        });
-                                        this.setState(() {});
-                                      },
+                                    Expanded(
+                                      child: RadioListTile<String>(
+                                        title: const Text('No'),
+                                        value: 'no',
+                                        groupValue: yesNoValue,
+                                        onChanged: (value) {
+                                          setState(() {
+                                            yesNoValue = value!;
+                                          });
+                                          this.setState(() {});
+                                        },
+                                      ),
                                     ),
-                                  ),
-                                ],
-                              );
-                            },
+                                  ],
+                                );
+                              },
+                            ),
                           ),
-                        ),
                         if (!widget.isHeadOfHousehold && isRelocated)
                           DigitButton(
                             capitalizeLetters: false,

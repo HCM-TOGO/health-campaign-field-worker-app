@@ -354,8 +354,10 @@ class CustomReferBeneficiarySMCPageState
                                     ).then(
                                       (value) => context.router.popAndPush(
                                         ZeroDoseCheckRoute(
-                                            eligibilityAssessmentType:
-                                                EligibilityAssessmentType.smc),
+                                          eligibilityAssessmentType:
+                                              EligibilityAssessmentType.smc,
+                                          isAdministration: false,
+                                        ),
                                         // CustomHouseholdAcknowledgementRoute(
                                         //   enableViewHousehold: true,
                                         //   eligibilityAssessmentType:
