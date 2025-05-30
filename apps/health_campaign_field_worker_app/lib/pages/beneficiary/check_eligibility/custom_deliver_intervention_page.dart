@@ -542,19 +542,11 @@ class CustomDeliverInterventionPageState
                                                   const EdgeInsets.all(spacer2),
                                               children: [
                                                 Text(
-                                                  widget.eligibilityAssessmentType ==
-                                                          EligibilityAssessmentType
-                                                              .smc
-                                                      ? localizations.translate(
-                                                          i18_local
-                                                              .deliverIntervention
-                                                              .deliverInterventionSMCLabel,
-                                                        )
-                                                      : localizations.translate(
-                                                          i18_local
-                                                              .deliverIntervention
-                                                              .deliverInterventionVASLabel,
-                                                        ),
+                                                  localizations.translate(
+                                                    i18_local
+                                                        .deliverIntervention
+                                                        .deliverInterventionSMCLabel,
+                                                  ),
                                                   style: textTheme.headingL
                                                       .copyWith(
                                                           color: theme

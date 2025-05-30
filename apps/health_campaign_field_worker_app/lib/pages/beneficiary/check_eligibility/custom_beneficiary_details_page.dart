@@ -34,7 +34,6 @@ import 'package:registration_delivery/widgets/localized.dart';
 import 'package:registration_delivery/widgets/table_card/table_card.dart';
 import 'package:registration_delivery/pages/beneficiary/widgets/record_delivery_cycle.dart';
 
-import '../../../widgets/registration_delivery/past_delivery_vas.dart';
 import 'custom_record_delivery_cycle.dart';
 
 @RoutePage()
@@ -229,27 +228,15 @@ class CustomBeneficiaryDetailsPageState
                                                         contentPadding:
                                                             EdgeInsets.zero,
                                                         additionalWidgets: [
-                                                          widget.eligibilityAssessmentType ==
-                                                                  EligibilityAssessmentType
-                                                                      .smc
-                                                              ? buildTableContentSMC(
-                                                                  deliverState,
-                                                                  context,
-                                                                  variant,
-                                                                  state
-                                                                      .selectedIndividual,
-                                                                  state
-                                                                      .householdMemberWrapper
-                                                                      .household)
-                                                              : buildTableContentVAS(
-                                                                  deliverState,
-                                                                  context,
-                                                                  variant,
-                                                                  state
-                                                                      .selectedIndividual,
-                                                                  state
-                                                                      .householdMemberWrapper
-                                                                      .household),
+                                                          buildTableContentSMC(
+                                                              deliverState,
+                                                              context,
+                                                              variant,
+                                                              state
+                                                                  .selectedIndividual,
+                                                              state
+                                                                  .householdMemberWrapper
+                                                                  .household)
                                                         ],
                                                         actions: [
                                                           DigitButton(

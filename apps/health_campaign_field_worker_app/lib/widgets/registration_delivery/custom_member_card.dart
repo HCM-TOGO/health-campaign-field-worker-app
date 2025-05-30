@@ -224,7 +224,6 @@ class CustomMemberCard extends StatelessWidget {
     final theme = Theme.of(context);
     final textTheme = theme.digitTextTheme(context);
     List<TaskModel>? smcTasks = _getSMCStatusData();
-    List<TaskModel>? vasTasks = _getVACStatusData();
     final doseStatus = checkStatus(smcTasks, context.selectedCycle);
     bool smcAssessmentPendingStatus = assessmentSMCPending(smcTasks);
     bool isBeneficiaryReferredSMC = checkBeneficiaryReferredSMC(smcTasks);
@@ -433,73 +432,6 @@ class CustomMemberCard extends StatelessWidget {
                     );
                   }
                 }
-              }
-            },
-          ),
-        if ((!smcAssessmentPendingStatus ||
-            isBeneficiaryReferredSMC ||
-            isBeneficiaryInEligibleSMC))
-          DigitElevatedButton(
-            child: Center(
-              child: Text(
-                localizations.translate(
-                  i18_local.householdOverView
-                      .householdOverViewVASAssessmentActionText,
-                ),
-                style: textTheme.headingM.copyWith(color: Colors.white),
-              ),
-            ),
-            onPressed: () async {
-              if (true) {
-                final bloc = context.read<HouseholdOverviewBloc>();
-                bloc.add(
-                  HouseholdOverviewEvent.selectedIndividual(
-                    individualModel: individual,
-                  ),
-                );
-
-                if ((vasTasks ?? []).isEmpty) {
-                  // context.router.push(
-                  //   CustomBeneficiaryDetailsRoute(
-                  //     eligibilityAssessmentType:
-                  //         EligibilityAssessmentType.smc,
-                  //   ),
-                  // );
-                  context.router.push(
-                    EligibilityChecklistViewRoute(
-                      projectBeneficiaryClientReferenceId:
-                          projectBeneficiaryClientReferenceId,
-                      individual: individual,
-                      eligibilityAssessmentType: EligibilityAssessmentType.vas,
-                    ),
-                  );
-                }
-              } else {
-                String descriptionText = localizations.translate(
-                  i18_local.beneficiaryDetails.insufficientStockMessage,
-                );
-
-                DigitDialog.show(
-                  context,
-                  options: DigitDialogOptions(
-                    titleText: localizations.translate(
-                      i18_local.beneficiaryDetails.insufficientStockHeading,
-                    ),
-                    titleIcon: Icon(
-                      Icons.warning,
-                      color: DigitTheme.instance.colorScheme.error,
-                    ),
-                    contentText: descriptionText,
-                    primaryAction: DigitDialogActions(
-                      label: localizations.translate(
-                        i18_local.beneficiaryDetails.backToHouseholdDetails,
-                      ),
-                      action: (ctx) {
-                        Navigator.of(ctx, rootNavigator: true).pop();
-                      },
-                    ),
-                  ),
-                );
               }
             },
           ),
