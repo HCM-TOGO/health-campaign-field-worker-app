@@ -518,13 +518,15 @@ class _EligibilityChecklistViewPage
                                     searchBloc.add(
                                       const SearchHouseholdsClearEvent(),
                                     );
-
-                                    router.push(
-                                      CustomHouseholdAcknowledgementRoute(
-                                          enableViewHousehold: true,
-                                          eligibilityAssessmentType:
-                                              widget.eligibilityAssessmentType),
-                                    );
+                                    router.push(ZeroDoseCheckRoute(
+                                        eligibilityAssessmentType:
+                                            widget.eligibilityAssessmentType));
+                                    // router.push(
+                                    //   CustomHouseholdAcknowledgementRoute(
+                                    //       enableViewHousehold: true,
+                                    //       eligibilityAssessmentType:
+                                    //           widget.eligibilityAssessmentType),
+                                    // );
                                   } else if (ifReferral) {
                                     if (widget.eligibilityAssessmentType ==
                                         EligibilityAssessmentType.smc) {
