@@ -38,6 +38,7 @@ import '../../router/app_router.dart';
 import '../../../utils/i18_key_constants.dart' as i18_local;
 import '../../utils/search/global_search_parameters_smc.dart';
 import '../../widgets/showcase/showcase_wrappers.dart';
+import '../inventory/qr_scanner.dart';
 import 'custom_view_beneficiary_card.dart';
 
 @RoutePage()
@@ -768,7 +769,18 @@ class _CustomSearchBeneficiaryPageState
                       type: DigitButtonType.secondary,
                       size: DigitButtonSize.large,
                       isDisabled: false,
-                      onPressed: () {},
+                      onPressed: () {
+                        Navigator.of(context).push(
+                          MaterialPageRoute(
+                            builder: (context) => const DigitScannerPage(
+                              quantity: 5,
+                              isGS1code: false,
+                              singleValue: false,
+                            ),
+                            settings: const RouteSettings(name: '/qr-scanner'),
+                          ),
+                        );
+                      },
                     );
                   },
                 ),
