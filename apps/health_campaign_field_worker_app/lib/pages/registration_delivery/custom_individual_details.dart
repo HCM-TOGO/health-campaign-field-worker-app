@@ -1,6 +1,7 @@
 import 'package:auto_route/auto_route.dart';
 import 'package:collection/collection.dart';
 import 'package:dart_mappable/dart_mappable.dart';
+import 'package:qr_flutter/qr_flutter.dart';
 // import 'package:digit_components/utils/date_utils.dart' as digits;
 import '../../utils/date_utils.dart' as digits;
 import 'package:digit_components/widgets/atoms/digit_toaster.dart';
@@ -79,6 +80,7 @@ class CustomIndividualDetailsPageState
 
   bool isEditIndividual = false;
   bool isAddIndividual = false;
+  bool isBeneficaryRegistration = false;
 
   final beneficiaryType = RegistrationDeliverySingleton().beneficiaryType!;
   Set<String>? beneficiaryId;
@@ -634,69 +636,75 @@ class CustomIndividualDetailsPageState
                             }
                           },
                         ),
-                        DigitButton(
-                          prefixIcon: Icons.qr_code_scanner,
-                          capitalizeLetters: false,
-                          label: "Link QR Code to Beneficiary",
-                          mainAxisSize: MainAxisSize.max,
-                          type: DigitButtonType.secondary,
-                          size: DigitButtonSize.large,
-                          isDisabled: false,
-                          onPressed: () {},
-                        ),
-                        Container(
-                          decoration: BoxDecoration(
-                            border: Border.all(
-                              color: Colors.grey,
-                            ),
-                            borderRadius: BorderRadius.circular(4),
-                          ),
-                          margin: const EdgeInsets.symmetric(vertical: 16),
-                          child: StatefulBuilder(
-                            builder: (context, setState) {
-                              String? yesNoValue = 'yes';
-
-                              return Row(
-                                children: [
-                                  Expanded(
-                                    child: RadioListTile<String>(
-                                      title: const Text('Yes'),
-                                      value: 'yes',
-                                      groupValue: yesNoValue,
-                                      onChanged: (value) {
-                                        setState(() {
-                                          yesNoValue = value!;
-                                        });
-                                      },
-                                    ),
-                                  ),
-                                  Expanded(
-                                    child: RadioListTile<String>(
-                                      title: const Text('No'),
-                                      value: 'no',
-                                      groupValue: yesNoValue,
-                                      onChanged: (value) {
-                                        setState(() {
-                                          yesNoValue = value!;
-                                        });
-                                      },
-                                    ),
-                                  ),
-                                ],
-                              );
+                        if (isBeneficaryRegistration)
+                          DigitButton(
+                            capitalizeLetters: false,
+                            label: "Link QR Code to Beneficiary",
+                            mainAxisSize: MainAxisSize.max,
+                            type: DigitButtonType.secondary,
+                            size: DigitButtonSize.large,
+                            isDisabled: false,
+                            onPressed: () {
+                              context.router.push(QRScannerRoute());
                             },
                           ),
-                        ),
-                        DigitButton(
-                          prefixIcon: Icons.qr_code_scanner,
-                          capitalizeLetters: false,
-                          label: "Previous Beneficiary QR Code",
-                          mainAxisSize: MainAxisSize.max,
-                          type: DigitButtonType.secondary,
-                          size: DigitButtonSize.large,
-                          isDisabled: false,
-                          onPressed: () {},
-                        ),
+                        if (isBeneficaryRegistration)
+                          Container(
+                            decoration: BoxDecoration(
+                              border: Border.all(
+                                color: Colors.grey,
+                              ),
+                              borderRadius: BorderRadius.circular(4),
+                            ),
+                            margin: const EdgeInsets.symmetric(vertical: 16),
+                            child: StatefulBuilder(
+                              builder: (context, setState) {
+                                String? yesNoValue = 'yes';
+
+                                return Row(
+                                  children: [
+                                    Expanded(
+                                      child: RadioListTile<String>(
+                                        title: const Text('Yes'),
+                                        value: 'yes',
+                                        groupValue: yesNoValue,
+                                        onChanged: (value) {
+                                          setState(() {
+                                            yesNoValue = value!;
+                                          });
+                                        },
+                                      ),
+                                    ),
+                                    Expanded(
+                                      child: RadioListTile<String>(
+                                        title: const Text('No'),
+                                        value: 'no',
+                                        groupValue: yesNoValue,
+                                        onChanged: (value) {
+                                          setState(() {
+                                            yesNoValue = value!;
+                                          });
+                                        },
+                                      ),
+                                    ),
+                                  ],
+                                );
+                              },
+                            ),
+                          ),
+                        if (isBeneficaryRegistration)
+                          DigitButton(
+                            prefixIcon: Icons.qr_code_scanner,
+                            capitalizeLetters: false,
+                            label: "Previous Beneficiary QR Code",
+                            mainAxisSize: MainAxisSize.max,
+                            type: DigitButtonType.secondary,
+                            size: DigitButtonSize.large,
+                            isDisabled: false,
+                            onPressed: () {
+                              context.router.push(QRScannerRoute());
+                            },
+                          ),
                         individualDetailsShowcaseData.mobile.buildWith(
                           child: Offstage(
                             offstage: !widget.isHeadOfHousehold,
@@ -717,7 +725,7 @@ class CustomIndividualDetailsPageState
                                 'maxLength': (object) => localizations
                                     .translate(i18_local.individualDetails
                                         .mobileNumberLengthValidationMessage)
-                                    .replaceAll('{}', '11'),
+                                    .replaceAll('{}', '8'),
                               },
                               builder: (field) => LabeledField(
                                 label: localizations.translate(
@@ -918,8 +926,8 @@ class CustomIndividualDetailsPageState
         Validators.delegate((validator) =>
             local_utils.CustomValidator.validMobileNumber(validator)),
 
-        Validators.minLength(10),
-        Validators.maxLength(10),
+        Validators.minLength(8),
+        Validators.maxLength(8),
         if (widget.isHeadOfHousehold) Validators.required,
         // Validators.required,
       ]),
