@@ -99,6 +99,7 @@ import '../pages/inventory/custom_warehouse_details.dart';
 import '../pages/inventory/qr_scanner.dart';
 import '../pages/closedhousehold/custom_closed_household_summary.dart';
 import 'package:digit_scanner/blocs/app_localization.dart';
+import '../pages/inventory/custom_summary_report.dart';
 
 part 'app_router.gr.dart';
 
@@ -202,6 +203,10 @@ class AppRouter extends _$AppRouter {
         AutoRoute(
           page: AttendanceDateSessionSelectionRoute.page,
           path: 'attendance-date-session-selection',
+        ),
+        AutoRoute(
+          page: CustomSummaryReportRoute.page,
+          path: 'custom-report-summary',
         ),
         AutoRoute(
           page: MarkAttendanceRoute.page,

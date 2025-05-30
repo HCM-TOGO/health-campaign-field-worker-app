@@ -376,6 +376,29 @@ class ForgotPassword {
 class HomeShowcase {
   const HomeShowcase();
 
+
+  String get summaryReport {
+    return 'HOME_SHOWCASE_SUMMARY_REPORT_LABLE';
+  }
+  String get summaryReportDate {
+    return 'HOME_SHOWCASE_SUMMARY_REPORT_DATE';
+  }
+  String get summaryReportRegistredChildren {
+    return 'HOME_SHOWCASE_SUMMARY_REPORT_REGISTRED_CHILDREN';
+  }
+  String get summaryReportAdministredChildren {
+    return 'HOME_SHOWCASE_SUMMARY_REPORT_ADMINISTRED_CHILDREN';
+  }
+  String get summaryReportRefusalsCases {
+    return 'HOME_SHOWCASE_SUMMARY_REPORT_REFUALS_CASES';
+  }
+  String get summaryReportSPAQ1 {
+    return 'HOME_SHOWCASE_SUMMARY_REPORT_SPAQ1';
+  }
+  String get summaryReportSPAQ2 {
+    return 'HOME_SHOWCASE_SUMMARY_REPORT_SPAQ2';
+  }
+
   String get distributorProgressBar {
     return 'DISTRIBUTOR_HOME_SHOWCASE_PROGRESS_BAR';
   }
@@ -922,6 +945,7 @@ class Home {
   String get closedHouseHoldLabel => 'HOME_CLOSE_HOUSEHOLD_LABEL';
 
   String get clfLabel => "HOME_COMMUNAL_LIVING_FACILITIES_LABEL";
+  String get summaryLabel => 'HOME_SUMMARY_LABEL';
 }
 
 class AcknowledgementSuccess {

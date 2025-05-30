@@ -13,7 +13,6 @@ class ServiceSearchModelMapper extends SubClassMapperBase<ServiceSearchModel> {
   static ServiceSearchModelMapper ensureInitialized() {
     if (_instance == null) {
       MapperContainer.globals.use(_instance = ServiceSearchModelMapper._());
-      EntitySearchModelMapper.ensureInitialized().addSubMapper(_instance!);
     }
     return _instance!;
   }
@@ -202,11 +201,6 @@ class ServiceModelMapper extends SubClassMapperBase<ServiceModel> {
   static ServiceModelMapper ensureInitialized() {
     if (_instance == null) {
       MapperContainer.globals.use(_instance = ServiceModelMapper._());
-      EntityModelMapper.ensureInitialized().addSubMapper(_instance!);
-      ServiceAdditionalFieldsMapper.ensureInitialized();
-      ServiceAttributesModelMapper.ensureInitialized();
-      AuditDetailsMapper.ensureInitialized();
-      ClientAuditDetailsMapper.ensureInitialized();
     }
     return _instance!;
   }
@@ -509,8 +503,6 @@ class ServiceAdditionalFieldsMapper
     if (_instance == null) {
       MapperContainer.globals
           .use(_instance = ServiceAdditionalFieldsMapper._());
-      AdditionalFieldsMapper.ensureInitialized().addSubMapper(_instance!);
-      AdditionalFieldMapper.ensureInitialized();
     }
     return _instance!;
   }
