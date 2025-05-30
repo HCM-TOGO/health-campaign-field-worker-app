@@ -131,7 +131,31 @@ class CustomStockReconciliationPageState
                                                             _productVariantKey)
                                                         .value ==
                                                     null)
-                                            ? () {}
+                                            ? () {
+                                                if (controller1.text.isEmpty) {
+                                                  Toast.showToast(context,
+                                                      type: ToastType.error,
+                                                      message: localizations
+                                                          .translate(
+                                                        i18.stockReconciliationDetails
+                                                            .facilityLabel,
+                                                      ));
+                                                } else if ((form
+                                                        .control(
+                                                            _productVariantKey)
+                                                        .value ==
+                                                    null)) {
+                                                  Toast.showToast(
+                                                    context,
+                                                    type: ToastType.error,
+                                                    message:
+                                                        localizations.translate(
+                                                      i18.stockDetails
+                                                          .selectProductLabel,
+                                                    ),
+                                                  );
+                                                }
+                                              }
                                             : () async {
                                                 form.markAllAsTouched();
                                                 FocusManager
