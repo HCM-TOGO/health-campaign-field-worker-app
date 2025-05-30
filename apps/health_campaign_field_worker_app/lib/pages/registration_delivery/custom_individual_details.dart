@@ -73,6 +73,8 @@ class CustomIndividualDetailsPageState
   static const _dobKey = 'dob';
   static const _genderKey = 'gender';
   static const _mobileNumberKey = 'mobileNumber';
+  static const _idTypeKey = 'idType';
+  static const _idNumberKey = 'idNumber';
   bool isDuplicateTag = false;
   static const maxLength = 200;
   final clickedStatus = ValueNotifier<bool>(false);
@@ -231,6 +233,14 @@ class CustomIndividualDetailsPageState
                                       .control(_genderKey)
                                       .setErrors({'': true});
                                 });
+                              }
+                              if (widget.isHeadOfHousehold &&
+                                  form.control(_idTypeKey).value == null) {
+                                form.control(_idTypeKey).setErrors({'': true});
+                              }
+                              if (widget.isHeadOfHousehold &&
+                                  form.control(_idNumberKey).value == null) {
+                                form.control(_idNumberKey).setErrors({'': true});
                               }
                               final userId = RegistrationDeliverySingleton()
                                   .loggedInUserUuid;
@@ -568,6 +578,106 @@ class CustomIndividualDetailsPageState
                             ),
                           ],
                         ),
+                        Offstage(
+                          offstage: !widget.isHeadOfHousehold,
+                          child: ReactiveWrapperField(
+                            formControlName: _idTypeKey,
+                            validationMessages: {
+                              'required': (_) => localizations.translate(
+                                    i18.common.corecommonRequired,
+                                  ),
+                            },
+                            builder: (field) => LabeledField(
+                              label: localizations.translate(
+                                i18.individualDetails.idTypeLabelText,
+                              ),
+                              capitalizedFirstLetter: false,
+                              isRequired: true,
+                              child: DigitDropdown<String>(
+                                selectedOption: (form
+                                            .control(_idTypeKey)
+                                            .value !=
+                                        null)
+                                    ? DropdownItem(
+                                        name: localizations.translate(
+                                            form.control(_idTypeKey).value),
+                                        code: form.control(_idTypeKey).value)
+                                    : const DropdownItem(name: '', code: ''),
+                                items: RegistrationDeliverySingleton()
+                                    .idTypeOptions!
+                                    .map(
+                                      (e) => DropdownItem(
+                                          name: localizations.translate(e),
+                                          code: e),
+                                    )
+                                    .toList(),
+                                onSelect: (value) {
+                                  form.control(_idTypeKey).value = value.code;
+                                  setState(() {
+                                    if (value.code == 'DEFAULT') {
+                                      form.control(_idNumberKey).value =
+                                          IdGen.i.identifier.toString();
+                                    } else {
+                                      form.control(_idNumberKey).value = null;
+                                    }
+                                  });
+                                },
+                                emptyItemText: localizations
+                                    .translate(i18.common.noMatchFound),
+                                errorMessage: form.control(_idTypeKey).hasErrors
+                                    ? localizations.translate(
+                                        i18.common.corecommonRequired,
+                                      )
+                                    : null,
+                              ),
+                            ),
+                          ),
+                        ),
+                        if (widget.isHeadOfHousehold &&
+                            form.control(_idTypeKey).value != 'DEFAULT')
+                          Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              ReactiveFormConsumer(
+                                builder: (context, formGroup, child) {
+                                  return ReactiveWrapperField(
+                                    formControlName: _idNumberKey,
+                                    validationMessages: {
+                                      'required': (object) =>
+                                          localizations.translate(
+                                            '${i18.individualDetails.idNumberLabelText}_IS_REQUIRED',
+                                          ),
+                                    },
+                                    builder: (field) => LabeledField(
+                                      label: localizations.translate(
+                                        i18.individualDetails.idNumberLabelText,
+                                      ),
+                                      capitalizedFirstLetter: false,
+                                      isRequired: true,
+                                      child: DigitTextFormInput(
+                                        readOnly:
+                                            form.control(_idTypeKey).value ==
+                                                'DEFAULT',
+                                        initialValue:
+                                            form.control(_idNumberKey).value,
+                                        onChange: (value) {
+                                          form.control(_idNumberKey).value =
+                                              value;
+                                        },
+                                        errorMessage: field.errorText,
+                                      ),
+                                    ),
+                                  );
+                                },
+                              ),
+                              const SizedBox(height: 4),
+                            ],
+                          ),
+                        if (widget.isHeadOfHousehold &&
+                            form.control(_idTypeKey).value == 'DEFAULT')
+                          const SizedBox(
+                            height: spacer2,
+                          ),
                         individualDetailsShowcaseData.dateOfBirth.buildWith(
                           child: CustomDigitDobPicker(
                             datePickerFormControl: _dobKey,
@@ -858,24 +968,27 @@ class CustomIndividualDetailsPageState
 
     String? individualName = form.control(_individualNameKey).value as String?;
     individual = individual.copyWith(
-      name: name.copyWith(
-        givenName: individualName?.trim(),
-      ),
-      gender: form.control(_genderKey).value == null
-          ? null
-          : Gender.values
-              .byName(form.control(_genderKey).value.toString().toLowerCase()),
-      mobileNumber: form.control(_mobileNumberKey).value,
-      dateOfBirth: dobString,
-      identifiers: isEditIndividual && identifier.identifierId != null
-          ? identifiers
-          : [
-              identifier.copyWith(
-                identifierId: beneficiaryId,
-                identifierType: IdentifierTypes.uniqueBeneficiaryID.toValue(),
-              ),
-            ],
-    );
+        name: name.copyWith(
+          givenName: individualName?.trim(),
+        ),
+        gender: form.control(_genderKey).value == null
+            ? null
+            : Gender.values.byName(
+                form.control(_genderKey).value.toString().toLowerCase()),
+        mobileNumber: form.control(_mobileNumberKey).value,
+        dateOfBirth: dobString,
+        identifiers: isEditIndividual && identifier.identifierId != null
+            ? identifiers
+            : [
+                identifier.copyWith(
+                  identifierId: beneficiaryId,
+                  identifierType: IdentifierTypes.uniqueBeneficiaryID.toValue(),
+                ),
+              ],
+        additionalFields: IndividualAdditionalFields(version: 1, fields: [
+          AdditionalField(form.control(_idTypeKey).value ?? '',
+              form.control(_idNumberKey).value ?? '')
+        ]));
 
     return individual;
   }
@@ -926,6 +1039,12 @@ class CustomIndividualDetailsPageState
                 individual!.dateOfBirth!,
               )
             : null,
+      ),
+      _idTypeKey: FormControl<String>(
+        value: individual?.identifiers?.firstOrNull?.identifierType,
+      ),
+      _idNumberKey: FormControl<String>(
+        value: individual?.identifiers?.firstOrNull?.identifierId,
       ),
       _genderKey: FormControl<String>(value: getGenderOptions(individual)),
       _mobileNumberKey:

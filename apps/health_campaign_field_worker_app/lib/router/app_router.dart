@@ -97,6 +97,7 @@ import '../pages/inventory/custom_stock_details.dart';
 import '../pages/inventory/custom_stock_reconciliation.dart';
 import '../pages/inventory/custom_warehouse_details.dart';
 import '../pages/inventory/qr_scanner.dart';
+import '../pages/closedhousehold/custom_closed_household_summary.dart';
 import 'package:digit_scanner/blocs/app_localization.dart';
 
 part 'app_router.gr.dart';
@@ -184,6 +185,10 @@ class AppRouter extends _$AppRouter {
               AutoRoute(
                   page: ClosedHouseholdSummaryRoute.page,
                   path: 'closed-household-summary'),
+              AutoRoute(
+                  page: CustomClosedHouseholdSummaryRoute.page,
+                  path: 'custom-closed-household-summary'),
+              RedirectRoute(path: 'closed-household-summary', redirectTo: 'custom-closed-household-summary'),
               AutoRoute(
                   page: ClosedHouseholdAcknowledgementRoute.page,
                   path: 'closed-household-acknowledgement'),
