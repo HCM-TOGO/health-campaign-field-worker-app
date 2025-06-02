@@ -19,6 +19,8 @@ class CustomDigitDobPicker extends StatelessWidget {
   final String confirmText;
   final DateTime? initialDate;
   final DateTime? finalDate;
+  final bool isHead;
+  final String requiredErrMsg;
   final void Function(FormControl<dynamic>)? onChangeOfFormControl;
 
   const CustomDigitDobPicker({
@@ -32,6 +34,8 @@ class CustomDigitDobPicker extends StatelessWidget {
     required this.monthsHintLabel,
     required this.separatorLabel,
     required this.yearsAndMonthsErrMsg,
+    this.requiredErrMsg = 'This field is required',
+    this.isHead = false,
     this.initialDate,
     this.finalDate,
     this.confirmText = 'OK',
@@ -138,6 +142,13 @@ class CustomDigitDobPicker extends StatelessWidget {
               builder: (context, form, child) {
                 final datePickerControl = form.control(datePickerFormControl);
                 if (datePickerControl.hasErrors) {
+                  if (datePickerControl.value == null || isHead) {
+                    return Text(
+                      requiredErrMsg,
+                      style: TextStyle(
+                          color: DigitTheme.instance.colorScheme.error),
+                    );
+                  }
                   return Text(
                     yearsAndMonthsErrMsg,
                     style:
