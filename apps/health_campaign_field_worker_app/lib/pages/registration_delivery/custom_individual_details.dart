@@ -235,7 +235,9 @@ class CustomIndividualDetailsPageState
                               }
                               if (widget.isHeadOfHousehold &&
                                   form.control(_idNumberKey).value == null) {
-                                form.control(_idNumberKey).setErrors({'': true});
+                                form
+                                    .control(_idNumberKey)
+                                    .setErrors({'': true});
                               }
                               final userId = RegistrationDeliverySingleton()
                                   .loggedInUserUuid;
@@ -533,7 +535,6 @@ class CustomIndividualDetailsPageState
                                         : i18_local.individualDetails
                                             .nameLabelTextNewUpdate,
                                   ),
-                                  isRequired: true,
                                   child: DigitTextFormInput(
                                     initialValue:
                                         form.control(_individualNameKey).value,
@@ -587,7 +588,6 @@ class CustomIndividualDetailsPageState
                                 i18.individualDetails.idTypeLabelText,
                               ),
                               capitalizedFirstLetter: false,
-                              isRequired: true,
                               child: DigitDropdown<String>(
                                 selectedOption: (form
                                             .control(_idTypeKey)
@@ -598,14 +598,28 @@ class CustomIndividualDetailsPageState
                                             form.control(_idTypeKey).value),
                                         code: form.control(_idTypeKey).value)
                                     : const DropdownItem(name: '', code: ''),
-                                items: RegistrationDeliverySingleton()
-                                    .idTypeOptions!
-                                    .map(
-                                      (e) => DropdownItem(
-                                          name: localizations.translate(e),
-                                          code: e),
-                                    )
-                                    .toList(),
+                                items: [
+                                  ...RegistrationDeliverySingleton()
+                                      .idTypeOptions!
+                                      .map((e) => DropdownItem(
+                                            name: localizations.translate(e),
+                                            code: e,
+                                          )),
+                                  DropdownItem(
+                                    name: localizations.translate(
+                                      i18_local.individualDetails
+                                          .idTypePassportLabel,
+                                    ),
+                                    code: 'Passport',
+                                  ),
+                                  DropdownItem(
+                                    name: localizations.translate(
+                                      i18_local
+                                          .individualDetails.idTypeCniLabel,
+                                    ),
+                                    code: 'CNI',
+                                  ),
+                                ],
                                 onSelect: (value) {
                                   form.control(_idTypeKey).value = value.code;
                                   setState(() {
@@ -648,7 +662,6 @@ class CustomIndividualDetailsPageState
                                         i18.individualDetails.idNumberLabelText,
                                       ),
                                       capitalizedFirstLetter: false,
-                                      isRequired: true,
                                       child: DigitTextFormInput(
                                         readOnly:
                                             form.control(_idTypeKey).value ==
@@ -692,6 +705,10 @@ class CustomIndividualDetailsPageState
                               i18_local.individualDetails
                                   .yearsAndMonthsErrorTextUpdate,
                             ),
+                            isHead: widget.isHeadOfHousehold,
+                            requiredErrMsg: localizations.translate(
+                              i18.common.corecommonRequired,
+                            ),
                             initialDate: before150Years,
                             onChangeOfFormControl: (formControl) {
                               // Handle changes to the control's value here
@@ -728,7 +745,6 @@ class CustomIndividualDetailsPageState
                               .map((e) => e)
                               .toList(),
                           formControlName: _genderKey,
-                          isRequired: true,
                           validationMessages: {
                             'required': (_) => localizations.translate(
                                   i18.common.corecommonRequired,
@@ -841,9 +857,8 @@ class CustomIndividualDetailsPageState
                               },
                               builder: (field) => LabeledField(
                                 label: localizations.translate(
-                                  i18.individualDetails.mobileNumberLabelText,
+                                  i18_local.individualDetails.mobileNumberLabel,
                                 ),
-                                isRequired: widget.isHeadOfHousehold,
                                 child: DigitTextFormInput(
                                   keyboardType: TextInputType.number,
                                   maxLength: 11,

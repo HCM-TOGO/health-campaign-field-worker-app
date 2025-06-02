@@ -8,6 +8,7 @@ import 'package:digit_ui_components/widgets/molecules/digit_card.dart';
 import 'package:digit_ui_components/widgets/molecules/label_value_summary.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:intl/intl.dart';
 import 'package:registration_delivery/blocs/delivery_intervention/deliver_intervention.dart';
 import 'package:registration_delivery/blocs/household_overview/household_overview.dart';
 import 'package:registration_delivery/models/entities/additional_fields_type.dart';
@@ -17,6 +18,7 @@ import 'package:registration_delivery/utils/constants.dart';
 import 'package:registration_delivery/widgets/back_navigation_help_header.dart';
 import 'package:registration_delivery/widgets/component_wrapper/product_variant_bloc_wrapper.dart';
 import 'package:registration_delivery/widgets/showcase/showcase_button.dart';
+import '../../../utils/date_utils.dart' as digits;
 
 import 'package:registration_delivery/widgets/localized.dart';
 import 'package:registration_delivery/utils/i18_key_constants.dart' as i18;
@@ -288,27 +290,35 @@ class CustomDeliverySummaryPageState
                                   //     isInline: true,
                                   //     labelFlex: 5,
                                   //   ),
-                                  //   LabelValueItem(
-                                  //       label: localizations.translate(i18
-                                  //           .householdDetails
-                                  //           .noOfChildrenBelow5YearsLabel),
-                                  //       value: deliverState
-                                  //               .householdMemberWrapper
-                                  //               ?.household
-                                  //               ?.additionalFields
-                                  //               ?.fields
-                                  //               .where((h) =>
-                                  //                   h.key ==
-                                  //                   AdditionalFieldsType.children
-                                  //                       .toValue())
-                                  //               .firstOrNull
-                                  //               ?.value
-                                  //               .toString() ??
-                                  //           '0',
-                                  //       isInline: true,
-                                  //       labelFlex: 5,
-                                  //       padding:
-                                  //           const EdgeInsets.only(top: spacer2)),
+                                  LabelValueItem(
+                                      label: localizations.translate(i18
+                                          .householdDetails
+                                          .noOfChildrenBelow5YearsLabel),
+                                      value: deliverState
+                                              .householdMemberWrapper?.members
+                                              ?.where((m) {
+                                                final dobString =
+                                                    m.dateOfBirth?.trim();
+
+                                                if (dobString != null &&
+                                                    dobString.isNotEmpty) {
+                                                  final parsedDate = DateFormat(
+                                                          'dd/MM/yyyy')
+                                                      .parseStrict(dobString);
+                                                  final age = digits
+                                                          .DigitDateUtils
+                                                      .calculateAge(parsedDate);
+                                                  return age.years < 5;
+                                                }
+                                                return false;
+                                              })
+                                              .length
+                                              .toString() ??
+                                          '0',
+                                      isInline: true,
+                                      labelFlex: 5,
+                                      padding:
+                                          const EdgeInsets.only(top: spacer2)),
                                 ]),
                           ]),
 
