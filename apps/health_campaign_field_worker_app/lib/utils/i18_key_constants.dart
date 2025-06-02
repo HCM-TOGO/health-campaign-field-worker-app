@@ -151,6 +151,8 @@ class Common {
   String get ageInMonths => 'AGE_IN_MONTHS_LABEL';
   String get locationCapturing => 'CAPTURING_LOCATION';
   String get profileUpdateSuccess => 'PROFILE_UPDATE_SUCCESS';
+  String get pleaseEnterRequiredDetails =>
+      'PLEASE_ENTER_REQUIRED_DETAILS';
 }
 
 class HouseholdOverView {
@@ -499,14 +501,26 @@ class StockDetails {
   String get quantityCapsuleReturnedLabel =>
       'STOCK_DETAILS_CAPSULE_QUANTITY_RETURNED';
 
-  String get quantityCapsuleUnusedReturnedLabel =>
-      'STOCK_DETAILS_CAPSULE_UNUSED_QUANTITY_RETURNED';
+  // String get quantityCapsuleUnusedReturnedLabel =>
+  //     'STOCK_DETAILS_CAPSULE_UNUSED_QUANTITY_RETURNED';
 
-  String get quantityCapsulePartiallyUsedReturnedLabel =>
-      'STOCK_DETAILS_CAPSULE_PARTIAL_QUANTITY_RETURNED';
+  // String get quantityCapsulePartiallyUsedReturnedLabel =>
+  //     'STOCK_DETAILS_CAPSULE_PARTIAL_QUANTITY_RETURNED';
 
-  String get quantityCapsuleWastedReturnedLabel =>
-      'STOCK_DETAILS_CAPSULE_WASTED_QUANTITY_RETURNED';
+  // String get quantityCapsuleWastedReturnedLabel =>
+  //     'STOCK_DETAILS_CAPSULE_WASTED_QUANTITY_RETURNED';
+
+  String get quantityUnusedBlistersReturnedLabel {
+    return 'QUANTITY_OF_UNUSED_BLISTERS_RETURNED';
+  }
+
+  String get quantityPartialBlistersReturnedLabel {
+    return 'QUANTITY_OF_PARTIAL_USED_BLISTERS_RETURNED';
+  }
+
+  String get quantityWastedBlistersReturnedLabel {
+    return 'QUANTITY_OF_WASTED_BLISTERS_RETURNED';
+  }
 
   String get batchNumberLabel {
     return 'STOCK_DETAILS_BATCH_NUMBER';
@@ -590,9 +604,11 @@ class WarehouseDetailsShowcase {
   String get dateOfReceipt {
     return 'WAREHOUSE_DETAILS_SHOWCASE_DATE_OF_RECEIPT';
   }
+
   String get dateOfIssue {
     return 'WAREHOUSE_DETAILS_SHOWCASE_DATE_OF_ISSUE';
   }
+
   String get dateOfReturn {
     return 'WAREHOUSE_DETAILS_SHOWCASE_DATE_OF_RETURN';
   }
