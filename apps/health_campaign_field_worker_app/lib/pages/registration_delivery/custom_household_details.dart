@@ -397,7 +397,8 @@ class CustomHouseHoldDetailsPageState
                                       i18.common.coreCommonCancel,
                                     ),
                                     initialValue: DateFormat(
-                                            Constants().dateMonthYearFormat)
+                                      'd MMMM yyyy',
+                                    )
                                         .format(form
                                             .control(_dateOfRegistrationKey)
                                             .value)
@@ -424,6 +425,7 @@ class CustomHouseHoldDetailsPageState
                                         i18.householdDetails
                                             .noOfMembersCountLabel,
                                       ),
+                                isRequired: true,
                                 child: DigitNumericFormInput(
                                   inputFormatters: [
                                     FilteringTextInputFormatter.digitsOnly
