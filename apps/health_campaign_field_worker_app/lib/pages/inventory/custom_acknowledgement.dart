@@ -3,7 +3,8 @@ import 'package:digit_ui_components/digit_components.dart';
 import 'package:digit_ui_components/widgets/molecules/digit_card.dart';
 import 'package:digit_ui_components/widgets/molecules/panel_cards.dart';
 import 'package:flutter/material.dart';
-
+import 'package:inventory_management/blocs/record_stock.dart';
+import '../../utils/i18_key_constants.dart' as i18_local;
 import 'package:inventory_management/utils/i18_key_constants.dart' as i18;
 import 'package:inventory_management/widgets/localized.dart';
 
@@ -13,6 +14,7 @@ class CustomInventoryAcknowledgementPage extends LocalizedStatefulWidget {
   final String? label;
   final String? description;
   final Map<String, dynamic>? descriptionTableData;
+  
 
   const CustomInventoryAcknowledgementPage({
     super.key,
@@ -21,6 +23,8 @@ class CustomInventoryAcknowledgementPage extends LocalizedStatefulWidget {
     this.label,
     this.description,
     this.descriptionTableData,
+    
+
   });
 
   @override
@@ -33,18 +37,21 @@ class CustomAcknowledgementPageState
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
-
+    String descriptionText;
+    
+  
     return Scaffold(
       body: PanelCard(
         title: widget.label ??
             localizations.translate(
-              i18.acknowledgementSuccess.acknowledgementLabelText,
+              i18_local.acknowledgementSuccess.updatedacknowledgementLabelText
             ),
+
         type: PanelType.success,
-        description: widget.description ??
-            localizations.translate(
-              i18.acknowledgementSuccess.acknowledgementDescriptionText,
+        description: localizations.translate(
+              widget.description ?? i18.acknowledgementSuccess.acknowledgementDescriptionText,
             ),
+
 
         /// TODO: need to update this as listview card
         // additionWidgets: widget.isDataRecordSuccess

@@ -950,9 +950,18 @@ class Home {
 
 class AcknowledgementSuccess {
   const AcknowledgementSuccess();
-
+  String get updatedacknowledgementLabelText => 'UPDATED_ACKNOWLEDGEMENT_SUCCESS_LABEL_TEXT';
+  String get updatedacknowledgementDescriptionText => 'UPDATED_ACKNOWLEDGEMENT_SUCCESS';
   String get acknowledgementSuccessUpdateLabelText =>
       "ACKNOWLEDGEMENT_SUCCESS_UPDATE_LABEL_TEXT";
+
+
+  String get acknowledgementDescriptionTextReturned => "UPDATED_ACKNOWLEDGEMENT_DESCRIPTION_TEXT_RETURNED";
+  String get acknowledgementDescriptionTextDispatch => "UPDATED_ACKNOWLEDGEMENT_DESCRIPTION_TEXT_DISPATCH";
+  String get acknowledgementDescriptionTextLoss => "UPDATED_ACKNOWLEDGEMENT_DESCRIPTION_TEXT_LOSS";
+  String get acknowledgementDescriptionTextDamaged => "UPDATED_ACKNOWLEDGEMENT_DESCRIPTION_TEXT_DAMAGED";
+  String get acknowledgementDescriptionTextReceipt => "UPDATED_ACKNOWLEDGEMENT_DESCRIPTION_TEXT_RECEIPT";
+  
 
   String get mrrnNumberDescription => "MRRN_NUMBER_DESCRIPTION";
 
