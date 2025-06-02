@@ -927,23 +927,39 @@ class CustomStockDetailsPageState
                                               );
                                               String descriptionText;
                                               switch (entryType) {
-                                                case StockRecordEntryType.receipt:
-                                                descriptionText = i18_local.acknowledgementSuccess.acknowledgementDescriptionTextReceipt;
-                                                break;
-                                                case StockRecordEntryType.dispatch:
-                                                descriptionText = i18_local.acknowledgementSuccess.acknowledgementDescriptionTextDispatch;
-                                                break;
-                                                case StockRecordEntryType.returned:
-                                                descriptionText = i18_local.acknowledgementSuccess.acknowledgementDescriptionTextReturned;
-                                                break;
+                                                case StockRecordEntryType
+                                                      .receipt:
+                                                  descriptionText = i18_local
+                                                      .acknowledgementSuccess
+                                                      .acknowledgementDescriptionTextReceipt;
+                                                  break;
+                                                case StockRecordEntryType
+                                                      .dispatch:
+                                                  descriptionText = i18_local
+                                                      .acknowledgementSuccess
+                                                      .acknowledgementDescriptionTextDispatch;
+                                                  break;
+                                                case StockRecordEntryType
+                                                      .returned:
+                                                  descriptionText = i18_local
+                                                      .acknowledgementSuccess
+                                                      .acknowledgementDescriptionTextReturned;
+                                                  break;
                                                 case StockRecordEntryType.loss:
-                                                descriptionText = i18_local.acknowledgementSuccess.acknowledgementDescriptionTextLoss;
-                                                break;
-                                                case StockRecordEntryType.damaged:
-                                                descriptionText = i18_local.acknowledgementSuccess.acknowledgementDescriptionTextDamaged;
-                                                break;
+                                                  descriptionText = i18_local
+                                                      .acknowledgementSuccess
+                                                      .acknowledgementDescriptionTextLoss;
+                                                  break;
+                                                case StockRecordEntryType
+                                                      .damaged:
+                                                  descriptionText = i18_local
+                                                      .acknowledgementSuccess
+                                                      .acknowledgementDescriptionTextDamaged;
+                                                  break;
                                                 default:
-                                                descriptionText = i18.acknowledgementSuccess.acknowledgementDescriptionText;
+                                                  descriptionText = i18
+                                                      .acknowledgementSuccess
+                                                      .acknowledgementDescriptionText;
                                               }
 
                                               (context.router.parent()
@@ -951,12 +967,13 @@ class CustomStockDetailsPageState
                                                   .maybePop();
 
                                               context.router.push(
-                                                  CustomInventoryAcknowledgementRoute(description: descriptionText));
+                                                  CustomInventoryAcknowledgementRoute(
+                                                      description:
+                                                          descriptionText));
                                             }
                                           });
                                         }
                                       },
-                                isDisabled: !form.valid,
                                 label: localizations
                                     .translate(i18.common.coreCommonSubmit),
                               );
@@ -1447,7 +1464,11 @@ class CustomStockDetailsPageState
                                     formControlName: _waybillQuantityKey,
                                     builder: (field) {
                                       return InputField(
-                                        type: InputType.text,
+                                        keyboardType: const TextInputType
+                                            .numberWithOptions(
+                                          decimal: true,
+                                        ),
+                                        type: InputType.numeric,
                                         label: localizations.translate(
                                           i18.stockDetails
                                               .quantityOfProductIndicatedOnWaybillLabel,
