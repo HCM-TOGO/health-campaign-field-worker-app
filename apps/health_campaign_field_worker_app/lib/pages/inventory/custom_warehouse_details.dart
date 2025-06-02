@@ -137,7 +137,7 @@ class CustomWarehouseDetailsPageState
                     i18.warehouseDetails.dateOfReceipt,
                   );
                   break;
-                
+
                 default:
                   dateLabel = '';
               }
@@ -310,7 +310,8 @@ class CustomWarehouseDetailsPageState
                                             cancelText: localizations.translate(
                                               i18.common.coreCommonCancel,
                                             ),
-                                            initialValue: DateFormat('dd/MM/yy')
+                                            initialValue: DateFormat(
+                                                    'd MMMM , yyyy')
                                                 .format(field.control.value),
                                             readOnly: true,
                                           );
@@ -319,6 +320,7 @@ class CustomWarehouseDetailsPageState
                                         formControlName: _administrativeUnitKey,
                                         builder: (field) {
                                           return InputField(
+                                            isRequired: true,
                                             type: InputType.text,
                                             label: localizations.translate(
                                               i18.warehouseDetails
