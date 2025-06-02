@@ -276,102 +276,102 @@ class ZeroDoseCheckPageState extends LocalizedState<ZeroDoseCheckPage> {
 
                                 // TODO: Uncomment this block when the vaccine selection page is complete
 
-                                // if (!zeroDose && !incompletementVaccine) {
-                                //   final referenceId = IdGen.i.identifier;
-                                //   List<ServiceAttributesModel> attributes = [];
-                                //   for (int i = 0; i < controller.length; i++) {
-                                //     final attribute = initialAttributes;
+                                if (!zeroDose && !incompletementVaccine) {
+                                  final referenceId = IdGen.i.identifier;
+                                  List<ServiceAttributesModel> attributes = [];
+                                  for (int i = 0; i < controller.length; i++) {
+                                    final attribute = initialAttributes;
 
-                                //     attributes.add(ServiceAttributesModel(
-                                //       auditDetails: AuditDetails(
-                                //         createdBy: context.loggedInUserUuid,
-                                //         createdTime:
-                                //             context.millisecondsSinceEpoch(),
-                                //       ),
-                                //       attributeCode: '${attribute?[i].code}',
-                                //       dataType: attribute?[i].dataType,
-                                //       clientReferenceId: IdGen.i.identifier,
-                                //       referenceId: referenceId,
-                                //       value: attribute?[i].dataType !=
-                                //               'SingleValueList'
-                                //           ? controller[i]
-                                //                   .text
-                                //                   .toString()
-                                //                   .trim()
-                                //                   .isNotEmpty
-                                //               ? controller[i].text.toString()
-                                //               : ''
-                                //           : visibleChecklistIndexes.contains(i)
-                                //               ? controller[i].text.toString()
-                                //               : i18_local
-                                //                   .checklist.notSelectedKey,
-                                //       rowVersion: 1,
-                                //       tenantId: attribute?[i].tenantId,
-                                //       additionalFields:
-                                //           ServiceAttributesAdditionalFields(
-                                //         version: 1,
-                                //         // TODO: This needs to be done after adding locationbloc
-                                //         fields: [
-                                //           AdditionalField(
-                                //             'latitude',
-                                //             latitude,
-                                //           ),
-                                //           AdditionalField(
-                                //             'longitude',
-                                //             longitude,
-                                //           ),
-                                //         ],
-                                //       ),
-                                //     ));
-                                //   }
+                                    attributes.add(ServiceAttributesModel(
+                                      auditDetails: AuditDetails(
+                                        createdBy: context.loggedInUserUuid,
+                                        createdTime:
+                                            context.millisecondsSinceEpoch(),
+                                      ),
+                                      attributeCode: '${attribute?[i].code}',
+                                      dataType: attribute?[i].dataType,
+                                      clientReferenceId: IdGen.i.identifier,
+                                      referenceId: referenceId,
+                                      value: attribute?[i].dataType !=
+                                              'SingleValueList'
+                                          ? controller[i]
+                                                  .text
+                                                  .toString()
+                                                  .trim()
+                                                  .isNotEmpty
+                                              ? controller[i].text.toString()
+                                              : ''
+                                          : visibleChecklistIndexes.contains(i)
+                                              ? controller[i].text.toString()
+                                              : i18_local
+                                                  .checklist.notSelectedKey,
+                                      rowVersion: 1,
+                                      tenantId: attribute?[i].tenantId,
+                                      additionalFields:
+                                          ServiceAttributesAdditionalFields(
+                                        version: 1,
+                                        // TODO: This needs to be done after adding locationbloc
+                                        fields: [
+                                          AdditionalField(
+                                            'latitude',
+                                            latitude,
+                                          ),
+                                          AdditionalField(
+                                            'longitude',
+                                            longitude,
+                                          ),
+                                        ],
+                                      ),
+                                    ));
+                                  }
 
-                                //   context.read<ServiceBloc>().add(
-                                //         ServiceCreateEvent(
-                                //           serviceModel: ServiceModel(
-                                //             createdAt: DigitDateUtils
-                                //                 .getDateFromTimestamp(
-                                //               DateTime.now()
-                                //                   .toLocal()
-                                //                   .millisecondsSinceEpoch,
-                                //               dateFormat: Constants
-                                //                   .checklistViewDateFormat,
-                                //             ),
-                                //             tenantId: selectedServiceDefinition!
-                                //                 .tenantId,
-                                //             clientId: referenceId,
-                                //             serviceDefId:
-                                //                 selectedServiceDefinition?.id,
-                                //             attributes: attributes,
-                                //             rowVersion: 1,
-                                //             accountId: context.projectId,
-                                //             auditDetails: AuditDetails(
-                                //               createdBy:
-                                //                   context.loggedInUserUuid,
-                                //               createdTime: DateTime.now()
-                                //                   .millisecondsSinceEpoch,
-                                //             ),
-                                //             clientAuditDetails:
-                                //                 ClientAuditDetails(
-                                //               createdBy:
-                                //                   context.loggedInUserUuid,
-                                //               createdTime: context
-                                //                   .millisecondsSinceEpoch(),
-                                //               lastModifiedBy:
-                                //                   context.loggedInUserUuid,
-                                //               lastModifiedTime: context
-                                //                   .millisecondsSinceEpoch(),
-                                //             ),
-                                //             additionalDetails: {
-                                //               "boundaryCode":
-                                //                   context.boundary.code
-                                //             },
-                                //           ),
-                                //         ),
-                                //       );
+                                  context.read<ServiceBloc>().add(
+                                        ServiceCreateEvent(
+                                          serviceModel: ServiceModel(
+                                            createdAt: DigitDateUtils
+                                                .getDateFromTimestamp(
+                                              DateTime.now()
+                                                  .toLocal()
+                                                  .millisecondsSinceEpoch,
+                                              dateFormat: Constants
+                                                  .checklistViewDateFormat,
+                                            ),
+                                            tenantId: selectedServiceDefinition!
+                                                .tenantId,
+                                            clientId: referenceId,
+                                            serviceDefId:
+                                                selectedServiceDefinition?.id,
+                                            attributes: attributes,
+                                            rowVersion: 1,
+                                            accountId: context.projectId,
+                                            auditDetails: AuditDetails(
+                                              createdBy:
+                                                  context.loggedInUserUuid,
+                                              createdTime: DateTime.now()
+                                                  .millisecondsSinceEpoch,
+                                            ),
+                                            clientAuditDetails:
+                                                ClientAuditDetails(
+                                              createdBy:
+                                                  context.loggedInUserUuid,
+                                              createdTime: context
+                                                  .millisecondsSinceEpoch(),
+                                              lastModifiedBy:
+                                                  context.loggedInUserUuid,
+                                              lastModifiedTime: context
+                                                  .millisecondsSinceEpoch(),
+                                            ),
+                                            additionalDetails: {
+                                              "boundaryCode":
+                                                  context.boundary.code
+                                            },
+                                          ),
+                                        ),
+                                      );
 
-                                //   context.router
-                                //       .push(const VaccineSelectionRoute());
-                                // } else {
+                                  context.router
+                                      .push(VaccineSelectionRoute());
+                                } else {
                                 final shouldSubmit = await DigitDialog.show(
                                   context,
                                   options: DigitDialogOptions(
@@ -543,7 +543,7 @@ class ZeroDoseCheckPageState extends LocalizedState<ZeroDoseCheckPage> {
                                         ),
                                       );
                                 }
-                                // }
+                                }
                               },
                               child: Text(
                                 localizations.translate(

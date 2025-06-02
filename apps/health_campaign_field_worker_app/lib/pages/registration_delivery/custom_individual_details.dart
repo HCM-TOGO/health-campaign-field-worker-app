@@ -587,7 +587,7 @@ class CustomIndividualDetailsPageState
                                 i18.individualDetails.idTypeLabelText,
                               ),
                               capitalizedFirstLetter: false,
-                              isRequired: true,
+                              isRequired: false,
                               child: DigitDropdown<String>(
                                 selectedOption: (form
                                             .control(_idTypeKey)
@@ -648,7 +648,7 @@ class CustomIndividualDetailsPageState
                                         i18.individualDetails.idNumberLabelText,
                                       ),
                                       capitalizedFirstLetter: false,
-                                      isRequired: true,
+                                      isRequired: false,
                                       child: DigitTextFormInput(
                                         readOnly:
                                             form.control(_idTypeKey).value ==

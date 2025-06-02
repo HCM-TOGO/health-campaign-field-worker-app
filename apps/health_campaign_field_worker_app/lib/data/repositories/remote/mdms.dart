@@ -145,6 +145,8 @@ class MdmsRepository {
     }
 
     final element = result.hcmWrapperModel;
+    final hcmProducts = result.hcmProductsWrapperModel;
+    print("Current HCM Products: $hcmProducts");
     final appConfig = result.hcmWrapperModel?.appConfig.first;
     final commonMasters = result.commonMasters;
     final backgroundServiceConfig = BackgroundServiceConfig()
@@ -213,6 +215,15 @@ class MdmsRepository {
 
       return deletionReasonOption;
     }).toList();
+
+    final List<VaccineData>? vaccinationData = hcmProducts?.vaccinationData
+        .map((e) => VaccineData()
+          ..name = e.name
+          ..code = e.code
+          ..active = e.active
+          ..ageInDays = e.ageInDays)
+        .toList();
+    appConfiguration.vaccinationData = vaccinationData;
 
     final List<HouseholdMemberDeletionReasonOptions>?
         householdMemberDeletionReasonOptions =
@@ -321,6 +332,7 @@ class MdmsRepository {
       ..interfaces = interfaceList ?? [];
     appConfiguration.genderOptions = genderOptions;
     appConfiguration.idTypeOptions = idTypeOptions;
+    appConfiguration.vaccinationData = vaccinationData;
     appConfiguration.privacyPolicyConfig = privacyPolicy;
     appConfiguration.deliveryCommentOptions = deliveryCommentOptions;
     appConfiguration.householdDeletionReasonOptions =

@@ -51,6 +51,7 @@ class MdmsMasterDetailModel with _$MdmsMasterDetailModel {
 class AppConfigPrimaryWrapperModel with _$AppConfigPrimaryWrapperModel {
   const factory AppConfigPrimaryWrapperModel({
     @JsonKey(name: 'HCM') HCMWrapperModel? hcmWrapperModel,
+    @JsonKey(name: 'HCM-PRODUCTS') HCMProductsWrapperModel? hcmProductsWrapperModel, 
     @JsonKey(name: 'common-masters') CommonMastersWrapperModel? commonMasters,
     @JsonKey(name: 'module-version') final RowVersionWrapperModel? rowVersions,
   }) = _AppConfigPrimaryWrapperModel;
@@ -108,6 +109,16 @@ class HCMWrapperModel with _$HCMWrapperModel {
 }
 
 @freezed
+class HCMProductsWrapperModel with _$HCMProductsWrapperModel {
+  const factory HCMProductsWrapperModel({
+    @JsonKey(name: 'vaccination-data') required List<VaccineData> vaccinationData,
+  }) = _HCMProductsWrapperModel;
+
+  factory HCMProductsWrapperModel.fromJson(Map<String, dynamic> json) =>
+      _$HCMProductsWrapperModelFromJson(json);
+}
+
+@freezed
 class AppConfigSecondaryWrapperModel with _$AppConfigSecondaryWrapperModel {
   const factory AppConfigSecondaryWrapperModel({
     @JsonKey(name: 'appConfig') List<AppConfig>? appConfiglist,
@@ -146,6 +157,19 @@ class CommonMasterModel with _$CommonMasterModel {
     Map<String, dynamic> json,
   ) =>
       _$CommonMasterModelFromJson(json);
+}
+
+@freezed
+class VaccineData with _$VaccineData {
+  const factory VaccineData({
+    // required String id,
+    required String code,
+    required String name,
+    required bool active,
+    required int ageInDays,
+  }) = _VaccineData;
+
+  factory VaccineData.fromJson(Map<String, dynamic> json) => _$VaccineDataFromJson(json);
 }
 
 @freezed

@@ -78,6 +78,9 @@ class AppConfiguration {
   @Name('SEARCH_CLF_FILTERS')
   late List<SearchCLFFilters>? searchCLFFilters;
 
+  @Name('vaccination-data')
+  late List<VaccineData>? vaccinationData;
+
   late List<ReferralReasons>? referralReasons;
   late List<HouseStructureTypes>? houseStructureTypes;
   late List<RefusalReasons>? refusalReasons;
@@ -106,6 +109,14 @@ class GenderOptions {
 class IdTypeOptions {
   late String name;
   late String code;
+}
+
+@embedded
+class VaccineData {
+  late String code;
+  late String name;
+  late int ageInDays;
+  late bool active;
 }
 
 @embedded

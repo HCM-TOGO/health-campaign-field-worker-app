@@ -1,4 +1,6 @@
-import 'dart:math';
+// import 'dart:math';
+
+import 'dart:ffi';
 
 import 'package:digit_components/widgets/digit_checkbox_tile.dart';
 import 'package:digit_components/widgets/digit_dialog.dart';
@@ -8,6 +10,8 @@ import 'package:digit_ui_components/services/location_bloc.dart';
 import 'package:digit_ui_components/widgets/molecules/digit_card.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:health_campaign_field_worker_app/blocs/app_initialization/app_initialization.dart';
+import 'package:health_campaign_field_worker_app/data/local_store/no_sql/schema/app_configuration.dart';
 import 'package:registration_delivery/registration_delivery.dart';
 import '../../../models/entities/roles_type.dart';
 import 'package:registration_delivery/blocs/household_overview/household_overview.dart';
@@ -23,12 +27,12 @@ import 'package:digit_data_model/data_model.dart';
 import '../../../widgets/custom_back_navigation.dart';
 import '../../../widgets/showcase/showcase_wrappers.dart';
 import 'package:registration_delivery/utils/i18_key_constants.dart' as i18;
+import '../../../utils/i18_key_constants.dart' as i18_local;
 import 'package:digit_components/widgets/atoms/checkbox_icon.dart';
 
 @RoutePage()
 class VaccineSelectionPage extends LocalizedStatefulWidget {
-  const VaccineSelectionPage(
-      {super.key, super.appLocalizations});
+  const VaccineSelectionPage({super.key, super.appLocalizations});
 
   @override
   State<VaccineSelectionPage> createState() => _VaccineSelectionPageState();
@@ -46,12 +50,13 @@ class _VaccineSelectionPageState extends LocalizedState<VaccineSelectionPage> {
   GlobalKey<FormState> checklistFormKey = GlobalKey<FormState>();
   Map<String?, String> responses = {};
   bool triggerLocalization = false;
+  List<Set<String>> selectedVaccines = [];
 
   @override
   void initState() {
     context.read<LocationBloc>().add(const LocationEvent.load());
-    context.read<ServiceBloc>().add(ServiceSurveyFormEvent(
-          value: Random().nextInt(100).toString(),
+    context.read<ServiceBloc>().add(const ServiceSurveyFormEvent(
+          value: 'xvxvcvxv',
           submitTriggered: true,
         ));
     super.initState();
@@ -59,288 +64,289 @@ class _VaccineSelectionPageState extends LocalizedState<VaccineSelectionPage> {
 
   @override
   Widget build(BuildContext context) {
-    final dob =
-        context.read<HouseholdOverviewBloc>().state.selectedIndividual?.dateOfBirth;
+    final dob = context
+        .read<HouseholdOverviewBloc>()
+        .state
+        .selectedIndividual
+        ?.dateOfBirth;
     final theme = Theme.of(context);
     // final years = DigitDateUtils.getYears
     final ageInDays = calculateAgeInDaysFromDob(dob!);
-    final deliverState = context.read<DeliverInterventionBloc>().state;
-    const Map<String, int> vaccineAgeMap = {
-      'BCG': 1,
-      'VPO-0': 1,
-      'Penta-1': 45,
-      'VPO-1': 45,
-      'Rota-1': 45,
-      'PCV13-1': 45,
-      'VPO-2': 75,
-      'Penta-2': 75,
-      'Rota-2': 75,
-      'PCV13-2': 75,
-      'VPO-3': 105,
-      'Penta-3': 105,
-      'PCV13-3': 105,
-      'VPI-1': 270,
-      'RR-1': 270,
-      'VAA': 270,
-      'VPI-2': 450,
-      'RR-2': 450,
-      'Men A': 450,
-    };
 
-    return PopScope(
-        canPop: true,
-        child: Scaffold(body: BlocBuilder<LocationBloc, LocationState>(
-            builder: (context, locationState) {
-          return BlocBuilder<HouseholdOverviewBloc, HouseholdOverviewState>(
-            builder: (context, householdOverviewState) {
-              double? latitude = locationState.latitude;
-              double? longitude = locationState.longitude;
-              String vaccineSelection = "VACCINE_SELECTION";
-              return BlocBuilder<ServiceDefinitionBloc, ServiceDefinitionState>(
-                builder: (context, state) {
-                  state.mapOrNull(
-                    serviceDefinitionFetch: (value) {
-                      // todo: verify the checklist name
-                      selectedServiceDefinition = value.serviceDefinitionList
-                          .where((element) => element.code.toString().contains(
-                                '${context.selectedProject.name}.$vaccineSelection.${context.isCommunityDistributor ? RolesType.communityDistributor.toValue() : RolesType.healthFacilitySupervisor.toValue()}',
-                              ))
-                          .toList()
-                          .firstOrNull;
-                      initialAttributes = selectedServiceDefinition?.attributes;
-                      if (!isControllersInitialized) {
-                        initialAttributes?.forEach((e) {
-                          controller.add(TextEditingController());
-                        });
+    return BlocBuilder<AppInitializationBloc, AppInitializationState>(
+        builder: (context, appInitState) {
+      List<VaccineData> vaccineDataList = [];
+      if (appInitState is AppInitialized) {
+        vaccineDataList = appInitState.appConfiguration.vaccinationData ?? [];
+      }
 
-                        // Set the flag to true after initializing controllers
-                        isControllersInitialized = true;
-                      }
-                    },
-                  );
+      final Map<String, int> vaccineAgeMap = {
+        for (final v in vaccineDataList) v.code: v.ageInDays
+      };
 
-                  return state.maybeMap(
-                    orElse: () => Text(state.runtimeType.toString()),
-                    serviceDefinitionFetch: (value) {
-                      return ScrollableContent(
-                        header: const Column(children: [
-                          CustomBackNavigationHelpHeaderWidget(
-                            showHelp: false,
-                          )
-                        ]),
-                        enableFixedDigitButton: true,
-                        footer: DigitCard(
-                          margin: const EdgeInsets.fromLTRB(0, kPadding, 0, 0),
-                          padding: const EdgeInsets.fromLTRB(
-                              kPadding, 0, kPadding, 0),
-                          children: [
-                            DigitElevatedButton(
-                              onPressed: () async {
-                                submitTriggered = true;
-                                final isValid =
-                                    checklistFormKey.currentState?.validate();
-                                if (!isValid!) {
-                                  return;
-                                }
-                                final itemsAttributes = initialAttributes;
-                                triggerLocalization = true;
-                                // final router = context.router;
+      final Map<String, String> vaccineCodeToName = {
+        for (final v in vaccineDataList) v.code: v.name
+      };
+      return PopScope(
+          canPop: true,
+          child: Scaffold(body: BlocBuilder<LocationBloc, LocationState>(
+              builder: (context, locationState) {
+            return BlocBuilder<HouseholdOverviewBloc, HouseholdOverviewState>(
+              builder: (context, householdOverviewState) {
+                double? latitude = locationState.latitude;
+                double? longitude = locationState.longitude;
+                String vaccineSelection = "ZERO_DOSE_ASSESSMENT";
+                return BlocBuilder<ServiceDefinitionBloc,
+                    ServiceDefinitionState>(
+                  builder: (context, state) {
+                    state.mapOrNull(
+                      serviceDefinitionFetch: (value) {
+                        // todo: verify the checklist name
+                        selectedServiceDefinition = value.serviceDefinitionList
+                            .where(
+                                (element) => element.code.toString().contains(
+                                      '${context.selectedProject.name}.$vaccineSelection.${context.isCommunityDistributor ? RolesType.communityDistributor.toValue() : RolesType.healthFacilitySupervisor.toValue()}',
+                                    ))
+                            .toList()
+                            .firstOrNull;
+                        initialAttributes = selectedServiceDefinition
+                            ?.attributes!
+                            .where((e) =>
+                                e.code != null &&
+                                e.dataType == 'MultiValueList')
+                            .toList();
+                        if (!isControllersInitialized) {
+                          initialAttributes?.forEach((e) {
+                            controller.add(TextEditingController());
+                            selectedVaccines.add({});
+                          });
 
-                                final shouldSubmit = await DigitDialog.show(
-                                  context,
-                                  options: DigitDialogOptions(
-                                    titleText: localizations.translate(
-                                      i18.deliverIntervention.dialogTitle,
-                                    ),
-                                    contentText: localizations.translate(
-                                      i18.deliverIntervention.dialogContent,
-                                    ),
-                                    primaryAction: DigitDialogActions(
-                                      label: localizations.translate(
-                                        i18.common.coreCommonSubmit,
-                                      ),
-                                      action: (ctx) {
-                                        final referenceId = IdGen.i.identifier;
-                                        List<ServiceAttributesModel>
-                                            attributes = [];
-                                        for (int i = 0;
-                                            i < controller.length;
-                                            i++) {
-                                          final attribute = initialAttributes;
+                          // Set the flag to true after initializing controllers
+                          isControllersInitialized = true;
+                        }
+                      },
+                    );
 
-                                          attributes.add(ServiceAttributesModel(
-                                            auditDetails: AuditDetails(
-                                              createdBy:
-                                                  context.loggedInUserUuid,
-                                              createdTime: context
-                                                  .millisecondsSinceEpoch(),
-                                            ),
-                                            attributeCode:
-                                                '${attribute?[i].code}',
-                                            dataType: attribute?[i].dataType,
-                                            clientReferenceId:
-                                                IdGen.i.identifier,
-                                            referenceId: referenceId,
-                                            value: attribute?[i].dataType !=
-                                                    'SingleValueList'
-                                                ? controller[i]
-                                                        .text
-                                                        .toString()
-                                                        .trim()
-                                                        .isNotEmpty
-                                                    ? controller[i]
-                                                        .text
-                                                        .toString()
-                                                    : ''
-                                                : visibleChecklistIndexes
-                                                        .contains(i)
-                                                    ? controller[i]
-                                                        .text
-                                                        .toString()
-                                                    : i18.checklist
-                                                        .notSelectedKey,
-                                            rowVersion: 1,
-                                            tenantId: attribute?[i].tenantId,
-                                            additionalFields:
-                                                ServiceAttributesAdditionalFields(
-                                              version: 1,
-                                              // TODO: This needs to be done after adding locationbloc
-                                              fields: [
-                                                AdditionalField(
-                                                  'latitude',
-                                                  latitude,
-                                                ),
-                                                AdditionalField(
-                                                  'longitude',
-                                                  longitude,
-                                                ),
-                                              ],
-                                            ),
-                                          ));
-                                        }
-
-                                        context.read<ServiceBloc>().add(
-                                              ServiceCreateEvent(
-                                                serviceModel: ServiceModel(
-                                                  createdAt: DigitDateUtils
-                                                      .getDateFromTimestamp(
-                                                    DateTime.now()
-                                                        .toLocal()
-                                                        .millisecondsSinceEpoch,
-                                                    dateFormat: Constants
-                                                        .checklistViewDateFormat,
-                                                  ),
-                                                  tenantId:
-                                                      selectedServiceDefinition!
-                                                          .tenantId,
-                                                  clientId: referenceId,
-                                                  serviceDefId:
-                                                      selectedServiceDefinition
-                                                          ?.id,
-                                                  attributes: attributes,
-                                                  rowVersion: 1,
-                                                  accountId: context.projectId,
-                                                  auditDetails: AuditDetails(
-                                                    createdBy: context
-                                                        .loggedInUserUuid,
-                                                    createdTime: DateTime.now()
-                                                        .millisecondsSinceEpoch,
-                                                  ),
-                                                  clientAuditDetails:
-                                                      ClientAuditDetails(
-                                                    createdBy: context
-                                                        .loggedInUserUuid,
-                                                    createdTime: context
-                                                        .millisecondsSinceEpoch(),
-                                                    lastModifiedBy: context
-                                                        .loggedInUserUuid,
-                                                    lastModifiedTime: context
-                                                        .millisecondsSinceEpoch(),
-                                                  ),
-                                                  additionalDetails: {
-                                                    "boundaryCode":
-                                                        context.boundary.code
-                                                  },
-                                                ),
-                                              ),
-                                            );
-
-                                        Navigator.of(
-                                          context,
-                                          rootNavigator: true,
-                                        ).pop(true);
-                                      },
-                                    ),
-                                    secondaryAction: DigitDialogActions(
-                                      label: localizations.translate(
-                                        i18.common.coreCommonGoback,
-                                      ),
-                                      action: (ctx) {
-                                        Navigator.of(ctx, rootNavigator: true)
-                                            .pop(false);
-                                      },
-                                    ),
-                                  ),
-                                );
-                                if (shouldSubmit ?? false) {
-                                  final router = context.router;
-                                  submitTriggered = true;
-
-                                  context.read<ServiceBloc>().add(
-                                        const ServiceSurveyFormEvent(
-                                          value: '',
-                                          submitTriggered: true,
-                                        ),
-                                      );
-                                  context.router.push(
-                                      CustomDoseAdministeredRoute(
-                                          eligibilityAssessmentType:
-                                              EligibilityAssessmentType.smc));
-                                }
-                              },
-                              child: Text(
-                                localizations
-                                    .translate(i18.common.coreCommonSubmit),
-                              ),
+                    return state.maybeMap(
+                      orElse: () => Text(state.runtimeType.toString()),
+                      serviceDefinitionFetch: (value) {
+                        return ScrollableContent(
+                          header: const Column(children: [
+                            CustomBackNavigationHelpHeaderWidget(
+                              showHelp: true,
                             )
-                          ],
-                        ),
-                        children: [
-                          Form(
-                            key: checklistFormKey, //assigning key to form
-                            child: DigitCard(
-                              children: [
-                                Column(
-                                    crossAxisAlignment:
-                                        CrossAxisAlignment.start,
-                                    children: [
-                                      Text("Vaccins Details", style: theme.textTheme.headlineLarge,),
-                                      Padding(
-                                        padding: const EdgeInsets.only(left: 8),
-                                        child: Text(
-                                          localizations.translate(
-                                            selectedServiceDefinition!.code
-                                                .toString(),
-                                          ),
-                                          style: theme.textTheme.displayMedium,
-                                          textAlign: TextAlign.left,
-                                        ),
-                                      ),
-                                      ...initialAttributes!.map((
-                                        e,
-                                      ) {
-                                        int index = (initialAttributes ?? [])
-                                            .indexOf(e);
+                          ]),
+                          enableFixedDigitButton: true,
+                          footer: DigitCard(
+                            margin:
+                                const EdgeInsets.fromLTRB(0, kPadding, 0, 0),
+                            padding: const EdgeInsets.fromLTRB(
+                                kPadding, 0, kPadding, 0),
+                            children: [
+                              DigitElevatedButton(
+                                onPressed: () async {
+                                  submitTriggered = true;
+                                  final isValid =
+                                      checklistFormKey.currentState?.validate();
+                                  if (!isValid!) {
+                                    return;
+                                  }
+                                  final itemsAttributes = initialAttributes;
+                                  triggerLocalization = true;
+                                  // final router = context.router;
 
-                                        return Column(children: [
-                                          if (e.dataType == 'MultiValueList' &&
-                                              !(e.code ?? '')
-                                                  .contains('.')) ...[
-                                            Align(
-                                              alignment: Alignment.topLeft,
-                                              child: Padding(
-                                                padding:
-                                                    const EdgeInsets.all(8),
+                                  final shouldSubmit = await DigitDialog.show(
+                                    context,
+                                    options: DigitDialogOptions(
+                                      titleText: localizations.translate(
+                                        i18.deliverIntervention.dialogTitle,
+                                      ),
+                                      contentText: localizations.translate(
+                                        i18.deliverIntervention.dialogContent,
+                                      ),
+                                      primaryAction: DigitDialogActions(
+                                        label: localizations.translate(
+                                          i18.common.coreCommonSubmit,
+                                        ),
+                                        action: (ctx) {
+                                          final referenceId =
+                                              IdGen.i.identifier;
+                                          List<ServiceAttributesModel>
+                                              attributes = [];
+                                          for (int i = 0;
+                                              i < controller.length;
+                                              i++) {
+                                            final attribute = initialAttributes;
+
+                                            attributes
+                                                .add(ServiceAttributesModel(
+                                              auditDetails: AuditDetails(
+                                                createdBy:
+                                                    context.loggedInUserUuid,
+                                                createdTime: context
+                                                    .millisecondsSinceEpoch(),
+                                              ),
+                                              attributeCode:
+                                                  '${attribute?[i].code}',
+                                              dataType: attribute?[i].dataType,
+                                              clientReferenceId:
+                                                  IdGen.i.identifier,
+                                              referenceId: referenceId,
+                                              value: attribute?[i].dataType !=
+                                                      'SingleValueList'
+                                                  ? controller[i]
+                                                          .text
+                                                          .toString()
+                                                          .trim()
+                                                          .isNotEmpty
+                                                      ? controller[i]
+                                                          .text
+                                                          .toString()
+                                                      : ''
+                                                  : visibleChecklistIndexes
+                                                          .contains(i)
+                                                      ? controller[i]
+                                                          .text
+                                                          .toString()
+                                                      : i18.checklist
+                                                          .notSelectedKey,
+                                              rowVersion: 1,
+                                              tenantId: attribute?[i].tenantId,
+                                              additionalFields:
+                                                  ServiceAttributesAdditionalFields(
+                                                version: 1,
+                                                // TODO: This needs to be done after adding locationbloc
+                                                fields: [
+                                                  AdditionalField(
+                                                    'latitude',
+                                                    latitude,
+                                                  ),
+                                                  AdditionalField(
+                                                    'longitude',
+                                                    longitude,
+                                                  ),
+                                                ],
+                                              ),
+                                            ));
+                                          }
+
+                                          context.read<ServiceBloc>().add(
+                                                ServiceCreateEvent(
+                                                  serviceModel: ServiceModel(
+                                                    createdAt: DigitDateUtils
+                                                        .getDateFromTimestamp(
+                                                      DateTime.now()
+                                                          .toLocal()
+                                                          .millisecondsSinceEpoch,
+                                                      dateFormat: Constants
+                                                          .checklistViewDateFormat,
+                                                    ),
+                                                    tenantId:
+                                                        selectedServiceDefinition!
+                                                            .tenantId,
+                                                    clientId: referenceId,
+                                                    serviceDefId:
+                                                        selectedServiceDefinition
+                                                            ?.id,
+                                                    attributes: attributes,
+                                                    rowVersion: 1,
+                                                    accountId:
+                                                        context.projectId,
+                                                    auditDetails: AuditDetails(
+                                                      createdBy: context
+                                                          .loggedInUserUuid,
+                                                      createdTime: DateTime
+                                                              .now()
+                                                          .millisecondsSinceEpoch,
+                                                    ),
+                                                    clientAuditDetails:
+                                                        ClientAuditDetails(
+                                                      createdBy: context
+                                                          .loggedInUserUuid,
+                                                      createdTime: context
+                                                          .millisecondsSinceEpoch(),
+                                                      lastModifiedBy: context
+                                                          .loggedInUserUuid,
+                                                      lastModifiedTime: context
+                                                          .millisecondsSinceEpoch(),
+                                                    ),
+                                                    additionalDetails: {
+                                                      "boundaryCode":
+                                                          context.boundary.code
+                                                    },
+                                                  ),
+                                                ),
+                                              );
+
+                                          Navigator.of(
+                                            context,
+                                            rootNavigator: true,
+                                          ).pop(true);
+                                        },
+                                      ),
+                                      secondaryAction: DigitDialogActions(
+                                        label: localizations.translate(
+                                          i18.common.coreCommonGoback,
+                                        ),
+                                        action: (ctx) {
+                                          Navigator.of(ctx, rootNavigator: true)
+                                              .pop(false);
+                                        },
+                                      ),
+                                    ),
+                                  );
+                                  if (shouldSubmit ?? false) {
+                                    final router = context.router;
+                                    submitTriggered = true;
+
+                                    context.read<ServiceBloc>().add(
+                                          const ServiceSurveyFormEvent(
+                                            value: '',
+                                            submitTriggered: true,
+                                          ),
+                                        );
+                                    context.router.push(
+                                        CustomDoseAdministeredRoute(
+                                            eligibilityAssessmentType:
+                                                EligibilityAssessmentType.smc));
+                                  }
+                                },
+                                child: Text(
+                                  localizations
+                                      .translate(i18.common.coreCommonSubmit),
+                                ),
+                              )
+                            ],
+                          ),
+                          children: [
+                            Form(
+                              key: checklistFormKey, //assigning key to form
+                              child: DigitCard(
+                                padding: const EdgeInsets.all(spacer5),
+                                margin: const EdgeInsets.symmetric(
+                                    horizontal: spacer5, vertical: spacer3),
+                                children: [
+                                  Column(
+                                      crossAxisAlignment:
+                                          CrossAxisAlignment.start,
+                                      children: [
+                                        Text(
+                                          localizations.translate(
+                                            i18_local
+                                                .deliverIntervention.vaccinsSelectionLabel,
+                                          ),
+                                          style: theme.textTheme.headlineLarge,
+                                        ),
+                                        const SizedBox(height: spacer5),
+                                        ...initialAttributes!.map((e) {
+                                          int index = (initialAttributes ?? [])
+                                              .indexOf(e);
+
+                                          return Column(children: [
+                                            if (e.dataType ==
+                                                'MultiValueList') ...[
+                                              Align(
+                                                alignment: Alignment.topLeft,
                                                 child: Column(
                                                   children: [
                                                     Text(
@@ -353,74 +359,83 @@ class _VaccineSelectionPageState extends LocalizedState<VaccineSelectionPage> {
                                                   ],
                                                 ),
                                               ),
-                                            ),
-                                            BlocBuilder<ServiceBloc,
-                                                ServiceState>(
-                                              builder: (context, state) {
-                                                return Column(
-                                                  children: e.values!
-                                                      .map((e) =>
-                                                          CustomDigitCheckboxTile(
-                                                            label: e,
-                                                            isDisabled: vaccineAgeMap[e]! <= ageInDays,
-                                                            value: controller[
+                                              const SizedBox(height: spacer4),
+                                              BlocBuilder<ServiceBloc,
+                                                  ServiceState>(
+                                                builder: (context, state) {
+                                                  // ...inside your BlocBuilder<ServiceBloc, ServiceState>...
+                                                  return buildTwoColumnCheckboxes(
+                                                    values: e.values!,
+                                                    index: index,
+                                                    vaccineCodeToName:
+                                                        vaccineCodeToName,
+                                                    vaccineAgeMap:
+                                                        vaccineAgeMap,
+                                                    ageInDays: ageInDays,
+                                                    controller:
+                                                        controller[index],
+                                                    onChanged: (code, value) {
+                                                      // var val =
+                                                      //     controller[index]
+                                                      //         .text
+                                                      //         .split('.');
+                                                      // if (value) {
+                                                      //   if (!val.contains(code))
+                                                      //     val.add(code);
+                                                      // } else {
+                                                      //   val.remove(code);
+                                                      // }
+                                                      // controller[index].value =
+                                                      //     TextEditingController
+                                                      //         .fromValue(
+                                                      //   TextEditingValue(
+                                                      //       text: val
+                                                      //           .where((v) => v
+                                                      //               .isNotEmpty)
+                                                      //           .join('.')),
+                                                      // ).value;
+                                                      setState(() {
+                                                        if (value) {
+                                                          selectedVaccines[
+                                                                  index]
+                                                              .add(code);
+                                                        } else {
+                                                          selectedVaccines[
+                                                                  index]
+                                                              .remove(code);
+                                                        }
+                                                        // If you still need to update the controller for submission:
+                                                        controller[index].text =
+                                                            selectedVaccines[
                                                                     index]
-                                                                .text
-                                                                .split('.')
-                                                                .contains(e),
-                                                            onChanged: (value) {
-                                                              final String ele;
-                                                              var val =
-                                                                  controller[
-                                                                          index]
-                                                                      .text
-                                                                      .split(
-                                                                          '.');
-                                                              if (val.contains(
-                                                                  e)) {
-                                                                val.remove(e);
-                                                                ele = val
-                                                                    .join(".");
-                                                              } else {
-                                                                ele =
-                                                                    "${controller[index].text}.$e";
-                                                              }
-                                                              controller[index]
-                                                                      .value =
-                                                                  TextEditingController
-                                                                      .fromValue(
-                                                                TextEditingValue(
-                                                                  text: ele,
-                                                                ),
-                                                              ).value;
-                                                            },
-                                                          ))
-                                                      .toList(),
-                                                );
-                                              },
-                                            ),
-                                          ]
-                                        ]);
-                                      }).toList(),
-                                      const SizedBox(
-                                        height: 15,
-                                      ),
-                                    ])
-                              ],
+                                                                .join('.');
+                                                      });
+                                                    },
+                                                  );
+                                                },
+                                              ),
+                                            ]
+                                          ]);
+                                        }).toList(),
+                                        const SizedBox(
+                                          height: 15,
+                                        ),
+                                      ])
+                                ],
+                              ),
                             ),
-                          ),
-                        ],
-                      );
-                    },
-                  );
-                },
-              );
-            },
-          );
-        })));
+                          ],
+                        );
+                      },
+                    );
+                  },
+                );
+              },
+            );
+          })));
+    });
   }
 }
-
 
 class CustomDigitCheckboxTile extends StatelessWidget {
   final bool value;
@@ -445,7 +460,8 @@ class CustomDigitCheckboxTile extends StatelessWidget {
     return Padding(
       padding: padding ?? const EdgeInsets.all(0),
       child: InkWell(
-        onTap: isDisabled ? null : () => onChanged?.call(!value), // 3. Disable tap
+        onTap:
+            isDisabled ? null : () => onChanged?.call(!value), // 3. Disable tap
         child: Padding(
           padding: const EdgeInsets.only(left: 0, bottom: kPadding * 2),
           child: Row(
@@ -453,10 +469,9 @@ class CustomDigitCheckboxTile extends StatelessWidget {
             children: [
               value
                   ? const CheckboxIcon(
-                      value: true,// 3. Disabled color
+                      value: true, // 3. Disabled color
                     )
-                  : const CheckboxIcon(
-                    ),
+                  : const CheckboxIcon(),
               const SizedBox(width: kPadding * 2),
               Expanded(
                 child: Text(
@@ -474,6 +489,46 @@ class CustomDigitCheckboxTile extends StatelessWidget {
       ),
     );
   }
+}
+
+Widget buildTwoColumnCheckboxes({
+  required List<String> values,
+  required int index,
+  required Map<String, String> vaccineCodeToName,
+  required Map<String, int> vaccineAgeMap,
+  required int ageInDays,
+  required TextEditingController controller,
+  required void Function(String code, bool value) onChanged,
+}) {
+  // Filter out 'NOT_SELECTED'
+  final filtered = values.where((e) => e != 'NOT_SELECTED').toList();
+  final mid = (filtered.length / 2).ceil();
+  final firstCol = filtered.sublist(0, mid);
+  final secondCol = filtered.sublist(mid);
+
+  Widget buildCol(List<String> col) => Column(
+        children: col
+            .map((code) => CustomDigitCheckboxTile(
+                  label: vaccineCodeToName.containsKey(code)
+                      ? vaccineCodeToName[code] ?? code
+                      : code,
+                  isDisabled: vaccineAgeMap.containsKey(code)
+                      ? vaccineAgeMap[code]! >= ageInDays
+                      : true,
+                  value: controller.text.split('.').contains(code),
+                  onChanged: (value) => onChanged(code, value),
+                ))
+            .toList(),
+      );
+
+  return Row(
+    crossAxisAlignment: CrossAxisAlignment.start,
+    children: [
+      Expanded(child: buildCol(firstCol)),
+      const SizedBox(width: 16),
+      Expanded(child: buildCol(secondCol)),
+    ],
+  );
 }
 
 int calculateAgeInDaysFromDob(String dobString) {
