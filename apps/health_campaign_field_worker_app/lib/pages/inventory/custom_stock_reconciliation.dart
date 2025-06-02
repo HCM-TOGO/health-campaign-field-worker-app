@@ -17,6 +17,7 @@ import 'package:inventory_management/utils/extensions/extensions.dart';
 import 'package:reactive_forms/reactive_forms.dart';
 
 import 'package:inventory_management/utils/i18_key_constants.dart' as i18;
+import '../../utils/i18_key_constants.dart' as i18_local;
 import 'package:inventory_management/widgets/inventory/no_facilities_assigned_dialog.dart';
 import 'package:inventory_management/widgets/localized.dart';
 import 'package:inventory_management/blocs/product_variant.dart';
@@ -130,7 +131,14 @@ class CustomStockReconciliationPageState
                                                         .control(
                                                             _productVariantKey)
                                                         .value ==
-                                                    null)
+                                                    null) ||
+                                                (int.tryParse(form
+                                                            .control(
+                                                                _manualCountKey)
+                                                            .value ??
+                                                        0) !=
+                                                    stockState.stockInHand
+                                                        .toInt())
                                             ? () {
                                                 if (controller1.text.isEmpty) {
                                                   Toast.showToast(context,
@@ -154,6 +162,28 @@ class CustomStockReconciliationPageState
                                                           .selectProductLabel,
                                                     ),
                                                   );
+                                                } else if (int.tryParse(form
+                                                            .control(
+                                                                _manualCountKey)
+                                                            .value ??
+                                                        0) !=
+                                                    stockState.stockInHand
+                                                        .toInt()) {
+                                                  Toast.showToast(
+                                                    context,
+                                                    type: ToastType.error,
+                                                    message:
+                                                        localizations.translate(
+                                                      i18_local
+                                                          .stockReconciliationDetails
+                                                          .commentRequiredError,
+                                                    ),
+                                                  );
+                                                } else {
+                                                  form.markAllAsTouched();
+                                                  FocusManager
+                                                      .instance.primaryFocus
+                                                      ?.unfocus();
                                                 }
                                               }
                                             : () async {
