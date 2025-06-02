@@ -585,6 +585,12 @@ class WarehouseDetailsShowcase {
   String get dateOfReceipt {
     return 'WAREHOUSE_DETAILS_SHOWCASE_DATE_OF_RECEIPT';
   }
+  String get dateOfIssue {
+    return 'WAREHOUSE_DETAILS_SHOWCASE_DATE_OF_ISSUE';
+  }
+  String get dateOfReturn {
+    return 'WAREHOUSE_DETAILS_SHOWCASE_DATE_OF_RETURN';
+  }
 
   String get administrativeUnit {
     return 'WAREHOUSE_DETAILS_SHOWCASE_ADMINISTRATIVE_UNIT';
@@ -592,10 +598,6 @@ class WarehouseDetailsShowcase {
 
   String get warehouseName {
     return 'WAREHOUSE_DETAILS_SHOWCASE_WAREHOUSE_NAME';
-  }
-
-  String get dateOfReturn {
-    return 'WAREHOUSE_DETAILS_SHOWCASE_DATE_OF_RETURN';
   }
 }
 

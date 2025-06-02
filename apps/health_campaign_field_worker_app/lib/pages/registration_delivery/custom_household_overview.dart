@@ -501,6 +501,41 @@ class _CustomHouseholdOverviewPageState
 
                                           return Column(
                                             children: [
+                                              // DigitTableCard(
+                                              //   element: {
+                                              //     localizations.translate(i18
+                                              //         .householdOverView
+                                              //         .householdOverViewHouseholdHeadNameLabel): state
+                                              //             .householdMemberWrapper
+                                              //             .headOfHousehold
+                                              //             ?.name
+                                              //             ?.givenName ??
+                                              //         localizations.translate(
+                                              //             i18.common
+                                              //                 .coreCommonNA),
+                                              //     localizations.translate(
+                                              //       i18.householdLocation
+                                              //           .administrationAreaFormLabel,
+                                              //     ): localizations.translate(state
+                                              //             .householdMemberWrapper
+                                              //             .headOfHousehold
+                                              //             ?.address
+                                              //             ?.first
+                                              //             .locality
+                                              //             ?.code ??
+                                              //         i18.common.coreCommonNA),
+                                              //     if (shouldShowStatus)
+                                              //       localizations.translate(i18
+                                              //               .beneficiaryDetails
+                                              //               .status):
+                                              //           localizations.translate(
+                                              //         getStatusAttributes(state,
+                                              //                 deliverInterventionState)[
+                                              //             'textLabel'],
+                                              //       )
+                                              //   },
+                                              // ),
+
                                               DigitTableCard(
                                                 element: {
                                                   localizations.translate(i18
@@ -513,28 +548,43 @@ class _CustomHouseholdOverviewPageState
                                                       localizations.translate(
                                                           i18.common
                                                               .coreCommonNA),
-                                                  localizations.translate(
-                                                    i18.householdLocation
-                                                        .administrationAreaFormLabel,
-                                                  ): localizations.translate(state
+
+                                                  // Number of household members
+                                                  localizations.translate(i18
+                                                      .householdDetails
+                                                      .noOfMembersCountLabel): state
                                                           .householdMemberWrapper
-                                                          .headOfHousehold
-                                                          ?.address
-                                                          ?.first
-                                                          .locality
-                                                          ?.code ??
-                                                      i18.common.coreCommonNA),
+                                                          .household
+                                                          ?.memberCount
+                                                          ?.toString() ??
+                                                      localizations.translate(
+                                                          i18.common
+                                                              .coreCommonNA),
+
+                                                  localizations.translate(i18
+                                                          .householdLocation
+                                                          .administrationAreaFormLabel):
+                                                      localizations.translate(state
+                                                              .householdMemberWrapper
+                                                              .headOfHousehold
+                                                              ?.address
+                                                              ?.first
+                                                              .locality
+                                                              ?.code ??
+                                                          i18.common
+                                                              .coreCommonNA),
+
                                                   if (shouldShowStatus)
                                                     localizations.translate(i18
                                                             .beneficiaryDetails
                                                             .status):
                                                         localizations.translate(
-                                                      getStatusAttributes(state,
-                                                              deliverInterventionState)[
-                                                          'textLabel'],
-                                                    )
+                                                            getStatusAttributes(
+                                                                    state,
+                                                                    deliverInterventionState)[
+                                                                'textLabel']),
                                                 },
-                                              ),
+                                              )
                                             ],
                                           );
                                         }),
@@ -1082,8 +1132,8 @@ class _CustomHouseholdOverviewPageState
                                             "\n ${localizations.translate(i18_local.beneficiaryDetails.spaq2DoseUnit)}";
                                       }
 
-                                      if (context.spaq1 > 0 ||
-                                          context.spaq2 > 0) {
+                                      if (context.spaq1 > -1 ||
+                                          context.spaq2 > -1) {
                                         addIndividual(
                                           context,
                                           state
