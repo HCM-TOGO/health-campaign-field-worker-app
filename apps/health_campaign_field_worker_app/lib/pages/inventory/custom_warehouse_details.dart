@@ -13,6 +13,7 @@ import 'package:inventory_management/router/inventory_router.gm.dart';
 import 'package:reactive_forms/reactive_forms.dart';
 
 import 'package:inventory_management/utils/i18_key_constants.dart' as i18;
+import '../../utils//i18_key_constants.dart' as i18_local;
 import 'package:inventory_management/widgets/localized.dart';
 import 'package:inventory_management/blocs/record_stock.dart';
 import 'package:inventory_management/utils/utils.dart';
@@ -106,6 +107,40 @@ class CustomWarehouseDetailsPageState
                   ) ??
                   [];
               final stockState = recordStockBloc.state;
+
+              final entryType = stockState.entryType;
+              String dateLabel;
+
+              switch (entryType) {
+                case StockRecordEntryType.receipt:
+                  dateLabel = localizations.translate(
+                    i18.warehouseDetails.dateOfReceipt,
+                  );
+                  break;
+                case StockRecordEntryType.dispatch:
+                  dateLabel = localizations.translate(
+                    i18_local.warehouseDetailsShowcase.dateOfIssue,
+                  );
+                  break;
+                case StockRecordEntryType.returned:
+                  dateLabel = localizations.translate(
+                    i18_local.warehouseDetailsShowcase.dateOfReturn,
+                  );
+                  break;
+                case StockRecordEntryType.damaged:
+                  dateLabel = localizations.translate(
+                    i18.warehouseDetails.dateOfReceipt,
+                  );
+                  break;
+                case StockRecordEntryType.loss:
+                  dateLabel = localizations.translate(
+                    i18.warehouseDetails.dateOfReceipt,
+                  );
+                  break;
+                
+                default:
+                  dateLabel = '';
+              }
 
               return Scaffold(
                 body: GestureDetector(
@@ -267,10 +302,7 @@ class CustomWarehouseDetailsPageState
                                         builder: (field) {
                                           return InputField(
                                             type: InputType.date,
-                                            label: localizations.translate(
-                                              i18.warehouseDetails
-                                                  .dateOfReceipt,
-                                            ),
+                                            label: dateLabel,
                                             confirmText:
                                                 localizations.translate(
                                               i18.common.coreCommonOk,
