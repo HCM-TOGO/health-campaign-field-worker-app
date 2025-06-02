@@ -122,10 +122,16 @@ class AppInitializationBloc
                   masterDetails:
                       getMasterDetailsModel([MasterEnums.rowVersion.toValue()]),
                 ),
+                MdmsModuleDetailModel(
+                  moduleName: ModuleEnums.hcmProducts.toValue(),
+                  masterDetails:
+                      getMasterDetailsModel([MasterEnums.vaccinationData.toValue()]),
+                ),
               ],
             ),
           ).toJson(),
         );
+        print("Config Result: $configResult");
         final pgrServiceDefinitions =
             await mdmsRepository.searchPGRServiceDefinitions(
           envConfig.variables.mdmsApiPath,
@@ -315,7 +321,6 @@ class MdmsConfig {
   final List<AppConfiguration> appConfigs;
   final List<ServiceRegistry> serviceRegistryList;
   final List<DashboardConfigSchema?>? dashboardConfigSchema;
-
 
   const MdmsConfig(
       {required this.appConfigs,

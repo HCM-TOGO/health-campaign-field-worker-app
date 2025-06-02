@@ -15,4 +15,6 @@ enum ModuleEnums {
   moduleVersion,
   @MappableValue("RAINMAKER-PGR")
   rainmakerPgr,
+  @MappableValue("HCM-PRODUCTS")
+  hcmProducts,
 }
