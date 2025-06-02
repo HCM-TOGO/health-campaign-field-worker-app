@@ -44,14 +44,19 @@ class CustomBeneficiaryAcknowledgementPageState
   }
 
   Map<String, String>? subtitleMap(
-      registration_delivery.HouseholdMemberWrapper? householdMember,HouseholdModel? household) {
+      registration_delivery.HouseholdMemberWrapper? householdMember,
+      HouseholdModel? household) {
     if (widget.acknowledgementType == AcknowledgementType.addHousehold) {
-      final householdId = household?.additionalFields?.fields.where((field) =>
-              field.key == IdentifierTypes.uniqueBeneficiaryID.toValue()).first.value;
+      final householdId = household?.additionalFields?.fields
+          .where((field) =>
+              field.key == IdentifierTypes.uniqueBeneficiaryID.toValue())
+          .first
+          .value;
       return householdId == null
           ? null
           : {
-              'id': localizations.translate(i18_local.beneficiaryDetails.householdId),
+              'id': localizations
+                  .translate(i18_local.beneficiaryDetails.householdId),
               'value': householdId,
             };
     } else {
@@ -103,9 +108,11 @@ class CustomBeneficiaryAcknowledgementPageState
               builder: (context, state) {
                 return CustomPanelCard(
                   type: PanelType.success,
-                  title: localizations.translate(
-                      i18_local.acknowledgementSuccess.acknowledgementSuccessUpdateLabelText),
-                  subTitle: subtitleMap(householdMemberWrapper, state.householdModel),
+                  title: localizations.translate(i18_local
+                      .acknowledgementSuccess
+                      .acknowledgementSuccessUpdateLabelText),
+                  subTitle:
+                      subtitleMap(householdMemberWrapper, state.householdModel),
                   actions: [
                     if (householdMemberWrapper != null)
                       DigitButton(
@@ -122,8 +129,9 @@ class CustomBeneficiaryAcknowledgementPageState
                           type: DigitButtonType.primary,
                           size: DigitButtonSize.large),
                     DigitButton(
-                        label: localizations.translate(
-                            i18.acknowledgementSuccess.actionLabelText),
+                        label: localizations.translate(i18_local
+                            .acknowledgementSuccess
+                            .backToSearchActionLabelText),
                         onPressed: () {
                           context.router.maybePop();
                         },
