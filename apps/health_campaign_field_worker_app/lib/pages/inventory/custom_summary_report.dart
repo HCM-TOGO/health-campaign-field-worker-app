@@ -114,32 +114,32 @@ class _CustomSummaryReportState
                               label: localizations.translate(i18Local
                                   .homeShowcase.summaryReportRegistredChildren),
                               key: _registeredChildrenKey,
-                              width: 200,
+                              width: 180,
                             ),
                             DigitGridColumn(
                               label: localizations.translate(i18Local
                                   .homeShowcase
                                   .summaryReportAdministredChildren),
                               key: _administeredChildrenKey,
-                              width: 230,
+                              width: 180,
                             ),
                             DigitGridColumn(
                               label: localizations.translate(i18Local
                                   .homeShowcase.summaryReportRefusalsCases),
                               key: _refusalsCasesKey,
-                              width: 230,
+                              width: 180,
                             ),
                             DigitGridColumn(
                               label: localizations.translate(
                                   i18Local.homeShowcase.summaryReportSPAQ1),
                               key: _usedTablet_3_11monthKey,
-                              width: 230,
+                              width: 180,
                             ),
                             DigitGridColumn(
                               label: localizations.translate(
                                   i18Local.homeShowcase.summaryReportSPAQ2),
                               key: _usedTablet_12_59monthKey,
-                              width: 230,
+                              width: 180,
                             ),
                           ],
                           rows: [
