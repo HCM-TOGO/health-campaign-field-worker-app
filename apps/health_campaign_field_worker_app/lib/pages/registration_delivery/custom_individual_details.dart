@@ -1056,7 +1056,6 @@ class CustomIndividualDetailsPageState
 
         Validators.minLength(8),
         Validators.maxLength(8),
-        if (widget.isHeadOfHousehold) Validators.required,
         // Validators.required,
       ]),
     });

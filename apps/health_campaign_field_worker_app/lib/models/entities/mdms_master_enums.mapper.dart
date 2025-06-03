@@ -51,6 +51,8 @@ class MasterEnumsMapper extends EnumMapper<MasterEnums> {
         return MasterEnums.idTypes;
       case "DELIVERY_COMMENT_OPTIONS_POPULATOR":
         return MasterEnums.deliveryComments;
+      case "vaccination-data":
+        return MasterEnums.vaccinationData;
       case "BACKEND_INTERFACE":
         return MasterEnums.backendInterface;
       case "CALL_SUPPORT":
@@ -109,6 +111,8 @@ class MasterEnumsMapper extends EnumMapper<MasterEnums> {
         return "ID_TYPE_OPTIONS_POPULATOR";
       case MasterEnums.deliveryComments:
         return "DELIVERY_COMMENT_OPTIONS_POPULATOR";
+      case MasterEnums.vaccinationData:
+        return "vaccination-data";
       case MasterEnums.backendInterface:
         return "BACKEND_INTERFACE";
       case MasterEnums.callSupport:
