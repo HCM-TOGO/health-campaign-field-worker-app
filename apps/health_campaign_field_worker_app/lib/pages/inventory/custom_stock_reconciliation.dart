@@ -133,12 +133,22 @@ class CustomStockReconciliationPageState
                                                         .value ==
                                                     null) ||
                                                 (int.tryParse(form
-                                                            .control(
-                                                                _manualCountKey)
-                                                            .value ??
-                                                        0) !=
-                                                    stockState.stockInHand
-                                                        .toInt())
+                                                                .control(
+                                                                    _manualCountKey)
+                                                                .value ??
+                                                            0) !=
+                                                        stockState.stockInHand
+                                                            .toInt() &&
+                                                    (form
+                                                                .control(
+                                                                    _reconciliationCommentsKey)
+                                                                .value ==
+                                                            null ||
+                                                        form
+                                                                .control(
+                                                                    _reconciliationCommentsKey)
+                                                                .value ==
+                                                            ''))
                                             ? () {
                                                 if (controller1.text.isEmpty) {
                                                   Toast.showToast(context,
