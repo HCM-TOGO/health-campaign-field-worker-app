@@ -134,7 +134,7 @@ class _CustomReferralReasonChecklistPageState
                                       .code!
                                       .split('.')
                                       .length ==
-                                  3) {
+                                  1) {
                                 parentIndexes.add(i);
                               }
                             }

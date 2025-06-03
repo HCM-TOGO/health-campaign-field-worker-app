@@ -229,16 +229,6 @@ class CustomIndividualDetailsPageState
                                       .setErrors({'': true});
                                 });
                               }
-                              if (widget.isHeadOfHousehold &&
-                                  form.control(_idTypeKey).value == null) {
-                                form.control(_idTypeKey).setErrors({'': true});
-                              }
-                              if (widget.isHeadOfHousehold &&
-                                  form.control(_idNumberKey).value == null) {
-                                form
-                                    .control(_idNumberKey)
-                                    .setErrors({'': true});
-                              }
                               final userId = RegistrationDeliverySingleton()
                                   .loggedInUserUuid;
                               final projectId =
@@ -606,20 +596,20 @@ class CustomIndividualDetailsPageState
                                             name: localizations.translate(e),
                                             code: e,
                                           )),
-                                  DropdownItem(
-                                    name: localizations.translate(
-                                      i18_local.individualDetails
-                                          .idTypePassportLabel,
-                                    ),
-                                    code: 'Passport',
-                                  ),
-                                  DropdownItem(
-                                    name: localizations.translate(
-                                      i18_local
-                                          .individualDetails.idTypeCniLabel,
-                                    ),
-                                    code: 'CNI',
-                                  ),
+                                  // DropdownItem(
+                                  //   name: localizations.translate(
+                                  //     i18_local.individualDetails
+                                  //         .idTypePassportLabel,
+                                  //   ),
+                                  //   code: 'Passport',
+                                  // ),
+                                  // DropdownItem(
+                                  //   name: localizations.translate(
+                                  //     i18_local
+                                  //         .individualDetails.idTypeCniLabel,
+                                  //   ),
+                                  //   code: 'CNI',
+                                  // ),
                                 ],
                                 onSelect: (value) {
                                   form.control(_idTypeKey).value = value.code;

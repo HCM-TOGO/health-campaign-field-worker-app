@@ -987,8 +987,6 @@ class _CustomRecordReferralDetailsPageState
                                           }),
                                     ]),
                                 StatefulBuilder(builder: (context, set) {
-                                  print(
-                                      "Current referral reason: ${ReferralReconSingleton().referralReasons}");
                                   form.control(_referralReason).value =
                                       recordState.mapOrNull(
                                     create: (value) => value.viewOnly
