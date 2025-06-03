@@ -266,6 +266,7 @@ class CustomMemberCard extends StatelessWidget {
 
               final clientReferenceId = IdGen.i.identifier;
               List<String?> ineligibilityReasons = [];
+              ineligibilityReasons.add("CHILD_AGE_LESS_THAN_3_MONTHS");
               context.read<DeliverInterventionBloc>().add(
                     DeliverInterventionSubmitEvent(
                       task: TaskModel(

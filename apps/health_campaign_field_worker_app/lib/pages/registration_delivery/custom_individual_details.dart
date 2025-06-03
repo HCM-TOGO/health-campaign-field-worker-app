@@ -596,20 +596,6 @@ class CustomIndividualDetailsPageState
                                             name: localizations.translate(e),
                                             code: e,
                                           )),
-                                  // DropdownItem(
-                                  //   name: localizations.translate(
-                                  //     i18_local.individualDetails
-                                  //         .idTypePassportLabel,
-                                  //   ),
-                                  //   code: 'Passport',
-                                  // ),
-                                  // DropdownItem(
-                                  //   name: localizations.translate(
-                                  //     i18_local
-                                  //         .individualDetails.idTypeCniLabel,
-                                  //   ),
-                                  //   code: 'CNI',
-                                  // ),
                                 ],
                                 onSelect: (value) {
                                   form.control(_idTypeKey).value = value.code;
@@ -966,7 +952,7 @@ class CustomIndividualDetailsPageState
         clientAuditDetails: individual.clientAuditDetails,
         auditDetails: individual.auditDetails,
       ));
-    }
+    } 
 
     String? individualName = form.control(_individualNameKey).value as String?;
     individual = individual.copyWith(
@@ -987,10 +973,11 @@ class CustomIndividualDetailsPageState
                   identifierType: IdentifierTypes.uniqueBeneficiaryID.toValue(),
                 ),
               ],
-        additionalFields: IndividualAdditionalFields(version: 1, fields: [
-          AdditionalField(form.control(_idTypeKey).value ?? '',
-              form.control(_idNumberKey).value ?? '')
-        ]));
+        // additionalFields: IndividualAdditionalFields(version: 1, fields: [
+        //   AdditionalField(form.control(_idTypeKey).value ?? '',
+        //       form.control(_idNumberKey).value ?? '')
+        // ])
+        );
 
     return individual;
   }
