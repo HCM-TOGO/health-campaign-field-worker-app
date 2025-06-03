@@ -1281,11 +1281,14 @@ class CustomStockDetailsPageState
                                     formControlName: _deliveryTeamKey,
                                     builder: (field) {
                                       return InputField(
-                                        type: InputType.text,
+                                        type: InputType.search,
                                         label: localizations.translate(
                                           i18.stockReconciliationDetails
                                               .teamCodeLabel,
                                         ),
+                                        initialValue: form
+                                            .control(_deliveryTeamKey)
+                                            .value,
                                         isRequired: deliveryTeamSelected,
                                         suffixIcon: Icons.qr_code_2,
                                         onSuffixTap: (value) {
@@ -1529,7 +1532,7 @@ class CustomStockDetailsPageState
                                             .numberWithOptions(
                                           decimal: true,
                                         ),
-                                        type: InputType.numeric,
+                                        type: InputType.text,
                                         label: localizations.translate(
                                           i18.stockDetails
                                               .quantityOfProductIndicatedOnWaybillLabel,
@@ -1552,7 +1555,7 @@ class CustomStockDetailsPageState
                                             .numberWithOptions(
                                           decimal: true,
                                         ),
-                                        type: InputType.numeric,
+                                        type: InputType.text,
                                         label: localizations.translate(
                                           i18_local
                                               .stockDetails.batchNumberLabel,
