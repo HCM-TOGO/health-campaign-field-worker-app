@@ -6,7 +6,9 @@ import 'package:digit_ui_components/theme/digit_extended_theme.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:registration_delivery/blocs/app_localization.dart';
+import 'package:registration_delivery/blocs/delivery_intervention/deliver_intervention.dart';
 import 'package:registration_delivery/blocs/household_overview/household_overview.dart';
+import 'package:registration_delivery/blocs/search_households/search_households.dart';
 import 'package:registration_delivery/models/entities/project_beneficiary.dart';
 import 'package:registration_delivery/models/entities/side_effect.dart';
 import 'package:registration_delivery/models/entities/status.dart';
@@ -19,12 +21,14 @@ import '../../models/entities/identifier_types.dart';
 import 'package:registration_delivery/utils/utils.dart';
 import '../../router/app_router.dart';
 import '../../utils/app_enums.dart';
+import '../../utils/environment_config.dart';
 import '../../utils/registration_delivery/utils_smc.dart';
 import '../../utils/utils.dart';
 import '../action_card/action_card.dart';
 
 import '../../utils/i18_key_constants.dart' as i18_local;
-
+import '../../../models/entities/assessment_checklist/status.dart'
+    as status_local;
 import '../../models/entities/additional_fields_type.dart'
     as additional_fields_local;
 
@@ -233,6 +237,109 @@ class CustomMemberCard extends StatelessWidget {
     final redosePendingStatus = smcAssessmentPendingStatus
         ? true
         : redosePending(smcTasks, context.selectedCycle);
+
+    if (!isHead &&
+        isNotEligibleSMC &&
+        !isSMCDelivered &&
+        !isBeneficiaryReferredSMC &&
+        !isBeneficiaryInEligibleSMC &&
+        smcTasks?.isEmpty == true) {
+      return Column(
+        children: [
+          DigitElevatedButton(
+            child: Center(
+              child: Text(
+                localizations.translate(
+                  i18_local
+                      .householdOverView.householdOverViewZeroDoseActionText,
+                ),
+                style: textTheme.headingM.copyWith(color: Colors.white),
+              ),
+            ),
+            onPressed: () async {
+              final bloc = context.read<HouseholdOverviewBloc>();
+              bloc.add(
+                HouseholdOverviewEvent.selectedIndividual(
+                  individualModel: individual,
+                ),
+              );
+
+              final clientReferenceId = IdGen.i.identifier;
+              List<String?> ineligibilityReasons = [];
+              context.read<DeliverInterventionBloc>().add(
+                    DeliverInterventionSubmitEvent(
+                      task: TaskModel(
+                        projectBeneficiaryClientReferenceId:
+                            projectBeneficiaryClientReferenceId,
+                        clientReferenceId: clientReferenceId,
+                        tenantId: envConfig.variables.tenantId,
+                        rowVersion: 1,
+                        auditDetails: AuditDetails(
+                          createdBy: context.loggedInUserUuid,
+                          createdTime: context.millisecondsSinceEpoch(),
+                        ),
+                        projectId: context.projectId,
+                        status:
+                            status_local.Status.beneficiaryInEligible.toValue(),
+                        clientAuditDetails: ClientAuditDetails(
+                          createdBy: context.loggedInUserUuid,
+                          createdTime: context.millisecondsSinceEpoch(),
+                          lastModifiedBy: context.loggedInUserUuid,
+                          lastModifiedTime: context.millisecondsSinceEpoch(),
+                        ),
+                        additionalFields: TaskAdditionalFields(
+                          version: 1,
+                          fields: [
+                            // AdditionalField(
+                            //   'taskStatus',
+                            //   status_local.Status
+                            //       .beneficiaryInEligible
+                            //       .toValue(),
+                            // ),
+                            AdditionalField(
+                              'ineligibleReasons',
+                              ineligibilityReasons.join(","),
+                            ),
+                            AdditionalField(
+                              additional_fields_local
+                                  .AdditionalFieldsType.deliveryType
+                                  .toValue(),
+                              EligibilityAssessmentStatus.smcDone.name,
+                            ),
+                          ],
+                        ),
+                        address: individual.address?.first.copyWith(
+                          relatedClientReferenceId: clientReferenceId,
+                          id: null,
+                        ),
+                      ),
+                      isEditing: false,
+                      boundaryModel: context.boundary,
+                      navigateToSummary: false,
+                      householdMemberWrapper: context
+                          .read<HouseholdOverviewBloc>()
+                          .state
+                          .householdMemberWrapper,
+                    ),
+                  );
+              final searchBloc = context.read<SearchHouseholdsBloc>();
+              searchBloc.add(
+                const SearchHouseholdsClearEvent(),
+              );
+              if ((smcTasks ?? []).isEmpty) {
+                context.router.push(
+                  ZeroDoseCheckRoute(
+                    eligibilityAssessmentType: EligibilityAssessmentType.smc,
+                    isAdministration: false,
+                    isChecklistAssessmentDone: false,
+                  ),
+                );
+              }
+            },
+          ),
+        ],
+      );
+    }
     if ((isNotEligibleSMC || isBeneficiaryIneligible) && !doseStatus)
       return const Offstage();
     if (isNotEligibleSMC || (!redosePendingStatus)) {
