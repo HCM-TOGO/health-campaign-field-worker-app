@@ -33,8 +33,8 @@
         android:allowBackup="false"
         android:fullBackupContent="false"
         android:fullBackupOnly="false"
-        android:icon="@mipmap/kebbi_logo"
-        android:label="HCM">
+        android:icon="@mipmap/ic_launcher"
+        android:label="Lafia">
         <service
             android:name=".LocationService"
             android:enabled="true"
