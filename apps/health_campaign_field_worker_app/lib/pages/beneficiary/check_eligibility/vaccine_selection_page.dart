@@ -1,6 +1,7 @@
 // import 'dart:math';
 
 import 'dart:ffi';
+import 'dart:math';
 
 import 'package:digit_components/widgets/digit_checkbox_tile.dart';
 import 'package:digit_components/widgets/digit_dialog.dart';
@@ -29,6 +30,7 @@ import '../../../widgets/showcase/showcase_wrappers.dart';
 import 'package:registration_delivery/utils/i18_key_constants.dart' as i18;
 import '../../../utils/i18_key_constants.dart' as i18_local;
 import 'package:digit_components/widgets/atoms/checkbox_icon.dart';
+import 'package:survey_form/utils/i18_key_constants.dart' as i18_survey_form;
 
 @RoutePage()
 class VaccineSelectionPage extends LocalizedStatefulWidget {
@@ -61,8 +63,8 @@ class _VaccineSelectionPageState extends LocalizedState<VaccineSelectionPage> {
   @override
   void initState() {
     context.read<LocationBloc>().add(const LocationEvent.load());
-    context.read<ServiceBloc>().add(const ServiceSurveyFormEvent(
-          value: 'xvxvcvxv',
+    context.read<ServiceBloc>().add(ServiceSurveyFormEvent(
+          value: Random().nextInt(100).toString(),
           submitTriggered: true,
         ));
     super.initState();
@@ -76,6 +78,12 @@ class _VaccineSelectionPageState extends LocalizedState<VaccineSelectionPage> {
         .selectedIndividual
         ?.dateOfBirth;
     final theme = Theme.of(context);
+
+    // final relatedClientRefId =  context
+    //     .read<HouseholdOverviewBloc>()
+    //     .state
+    //     .selectedIndividual
+    //     ?.clientReferenceId;
     // final years = DigitDateUtils.getYears
     final ageInDays = calculateAgeInDaysFromDob(dob!);
 
@@ -116,11 +124,11 @@ class _VaccineSelectionPageState extends LocalizedState<VaccineSelectionPage> {
                             .toList()
                             .firstOrNull;
                         initialAttributes = selectedServiceDefinition
-                            ?.attributes!
-                            .where((e) =>
-                                e.code != null &&
-                                e.dataType == 'MultiValueList')
-                            .toList();
+                            ?.attributes!;
+                        //     .where((e) =>
+                        //         e.code != null &&
+                        //         e.dataType == 'MultiValueList')
+                        //     .toList();
                         if (!isControllersInitialized) {
                           initialAttributes?.forEach((e) {
                             controller.add(TextEditingController());
@@ -198,24 +206,43 @@ class _VaccineSelectionPageState extends LocalizedState<VaccineSelectionPage> {
                                               clientReferenceId:
                                                   IdGen.i.identifier,
                                               referenceId: referenceId,
-                                              value: attribute?[i].dataType !=
-                                                      'SingleValueList'
+                                             value: attribute?[i].dataType ==
+                                                      'MultiValueList'
                                                   ? controller[i]
                                                           .text
                                                           .toString()
-                                                          .trim()
                                                           .isNotEmpty
                                                       ? controller[i]
                                                           .text
                                                           .toString()
-                                                      : ''
-                                                  : visibleChecklistIndexes
-                                                          .contains(i)
+                                                      : i18_survey_form
+                                                          .surveyForm
+                                                          .notSelectedKey
+                                                  : attribute?[i].dataType !=
+                                                          'SingleValueList'
                                                       ? controller[i]
-                                                          .text
-                                                          .toString()
-                                                      : i18.checklist
-                                                          .notSelectedKey,
+                                                              .text
+                                                              .toString()
+                                                              .trim()
+                                                              .isNotEmpty
+                                                          ? controller[i]
+                                                              .text
+                                                              .toString()
+                                                          : (attribute?[i]
+                                                                      .dataType !=
+                                                                  'Number'
+                                                              ? i18_survey_form
+                                                                  .surveyForm
+                                                                  .notSelectedKey
+                                                              : '0')
+                                                      : visibleChecklistIndexes
+                                                              .contains(i)
+                                                          ? controller[i]
+                                                              .text
+                                                              .toString()
+                                                          : i18_survey_form
+                                                              .surveyForm
+                                                              .notSelectedKey,
                                               rowVersion: 1,
                                               tenantId: attribute?[i].tenantId,
                                               additionalFields:
@@ -392,25 +419,6 @@ class _VaccineSelectionPageState extends LocalizedState<VaccineSelectionPage> {
                                                     controller:
                                                         controller[index],
                                                     onChanged: (code, value) {
-                                                      // var val =
-                                                      //     controller[index]
-                                                      //         .text
-                                                      //         .split('.');
-                                                      // if (value) {
-                                                      //   if (!val.contains(code))
-                                                      //     val.add(code);
-                                                      // } else {
-                                                      //   val.remove(code);
-                                                      // }
-                                                      // controller[index].value =
-                                                      //     TextEditingController
-                                                      //         .fromValue(
-                                                      //   TextEditingValue(
-                                                      //       text: val
-                                                      //           .where((v) => v
-                                                      //               .isNotEmpty)
-                                                      //           .join('.')),
-                                                      // ).value;
                                                       setState(() {
                                                         if (value) {
                                                           selectedVaccines[
