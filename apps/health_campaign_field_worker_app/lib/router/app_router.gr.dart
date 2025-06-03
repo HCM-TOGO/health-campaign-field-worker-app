@@ -722,13 +722,14 @@ abstract class _$AppRouter extends RootStackRouter {
       );
     },
     VaccineSelectionRoute.name: (routeData) {
-      final args = routeData.argsAs<VaccineSelectionRouteArgs>(
-          orElse: () => const VaccineSelectionRouteArgs());
+      final args = routeData.argsAs<VaccineSelectionRouteArgs>();
       return AutoRoutePage<dynamic>(
         routeData: routeData,
         child: VaccineSelectionPage(
           key: args.key,
           appLocalizations: args.appLocalizations,
+          isAdministration: args.isAdministration,
+          eligibilityAssessmentType: args.eligibilityAssessmentType,
         ),
       );
     },
@@ -742,6 +743,7 @@ abstract class _$AppRouter extends RootStackRouter {
           eligibilityAssessmentType: args.eligibilityAssessmentType,
           isAdministration: args.isAdministration,
           isEditing: args.isEditing,
+          isChecklistAssessmentDone: args.isChecklistAssessmentDone,
         ),
       );
     },
@@ -3342,12 +3344,16 @@ class VaccineSelectionRoute extends PageRouteInfo<VaccineSelectionRouteArgs> {
   VaccineSelectionRoute({
     Key? key,
     AppLocalizations? appLocalizations,
+    required bool isAdministration,
+    required EligibilityAssessmentType eligibilityAssessmentType,
     List<PageRouteInfo>? children,
   }) : super(
           VaccineSelectionRoute.name,
           args: VaccineSelectionRouteArgs(
             key: key,
             appLocalizations: appLocalizations,
+            isAdministration: isAdministration,
+            eligibilityAssessmentType: eligibilityAssessmentType,
           ),
           initialChildren: children,
         );
@@ -3362,15 +3368,21 @@ class VaccineSelectionRouteArgs {
   const VaccineSelectionRouteArgs({
     this.key,
     this.appLocalizations,
+    required this.isAdministration,
+    required this.eligibilityAssessmentType,
   });
 
   final Key? key;
 
   final AppLocalizations? appLocalizations;
 
+  final bool isAdministration;
+
+  final EligibilityAssessmentType eligibilityAssessmentType;
+
   @override
   String toString() {
-    return 'VaccineSelectionRouteArgs{key: $key, appLocalizations: $appLocalizations}';
+    return 'VaccineSelectionRouteArgs{key: $key, appLocalizations: $appLocalizations, isAdministration: $isAdministration, eligibilityAssessmentType: $eligibilityAssessmentType}';
   }
 }
 
@@ -3383,6 +3395,7 @@ class ZeroDoseCheckRoute extends PageRouteInfo<ZeroDoseCheckRouteArgs> {
     required EligibilityAssessmentType eligibilityAssessmentType,
     required bool isAdministration,
     bool isEditing = false,
+    bool isChecklistAssessmentDone = true,
     List<PageRouteInfo>? children,
   }) : super(
           ZeroDoseCheckRoute.name,
@@ -3392,6 +3405,7 @@ class ZeroDoseCheckRoute extends PageRouteInfo<ZeroDoseCheckRouteArgs> {
             eligibilityAssessmentType: eligibilityAssessmentType,
             isAdministration: isAdministration,
             isEditing: isEditing,
+            isChecklistAssessmentDone: isChecklistAssessmentDone,
           ),
           initialChildren: children,
         );
@@ -3409,6 +3423,7 @@ class ZeroDoseCheckRouteArgs {
     required this.eligibilityAssessmentType,
     required this.isAdministration,
     this.isEditing = false,
+    this.isChecklistAssessmentDone = true,
   });
 
   final Key? key;
@@ -3421,8 +3436,10 @@ class ZeroDoseCheckRouteArgs {
 
   final bool isEditing;
 
+  final bool isChecklistAssessmentDone;
+
   @override
   String toString() {
-    return 'ZeroDoseCheckRouteArgs{key: $key, appLocalizations: $appLocalizations, eligibilityAssessmentType: $eligibilityAssessmentType, isAdministration: $isAdministration, isEditing: $isEditing}';
+    return 'ZeroDoseCheckRouteArgs{key: $key, appLocalizations: $appLocalizations, eligibilityAssessmentType: $eligibilityAssessmentType, isAdministration: $isAdministration, isEditing: $isEditing, isChecklistAssessmentDone: $isChecklistAssessmentDone}';
   }
 }

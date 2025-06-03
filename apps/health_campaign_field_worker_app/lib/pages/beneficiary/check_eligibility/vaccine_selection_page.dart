@@ -32,7 +32,13 @@ import 'package:digit_components/widgets/atoms/checkbox_icon.dart';
 
 @RoutePage()
 class VaccineSelectionPage extends LocalizedStatefulWidget {
-  const VaccineSelectionPage({super.key, super.appLocalizations});
+  final bool isAdministration;
+  final EligibilityAssessmentType eligibilityAssessmentType;
+  const VaccineSelectionPage(
+      {super.key,
+      super.appLocalizations,
+      required this.isAdministration,
+      required this.eligibilityAssessmentType});
 
   @override
   State<VaccineSelectionPage> createState() => _VaccineSelectionPageState();
@@ -305,10 +311,21 @@ class _VaccineSelectionPageState extends LocalizedState<VaccineSelectionPage> {
                                             submitTriggered: true,
                                           ),
                                         );
-                                    context.router.push(
-                                        CustomDoseAdministeredRoute(
-                                            eligibilityAssessmentType:
-                                                EligibilityAssessmentType.smc));
+                                    if (widget.isAdministration == true) {
+                                      router.push(
+                                        CustomSplashAcknowledgementRoute(
+                                            enableBackToSearch: false,
+                                            eligibilityAssessmentType: widget
+                                                .eligibilityAssessmentType),
+                                      );
+                                    } else {
+                                      router.push(
+                                        CustomHouseholdAcknowledgementRoute(
+                                            enableViewHousehold: true,
+                                            eligibilityAssessmentType: widget
+                                                .eligibilityAssessmentType),
+                                      );
+                                    }
                                   }
                                 },
                                 child: Text(
@@ -332,8 +349,8 @@ class _VaccineSelectionPageState extends LocalizedState<VaccineSelectionPage> {
                                       children: [
                                         Text(
                                           localizations.translate(
-                                            i18_local
-                                                .deliverIntervention.vaccinsSelectionLabel,
+                                            i18_local.deliverIntervention
+                                                .vaccinsSelectionLabel,
                                           ),
                                           style: theme.textTheme.headlineLarge,
                                         ),

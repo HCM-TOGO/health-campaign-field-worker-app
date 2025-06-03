@@ -151,8 +151,7 @@ class Common {
   String get ageInMonths => 'AGE_IN_MONTHS_LABEL';
   String get locationCapturing => 'CAPTURING_LOCATION';
   String get profileUpdateSuccess => 'PROFILE_UPDATE_SUCCESS';
-  String get pleaseEnterRequiredDetails =>
-      'PLEASE_ENTER_REQUIRED_DETAILS';
+  String get pleaseEnterRequiredDetails => 'PLEASE_ENTER_REQUIRED_DETAILS';
 }
 
 class HouseholdOverView {
@@ -166,6 +165,9 @@ class HouseholdOverView {
 
   String get householdOverViewSMCAssessmentActionText =>
       'HOUSEHOLD_OVER_VIEW_SMC_ASSESSMENT_ACTION_TEXT';
+
+  String get householdOverViewZeroDoseActionText =>
+      'HOUSEHOLD_OVER_VIEW_ZERO_DOSE_ACTION_TEXT';
 
   String get householdOverViewVASAssessmentActionText =>
       'HOUSEHOLD_OVER_VIEW_VAS_ASSESSMENT_ACTION_TEXT';
