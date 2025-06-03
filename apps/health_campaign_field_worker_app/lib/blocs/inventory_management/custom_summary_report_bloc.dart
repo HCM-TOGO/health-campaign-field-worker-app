@@ -7,6 +7,7 @@ import 'package:registration_delivery/models/entities/task.dart';
 import 'package:registration_delivery/models/entities/task_resource.dart';
 import 'package:registration_delivery/utils/typedefs.dart';
 
+import '../../models/entities/assessment_checklist/status.dart';
 import '../../utils/constants.dart';
 import '../../utils/date_utils.dart';
 
@@ -47,21 +48,24 @@ class SummaryReportBloc extends Bloc<SummaryReportEvent, SummaryReportState> {
     productVariantList = await (productVariantDataRepository)
         .search(ProductVariantSearchModel());
     for (var element in taskList) {
-      if (element.status == 'ADMINISTRATION_SUCCESS') {
+      final status = StatusMapper.fromValue(element.status);
+
+      if (status == Status.administeredSuccess) {
         administeredChildrenList.add(element);
-      } else {
+      } else if (status == Status.beneficiaryReferred ||
+          status == Status.beneficiaryInEligible) {
         refusalCasesList.add(element);
       }
     }
 
-    for (var task in taskList) {
+    for (var task in administeredChildrenList) {
       for (var resource in task.resources!) {
         for (var productVariant in productVariantList) {
           if (productVariant.id == resource.productVariantId &&
-              productVariant.sku == "SPAQ 1") {
+              productVariant.sku == Constants.spaq1) {
             spaq1List.add(resource);
           } else if (productVariant.id == resource.productVariantId &&
-              productVariant.sku == "SPAQ 2") {
+              productVariant.sku == Constants.spaq2) {
             spaq2List.add(resource);
           }
         }
