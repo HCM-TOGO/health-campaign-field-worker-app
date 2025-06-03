@@ -106,6 +106,7 @@ class CustomStockDetailsPageState
       _partialBlistersKey: FormControl<int>(),
       _wastedBlistersKey: FormControl<int>(),
       _waybillQuantityKey: FormControl<String>(),
+      _batchNumberKey: FormControl<String>(),
       _vehicleNumberKey: FormControl<String>(),
       _typeOfTransportKey: FormControl<String>(),
       _commentsKey: FormControl<String>(),
@@ -438,6 +439,10 @@ class CustomStockDetailsPageState
                                           .control(_waybillQuantityKey)
                                           .value as String?;
 
+                                      final batchNumber = form
+                                          .control(_waybillQuantityKey)
+                                          .value as String?;
+
                                       final vehicleNumber = form
                                           .control(_vehicleNumberKey)
                                           .value as String?;
@@ -595,6 +600,7 @@ class CustomStockDetailsPageState
                                         ),
                                         additionalFields: [
                                                   waybillQuantity,
+                                                  batchNumber,
                                                   vehicleNumber,
                                                   comments,
                                                 ].any((element) =>
@@ -618,6 +624,14 @@ class CustomStockDetailsPageState
                                                     AdditionalField(
                                                       'waybill_quantity',
                                                       waybillQuantity,
+                                                    ),
+                                                  if (batchNumber != null &&
+                                                      batchNumber
+                                                          .trim()
+                                                          .isNotEmpty)
+                                                    AdditionalField(
+                                                      'batch_number',
+                                                      batchNumber,
                                                     ),
                                                   if (vehicleNumber != null &&
                                                       vehicleNumber
@@ -1519,6 +1533,28 @@ class CustomStockDetailsPageState
                                         label: localizations.translate(
                                           i18.stockDetails
                                               .quantityOfProductIndicatedOnWaybillLabel,
+                                        ),
+                                        onChange: (val) {
+                                          if (val == '') {
+                                            field.control.value = '0';
+                                          } else {
+                                            field.control.value = val;
+                                          }
+                                        },
+                                      );
+                                    }),
+                              if (isWareHouseMgr)
+                                ReactiveWrapperField(
+                                    formControlName: _batchNumberKey,
+                                    builder: (field) {
+                                      return InputField(
+                                        keyboardType: const TextInputType
+                                            .numberWithOptions(
+                                          decimal: true,
+                                        ),
+                                        type: InputType.numeric,
+                                        label: localizations.translate(
+                                          i18.stockDetails.batchNumberLabel,
                                         ),
                                         onChange: (val) {
                                           if (val == '') {
