@@ -243,7 +243,7 @@ class CustomMemberCard extends StatelessWidget {
         !isSMCDelivered &&
         !isBeneficiaryReferredSMC &&
         !isBeneficiaryInEligibleSMC &&
-        smcTasks?.isEmpty == true) {
+        (smcTasks == null || smcTasks.isEmpty == true)) {
       return Column(
         children: [
           DigitElevatedButton(

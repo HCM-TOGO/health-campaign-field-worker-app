@@ -1554,7 +1554,8 @@ class CustomStockDetailsPageState
                                         ),
                                         type: InputType.numeric,
                                         label: localizations.translate(
-                                          i18.stockDetails.batchNumberLabel,
+                                          i18_local
+                                              .stockDetails.batchNumberLabel,
                                         ),
                                         onChange: (val) {
                                           if (val == '') {
