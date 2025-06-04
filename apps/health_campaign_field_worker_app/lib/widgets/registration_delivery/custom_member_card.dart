@@ -178,9 +178,10 @@ class CustomMemberCard extends StatelessWidget {
                 iconSize: 20,
                 iconText: localizations.translate(
                     (isNotEligibleSMC || isBeneficiaryIneligible)
-                        ? i18.householdOverView
-                            .householdOverViewNotEligibleIconLabel
-                        : ""),
+                        ? i18_local.householdOverView
+                            .householdOverViewBeneficiaryInEligibleSMCLabel
+                        : i18.householdOverView
+                            .householdOverViewNotEligibleIconLabel),
                 iconTextColor: theme.colorScheme.error,
                 iconColor: theme.colorScheme.error,
               ),
