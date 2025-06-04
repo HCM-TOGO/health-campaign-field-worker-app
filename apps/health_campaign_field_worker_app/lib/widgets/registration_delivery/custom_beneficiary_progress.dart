@@ -63,7 +63,7 @@ class _CustomBeneficiaryProgressBarState
 
     taskRepository.listenToChanges(
       query: TaskSearchModel(
-        status: Status.administeredSuccess.toValue(),
+        // status: Status.administeredSuccess.toValue(),
         projectId: projectId,
         createdBy: loggedInUserUuid,
         plannedEndDate: lte.millisecondsSinceEpoch,
@@ -87,7 +87,7 @@ class _CustomBeneficiaryProgressBarState
             999,
           );
           TaskSearchModel taskSearchQuery = TaskSearchModel(
-            status: Status.administeredSuccess.toValue(),
+            // status: Status.administeredSuccess.toValue(),
             createdBy: loggedInUserUuid,
             plannedEndDate: lte.millisecondsSinceEpoch,
             plannedStartDate: gte.millisecondsSinceEpoch,
@@ -95,7 +95,14 @@ class _CustomBeneficiaryProgressBarState
           );
           List<TaskModel> results =
               await taskRepository.progressBarSearch(taskSearchQuery);
-          final groupedEntries = results.groupListsBy(
+          final filteredResult = results.where((element) {
+            // Exclude if any field matches the condition
+            final fields = element.additionalFields?.fields ?? [];
+            return !fields.any((f) =>
+                f.key == 'ineligibleineligibleReasons' &&
+                f.value == 'CHILD_AGE_LESS_THAN_3_MONTHS');
+          }).toList();
+          final groupedEntries = filteredResult.groupListsBy(
             (element) => element.projectBeneficiaryClientReferenceId,
           );
           if (mounted) {

@@ -165,8 +165,20 @@ class _EligibilityChecklistViewPage
                                 return;
                               }
                               final itemsAttributes = initialAttributes;
+                              final parentIndexes = <int>[];
+                              for (int i = 0;
+                                  i < initialAttributes!.length;
+                                  i++) {
+                                if (initialAttributes![i]
+                                        .code!
+                                        .split('.')
+                                        .length ==
+                                    1) {
+                                  parentIndexes.add(i);
+                                }
+                              }
 
-                              for (int i = 0; i < controller.length; i++) {
+                              for (int i in parentIndexes) {
                                 if (itemsAttributes?[i].required == true &&
                                     ((itemsAttributes?[i].dataType ==
                                                 'SingleValueList' &&
@@ -176,13 +188,12 @@ class _EligibilityChecklistViewPage
                                         (itemsAttributes?[i].dataType !=
                                                 'SingleValueList' &&
                                             (controller[i].text == '' &&
-                                                !(context
-                                                        .isHealthFacilitySupervisor &&
-                                                    widget.referralClientRefId !=
-                                                        null))))) {
+                                                !(widget.referralClientRefId !=
+                                                    null))))) {
                                   return;
                                 }
                               }
+
                               for (int i = 0; i < controller.length; i++) {
                                 initialAttributes;
                                 var attributeCode =
@@ -835,10 +846,11 @@ class _EligibilityChecklistViewPage
                             .toList()
                         : [],
                     itemBuilder: (item) => RadioButtonBuilder(
-                      item.trim().toUpperCase() == 'TEST_UNAVAILABLE' ?
-                        localizations.translate("${selectedServiceDefinition?.code}.${item.trim().toUpperCase()}") :
-                        localizations.translate('CORE_COMMON_${item.trim().toUpperCase()}'),
-
+                      item.trim().toUpperCase() == 'TEST_UNAVAILABLE'
+                          ? localizations.translate(
+                              "${selectedServiceDefinition?.code}.${item.trim().toUpperCase()}")
+                          : localizations.translate(
+                              'CORE_COMMON_${item.trim().toUpperCase()}'),
                     ),
                   );
                 },
@@ -1103,12 +1115,12 @@ class _EligibilityChecklistViewPage
     }
     if (isReferral) {
       for (var entry in referralKeysVsCode.entries) {
-        if( responses.containsKey(entry.key) &&
+        if (responses.containsKey(entry.key) &&
             responses[entry.key]!.isNotEmpty) {
-          if ((entry.key ==q1Key && responses[q1Key] == yes) ||
-              (entry.key ==q3Key && responses[q3Key] == negative) ||
-              (entry.key ==q3Key && responses[q3Key] == test_unavailable) ||
-              (entry.key ==q4Key && responses[q4Key] == no)) {
+          if ((entry.key == q1Key && responses[q1Key] == yes) ||
+              (entry.key == q3Key && responses[q3Key] == negative) ||
+              (entry.key == q3Key && responses[q3Key] == test_unavailable) ||
+              (entry.key == q4Key && responses[q4Key] == no)) {
             referralReasons.add(entry.value);
           }
         }
