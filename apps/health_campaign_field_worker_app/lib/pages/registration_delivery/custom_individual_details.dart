@@ -83,7 +83,7 @@ class CustomIndividualDetailsPageState
   bool isEditIndividual = false;
   bool isAddIndividual = false;
   bool isBeneficaryRegistration = false;
-  String? yesNoValue;
+  String? yesNoValue = 'no';
   bool get isRelocated => yesNoValue == 'yes';
 
   final beneficiaryType = RegistrationDeliverySingleton().beneficiaryType!;

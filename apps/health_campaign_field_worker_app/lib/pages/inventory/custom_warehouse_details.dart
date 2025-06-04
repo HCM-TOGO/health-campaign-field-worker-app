@@ -311,7 +311,7 @@ class CustomWarehouseDetailsPageState
                                               i18.common.coreCommonCancel,
                                             ),
                                             initialValue: DateFormat(
-                                                    'd MMMM , yyyy')
+                                                    'd MMMM yyyy')
                                                 .format(field.control.value),
                                             readOnly: true,
                                           );
@@ -399,6 +399,7 @@ class CustomWarehouseDetailsPageState
                                           formControlName: _teamCodeKey,
                                           builder: (field) {
                                             return InputField(
+                                              keyboardType: TextInputType.none,
                                               type: InputType.search,
                                               label: localizations.translate(
                                                 i18.stockReconciliationDetails
