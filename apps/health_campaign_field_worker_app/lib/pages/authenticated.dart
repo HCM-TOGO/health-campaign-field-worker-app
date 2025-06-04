@@ -346,9 +346,13 @@ class AuthenticatedPageWrapper extends StatelessWidget {
             ],
             logOutDigitButtonLabel: AppLocalizations.of(context)
                 .translate(i18.common.coreCommonLogout),
-            onLogOut: () {
-              context.read<BoundaryBloc>().add(const BoundaryResetEvent());
-              context.read<AuthBloc>().add(const AuthLogoutEvent());
+            onLogOut: () async {
+              final isConnected = await getIsConnected();
+
+              if (isConnected) {
+                context.read<BoundaryBloc>().add(const BoundaryResetEvent());
+                context.read<AuthBloc>().add(const AuthLogoutEvent());
+              }
             },
           ),
         ),
