@@ -47,8 +47,8 @@ class CustomStockDetailsPageState
   static const _productVariantKey = 'productVariant';
   static const _secondaryPartyKey = 'secondaryParty';
   static const _transactionQuantityKey = 'quantity';
-  static const _partialBlistersKey = 'partialBlistersReturned';
-  static const _wastedBlistersKey = 'wastedBlistersReturned';
+  // static const _partialBlistersKey = 'partialBlistersReturned';
+  // static const _wastedBlistersKey = 'wastedBlistersReturned';
   static const _transactionReasonKey = 'transactionReason';
   static const _waybillNumberKey = 'waybillNumber';
   static const _waybillQuantityKey = 'waybillQuantity';
@@ -89,22 +89,10 @@ class CustomStockDetailsPageState
         Validators.min(1),
         Validators.max(10000),
       ]),
-      _partialBlistersKey: FormControl<int>(
-        validators: entryType == StockRecordEntryType.returned
-            ? [Validators.required]
-            : [],
-      ),
-      _wastedBlistersKey: FormControl<int>(
-        validators: entryType == StockRecordEntryType.returned
-            ? [Validators.required]
-            : [],
-      ),
       _transactionReasonKey: FormControl<String>(),
       _waybillNumberKey: FormControl<String>(
         validators: [Validators.minLength(2), Validators.maxLength(200)],
       ),
-      _partialBlistersKey: FormControl<int>(),
-      _wastedBlistersKey: FormControl<int>(),
       _waybillQuantityKey: FormControl<String>(),
       _batchNumberKey: FormControl<String>(),
       _vehicleNumberKey: FormControl<String>(),
@@ -459,17 +447,17 @@ class CustomStockDetailsPageState
                                           )
                                           .value as String?;
 
-                                      final partialBlisters = form
-                                          .control(
-                                            _partialBlistersKey,
-                                          )
-                                          .value;
+                                      // final partialBlisters = form
+                                      //     .control(
+                                      //       _partialBlistersKey,
+                                      //     )
+                                      //     .value;
 
-                                      final wastedBlisters = form
-                                          .control(
-                                            _wastedBlistersKey,
-                                          )
-                                          .value;
+                                      // final wastedBlisters = form
+                                      //     .control(
+                                      //       _wastedBlistersKey,
+                                      //     )
+                                      //     .value;
 
                                       final comments = form
                                           .control(_commentsKey)
@@ -483,15 +471,12 @@ class CustomStockDetailsPageState
                                                   StockRecordEntryType
                                                       .returned &&
                                               isHealthFacilitySupervisor &&
-                                              quantity == 0 &&
-                                              partialBlisters == 0) ||
+                                              quantity == 0) ||
                                           (entryType ==
                                                   StockRecordEntryType
                                                       .dispatch &&
                                               isDistributor &&
-                                              quantity == 0 &&
-                                              partialBlisters == 0 &&
-                                              wastedBlisters == 0)) {
+                                              quantity == 0)) {
                                         DigitToast.show(
                                           context,
                                           options: DigitToastOptions(
@@ -738,17 +723,10 @@ class CustomStockDetailsPageState
                                           totalQuantity = entryType ==
                                                   StockRecordEntryType.dispatch
                                               ? ((quantity != null
-                                                          ? int.parse(
-                                                              quantity
-                                                                  .toString(),
-                                                            )
-                                                          : 0) +
-                                                      (wastedBlisters != null
-                                                          ? int.parse(
-                                                              wastedBlisters
-                                                                  .toString(),
-                                                            )
-                                                          : 0)) *
+                                                      ? int.parse(
+                                                          quantity.toString(),
+                                                        )
+                                                      : 0)) *
                                                   -1
                                               : quantity != null
                                                   ? int.parse(
@@ -1429,84 +1407,84 @@ class CustomStockDetailsPageState
                               if (entryType ==
                                   StockRecordEntryType.returned) ...[
                                 // Wasted blisters field
-                                ReactiveWrapperField(
-                                  formControlName: _wastedBlistersKey,
-                                  validationMessages: {
-                                    "required": (object) =>
-                                        localizations.translate(
-                                          '${i18_local.stockDetails.quantityWastedBlistersReturnedLabel}_ERROR',
-                                        ),
-                                  },
-                                  builder: (field) {
-                                    return LabeledField(
-                                      label: localizations.translate(
-                                        i18_local.stockDetails
-                                            .quantityWastedBlistersReturnedLabel,
-                                      ),
-                                      isRequired: true,
-                                      child: BaseDigitFormInput(
-                                        errorMessage: field.errorText,
-                                        keyboardType: const TextInputType
-                                            .numberWithOptions(
-                                          decimal: true,
-                                        ),
-                                        onChange: (val) {
-                                          field.control.markAsTouched();
-                                          if (int.parse(val) > 10000000000) {
-                                            field.control.value = 10000;
-                                          } else {
-                                            if (val != '') {
-                                              field.control.value =
-                                                  int.parse(val);
-                                            } else {
-                                              field.control.value = null;
-                                            }
-                                          }
-                                        },
-                                      ),
-                                    );
-                                  },
-                                ),
+                                // ReactiveWrapperField(
+                                //   formControlName: _wastedBlistersKey,
+                                //   validationMessages: {
+                                //     "required": (object) =>
+                                //         localizations.translate(
+                                //           '${i18_local.stockDetails.quantityWastedBlistersReturnedLabel}_ERROR',
+                                //         ),
+                                //   },
+                                //   builder: (field) {
+                                //     return LabeledField(
+                                //       label: localizations.translate(
+                                //         i18_local.stockDetails
+                                //             .quantityWastedBlistersReturnedLabel,
+                                //       ),
+                                //       isRequired: true,
+                                //       child: BaseDigitFormInput(
+                                //         errorMessage: field.errorText,
+                                //         keyboardType: const TextInputType
+                                //             .numberWithOptions(
+                                //           decimal: true,
+                                //         ),
+                                //         onChange: (val) {
+                                //           field.control.markAsTouched();
+                                //           if (int.parse(val) > 10000000000) {
+                                //             field.control.value = 10000;
+                                //           } else {
+                                //             if (val != '') {
+                                //               field.control.value =
+                                //                   int.parse(val);
+                                //             } else {
+                                //               field.control.value = null;
+                                //             }
+                                //           }
+                                //         },
+                                //       ),
+                                //     );
+                                //   },
+                                // ),
 
                                 // Partial blisters field
-                                ReactiveWrapperField(
-                                  formControlName: _partialBlistersKey,
-                                  validationMessages: {
-                                    "required": (object) =>
-                                        localizations.translate(
-                                          '${i18_local.stockDetails.quantityPartialBlistersReturnedLabel}_ERROR',
-                                        ),
-                                  },
-                                  builder: (field) {
-                                    return LabeledField(
-                                      label: localizations.translate(
-                                        i18_local.stockDetails
-                                            .quantityPartialBlistersReturnedLabel,
-                                      ),
-                                      isRequired: true,
-                                      child: BaseDigitFormInput(
-                                        errorMessage: field.errorText,
-                                        keyboardType: const TextInputType
-                                            .numberWithOptions(
-                                          decimal: true,
-                                        ),
-                                        onChange: (val) {
-                                          field.control.markAsTouched();
-                                          if (int.parse(val) > 10000000000) {
-                                            field.control.value = 10000;
-                                          } else {
-                                            if (val != '') {
-                                              field.control.value =
-                                                  int.parse(val);
-                                            } else {
-                                              field.control.value = null;
-                                            }
-                                          }
-                                        },
-                                      ),
-                                    );
-                                  },
-                                ),
+                                // ReactiveWrapperField(
+                                //   formControlName: _partialBlistersKey,
+                                //   validationMessages: {
+                                //     "required": (object) =>
+                                //         localizations.translate(
+                                //           '${i18_local.stockDetails.quantityPartialBlistersReturnedLabel}_ERROR',
+                                //         ),
+                                //   },
+                                //   builder: (field) {
+                                //     return LabeledField(
+                                //       label: localizations.translate(
+                                //         i18_local.stockDetails
+                                //             .quantityPartialBlistersReturnedLabel,
+                                //       ),
+                                //       isRequired: true,
+                                //       child: BaseDigitFormInput(
+                                //         errorMessage: field.errorText,
+                                //         keyboardType: const TextInputType
+                                //             .numberWithOptions(
+                                //           decimal: true,
+                                //         ),
+                                //         onChange: (val) {
+                                //           field.control.markAsTouched();
+                                //           if (int.parse(val) > 10000000000) {
+                                //             field.control.value = 10000;
+                                //           } else {
+                                //             if (val != '') {
+                                //               field.control.value =
+                                //                   int.parse(val);
+                                //             } else {
+                                //               field.control.value = null;
+                                //             }
+                                //           }
+                                //         },
+                                //       ),
+                                //     );
+                                //   },
+                                // ),
                               ],
 
                               if (isWareHouseMgr)
