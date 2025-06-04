@@ -1017,11 +1017,11 @@ class CustomResourceBeneficiaryCardState
               return Column(
                 children: [
                   LabeledField(
-                    isRequired: true,
-                    label: localizations.translate(
+                    // isRequired: true,
+                    label: '${localizations.translate(
                       i18_local
                           .deliverIntervention.selectTheResourcDeliveredLabel,
-                    ),
+                    )} *',
                     labelStyle: TextStyle(
                       color: Theme.of(context).colorTheme.text.secondary,
                       fontSize: 16,
@@ -1049,11 +1049,11 @@ class CustomResourceBeneficiaryCardState
                   ReactiveWrapperField(
                     formControlName: 'quantityDistributed.${widget.cardIndex}',
                     builder: (field) => LabeledField(
-                      isRequired: true,
-                      label: localizations.translate(
+                      // isRequired: true,
+                      label: '${localizations.translate(
                         i18_local
                             .deliverIntervention.quantityAdministratedLabel,
-                      ),
+                      )} *',
                       child: DigitNumericFormInput(
                         isDisabled: true,
                         minValue: 1,

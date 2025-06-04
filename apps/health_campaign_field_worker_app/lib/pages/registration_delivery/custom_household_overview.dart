@@ -550,9 +550,10 @@ class _CustomHouseholdOverviewPageState
                                                               .coreCommonNA),
 
                                                   // Number of household members
-                                                  localizations.translate(i18
-                                                      .householdDetails
-                                                      .noOfMembersCountLabel): state
+                                                  localizations.translate(
+                                                    i18.householdDetails
+                                                        .noOfMembersCountLabel,
+                                                  ): state
                                                           .householdMemberWrapper
                                                           .household
                                                           ?.memberCount
