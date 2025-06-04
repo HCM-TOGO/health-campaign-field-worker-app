@@ -83,7 +83,7 @@ class CustomIndividualDetailsPageState
   bool isEditIndividual = false;
   bool isAddIndividual = false;
   bool isBeneficaryRegistration = false;
-  String? yesNoValue;
+  String? yesNoValue = 'no';
   bool get isRelocated => yesNoValue == 'yes';
 
   final beneficiaryType = RegistrationDeliverySingleton().beneficiaryType!;
@@ -952,32 +952,32 @@ class CustomIndividualDetailsPageState
         clientAuditDetails: individual.clientAuditDetails,
         auditDetails: individual.auditDetails,
       ));
-    } 
+    }
 
     String? individualName = form.control(_individualNameKey).value as String?;
     individual = individual.copyWith(
-        name: name.copyWith(
-          givenName: individualName?.trim(),
-        ),
-        gender: form.control(_genderKey).value == null
-            ? null
-            : Gender.values.byName(
-                form.control(_genderKey).value.toString().toLowerCase()),
-        mobileNumber: form.control(_mobileNumberKey).value,
-        dateOfBirth: dobString,
-        identifiers: isEditIndividual && identifier.identifierId != null
-            ? identifiers
-            : [
-                identifier.copyWith(
-                  identifierId: beneficiaryId,
-                  identifierType: IdentifierTypes.uniqueBeneficiaryID.toValue(),
-                ),
-              ],
-        // additionalFields: IndividualAdditionalFields(version: 1, fields: [
-        //   AdditionalField(form.control(_idTypeKey).value ?? '',
-        //       form.control(_idNumberKey).value ?? '')
-        // ])
-        );
+      name: name.copyWith(
+        givenName: individualName?.trim(),
+      ),
+      gender: form.control(_genderKey).value == null
+          ? null
+          : Gender.values
+              .byName(form.control(_genderKey).value.toString().toLowerCase()),
+      mobileNumber: form.control(_mobileNumberKey).value,
+      dateOfBirth: dobString,
+      identifiers: isEditIndividual && identifier.identifierId != null
+          ? identifiers
+          : [
+              identifier.copyWith(
+                identifierId: beneficiaryId,
+                identifierType: IdentifierTypes.uniqueBeneficiaryID.toValue(),
+              ),
+            ],
+      // additionalFields: IndividualAdditionalFields(version: 1, fields: [
+      //   AdditionalField(form.control(_idTypeKey).value ?? '',
+      //       form.control(_idNumberKey).value ?? '')
+      // ])
+    );
 
     return individual;
   }
