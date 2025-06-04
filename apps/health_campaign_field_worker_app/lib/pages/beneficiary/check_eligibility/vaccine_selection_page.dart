@@ -123,8 +123,8 @@ class _VaccineSelectionPageState extends LocalizedState<VaccineSelectionPage> {
                                     ))
                             .toList()
                             .firstOrNull;
-                        initialAttributes = selectedServiceDefinition
-                            ?.attributes!;
+                        initialAttributes =
+                            selectedServiceDefinition?.attributes!;
                         //     .where((e) =>
                         //         e.code != null &&
                         //         e.dataType == 'MultiValueList')
@@ -206,7 +206,7 @@ class _VaccineSelectionPageState extends LocalizedState<VaccineSelectionPage> {
                                               clientReferenceId:
                                                   IdGen.i.identifier,
                                               referenceId: referenceId,
-                                             value: attribute?[i].dataType ==
+                                              value: attribute?[i].dataType ==
                                                       'MultiValueList'
                                                   ? controller[i]
                                                           .text
@@ -396,7 +396,7 @@ class _VaccineSelectionPageState extends LocalizedState<VaccineSelectionPage> {
                                                     Text(
                                                       '${localizations.translate(
                                                         '${selectedServiceDefinition?.code}.${e.code}',
-                                                      )} ${e.required == true ? '*' : ''}',
+                                                      )} ',
                                                       style: theme.textTheme
                                                           .headlineSmall,
                                                     ),
