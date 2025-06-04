@@ -257,7 +257,9 @@ class CustomDeliverySummaryPageState
                                 items: [
                                   LabelValueItem(
                                       label: localizations.translate(
-                                          i18.beneficiaryDetails.totalMembers),
+                                        i18.householdDetails
+                                            .noOfMembersCountLabel,
+                                      ),
                                       value: deliverState.householdMemberWrapper
                                               ?.household?.memberCount
                                               .toString() ??
@@ -290,35 +292,35 @@ class CustomDeliverySummaryPageState
                                   //     isInline: true,
                                   //     labelFlex: 5,
                                   //   ),
-                                  LabelValueItem(
-                                      label: localizations.translate(i18
-                                          .householdDetails
-                                          .noOfChildrenBelow5YearsLabel),
-                                      value: deliverState
-                                              .householdMemberWrapper?.members
-                                              ?.where((m) {
-                                                final dobString =
-                                                    m.dateOfBirth?.trim();
+                                  //   LabelValueItem(
+                                  //       label: localizations.translate(i18
+                                  //           .householdDetails
+                                  //           .noOfChildrenBelow5YearsLabel),
+                                  //       value: deliverState
+                                  //               .householdMemberWrapper?.members
+                                  //               ?.where((m) {
+                                  //                 final dobString =
+                                  //                     m.dateOfBirth?.trim();
 
-                                                if (dobString != null &&
-                                                    dobString.isNotEmpty) {
-                                                  final parsedDate = DateFormat(
-                                                          'dd/MM/yyyy')
-                                                      .parseStrict(dobString);
-                                                  final age = digits
-                                                          .DigitDateUtils
-                                                      .calculateAge(parsedDate);
-                                                  return age.years < 5;
-                                                }
-                                                return false;
-                                              })
-                                              .length
-                                              .toString() ??
-                                          '0',
-                                      isInline: true,
-                                      labelFlex: 5,
-                                      padding:
-                                          const EdgeInsets.only(top: spacer2)),
+                                  //                 if (dobString != null &&
+                                  //                     dobString.isNotEmpty) {
+                                  //                   final parsedDate = DateFormat(
+                                  //                           'dd/MM/yyyy')
+                                  //                       .parseStrict(dobString);
+                                  //                   final age = digits
+                                  //                           .DigitDateUtils
+                                  //                       .calculateAge(parsedDate);
+                                  //                   return age.years < 5;
+                                  //                 }
+                                  //                 return false;
+                                  //               })
+                                  //               .length
+                                  //               .toString() ??
+                                  //           '0',
+                                  //       isInline: true,
+                                  //       labelFlex: 5,
+                                  //       padding:
+                                  //           const EdgeInsets.only(top: spacer2)),
                                 ]),
                           ]),
 
@@ -382,8 +384,8 @@ class CustomDeliverySummaryPageState
                       //                 labelFlex: 5,
                       //                 padding:
                       //                     const EdgeInsets.only(top: spacer2)),
-                      //           ]),
-                      //     ]),
+                      // ]),
+                      // ]),
                       BlocBuilder<ProductVariantBloc, ProductVariantState>(
                           builder: (context, productState) {
                         final variants = productState.whenOrNull(
