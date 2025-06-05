@@ -95,13 +95,12 @@ class _CustomBeneficiaryProgressBarState
           );
           List<TaskModel> results =
               await taskRepository.progressBarSearch(taskSearchQuery);
-          final filteredResult = results.where((element) {
-            // Exclude if any field matches the condition
-            final fields = element.additionalFields?.fields ?? [];
-            return !fields.any((f) =>
-                f.key == 'ineligibleineligibleReasons' &&
-                f.value == 'CHILD_AGE_LESS_THAN_3_MONTHS');
-          }).toList();
+          final filteredResult = results
+              .where((element) =>
+                  element.additionalFields?.fields
+                      .firstWhereOrNull((e) => e.key == 'ageBelow3Months') ==
+                  null)
+              .toList();
           final groupedEntries = filteredResult.groupListsBy(
             (element) => element.projectBeneficiaryClientReferenceId,
           );

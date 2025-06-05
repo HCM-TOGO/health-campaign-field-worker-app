@@ -13,6 +13,7 @@ import 'package:registration_delivery/blocs/delivery_intervention/deliver_interv
 import 'package:registration_delivery/blocs/household_overview/household_overview.dart';
 import 'package:registration_delivery/models/entities/additional_fields_type.dart';
 import 'package:registration_delivery/models/entities/status.dart';
+import 'package:registration_delivery/models/entities/task.dart';
 import 'package:registration_delivery/router/registration_delivery_router.gm.dart';
 import 'package:registration_delivery/utils/constants.dart';
 import 'package:registration_delivery/widgets/back_navigation_help_header.dart';
@@ -30,10 +31,12 @@ import '../../../utils/app_enums.dart';
 @RoutePage()
 class CustomDeliverySummaryPage extends LocalizedStatefulWidget {
   final EligibilityAssessmentType eligibilityAssessmentType;
+  final TaskModel task;
   const CustomDeliverySummaryPage({
     super.key,
     super.appLocalizations,
     required this.eligibilityAssessmentType,
+    required this.task,
   });
 
   @override
@@ -127,70 +130,74 @@ class CustomDeliverySummaryPageState
                             );
                             if (submit ?? false) {
                               if (context.mounted) {
-                                context.read<DeliverInterventionBloc>().add(
-                                      DeliverInterventionSubmitEvent(
-                                        task: deliverState.oldTask!,
-                                        isEditing: (deliverState.tasks ?? [])
-                                                    .isNotEmpty &&
-                                                RegistrationDeliverySingleton()
-                                                        .beneficiaryType ==
-                                                    BeneficiaryType.household
-                                            ? true
-                                            : false,
-                                        boundaryModel:
-                                            RegistrationDeliverySingleton()
-                                                .boundary!,
-                                      ),
-                                    );
+                                // TODO: Uncomment the following lines if you want to submit the task model here only
+                                // Currently it's been shifted to the ZeroDose flow page
 
-                                ProjectTypeModel? projectTypeModel =
-                                    widget.eligibilityAssessmentType ==
-                                            EligibilityAssessmentType.smc
-                                        ? RegistrationDeliverySingleton()
-                                            .selectedProject
-                                            ?.additionalDetails
-                                            ?.projectType
-                                        : RegistrationDeliverySingleton()
-                                            .selectedProject
-                                            ?.additionalDetails
-                                            ?.additionalProjectType;
+                                // context.read<DeliverInterventionBloc>().add(
+                                //       DeliverInterventionSubmitEvent(
+                                //         task: deliverState.oldTask ?? widget.task,
+                                //         isEditing: (deliverState.tasks ?? [])
+                                //                     .isNotEmpty &&
+                                //                 RegistrationDeliverySingleton()
+                                //                         .beneficiaryType ==
+                                //                     BeneficiaryType.household
+                                //             ? true
+                                //             : false,
+                                //         boundaryModel:
+                                //             RegistrationDeliverySingleton()
+                                //                 .boundary!,
+                                //       ),
+                                //     );
 
-                                if (deliverState.futureDeliveries != null &&
-                                    deliverState.futureDeliveries!.isNotEmpty &&
-                                    projectTypeModel?.cycles?.isNotEmpty ==
-                                        true) {
-                                  // context.router.popUntilRouteWithName(
-                                  //   BeneficiaryWrapperRoute.name,
-                                  // );
-                                  context.router.popAndPush(
-                                      // CustomSplashAcknowledgementRoute(
-                                      //     enableBackToSearch: false,
-                                      //     eligibilityAssessmentType:
-                                      //         widget.eligibilityAssessmentType),
-                                      ZeroDoseCheckRoute(
-                                    eligibilityAssessmentType:
-                                        widget.eligibilityAssessmentType,
-                                    isAdministration: true,
-                                  ));
-                                } else {
-                                  final reloadState =
-                                      context.read<HouseholdOverviewBloc>();
+                                // ProjectTypeModel? projectTypeModel =
+                                //     widget.eligibilityAssessmentType ==
+                                //             EligibilityAssessmentType.smc
+                                //         ? RegistrationDeliverySingleton()
+                                //             .selectedProject
+                                //             ?.additionalDetails
+                                //             ?.projectType
+                                //         : RegistrationDeliverySingleton()
+                                //             .selectedProject
+                                //             ?.additionalDetails
+                                //             ?.additionalProjectType;
 
-                                  reloadState.add(
-                                    HouseholdOverviewReloadEvent(
-                                      projectId: RegistrationDeliverySingleton()
-                                          .projectId!,
-                                      projectBeneficiaryType:
-                                          RegistrationDeliverySingleton()
-                                              .beneficiaryType!,
-                                    ),
-                                  );
-                                  context.router.popAndPush(
-                                    HouseholdAcknowledgementRoute(
-                                      enableViewHousehold: true,
-                                    ),
-                                  );
-                                }
+                                // if (deliverState.futureDeliveries != null &&
+                                //     deliverState.futureDeliveries!.isNotEmpty &&
+                                //     projectTypeModel?.cycles?.isNotEmpty ==
+                                //         true) {
+                                // context.router.popUntilRouteWithName(
+                                //   BeneficiaryWrapperRoute.name,
+                                // );
+                                context.router.popAndPush(
+                                    // CustomSplashAcknowledgementRoute(
+                                    //     enableBackToSearch: false,
+                                    //     eligibilityAssessmentType:
+                                    //         widget.eligibilityAssessmentType),
+                                    ZeroDoseCheckRoute(
+                                  eligibilityAssessmentType:
+                                      widget.eligibilityAssessmentType,
+                                  isAdministration: true,
+                                  task: widget.task,
+                                ));
+                                // } else {
+                                //   final reloadState =
+                                //       context.read<HouseholdOverviewBloc>();
+
+                                //   reloadState.add(
+                                //     HouseholdOverviewReloadEvent(
+                                //       projectId: RegistrationDeliverySingleton()
+                                //           .projectId!,
+                                //       projectBeneficiaryType:
+                                //           RegistrationDeliverySingleton()
+                                //               .beneficiaryType!,
+                                //     ),
+                                //   );
+                                //   context.router.popAndPush(
+                                //     HouseholdAcknowledgementRoute(
+                                //       enableViewHousehold: true,
+                                //     ),
+                                //   );
+                                // }
                               }
                             }
                           },

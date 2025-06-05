@@ -155,6 +155,7 @@ abstract class _$AppRouter extends RootStackRouter {
           key: args.key,
           appLocalizations: args.appLocalizations,
           eligibilityAssessmentType: args.eligibilityAssessmentType,
+          task: args.task,
         ),
       );
     },
@@ -730,6 +731,11 @@ abstract class _$AppRouter extends RootStackRouter {
           appLocalizations: args.appLocalizations,
           isAdministration: args.isAdministration,
           eligibilityAssessmentType: args.eligibilityAssessmentType,
+          isChecklistAssessmentDone: args.isChecklistAssessmentDone,
+          projectBeneficiaryClientReferenceId:
+              args.projectBeneficiaryClientReferenceId,
+          individual: args.individual,
+          task: args.task,
         ),
       );
     },
@@ -744,6 +750,10 @@ abstract class _$AppRouter extends RootStackRouter {
           isAdministration: args.isAdministration,
           isEditing: args.isEditing,
           isChecklistAssessmentDone: args.isChecklistAssessmentDone,
+          projectBeneficiaryClientReferenceId:
+              args.projectBeneficiaryClientReferenceId,
+          individual: args.individual,
+          task: args.task,
         ),
       );
     },
@@ -1241,6 +1251,7 @@ class CustomDeliverySummaryRoute
     Key? key,
     RegistrationDeliveryLocalization? appLocalizations,
     required EligibilityAssessmentType eligibilityAssessmentType,
+    required TaskModel task,
     List<PageRouteInfo>? children,
   }) : super(
           CustomDeliverySummaryRoute.name,
@@ -1248,6 +1259,7 @@ class CustomDeliverySummaryRoute
             key: key,
             appLocalizations: appLocalizations,
             eligibilityAssessmentType: eligibilityAssessmentType,
+            task: task,
           ),
           initialChildren: children,
         );
@@ -1263,6 +1275,7 @@ class CustomDeliverySummaryRouteArgs {
     this.key,
     this.appLocalizations,
     required this.eligibilityAssessmentType,
+    required this.task,
   });
 
   final Key? key;
@@ -1271,9 +1284,11 @@ class CustomDeliverySummaryRouteArgs {
 
   final EligibilityAssessmentType eligibilityAssessmentType;
 
+  final TaskModel task;
+
   @override
   String toString() {
-    return 'CustomDeliverySummaryRouteArgs{key: $key, appLocalizations: $appLocalizations, eligibilityAssessmentType: $eligibilityAssessmentType}';
+    return 'CustomDeliverySummaryRouteArgs{key: $key, appLocalizations: $appLocalizations, eligibilityAssessmentType: $eligibilityAssessmentType, task: $task}';
   }
 }
 
@@ -3346,6 +3361,10 @@ class VaccineSelectionRoute extends PageRouteInfo<VaccineSelectionRouteArgs> {
     AppLocalizations? appLocalizations,
     required bool isAdministration,
     required EligibilityAssessmentType eligibilityAssessmentType,
+    required bool isChecklistAssessmentDone,
+    String? projectBeneficiaryClientReferenceId,
+    IndividualModel? individual,
+    required TaskModel task,
     List<PageRouteInfo>? children,
   }) : super(
           VaccineSelectionRoute.name,
@@ -3354,6 +3373,11 @@ class VaccineSelectionRoute extends PageRouteInfo<VaccineSelectionRouteArgs> {
             appLocalizations: appLocalizations,
             isAdministration: isAdministration,
             eligibilityAssessmentType: eligibilityAssessmentType,
+            isChecklistAssessmentDone: isChecklistAssessmentDone,
+            projectBeneficiaryClientReferenceId:
+                projectBeneficiaryClientReferenceId,
+            individual: individual,
+            task: task,
           ),
           initialChildren: children,
         );
@@ -3370,6 +3394,10 @@ class VaccineSelectionRouteArgs {
     this.appLocalizations,
     required this.isAdministration,
     required this.eligibilityAssessmentType,
+    required this.isChecklistAssessmentDone,
+    this.projectBeneficiaryClientReferenceId,
+    this.individual,
+    required this.task,
   });
 
   final Key? key;
@@ -3380,9 +3408,17 @@ class VaccineSelectionRouteArgs {
 
   final EligibilityAssessmentType eligibilityAssessmentType;
 
+  final bool isChecklistAssessmentDone;
+
+  final String? projectBeneficiaryClientReferenceId;
+
+  final IndividualModel? individual;
+
+  final TaskModel task;
+
   @override
   String toString() {
-    return 'VaccineSelectionRouteArgs{key: $key, appLocalizations: $appLocalizations, isAdministration: $isAdministration, eligibilityAssessmentType: $eligibilityAssessmentType}';
+    return 'VaccineSelectionRouteArgs{key: $key, appLocalizations: $appLocalizations, isAdministration: $isAdministration, eligibilityAssessmentType: $eligibilityAssessmentType, isChecklistAssessmentDone: $isChecklistAssessmentDone, projectBeneficiaryClientReferenceId: $projectBeneficiaryClientReferenceId, individual: $individual, task: $task}';
   }
 }
 
@@ -3396,6 +3432,9 @@ class ZeroDoseCheckRoute extends PageRouteInfo<ZeroDoseCheckRouteArgs> {
     required bool isAdministration,
     bool isEditing = false,
     bool isChecklistAssessmentDone = true,
+    String? projectBeneficiaryClientReferenceId,
+    IndividualModel? individual,
+    TaskModel? task,
     List<PageRouteInfo>? children,
   }) : super(
           ZeroDoseCheckRoute.name,
@@ -3406,6 +3445,10 @@ class ZeroDoseCheckRoute extends PageRouteInfo<ZeroDoseCheckRouteArgs> {
             isAdministration: isAdministration,
             isEditing: isEditing,
             isChecklistAssessmentDone: isChecklistAssessmentDone,
+            projectBeneficiaryClientReferenceId:
+                projectBeneficiaryClientReferenceId,
+            individual: individual,
+            task: task,
           ),
           initialChildren: children,
         );
@@ -3424,6 +3467,9 @@ class ZeroDoseCheckRouteArgs {
     required this.isAdministration,
     this.isEditing = false,
     this.isChecklistAssessmentDone = true,
+    this.projectBeneficiaryClientReferenceId,
+    this.individual,
+    this.task,
   });
 
   final Key? key;
@@ -3438,8 +3484,14 @@ class ZeroDoseCheckRouteArgs {
 
   final bool isChecklistAssessmentDone;
 
+  final String? projectBeneficiaryClientReferenceId;
+
+  final IndividualModel? individual;
+
+  final TaskModel? task;
+
   @override
   String toString() {
-    return 'ZeroDoseCheckRouteArgs{key: $key, appLocalizations: $appLocalizations, eligibilityAssessmentType: $eligibilityAssessmentType, isAdministration: $isAdministration, isEditing: $isEditing, isChecklistAssessmentDone: $isChecklistAssessmentDone}';
+    return 'ZeroDoseCheckRouteArgs{key: $key, appLocalizations: $appLocalizations, eligibilityAssessmentType: $eligibilityAssessmentType, isAdministration: $isAdministration, isEditing: $isEditing, isChecklistAssessmentDone: $isChecklistAssessmentDone, projectBeneficiaryClientReferenceId: $projectBeneficiaryClientReferenceId, individual: $individual, task: $task}';
   }
 }

@@ -179,7 +179,7 @@ class CustomDeliverInterventionPageState
     DeliverInterventionState deliverState,
   ) async {
     // TODO: Uncomment the following lines if you want to submit the task model here only
-    // Currently it's been shifted to the CustomDeliverySummary page
+    // Currently it's been shifted to the ZeroDose flow page
 
     // context.read<DeliverInterventionBloc>().add(
     //       DeliverInterventionSubmitEvent(
@@ -232,6 +232,7 @@ class CustomDeliverInterventionPageState
     // }
     context.router.popAndPush(CustomDeliverySummaryRoute(
       eligibilityAssessmentType: widget.eligibilityAssessmentType,
+      task: taskModel,
     ));
   }
 

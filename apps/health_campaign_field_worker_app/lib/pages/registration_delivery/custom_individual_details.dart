@@ -740,7 +740,10 @@ class CustomIndividualDetailsPageState
                         if (!widget.isHeadOfHousehold)
                           DigitButton(
                             capitalizeLetters: false,
-                            label: "Link QR Code to Beneficiary",
+                            label: localizations.translate(
+                              i18_local.individualDetails
+                                  .linkQrCodeToBeneficiaryLabel,
+                            ),
                             mainAxisSize: MainAxisSize.max,
                             type: DigitButtonType.secondary,
                             size: DigitButtonSize.large,
@@ -750,7 +753,10 @@ class CustomIndividualDetailsPageState
                             },
                           ),
                         if (!widget.isHeadOfHousehold)
-                          Text("Is this a relocated beneficiary?",
+                          Text(
+                              localizations.translate(i18_local
+                                  .individualDetails
+                                  .relocatedBeneficiaryQuestion),
                               style: TextStyle(
                                 fontSize: 16,
                                 color: theme.colorTheme.text.primary,

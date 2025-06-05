@@ -188,6 +188,13 @@ class HouseholdOverView {
       'HOUSEHOLD_OVER_VIEW_BENEFICIARY_INELIGIBLE_SMC_LABEL';
   String get householdOverViewBeneficiaryInEligibleVASLabel =>
       'HOUSEHOLD_OVER_VIEW_BENEFICIARY_INELIGIBLE_VAS_LABEL';
+
+  String get householdOverViewZeroDoseIconLabel =>
+      'HOUSEHOLD_OVER_VIEW_ZERO_DOSE_ICON_LABEL';
+  String get householdOverViewIncompletementVaccineLabel =>
+      'HOUSEHOLD_OVER_VIEW_INCOMPLETEMENT_VACCINE_LABEL';
+  String get householdOverViewZeroDoseDeliveredIconLabel =>
+      'HOUSEHOLD_OVER_VIEW_ZERO_DOSE_DELIVERED_ICON_LABEL';
 }
 
 class DeliverIntervention {
@@ -1424,6 +1431,11 @@ class IndividualDetails {
   String get linkVoucherToIndividual => 'LINK_VOUCHER_TO_INDIVIDUAL';
 
   String get yearsAndMonthsErrorTextUpdate => 'ERR_YEARS_AND_MONTHS_UPDATE';
+
+  String get linkQrCodeToBeneficiaryLabel =>
+      'LINK_QR_CODE_TO_BENEFICIARY_LABEL';
+
+  String get relocatedBeneficiaryQuestion => 'RELOCATED_BENEFICIARY_QUESTION';
 }
 
 class BeneficiaryDetails {
@@ -1534,6 +1546,9 @@ class BeneficiaryDetails {
 
   String get currentSmcCycleLabel => 'BENEFICIARY_DETAILS_CURRENT_SMC_CYCLE';
   String get noHealthFacilityError => 'NO_HEALTH_FACILITY_ERROR';
+
+  String get qrScannerTitle => 'QR_SCANNER_TITLE';
+  String get qrScannerToggleTorch => 'QR_SCANNER_TOGGLE_TORCH';
 }
 
 class PrivacyPolicy {
