@@ -291,8 +291,9 @@ class CustomSummaryPageState extends LocalizedState<CustomSummaryPage> {
                                 ),
                                 items: [
                                   LabelValueItem(
-                                      label: localizations.translate(
-                                          i18.beneficiaryDetails.totalMembers),
+                                      label: localizations.translate(i18
+                                          .householdDetails
+                                          .noOfMembersCountLabel),
                                       value: householdState
                                               .householdModel?.memberCount
                                               .toString() ??
