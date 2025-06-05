@@ -185,6 +185,8 @@ class CustomViewBeneficiaryCardState
 
         final isStatusReset = checkStatus(taskData, currentCycle);
 
+        final isHeadOfHousehold = isNotEligible && (ageInYears >= 18);
+
         final rowTableData = [
           DigitTableData(
             [
@@ -198,6 +200,7 @@ class CustomViewBeneficiaryCardState
           DigitTableData(
             getTableCellText(
               CustomStatusKeys(
+                  isHeadOfHousehold,
                   isNotEligible,
                   isIneligibleForSMC,
                   isIneligibleForVAS,
@@ -401,9 +404,13 @@ class CustomViewBeneficiaryCardState
     CustomStatusKeys statusKeys,
     List<TaskModel>? taskData,
   ) {
-    if(statusKeys.isNotEligible) {
+    if (statusKeys.isHeadOfHousehold) {
       return localizations.translate(i18_local
               .householdOverView.householdOverViewHouseholderHeadLabel);
+    }
+    else if(statusKeys.isNotEligible) {
+      return localizations.translate(i18
+              .householdOverView.householdOverViewNotEligibleIconLabel);
     }
     else if (statusKeys.isIneligibleForSMC || statusKeys.isIneligibleForVAS) {
       return localizations.translate(
@@ -414,8 +421,6 @@ class CustomViewBeneficiaryCardState
       if (taskData.isEmpty) {
         return localizations.translate(Status.notVisited.toValue());
       } else if (statusKeys.isVASDelivered && statusKeys.isSMCDelivered) {
-        print("Is it even been called?");
-        // You can concatenate both, or pick one as per your business logic
         return localizations.translate(
             i18_local.householdOverView.householdOverViewVASDeliveredIconLabel);
       } else if (statusKeys.isSMCDelivered) {
@@ -471,6 +476,7 @@ class CustomViewBeneficiaryCardState
 }
 
 class CustomStatusKeys {
+  bool isHeadOfHousehold;
   bool isNotEligible;
   bool isIneligibleForSMC;
   bool isIneligibleForVAS;
@@ -480,6 +486,7 @@ class CustomStatusKeys {
   bool isVASDelivered;
   bool isSMCDelivered;
   CustomStatusKeys(
+      this.isHeadOfHousehold,
       this.isNotEligible,
       this.isIneligibleForSMC,
       this.isIneligibleForVAS,

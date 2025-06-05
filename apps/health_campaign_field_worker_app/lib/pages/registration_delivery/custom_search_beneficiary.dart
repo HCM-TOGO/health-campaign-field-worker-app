@@ -36,6 +36,7 @@ import 'package:registration_delivery/widgets/status_filter/status_filter.dart';
 import '../../blocs/registration_delivery/custom_search_household.dart';
 import '../../router/app_router.dart';
 import '../../../utils/i18_key_constants.dart' as i18_local;
+import 'package:digit_scanner/utils/i18_key_constants.dart' as i18_scanner;
 import '../../utils/search/global_search_parameters_smc.dart';
 import '../../widgets/showcase/showcase_wrappers.dart';
 import '../inventory/qr_scanner.dart';
@@ -711,7 +712,9 @@ class _CustomSearchBeneficiaryPageState
                     return DigitButton(
                       prefixIcon: Icons.qr_code_scanner,
                       capitalizeLetters: false,
-                      label: "Scan QR Code",
+                      label: localizations.translate(
+                        i18_scanner.scanner.scannerLabel,
+                      ),
                       mainAxisSize: MainAxisSize.max,
                       type: DigitButtonType.secondary,
                       size: DigitButtonSize.large,

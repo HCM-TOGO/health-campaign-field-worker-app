@@ -183,44 +183,47 @@ class CustomIndividualDetailsPageState
                           mainAxisSize: MainAxisSize.max,
                           onPressed: () async {
                             if (form.control(_dobKey).value == null) {
-                              setState(() {
-                                form.control(_dobKey).setErrors({'': true});
-                              });
-                            }
-                            if (form.control(_genderKey).value == null) {
-                              setState(() {
-                                form.control(_genderKey).setErrors({'': true});
-                              });
-                            }
-                            final userId = RegistrationDeliverySingleton()
-                                .loggedInUserUuid;
-                            final projectId =
-                                RegistrationDeliverySingleton().projectId;
-                            form.markAllAsTouched();
-                            if (!form.valid) return;
-                            FocusManager.instance.primaryFocus?.unfocus();
+                                setState(() {
+                                  form.control(_dobKey).setErrors({'required': true});
+                                  form.control(_dobKey).markAsTouched();
+                                });
+                              }
+                              if (form.control(_genderKey).value == null) {
+                                setState(() {
+                                  form
+                                      .control(_genderKey)
+                                      .setErrors({'': true});
+                                });
+                              }
+                              final userId = RegistrationDeliverySingleton()
+                                  .loggedInUserUuid;
+                              final projectId =
+                                  RegistrationDeliverySingleton().projectId;
+                              form.markAllAsTouched();
+                              if (!form.valid) return;
+                              FocusManager.instance.primaryFocus?.unfocus();
 
-                            final age = (form.control(_dobKey).value != null)
-                                ? digits.DigitDateUtils.calculateAge(
-                                    form.control(_dobKey).value as DateTime,
-                                  )
-                                : digits.DigitDateUtils.calculateAge(
-                                    DateTime.now(),
-                                  );
+                              final age = (form.control(_dobKey).value != null)
+                                  ? digits.DigitDateUtils.calculateAge(
+                                      form.control(_dobKey).value as DateTime,
+                                    )
+                                  : digits.DigitDateUtils.calculateAge(
+                                      DateTime.now(),
+                                    );
 
-                            if (age.years < 18 && widget.isHeadOfHousehold) {
-                              await DigitToast.show(
-                                context,
-                                options: DigitToastOptions(
-                                  localizations.translate(i18_local
-                                      .individualDetails.headAgeValidError),
-                                  true,
-                                  theme,
-                                ),
-                              );
+                              if (age.years < 18 && widget.isHeadOfHousehold) {
+                                await DigitToast.show(
+                                  context,
+                                  options: DigitToastOptions(
+                                    localizations.translate(i18_local
+                                        .individualDetails.headAgeValidError),
+                                    true,
+                                    theme,
+                                  ),
+                                );
 
-                              return;
-                            }
+                                return;
+                              }
                             final submit = await showDialog(
                               context: context,
                               builder: (ctx) => Popup(
@@ -259,7 +262,6 @@ class CustomIndividualDetailsPageState
                             );
 
                             if (submit ?? false) {
-                              
                               final boundaryBloc =
                                   context.read<BoundaryBloc>().state;
                               final code = boundaryBloc.boundaryList.first.code;
@@ -666,6 +668,51 @@ class CustomIndividualDetailsPageState
                             height: spacer2,
                           ),
                         individualDetailsShowcaseData.dateOfBirth.buildWith(
+                          // child: CustomDigitDobPicker(
+                          //   datePickerFormControl: _dobKey,
+                          //   datePickerLabel: localizations.translate(
+                          //     i18.individualDetails.dobLabelText,
+                          //   ),
+                          //   ageFieldLabel: localizations.translate(
+                          //     i18.individualDetails.ageLabelText,
+                          //   ),
+                          //   yearsHintLabel: localizations.translate(
+                          //     i18.individualDetails.yearsHintText,
+                          //   ),
+                          //   separatorLabel: localizations.translate(
+                          //     i18.individualDetails.separatorLabelText,
+                          //   ),
+                          //   yearsAndMonthsErrMsg: localizations.translate(
+                          //     i18_local.individualDetails
+                          //         .yearsAndMonthsErrorTextUpdate,
+                          //   ),
+                          //   isHead: widget.isHeadOfHousehold,
+                          //   requiredErrMsg: localizations.translate(
+                          //     i18.common.corecommonRequired,
+                          //   ),
+                          //   initialDate: before150Years,
+                          //   onChangeOfFormControl: (formControl) {
+                          //     // Handle changes to the control's value here
+                          //     final value = formControl.value;
+
+                          //     digits.DigitDOBAge age =
+                          //         digits.DigitDateUtils.calculateAge(value);
+                          //     // Allow only between 0 to 59 months for cycle 1
+                          //     final ageInMonths = age.years * 12 + age.months;
+                          //     if (ageInMonths > 59) {
+                          //       widget.isHeadOfHousehold
+                          //           ? formControl.removeError('')
+                          //           : formControl.setErrors({'': true});
+                          //     } else {
+                          //       formControl.removeError('');
+                          //     }
+                          //   },
+                          //   cancelText: localizations
+                          //       .translate(i18.common.coreCommonCancel),
+                          //   confirmText: localizations
+                          //       .translate(i18.common.coreCommonOk),
+                          //   monthsHintLabel: 'Month',
+                          // ),
                           child: CustomDigitDobPicker(
                             datePickerFormControl: _dobKey,
                             datePickerLabel: localizations.translate(
@@ -684,30 +731,27 @@ class CustomIndividualDetailsPageState
                               i18_local.individualDetails
                                   .yearsAndMonthsErrorTextUpdate,
                             ),
-                            isHead: widget.isHeadOfHousehold,
+                            isHeadOfHousehold: widget.isHeadOfHousehold,
+                            initialDate: before150Years,
                             requiredErrMsg: localizations.translate(
                               i18.common.corecommonRequired,
                             ),
-                            // initialDate: before150Years,
-                            initialDate: widget.isHeadOfHousehold
-                                ? before150Years
-                                : firstDate,
-                            finalDate: widget.isHeadOfHousehold
-                                ? DateTime.now()
-                                : lastDate,
-                            onChangeOfFormControl: (formControl) {
-                              // Handle changes to the control's value here
-                              final value = formControl.value;
-                              digits.DigitDOBAge age =
-                                  digits.DigitDateUtils.calculateAge(value);
-                              // Allow only between 0 to 59 months for cycle 1
+                            onChangeOfFormControl: (dob) {
+                              final control = form.control(_dobKey);
+                              if (dob == null) {
+                                control.setErrors({'required': true});
+                                return;
+                              }
+                              final age =
+                                  digits.DigitDateUtils.calculateAge(dob);
                               final ageInMonths = age.years * 12 + age.months;
-                              if (ageInMonths > 59) {
-                                widget.isHeadOfHousehold
-                                    ? formControl.removeError('')
-                                    : formControl.setErrors({'': true});
+                              if (!widget.isHeadOfHousehold &&
+                                  ageInMonths > 59) {
+                                control.setErrors({'ageLimit': true});
                               } else {
-                                formControl.removeError('');
+                                control.removeError('ageLimit');
+                                control.removeError('required');
+                                control.removeError('');
                               }
                             },
                             cancelText: localizations
@@ -1035,6 +1079,7 @@ class CustomIndividualDetailsPageState
                 : searchQuery?.trim()),
       ),
       _dobKey: FormControl<DateTime>(
+        validators: [Validators.required],
         value: individual?.dateOfBirth != null
             ? DateFormat(Constants().dateFormat).parse(
                 individual!.dateOfBirth!,
