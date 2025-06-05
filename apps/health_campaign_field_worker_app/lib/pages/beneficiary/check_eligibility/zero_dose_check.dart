@@ -247,8 +247,20 @@ class ZeroDoseCheckPageState extends LocalizedState<ZeroDoseCheckPage> {
                                   return;
                                 }
                                 final itemsAttributes = initialAttributes;
+                                final parentIndexes = <int>[];
+                                for (int i = 0;
+                                    i < initialAttributes!.length;
+                                    i++) {
+                                  if (initialAttributes![i]
+                                          .code!
+                                          .split('.')
+                                          .length ==
+                                      1) {
+                                    parentIndexes.add(i);
+                                  }
+                                }
 
-                                for (int i = 0; i < controller.length; i++) {
+                                for (int i in parentIndexes) {
                                   if (itemsAttributes?[i].required == true &&
                                       (itemsAttributes?[i].dataType ==
                                               'SingleValueList' &&
