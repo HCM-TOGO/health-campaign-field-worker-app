@@ -334,10 +334,14 @@ class CustomStockDetailsPageState
                                         i18.stockDetails.selectProductLabel,
                                       ),
                                     );
-                                  } else if (form
-                                          .control(_transactionReasonKey)
-                                          .value ==
-                                      null) {
+                                  } else if ([
+                                        StockRecordEntryType.loss,
+                                        StockRecordEntryType.damaged,
+                                      ].contains(entryType) &&
+                                      form
+                                              .control(_transactionReasonKey)
+                                              .value ==
+                                          null) {
                                     Toast.showToast(
                                       context,
                                       type: ToastType.error,
