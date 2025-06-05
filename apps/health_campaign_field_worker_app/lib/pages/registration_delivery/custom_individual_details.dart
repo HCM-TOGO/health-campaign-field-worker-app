@@ -135,6 +135,9 @@ class CustomIndividualDetailsPageState
     final router = context.router;
     final theme = Theme.of(context);
     DateTime before150Years = DateTime(now.year - 150, now.month, now.day);
+    DateTime lastDate = DateTime(now.year, now.month - 3, now.day);
+    DateTime firstDate = DateTime(now.year, now.month - 59, now.day);
+
     final textTheme = theme.digitTextTheme(context);
 
     return Scaffold(
@@ -179,45 +182,7 @@ class CustomIndividualDetailsPageState
                           size: DigitButtonSize.large,
                           mainAxisSize: MainAxisSize.max,
                           onPressed: () async {
-                            final submit = await showDialog(
-                              context: context,
-                              builder: (ctx) => Popup(
-                                title: localizations.translate(
-                                  i18.deliverIntervention.dialogTitle,
-                                ),
-                                description: localizations.translate(
-                                  i18.deliverIntervention.dialogContent,
-                                ),
-                                actions: [
-                                  DigitButton(
-                                      label: localizations.translate(
-                                        i18.common.coreCommonSubmit,
-                                      ),
-                                      onPressed: () {
-                                        clickedStatus.value = true;
-                                        Navigator.of(
-                                          context,
-                                          rootNavigator: true,
-                                        ).pop(true);
-                                      },
-                                      type: DigitButtonType.primary,
-                                      size: DigitButtonSize.large),
-                                  DigitButton(
-                                      label: localizations.translate(
-                                        i18.common.coreCommonCancel,
-                                      ),
-                                      onPressed: () => Navigator.of(
-                                            context,
-                                            rootNavigator: true,
-                                          ).pop(false),
-                                      type: DigitButtonType.secondary,
-                                      size: DigitButtonSize.large)
-                                ],
-                              ),
-                            );
-
-                            if (submit ?? false) {
-                              if (form.control(_dobKey).value == null) {
+                            if (form.control(_dobKey).value == null) {
                                 setState(() {
                                   form.control(_dobKey).setErrors({'required': true});
                                   form.control(_dobKey).markAsTouched();
@@ -259,7 +224,44 @@ class CustomIndividualDetailsPageState
 
                                 return;
                               }
+                            final submit = await showDialog(
+                              context: context,
+                              builder: (ctx) => Popup(
+                                title: localizations.translate(
+                                  i18.deliverIntervention.dialogTitle,
+                                ),
+                                description: localizations.translate(
+                                  i18.deliverIntervention.dialogContent,
+                                ),
+                                actions: [
+                                  DigitButton(
+                                      label: localizations.translate(
+                                        i18.common.coreCommonSubmit,
+                                      ),
+                                      onPressed: () {
+                                        clickedStatus.value = true;
+                                        Navigator.of(
+                                          context,
+                                          rootNavigator: true,
+                                        ).pop(true);
+                                      },
+                                      type: DigitButtonType.primary,
+                                      size: DigitButtonSize.large),
+                                  DigitButton(
+                                      label: localizations.translate(
+                                        i18.common.coreCommonCancel,
+                                      ),
+                                      onPressed: () => Navigator.of(
+                                            context,
+                                            rootNavigator: true,
+                                          ).pop(false),
+                                      type: DigitButtonType.secondary,
+                                      size: DigitButtonSize.large)
+                                ],
+                              ),
+                            );
 
+                            if (submit ?? false) {
                               final boundaryBloc =
                                   context.read<BoundaryBloc>().state;
                               final code = boundaryBloc.boundaryList.first.code;
@@ -788,7 +790,10 @@ class CustomIndividualDetailsPageState
                         if (!widget.isHeadOfHousehold)
                           DigitButton(
                             capitalizeLetters: false,
-                            label: "Link QR Code to Beneficiary",
+                            label: localizations.translate(
+                              i18_local.individualDetails
+                                  .linkQrCodeToBeneficiaryLabel,
+                            ),
                             mainAxisSize: MainAxisSize.max,
                             type: DigitButtonType.secondary,
                             size: DigitButtonSize.large,
@@ -798,7 +803,10 @@ class CustomIndividualDetailsPageState
                             },
                           ),
                         if (!widget.isHeadOfHousehold)
-                          Text("Is this a relocated beneficiary?",
+                          Text(
+                              localizations.translate(i18_local
+                                  .individualDetails
+                                  .relocatedBeneficiaryQuestion),
                               style: TextStyle(
                                 fontSize: 16,
                                 color: theme.colorTheme.text.primary,

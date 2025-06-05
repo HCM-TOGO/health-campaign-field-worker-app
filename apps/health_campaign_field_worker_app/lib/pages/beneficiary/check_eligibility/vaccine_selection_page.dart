@@ -14,6 +14,7 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:health_campaign_field_worker_app/blocs/app_initialization/app_initialization.dart';
 import 'package:health_campaign_field_worker_app/data/local_store/no_sql/schema/app_configuration.dart';
 import 'package:registration_delivery/registration_delivery.dart';
+import 'package:registration_delivery/router/registration_delivery_router.gm.dart';
 import '../../../models/entities/roles_type.dart';
 import 'package:registration_delivery/blocs/household_overview/household_overview.dart';
 import 'package:survey_form/survey_form.dart';
@@ -21,10 +22,15 @@ import '../../../router/app_router.dart';
 import '../../../utils/app_enums.dart';
 import '../../../utils/constants.dart';
 import '../../../utils/date_utils.dart';
+import '../../../utils/environment_config.dart';
 import '../../../utils/extensions/extensions.dart';
 import '../../../widgets/localized.dart';
 import 'package:digit_data_model/data_model.dart';
 
+import '../../../models/entities/additional_fields_type.dart'
+    as additional_fields_local;
+import '../../../models/entities/assessment_checklist/status.dart'
+    as status_local;
 import '../../../widgets/custom_back_navigation.dart';
 import '../../../widgets/showcase/showcase_wrappers.dart';
 import 'package:registration_delivery/utils/i18_key_constants.dart' as i18;
@@ -36,11 +42,20 @@ import 'package:survey_form/utils/i18_key_constants.dart' as i18_survey_form;
 class VaccineSelectionPage extends LocalizedStatefulWidget {
   final bool isAdministration;
   final EligibilityAssessmentType eligibilityAssessmentType;
-  const VaccineSelectionPage(
-      {super.key,
-      super.appLocalizations,
-      required this.isAdministration,
-      required this.eligibilityAssessmentType});
+  final bool isChecklistAssessmentDone;
+  final String? projectBeneficiaryClientReferenceId;
+  final IndividualModel? individual;
+  final TaskModel task;
+  const VaccineSelectionPage({
+    super.key,
+    super.appLocalizations,
+    required this.isAdministration,
+    required this.eligibilityAssessmentType,
+    required this.isChecklistAssessmentDone,
+    this.projectBeneficiaryClientReferenceId,
+    this.individual,
+    required this.task,
+  });
 
   @override
   State<VaccineSelectionPage> createState() => _VaccineSelectionPageState();
@@ -338,20 +353,222 @@ class _VaccineSelectionPageState extends LocalizedState<VaccineSelectionPage> {
                                             submitTriggered: true,
                                           ),
                                         );
-                                    if (widget.isAdministration == true) {
-                                      router.push(
-                                        CustomSplashAcknowledgementRoute(
-                                            enableBackToSearch: false,
-                                            eligibilityAssessmentType: widget
-                                                .eligibilityAssessmentType),
+
+                                    if (widget.isChecklistAssessmentDone ==
+                                        true) {
+                                      final householdMember = context
+                                          .read<HouseholdOverviewBloc>()
+                                          .state
+                                          .householdMemberWrapper;
+                                      final deliverState = context
+                                          .read<DeliverInterventionBloc>()
+                                          .state;
+
+                                      final oldTask =
+                                          deliverState.oldTask ?? widget.task;
+                                      final oldFields =
+                                          oldTask.additionalFields?.fields ??
+                                              [];
+
+                                      final updatedFields = [
+                                        ...oldFields,
+                                        AdditionalField(
+                                          'zeroDoseStatus',
+                                          ZeroDoseStatus.done.name,
+                                        ),
+                                      ];
+
+                                      final updatedTask = oldTask.copyWith(
+                                        additionalFields: TaskAdditionalFields(
+                                          version: 1,
+                                          fields: updatedFields,
+                                        ),
                                       );
-                                    } else {
-                                      router.push(
-                                        CustomHouseholdAcknowledgementRoute(
+
+                                      context
+                                          .read<DeliverInterventionBloc>()
+                                          .add(
+                                            DeliverInterventionSubmitEvent(
+                                              task: updatedTask,
+                                              isEditing: (deliverState.tasks ??
+                                                          [])
+                                                      .isNotEmpty &&
+                                                  RegistrationDeliverySingleton()
+                                                          .beneficiaryType ==
+                                                      BeneficiaryType.household,
+                                              boundaryModel:
+                                                  RegistrationDeliverySingleton()
+                                                      .boundary!,
+                                            ),
+                                          );
+
+                                      ProjectTypeModel? projectTypeModel =
+                                          widget.eligibilityAssessmentType ==
+                                                  EligibilityAssessmentType.smc
+                                              ? RegistrationDeliverySingleton()
+                                                  .selectedProject
+                                                  ?.additionalDetails
+                                                  ?.projectType
+                                              : RegistrationDeliverySingleton()
+                                                  .selectedProject
+                                                  ?.additionalDetails
+                                                  ?.additionalProjectType;
+
+                                      if (deliverState.futureDeliveries !=
+                                              null &&
+                                          deliverState
+                                              .futureDeliveries!.isNotEmpty &&
+                                          projectTypeModel
+                                                  ?.cycles?.isNotEmpty ==
+                                              true) {
+                                        router.popUntilRouteWithName(
+                                            BeneficiaryWrapperRoute.name);
+                                        if (widget.isAdministration == true) {
+                                          router.push(
+                                            CustomSplashAcknowledgementRoute(
+                                                enableBackToSearch: false,
+                                                eligibilityAssessmentType: widget
+                                                    .eligibilityAssessmentType),
+                                          );
+                                        } else {
+                                          router.push(
+                                            CustomHouseholdAcknowledgementRoute(
+                                                enableViewHousehold: true,
+                                                eligibilityAssessmentType: widget
+                                                    .eligibilityAssessmentType),
+                                          );
+                                        }
+                                      } else {
+                                        final reloadState = context
+                                            .read<HouseholdOverviewBloc>();
+
+                                        reloadState.add(
+                                          HouseholdOverviewReloadEvent(
+                                            projectId:
+                                                RegistrationDeliverySingleton()
+                                                    .projectId!,
+                                            projectBeneficiaryType:
+                                                RegistrationDeliverySingleton()
+                                                    .beneficiaryType!,
+                                          ),
+                                        );
+                                        router.popAndPush(
+                                          CustomHouseholdAcknowledgementRoute(
                                             enableViewHousehold: true,
                                             eligibilityAssessmentType: widget
-                                                .eligibilityAssessmentType),
+                                                .eligibilityAssessmentType,
+                                          ),
+                                        );
+                                      }
+                                    } else {
+                                      final clientReferenceId =
+                                          IdGen.i.identifier;
+                                      List<String?> ineligibilityReasons = [];
+                                      ineligibilityReasons
+                                          .add("CHILD_AGE_LESS_THAN_3_MONTHS");
+                                      context
+                                          .read<DeliverInterventionBloc>()
+                                          .add(
+                                            DeliverInterventionSubmitEvent(
+                                              task: TaskModel(
+                                                projectBeneficiaryClientReferenceId:
+                                                    widget
+                                                        .projectBeneficiaryClientReferenceId,
+                                                clientReferenceId:
+                                                    clientReferenceId,
+                                                tenantId: envConfig
+                                                    .variables.tenantId,
+                                                rowVersion: 1,
+                                                auditDetails: AuditDetails(
+                                                  createdBy:
+                                                      context.loggedInUserUuid,
+                                                  createdTime: context
+                                                      .millisecondsSinceEpoch(),
+                                                ),
+                                                projectId: context.projectId,
+                                                status: status_local.Status
+                                                    .beneficiaryInEligible
+                                                    .toValue(),
+                                                clientAuditDetails:
+                                                    ClientAuditDetails(
+                                                  createdBy:
+                                                      context.loggedInUserUuid,
+                                                  createdTime: context
+                                                      .millisecondsSinceEpoch(),
+                                                  lastModifiedBy:
+                                                      context.loggedInUserUuid,
+                                                  lastModifiedTime: context
+                                                      .millisecondsSinceEpoch(),
+                                                ),
+                                                additionalFields:
+                                                    TaskAdditionalFields(
+                                                  version: 1,
+                                                  fields: [
+                                                    // AdditionalField(
+                                                    //   'taskStatus',
+                                                    //   status_local.Status
+                                                    //       .beneficiaryInEligible
+                                                    //       .toValue(),
+                                                    // ),
+                                                    AdditionalField(
+                                                      'ineligibleReasons',
+                                                      ineligibilityReasons
+                                                          .join(","),
+                                                    ),
+                                                    AdditionalField(
+                                                      additional_fields_local
+                                                          .AdditionalFieldsType
+                                                          .deliveryType
+                                                          .toValue(),
+                                                      EligibilityAssessmentStatus
+                                                          .smcDone.name,
+                                                    ),
+                                                    AdditionalField(
+                                                      'zeroDoseStatus',
+                                                      ZeroDoseStatus.done.name,
+                                                    ),
+                                                    AdditionalField(
+                                                        'ageBelow3Months',
+                                                        true.toString()),
+                                                  ],
+                                                ),
+                                                address: widget
+                                                    .individual?.address?.first
+                                                    .copyWith(
+                                                  relatedClientReferenceId:
+                                                      clientReferenceId,
+                                                  id: null,
+                                                ),
+                                              ),
+                                              isEditing: false,
+                                              boundaryModel: context.boundary,
+                                              navigateToSummary: false,
+                                              householdMemberWrapper: context
+                                                  .read<HouseholdOverviewBloc>()
+                                                  .state
+                                                  .householdMemberWrapper,
+                                            ),
+                                          );
+                                      final searchBloc =
+                                          context.read<SearchHouseholdsBloc>();
+                                      searchBloc.add(
+                                        const SearchHouseholdsClearEvent(),
                                       );
+                                      if (widget.isAdministration == true) {
+                                        router.push(
+                                          CustomSplashAcknowledgementRoute(
+                                              enableBackToSearch: false,
+                                              eligibilityAssessmentType: widget
+                                                  .eligibilityAssessmentType),
+                                        );
+                                      } else {
+                                        router.push(
+                                          CustomHouseholdAcknowledgementRoute(
+                                              enableViewHousehold: true,
+                                              eligibilityAssessmentType: widget
+                                                  .eligibilityAssessmentType),
+                                        );
+                                      }
                                     }
                                   }
                                 },

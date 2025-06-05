@@ -12,6 +12,7 @@ import '../../router/app_router.dart';
 import '../../utils/extensions/extensions.dart';
 import 'package:digit_components/widgets/digit_dialog.dart' as dialog;
 import 'package:registration_delivery/utils/i18_key_constants.dart' as i18;
+import '../../utils/i18_key_constants.dart' as i18_local;
 
 @RoutePage()
 class QRScannerPage extends LocalizedStatefulWidget {
@@ -145,14 +146,16 @@ class _QRScannerPageState extends LocalizedState<QRScannerPage> {
   Widget build(BuildContext context) {
     return Scaffold(
         appBar: AppBar(
-          title: Text(localizations.translate('qr_scanner_title')),
+          title: Text(localizations
+              .translate(i18_local.beneficiaryDetails.qrScannerTitle)),
           actions: [
             IconButton(
               icon: const Icon(Icons.flash_on),
               onPressed: () {
                 cameraController.toggleTorch();
               },
-              tooltip: 'Toggle Torch',
+              tooltip: localizations
+                  .translate(i18_local.beneficiaryDetails.qrScannerToggleTorch),
             ),
           ],
         ),

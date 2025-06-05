@@ -51,15 +51,21 @@ class ZeroDoseCheckPage extends LocalizedStatefulWidget {
   final bool isEditing;
   final bool isAdministration;
   final bool isChecklistAssessmentDone;
+  final String? projectBeneficiaryClientReferenceId;
+  final IndividualModel? individual;
+  final TaskModel task;
 
-  const ZeroDoseCheckPage({
+  ZeroDoseCheckPage({
     super.key,
     super.appLocalizations,
     required this.eligibilityAssessmentType,
     required this.isAdministration,
     this.isEditing = false,
     this.isChecklistAssessmentDone = true,
-  });
+    this.projectBeneficiaryClientReferenceId,
+    this.individual,
+    TaskModel? task,
+  }) : task = task ?? TaskModel(clientReferenceId: '');
 
   @override
   State<ZeroDoseCheckPage> createState() => ZeroDoseCheckPageState();
@@ -291,6 +297,8 @@ class ZeroDoseCheckPageState extends LocalizedState<ZeroDoseCheckPage> {
                                   responses[attributeCode] = value;
                                 }
 
+                                bool showVaccineSelectionPage =
+                                    shouldShowVaccinePage(responses);
                                 bool zeroDose = isZeroDose(responses);
                                 bool incompletementVaccine =
                                     isIncompletementVaccine(
@@ -299,7 +307,8 @@ class ZeroDoseCheckPageState extends LocalizedState<ZeroDoseCheckPage> {
 
                                 // TODO: Uncomment this block when the vaccine selection page is complete
 
-                                if (!zeroDose && !incompletementVaccine) {
+                                if (showVaccineSelectionPage ||
+                                    (!zeroDose && !incompletementVaccine)) {
                                   final referenceId = IdGen.i.identifier;
                                   List<ServiceAttributesModel> attributes = [];
                                   for (int i = 0; i < controller.length; i++) {
@@ -393,9 +402,16 @@ class ZeroDoseCheckPageState extends LocalizedState<ZeroDoseCheckPage> {
                                       );
 
                                   context.router.push(VaccineSelectionRoute(
-                                      isAdministration: widget.isAdministration,
-                                      eligibilityAssessmentType:
-                                          widget.eligibilityAssessmentType));
+                                    isAdministration: widget.isAdministration,
+                                    eligibilityAssessmentType:
+                                        widget.eligibilityAssessmentType,
+                                    isChecklistAssessmentDone:
+                                        widget.isChecklistAssessmentDone,
+                                    projectBeneficiaryClientReferenceId: widget
+                                        .projectBeneficiaryClientReferenceId,
+                                    individual: widget.individual,
+                                    task: widget.task,
+                                  ));
                                 } else {
                                   final shouldSubmit = await DigitDialog.show(
                                     context,
@@ -545,23 +561,244 @@ class ZeroDoseCheckPageState extends LocalizedState<ZeroDoseCheckPage> {
                                   );
                                   if (shouldSubmit ?? false) {
                                     if (context.mounted) {
-                                      final router = context.router;
-                                      router.popUntilRouteWithName(
-                                          BeneficiaryWrapperRoute.name);
-                                      if (widget.isAdministration == true) {
-                                        router.push(
-                                          CustomSplashAcknowledgementRoute(
-                                              enableBackToSearch: false,
-                                              eligibilityAssessmentType: widget
-                                                  .eligibilityAssessmentType),
+                                      if (widget.isChecklistAssessmentDone ==
+                                          true) {
+                                        final householdMember = context
+                                            .read<HouseholdOverviewBloc>()
+                                            .state
+                                            .householdMemberWrapper;
+                                        final deliverState = context
+                                            .read<DeliverInterventionBloc>()
+                                            .state;
+
+                                        final oldTask =
+                                            deliverState.oldTask ?? widget.task;
+                                        final oldFields =
+                                            oldTask.additionalFields?.fields ??
+                                                [];
+
+                                        final updatedFields = [
+                                          ...oldFields,
+                                          AdditionalField(
+                                            'zeroDoseStatus',
+                                            zeroDose
+                                                ? ZeroDoseStatus.zeroDose.name
+                                                : incompletementVaccine
+                                                    ? ZeroDoseStatus
+                                                        .incompletementVaccine
+                                                        .name
+                                                    : ZeroDoseStatus.done.name,
+                                          ),
+                                        ];
+
+                                        final updatedTask = oldTask.copyWith(
+                                          additionalFields:
+                                              TaskAdditionalFields(
+                                            version: 1,
+                                            fields: updatedFields,
+                                          ),
                                         );
-                                      } else {
-                                        router.push(
-                                          CustomHouseholdAcknowledgementRoute(
+
+                                        context
+                                            .read<DeliverInterventionBloc>()
+                                            .add(
+                                              DeliverInterventionSubmitEvent(
+                                                task: updatedTask,
+                                                isEditing: (deliverState
+                                                                .tasks ??
+                                                            [])
+                                                        .isNotEmpty &&
+                                                    RegistrationDeliverySingleton()
+                                                            .beneficiaryType ==
+                                                        BeneficiaryType
+                                                            .household,
+                                                boundaryModel:
+                                                    RegistrationDeliverySingleton()
+                                                        .boundary!,
+                                              ),
+                                            );
+
+                                        ProjectTypeModel? projectTypeModel =
+                                            widget.eligibilityAssessmentType ==
+                                                    EligibilityAssessmentType
+                                                        .smc
+                                                ? RegistrationDeliverySingleton()
+                                                    .selectedProject
+                                                    ?.additionalDetails
+                                                    ?.projectType
+                                                : RegistrationDeliverySingleton()
+                                                    .selectedProject
+                                                    ?.additionalDetails
+                                                    ?.additionalProjectType;
+
+                                        if (deliverState.futureDeliveries !=
+                                                null &&
+                                            deliverState
+                                                .futureDeliveries!.isNotEmpty &&
+                                            projectTypeModel
+                                                    ?.cycles?.isNotEmpty ==
+                                                true) {
+                                          final router = context.router;
+                                          router.popUntilRouteWithName(
+                                              BeneficiaryWrapperRoute.name);
+                                          if (widget.isAdministration == true) {
+                                            router.push(
+                                              CustomSplashAcknowledgementRoute(
+                                                  enableBackToSearch: false,
+                                                  eligibilityAssessmentType: widget
+                                                      .eligibilityAssessmentType),
+                                            );
+                                          } else {
+                                            router.push(
+                                              CustomHouseholdAcknowledgementRoute(
+                                                  enableViewHousehold: true,
+                                                  eligibilityAssessmentType: widget
+                                                      .eligibilityAssessmentType),
+                                            );
+                                          }
+                                        } else {
+                                          final reloadState = context
+                                              .read<HouseholdOverviewBloc>();
+
+                                          reloadState.add(
+                                            HouseholdOverviewReloadEvent(
+                                              projectId:
+                                                  RegistrationDeliverySingleton()
+                                                      .projectId!,
+                                              projectBeneficiaryType:
+                                                  RegistrationDeliverySingleton()
+                                                      .beneficiaryType!,
+                                            ),
+                                          );
+                                          context.router.popAndPush(
+                                            CustomHouseholdAcknowledgementRoute(
                                               enableViewHousehold: true,
                                               eligibilityAssessmentType: widget
-                                                  .eligibilityAssessmentType),
+                                                  .eligibilityAssessmentType,
+                                            ),
+                                          );
+                                        }
+                                      } else {
+                                        final clientReferenceId =
+                                            IdGen.i.identifier;
+                                        List<String?> ineligibilityReasons = [];
+                                        ineligibilityReasons.add(
+                                            "CHILD_AGE_LESS_THAN_3_MONTHS");
+                                        context
+                                            .read<DeliverInterventionBloc>()
+                                            .add(
+                                              DeliverInterventionSubmitEvent(
+                                                task: TaskModel(
+                                                  projectBeneficiaryClientReferenceId:
+                                                      widget
+                                                          .projectBeneficiaryClientReferenceId,
+                                                  clientReferenceId:
+                                                      clientReferenceId,
+                                                  tenantId: envConfig
+                                                      .variables.tenantId,
+                                                  rowVersion: 1,
+                                                  auditDetails: AuditDetails(
+                                                    createdBy: context
+                                                        .loggedInUserUuid,
+                                                    createdTime: context
+                                                        .millisecondsSinceEpoch(),
+                                                  ),
+                                                  projectId: context.projectId,
+                                                  status: status_local.Status
+                                                      .beneficiaryInEligible
+                                                      .toValue(),
+                                                  clientAuditDetails:
+                                                      ClientAuditDetails(
+                                                    createdBy: context
+                                                        .loggedInUserUuid,
+                                                    createdTime: context
+                                                        .millisecondsSinceEpoch(),
+                                                    lastModifiedBy: context
+                                                        .loggedInUserUuid,
+                                                    lastModifiedTime: context
+                                                        .millisecondsSinceEpoch(),
+                                                  ),
+                                                  additionalFields:
+                                                      TaskAdditionalFields(
+                                                    version: 1,
+                                                    fields: [
+                                                      // AdditionalField(
+                                                      //   'taskStatus',
+                                                      //   status_local.Status
+                                                      //       .beneficiaryInEligible
+                                                      //       .toValue(),
+                                                      // ),
+                                                      AdditionalField(
+                                                        'ineligibleReasons',
+                                                        ineligibilityReasons
+                                                            .join(","),
+                                                      ),
+                                                      AdditionalField(
+                                                        additional_fields_local
+                                                            .AdditionalFieldsType
+                                                            .deliveryType
+                                                            .toValue(),
+                                                        EligibilityAssessmentStatus
+                                                            .smcDone.name,
+                                                      ),
+                                                      AdditionalField(
+                                                        'zeroDoseStatus',
+                                                        zeroDose
+                                                            ? ZeroDoseStatus
+                                                                .zeroDose.name
+                                                            : incompletementVaccine
+                                                                ? ZeroDoseStatus
+                                                                    .incompletementVaccine
+                                                                    .name
+                                                                : ZeroDoseStatus
+                                                                    .done.name,
+                                                      ),
+                                                      AdditionalField(
+                                                          'ageBelow3Months',
+                                                          true.toString()),
+                                                    ],
+                                                  ),
+                                                  address: widget.individual
+                                                      ?.address?.first
+                                                      .copyWith(
+                                                    relatedClientReferenceId:
+                                                        clientReferenceId,
+                                                    id: null,
+                                                  ),
+                                                ),
+                                                isEditing: false,
+                                                boundaryModel: context.boundary,
+                                                navigateToSummary: false,
+                                                householdMemberWrapper: context
+                                                    .read<
+                                                        HouseholdOverviewBloc>()
+                                                    .state
+                                                    .householdMemberWrapper,
+                                              ),
+                                            );
+                                        final searchBloc = context
+                                            .read<SearchHouseholdsBloc>();
+                                        searchBloc.add(
+                                          const SearchHouseholdsClearEvent(),
                                         );
+                                        final router = context.router;
+                                        router.popUntilRouteWithName(
+                                            BeneficiaryWrapperRoute.name);
+                                        if (widget.isAdministration == true) {
+                                          router.push(
+                                            CustomSplashAcknowledgementRoute(
+                                                enableBackToSearch: false,
+                                                eligibilityAssessmentType: widget
+                                                    .eligibilityAssessmentType),
+                                          );
+                                        } else {
+                                          router.push(
+                                            CustomHouseholdAcknowledgementRoute(
+                                                enableViewHousehold: true,
+                                                eligibilityAssessmentType: widget
+                                                    .eligibilityAssessmentType),
+                                          );
+                                        }
                                       }
                                     }
 
@@ -1247,19 +1484,31 @@ class ZeroDoseCheckPageState extends LocalizedState<ZeroDoseCheckPage> {
     return shouldNavigateBack ?? false;
   }
 
+  bool shouldShowVaccinePage(
+    Map<String?, String> responses,
+  ) {
+    var showVaccinePage = false;
+    var q1Key = "ZDAQ1";
+
+    if (responses.isNotEmpty) {
+      if (!showVaccinePage &&
+          (responses.containsKey(q1Key) && responses[q1Key]!.isNotEmpty)) {
+        showVaccinePage = responses[q1Key] == yes ? true : false;
+      }
+    }
+
+    return showVaccinePage;
+  }
+
   bool isZeroDose(
     Map<String?, String> responses,
   ) {
     var isZeroDose = false;
-    var q1Key = "ZDAQ1";
     var q2Key = "ZDAQ1.NO.Q2A";
     var q3Key = "ZDAQ1.NO.Q2A.YES.Q2AA";
 
     if (responses.isNotEmpty) {
-      if (responses.containsKey(q1Key) && responses[q1Key]!.isNotEmpty) {
-        isZeroDose = responses[q1Key] == no ? true : false;
-      }
-      if (isZeroDose &&
+      if (!isZeroDose &&
           (responses.containsKey(q2Key) && responses[q2Key]!.isNotEmpty)) {
         isZeroDose = responses[q2Key] == no ? true : false;
       }
