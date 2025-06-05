@@ -135,6 +135,9 @@ class CustomIndividualDetailsPageState
     final router = context.router;
     final theme = Theme.of(context);
     DateTime before150Years = DateTime(now.year - 150, now.month, now.day);
+    DateTime lastDate = DateTime(now.year, now.month - 3, now.day);
+    DateTime firstDate = DateTime(now.year, now.month - 59, now.day);
+
     final textTheme = theme.digitTextTheme(context);
 
     return Scaffold(
@@ -179,6 +182,45 @@ class CustomIndividualDetailsPageState
                           size: DigitButtonSize.large,
                           mainAxisSize: MainAxisSize.max,
                           onPressed: () async {
+                            if (form.control(_dobKey).value == null) {
+                              setState(() {
+                                form.control(_dobKey).setErrors({'': true});
+                              });
+                            }
+                            if (form.control(_genderKey).value == null) {
+                              setState(() {
+                                form.control(_genderKey).setErrors({'': true});
+                              });
+                            }
+                            final userId = RegistrationDeliverySingleton()
+                                .loggedInUserUuid;
+                            final projectId =
+                                RegistrationDeliverySingleton().projectId;
+                            form.markAllAsTouched();
+                            if (!form.valid) return;
+                            FocusManager.instance.primaryFocus?.unfocus();
+
+                            final age = (form.control(_dobKey).value != null)
+                                ? digits.DigitDateUtils.calculateAge(
+                                    form.control(_dobKey).value as DateTime,
+                                  )
+                                : digits.DigitDateUtils.calculateAge(
+                                    DateTime.now(),
+                                  );
+
+                            if (age.years < 18 && widget.isHeadOfHousehold) {
+                              await DigitToast.show(
+                                context,
+                                options: DigitToastOptions(
+                                  localizations.translate(i18_local
+                                      .individualDetails.headAgeValidError),
+                                  true,
+                                  theme,
+                                ),
+                              );
+
+                              return;
+                            }
                             final submit = await showDialog(
                               context: context,
                               builder: (ctx) => Popup(
@@ -217,48 +259,7 @@ class CustomIndividualDetailsPageState
                             );
 
                             if (submit ?? false) {
-                              if (form.control(_dobKey).value == null) {
-                                setState(() {
-                                  form.control(_dobKey).setErrors({'': true});
-                                });
-                              }
-                              if (form.control(_genderKey).value == null) {
-                                setState(() {
-                                  form
-                                      .control(_genderKey)
-                                      .setErrors({'': true});
-                                });
-                              }
-                              final userId = RegistrationDeliverySingleton()
-                                  .loggedInUserUuid;
-                              final projectId =
-                                  RegistrationDeliverySingleton().projectId;
-                              form.markAllAsTouched();
-                              if (!form.valid) return;
-                              FocusManager.instance.primaryFocus?.unfocus();
-
-                              final age = (form.control(_dobKey).value != null)
-                                  ? digits.DigitDateUtils.calculateAge(
-                                      form.control(_dobKey).value as DateTime,
-                                    )
-                                  : digits.DigitDateUtils.calculateAge(
-                                      DateTime.now(),
-                                    );
-
-                              if (age.years < 18 && widget.isHeadOfHousehold) {
-                                await DigitToast.show(
-                                  context,
-                                  options: DigitToastOptions(
-                                    localizations.translate(i18_local
-                                        .individualDetails.headAgeValidError),
-                                    true,
-                                    theme,
-                                  ),
-                                );
-
-                                return;
-                              }
-
+                              
                               final boundaryBloc =
                                   context.read<BoundaryBloc>().state;
                               final code = boundaryBloc.boundaryList.first.code;
@@ -687,11 +688,16 @@ class CustomIndividualDetailsPageState
                             requiredErrMsg: localizations.translate(
                               i18.common.corecommonRequired,
                             ),
-                            initialDate: before150Years,
+                            // initialDate: before150Years,
+                            initialDate: widget.isHeadOfHousehold
+                                ? before150Years
+                                : firstDate,
+                            finalDate: widget.isHeadOfHousehold
+                                ? DateTime.now()
+                                : lastDate,
                             onChangeOfFormControl: (formControl) {
                               // Handle changes to the control's value here
                               final value = formControl.value;
-
                               digits.DigitDOBAge age =
                                   digits.DigitDateUtils.calculateAge(value);
                               // Allow only between 0 to 59 months for cycle 1

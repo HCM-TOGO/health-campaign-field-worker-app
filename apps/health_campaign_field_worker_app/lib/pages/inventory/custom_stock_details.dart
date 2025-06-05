@@ -334,6 +334,18 @@ class CustomStockDetailsPageState
                                         i18.stockDetails.selectProductLabel,
                                       ),
                                     );
+                                  } else if (form
+                                          .control(_transactionReasonKey)
+                                          .value ==
+                                      null) {
+                                    Toast.showToast(
+                                      context,
+                                      type: ToastType.error,
+                                      message: localizations.translate(
+                                        i18_local
+                                            .common.pleaseEnterRequiredDetails,
+                                      ),
+                                    );
                                   } else if (controller1.text.isEmpty) {
                                     Toast.showToast(context,
                                         type: ToastType.error,
