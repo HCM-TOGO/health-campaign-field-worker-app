@@ -456,6 +456,18 @@ abstract class _$AppRouter extends RootStackRouter {
         ),
       );
     },
+    CustomSideEffectsRoute.name: (routeData) {
+      final args = routeData.argsAs<CustomSideEffectsRouteArgs>();
+      return AutoRoutePage<dynamic>(
+        routeData: routeData,
+        child: CustomSideEffectsPage(
+          key: args.key,
+          appLocalizations: args.appLocalizations,
+          tasks: args.tasks,
+          isEditing: args.isEditing,
+        ),
+      );
+    },
     CustomSplashAcknowledgementRoute.name: (routeData) {
       final args = routeData.argsAs<CustomSplashAcknowledgementRouteArgs>();
       return AutoRoutePage<dynamic>(
@@ -465,6 +477,8 @@ abstract class _$AppRouter extends RootStackRouter {
           appLocalizations: args.appLocalizations,
           enableBackToSearch: args.enableBackToSearch,
           eligibilityAssessmentType: args.eligibilityAssessmentType,
+          enableRouteToZeroDose: args.enableRouteToZeroDose,
+          task: args.task,
         ),
       );
     },
@@ -736,6 +750,8 @@ abstract class _$AppRouter extends RootStackRouter {
               args.projectBeneficiaryClientReferenceId,
           individual: args.individual,
           task: args.task,
+          hasSideEffects: args.hasSideEffects,
+          sideEffect: args.sideEffect,
         ),
       );
     },
@@ -753,6 +769,8 @@ abstract class _$AppRouter extends RootStackRouter {
           projectBeneficiaryClientReferenceId:
               args.projectBeneficiaryClientReferenceId,
           individual: args.individual,
+          hasSideEffects: args.hasSideEffects,
+          sideEffect: args.sideEffect,
           task: args.task,
         ),
       );
@@ -2394,6 +2412,54 @@ class CustomSearchReferralReconciliationsRouteArgs {
 }
 
 /// generated route for
+/// [CustomSideEffectsPage]
+class CustomSideEffectsRoute extends PageRouteInfo<CustomSideEffectsRouteArgs> {
+  CustomSideEffectsRoute({
+    Key? key,
+    RegistrationDeliveryLocalization? appLocalizations,
+    required List<TaskModel> tasks,
+    bool isEditing = false,
+    List<PageRouteInfo>? children,
+  }) : super(
+          CustomSideEffectsRoute.name,
+          args: CustomSideEffectsRouteArgs(
+            key: key,
+            appLocalizations: appLocalizations,
+            tasks: tasks,
+            isEditing: isEditing,
+          ),
+          initialChildren: children,
+        );
+
+  static const String name = 'CustomSideEffectsRoute';
+
+  static const PageInfo<CustomSideEffectsRouteArgs> page =
+      PageInfo<CustomSideEffectsRouteArgs>(name);
+}
+
+class CustomSideEffectsRouteArgs {
+  const CustomSideEffectsRouteArgs({
+    this.key,
+    this.appLocalizations,
+    required this.tasks,
+    this.isEditing = false,
+  });
+
+  final Key? key;
+
+  final RegistrationDeliveryLocalization? appLocalizations;
+
+  final List<TaskModel> tasks;
+
+  final bool isEditing;
+
+  @override
+  String toString() {
+    return 'CustomSideEffectsRouteArgs{key: $key, appLocalizations: $appLocalizations, tasks: $tasks, isEditing: $isEditing}';
+  }
+}
+
+/// generated route for
 /// [CustomSplashAcknowledgementPage]
 class CustomSplashAcknowledgementRoute
     extends PageRouteInfo<CustomSplashAcknowledgementRouteArgs> {
@@ -2402,6 +2468,8 @@ class CustomSplashAcknowledgementRoute
     RegistrationDeliveryLocalization? appLocalizations,
     bool? enableBackToSearch,
     required EligibilityAssessmentType eligibilityAssessmentType,
+    bool? enableRouteToZeroDose = false,
+    TaskModel? task,
     List<PageRouteInfo>? children,
   }) : super(
           CustomSplashAcknowledgementRoute.name,
@@ -2410,6 +2478,8 @@ class CustomSplashAcknowledgementRoute
             appLocalizations: appLocalizations,
             enableBackToSearch: enableBackToSearch,
             eligibilityAssessmentType: eligibilityAssessmentType,
+            enableRouteToZeroDose: enableRouteToZeroDose,
+            task: task,
           ),
           initialChildren: children,
         );
@@ -2426,6 +2496,8 @@ class CustomSplashAcknowledgementRouteArgs {
     this.appLocalizations,
     this.enableBackToSearch,
     required this.eligibilityAssessmentType,
+    this.enableRouteToZeroDose = false,
+    this.task,
   });
 
   final Key? key;
@@ -2436,9 +2508,13 @@ class CustomSplashAcknowledgementRouteArgs {
 
   final EligibilityAssessmentType eligibilityAssessmentType;
 
+  final bool? enableRouteToZeroDose;
+
+  final TaskModel? task;
+
   @override
   String toString() {
-    return 'CustomSplashAcknowledgementRouteArgs{key: $key, appLocalizations: $appLocalizations, enableBackToSearch: $enableBackToSearch, eligibilityAssessmentType: $eligibilityAssessmentType}';
+    return 'CustomSplashAcknowledgementRouteArgs{key: $key, appLocalizations: $appLocalizations, enableBackToSearch: $enableBackToSearch, eligibilityAssessmentType: $eligibilityAssessmentType, enableRouteToZeroDose: $enableRouteToZeroDose, task: $task}';
   }
 }
 
@@ -3365,6 +3441,8 @@ class VaccineSelectionRoute extends PageRouteInfo<VaccineSelectionRouteArgs> {
     String? projectBeneficiaryClientReferenceId,
     IndividualModel? individual,
     required TaskModel task,
+    bool? hasSideEffects = false,
+    required SideEffectModel sideEffect,
     List<PageRouteInfo>? children,
   }) : super(
           VaccineSelectionRoute.name,
@@ -3378,6 +3456,8 @@ class VaccineSelectionRoute extends PageRouteInfo<VaccineSelectionRouteArgs> {
                 projectBeneficiaryClientReferenceId,
             individual: individual,
             task: task,
+            hasSideEffects: hasSideEffects,
+            sideEffect: sideEffect,
           ),
           initialChildren: children,
         );
@@ -3398,6 +3478,8 @@ class VaccineSelectionRouteArgs {
     this.projectBeneficiaryClientReferenceId,
     this.individual,
     required this.task,
+    this.hasSideEffects = false,
+    required this.sideEffect,
   });
 
   final Key? key;
@@ -3416,9 +3498,13 @@ class VaccineSelectionRouteArgs {
 
   final TaskModel task;
 
+  final bool? hasSideEffects;
+
+  final SideEffectModel sideEffect;
+
   @override
   String toString() {
-    return 'VaccineSelectionRouteArgs{key: $key, appLocalizations: $appLocalizations, isAdministration: $isAdministration, eligibilityAssessmentType: $eligibilityAssessmentType, isChecklistAssessmentDone: $isChecklistAssessmentDone, projectBeneficiaryClientReferenceId: $projectBeneficiaryClientReferenceId, individual: $individual, task: $task}';
+    return 'VaccineSelectionRouteArgs{key: $key, appLocalizations: $appLocalizations, isAdministration: $isAdministration, eligibilityAssessmentType: $eligibilityAssessmentType, isChecklistAssessmentDone: $isChecklistAssessmentDone, projectBeneficiaryClientReferenceId: $projectBeneficiaryClientReferenceId, individual: $individual, task: $task, hasSideEffects: $hasSideEffects, sideEffect: $sideEffect}';
   }
 }
 
@@ -3434,6 +3520,8 @@ class ZeroDoseCheckRoute extends PageRouteInfo<ZeroDoseCheckRouteArgs> {
     bool isChecklistAssessmentDone = true,
     String? projectBeneficiaryClientReferenceId,
     IndividualModel? individual,
+    bool? hasSideEffects = false,
+    SideEffectModel? sideEffect,
     TaskModel? task,
     List<PageRouteInfo>? children,
   }) : super(
@@ -3448,6 +3536,8 @@ class ZeroDoseCheckRoute extends PageRouteInfo<ZeroDoseCheckRouteArgs> {
             projectBeneficiaryClientReferenceId:
                 projectBeneficiaryClientReferenceId,
             individual: individual,
+            hasSideEffects: hasSideEffects,
+            sideEffect: sideEffect,
             task: task,
           ),
           initialChildren: children,
@@ -3469,6 +3559,8 @@ class ZeroDoseCheckRouteArgs {
     this.isChecklistAssessmentDone = true,
     this.projectBeneficiaryClientReferenceId,
     this.individual,
+    this.hasSideEffects = false,
+    this.sideEffect,
     this.task,
   });
 
@@ -3488,10 +3580,14 @@ class ZeroDoseCheckRouteArgs {
 
   final IndividualModel? individual;
 
+  final bool? hasSideEffects;
+
+  final SideEffectModel? sideEffect;
+
   final TaskModel? task;
 
   @override
   String toString() {
-    return 'ZeroDoseCheckRouteArgs{key: $key, appLocalizations: $appLocalizations, eligibilityAssessmentType: $eligibilityAssessmentType, isAdministration: $isAdministration, isEditing: $isEditing, isChecklistAssessmentDone: $isChecklistAssessmentDone, projectBeneficiaryClientReferenceId: $projectBeneficiaryClientReferenceId, individual: $individual, task: $task}';
+    return 'ZeroDoseCheckRouteArgs{key: $key, appLocalizations: $appLocalizations, eligibilityAssessmentType: $eligibilityAssessmentType, isAdministration: $isAdministration, isEditing: $isEditing, isChecklistAssessmentDone: $isChecklistAssessmentDone, projectBeneficiaryClientReferenceId: $projectBeneficiaryClientReferenceId, individual: $individual, hasSideEffects: $hasSideEffects, sideEffect: $sideEffect, task: $task}';
   }
 }

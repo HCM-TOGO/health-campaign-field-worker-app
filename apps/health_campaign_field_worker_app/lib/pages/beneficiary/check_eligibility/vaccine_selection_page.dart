@@ -18,6 +18,7 @@ import 'package:registration_delivery/router/registration_delivery_router.gm.dar
 import '../../../models/entities/roles_type.dart';
 import 'package:registration_delivery/blocs/household_overview/household_overview.dart';
 import 'package:survey_form/survey_form.dart';
+import '../../../models/entities/status.dart';
 import '../../../router/app_router.dart';
 import '../../../utils/app_enums.dart';
 import '../../../utils/constants.dart';
@@ -46,6 +47,9 @@ class VaccineSelectionPage extends LocalizedStatefulWidget {
   final String? projectBeneficiaryClientReferenceId;
   final IndividualModel? individual;
   final TaskModel task;
+  final bool? hasSideEffects;
+  final SideEffectModel sideEffect;
+
   const VaccineSelectionPage({
     super.key,
     super.appLocalizations,
@@ -55,6 +59,8 @@ class VaccineSelectionPage extends LocalizedStatefulWidget {
     this.projectBeneficiaryClientReferenceId,
     this.individual,
     required this.task,
+    this.hasSideEffects = false,
+    required this.sideEffect,
   });
 
   @override
@@ -468,6 +474,14 @@ class _VaccineSelectionPageState extends LocalizedState<VaccineSelectionPage> {
                                         );
                                       }
                                     } else {
+                                      if (widget.hasSideEffects == true) {
+                                        context.read<SideEffectsBloc>().add(
+                                              SideEffectsSubmitEvent(
+                                                widget.sideEffect!,
+                                                false,
+                                              ),
+                                            );
+                                      }
                                       final clientReferenceId =
                                           IdGen.i.identifier;
                                       List<String?> ineligibilityReasons = [];
@@ -493,9 +507,13 @@ class _VaccineSelectionPageState extends LocalizedState<VaccineSelectionPage> {
                                                       .millisecondsSinceEpoch(),
                                                 ),
                                                 projectId: context.projectId,
-                                                status: status_local.Status
-                                                    .beneficiaryInEligible
-                                                    .toValue(),
+                                                status: (widget.hasSideEffects ??
+                                                        false)
+                                                    ? Status.inComplete
+                                                        .toValue()
+                                                    : status_local.Status
+                                                        .beneficiaryInEligible
+                                                        .toValue(),
                                                 clientAuditDetails:
                                                     ClientAuditDetails(
                                                   createdBy:
@@ -517,11 +535,18 @@ class _VaccineSelectionPageState extends LocalizedState<VaccineSelectionPage> {
                                                     //       .beneficiaryInEligible
                                                     //       .toValue(),
                                                     // ),
-                                                    AdditionalField(
-                                                      'ineligibleReasons',
-                                                      ineligibilityReasons
-                                                          .join(","),
-                                                    ),
+                                                    if (widget.hasSideEffects ==
+                                                        false) ...[
+                                                      AdditionalField(
+                                                        'ineligibleReasons',
+                                                        ineligibilityReasons
+                                                            .join(","),
+                                                      ),
+                                                      AdditionalField(
+                                                        'ageBelow3Months',
+                                                        true.toString(),
+                                                      ),
+                                                    ],
                                                     AdditionalField(
                                                       additional_fields_local
                                                           .AdditionalFieldsType
@@ -534,9 +559,6 @@ class _VaccineSelectionPageState extends LocalizedState<VaccineSelectionPage> {
                                                       'zeroDoseStatus',
                                                       ZeroDoseStatus.done.name,
                                                     ),
-                                                    AdditionalField(
-                                                        'ageBelow3Months',
-                                                        true.toString()),
                                                   ],
                                                 ),
                                                 address: widget
