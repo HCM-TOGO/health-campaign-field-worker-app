@@ -100,7 +100,7 @@ import '../pages/inventory/qr_scanner.dart';
 import '../pages/closedhousehold/custom_closed_household_summary.dart';
 import 'package:digit_scanner/blocs/app_localization.dart';
 import '../pages/inventory/custom_summary_report.dart';
-
+import '../pages/registration_delivery/custom_beneficiary_summary.dart';
 part 'app_router.gr.dart';
 
 @AutoRouterConfig(
@@ -344,6 +344,11 @@ class AppRouter extends _$AppRouter {
                     page: CustomSummaryRoute.page,
                     path: 'custom-beneficiary-summary',
                   ),
+                  AutoRoute(
+                    page: CustomBeneficiarySummaryRoute.page,
+                    path: 'custom-beneficiary-summary-page',
+                  ),
+
                   // AutoRoute(
                   //   page: BeneficiaryAcknowledgementRoute.page,
                   //   path: 'beneficiary-acknowledgement',
