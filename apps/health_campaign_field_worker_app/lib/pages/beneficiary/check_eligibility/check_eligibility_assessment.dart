@@ -448,91 +448,88 @@ class _EligibilityChecklistViewPage
                                     // added the deliversubmitevent here
                                     final clientReferenceId =
                                         IdGen.i.identifier;
-                                    context.read<DeliverInterventionBloc>().add(
-                                          DeliverInterventionSubmitEvent(
-                                              task: TaskModel(
-                                                projectBeneficiaryClientReferenceId:
-                                                    projectBeneficiaryClientReferenceId,
-                                                clientReferenceId:
-                                                    clientReferenceId,
-                                                tenantId: envConfig
-                                                    .variables.tenantId,
-                                                rowVersion: 1,
-                                                auditDetails: AuditDetails(
-                                                  createdBy:
-                                                      context.loggedInUserUuid,
-                                                  createdTime: context
-                                                      .millisecondsSinceEpoch(),
-                                                ),
-                                                projectId: context.projectId,
-                                                status: status_local.Status
-                                                    .beneficiaryInEligible
-                                                    .toValue(),
-                                                clientAuditDetails:
-                                                    ClientAuditDetails(
-                                                  createdBy:
-                                                      context.loggedInUserUuid,
-                                                  createdTime: context
-                                                      .millisecondsSinceEpoch(),
-                                                  lastModifiedBy:
-                                                      context.loggedInUserUuid,
-                                                  lastModifiedTime: context
-                                                      .millisecondsSinceEpoch(),
-                                                ),
-                                                additionalFields:
-                                                    TaskAdditionalFields(
-                                                  version: 1,
-                                                  fields: [
-                                                    // AdditionalField(
-                                                    //   'taskStatus',
-                                                    //   status_local.Status
-                                                    //       .beneficiaryInEligible
-                                                    //       .toValue(),
-                                                    // ),
-                                                    AdditionalField(
-                                                      'ineligibleReasons',
-                                                      ineligibilityReasons
-                                                          .join(","),
-                                                    ),
-                                                    AdditionalField(
-                                                      additional_fields_local
-                                                          .AdditionalFieldsType
-                                                          .deliveryType
-                                                          .toValue(),
-                                                      (widget.eligibilityAssessmentType ==
-                                                              EligibilityAssessmentType
-                                                                  .smc)
-                                                          ? EligibilityAssessmentStatus
-                                                              .smcDone.name
-                                                          : EligibilityAssessmentStatus
-                                                              .vasDone.name,
-                                                    ),
-                                                  ],
-                                                ),
-                                                address: widget
-                                                    .individual!.address?.first
-                                                    .copyWith(
-                                                  relatedClientReferenceId:
-                                                      clientReferenceId,
-                                                  id: null,
-                                                ),
-                                              ),
-                                              isEditing: false,
-                                              boundaryModel: context.boundary,
-                                              navigateToSummary: false,
-                                              householdMemberWrapper:
-                                                  householdOverviewState
-                                                      .householdMemberWrapper),
-                                        );
-                                    final searchBloc =
-                                        context.read<SearchHouseholdsBloc>();
-                                    searchBloc.add(
-                                      const SearchHouseholdsClearEvent(),
+                                    final task = TaskModel(
+                                      projectBeneficiaryClientReferenceId:
+                                          projectBeneficiaryClientReferenceId,
+                                      clientReferenceId: clientReferenceId,
+                                      tenantId: envConfig.variables.tenantId,
+                                      rowVersion: 1,
+                                      auditDetails: AuditDetails(
+                                        createdBy: context.loggedInUserUuid,
+                                        createdTime:
+                                            context.millisecondsSinceEpoch(),
+                                      ),
+                                      projectId: context.projectId,
+                                      status: status_local
+                                          .Status.beneficiaryInEligible
+                                          .toValue(),
+                                      clientAuditDetails: ClientAuditDetails(
+                                        createdBy: context.loggedInUserUuid,
+                                        createdTime:
+                                            context.millisecondsSinceEpoch(),
+                                        lastModifiedBy:
+                                            context.loggedInUserUuid,
+                                        lastModifiedTime:
+                                            context.millisecondsSinceEpoch(),
+                                      ),
+                                      additionalFields: TaskAdditionalFields(
+                                        version: 1,
+                                        fields: [
+                                          // AdditionalField(
+                                          //   'taskStatus',
+                                          //   status_local.Status
+                                          //       .beneficiaryInEligible
+                                          //       .toValue(),
+                                          // ),
+                                          AdditionalField(
+                                            'ineligibleReasons',
+                                            ineligibilityReasons.join(","),
+                                          ),
+                                          AdditionalField(
+                                            additional_fields_local
+                                                .AdditionalFieldsType
+                                                .deliveryType
+                                                .toValue(),
+                                            (widget.eligibilityAssessmentType ==
+                                                    EligibilityAssessmentType
+                                                        .smc)
+                                                ? EligibilityAssessmentStatus
+                                                    .smcDone.name
+                                                : EligibilityAssessmentStatus
+                                                    .vasDone.name,
+                                          ),
+                                        ],
+                                      ),
+                                      address: widget.individual!.address?.first
+                                          .copyWith(
+                                        relatedClientReferenceId:
+                                            clientReferenceId,
+                                        id: null,
+                                      ),
                                     );
+
+                                    // TODO: Currently, it's been shifted to the zero dose flow
+                                    // context.read<DeliverInterventionBloc>().add(
+                                    //       DeliverInterventionSubmitEvent(
+                                    //           task: task,
+                                    //           isEditing: false,
+                                    //           boundaryModel: context.boundary,
+                                    //           navigateToSummary: false,
+                                    //           householdMemberWrapper:
+                                    //               householdOverviewState
+                                    //                   .householdMemberWrapper),
+                                    //     );
+                                    // final searchBloc =
+                                    //     context.read<SearchHouseholdsBloc>();
+                                    // searchBloc.add(
+                                    //   const SearchHouseholdsClearEvent(),
+                                    // );
+
                                     router.push(ZeroDoseCheckRoute(
                                       eligibilityAssessmentType:
                                           widget.eligibilityAssessmentType,
                                       isAdministration: false,
+                                      task: task,
                                     ));
                                     // router.push(
                                     //   CustomHouseholdAcknowledgementRoute(

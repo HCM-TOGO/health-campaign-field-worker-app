@@ -100,6 +100,9 @@ import '../pages/inventory/qr_scanner.dart';
 import '../pages/closedhousehold/custom_closed_household_summary.dart';
 import 'package:digit_scanner/blocs/app_localization.dart';
 import '../pages/inventory/custom_summary_report.dart';
+import '../pages/beneficiary/check_eligibility/custom_side_effects.dart';
+import 'package:registration_delivery/models/entities/side_effect.dart';
+
 import '../pages/registration_delivery/custom_beneficiary_summary.dart';
 part 'app_router.gr.dart';
 
@@ -400,9 +403,17 @@ class AppRouter extends _$AppRouter {
                   //   redirectTo: 'custom-deliver-intervention',
                   // ),
                   AutoRoute(
-                    page: SideEffectsRoute.page,
-                    path: 'side-effects',
+                    page: CustomSideEffectsRoute.page,
+                    path: 'custom-side-effects',
                   ),
+                  // AutoRoute(
+                  //   page: SideEffectsRoute.page,
+                  //   path: 'side-effects',
+                  // ),
+                  // RedirectRoute(
+                  //   path: 'side-effects',
+                  //   redirectTo: 'custom-side-effects',
+                  // ),
                   AutoRoute(
                     page: ReferBeneficiaryRoute.page,
                     path: 'refer-beneficiary',

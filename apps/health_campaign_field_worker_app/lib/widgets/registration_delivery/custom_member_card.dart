@@ -2,7 +2,10 @@ import 'package:auto_route/auto_route.dart';
 import 'package:collection/collection.dart';
 import 'package:digit_components/digit_components.dart';
 import 'package:digit_data_model/data_model.dart';
+import 'package:digit_ui_components/enum/app_enums.dart';
 import 'package:digit_ui_components/theme/digit_extended_theme.dart';
+import 'package:digit_ui_components/widgets/atoms/digit_action_card.dart';
+import 'package:digit_ui_components/widgets/atoms/digit_button.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:registration_delivery/blocs/app_localization.dart';
@@ -138,8 +141,8 @@ class CustomMemberCard extends StatelessWidget {
         checkBeneficiaryIncompletementVaccine(zeroDoseTasks);
     bool isZeroDoseDelivered = checkBeneficiaryZeroDoseDelivered(zeroDoseTasks);
     bool isBeneficiaryReferredSMC = checkBeneficiaryReferredSMC(smcTasks);
-
     bool isBeneficiaryInEligibleSMC = checkBeneficiaryInEligibleSMC(smcTasks);
+    bool hasBeneficiaryRefused = checkBeneficiaryRefusedSMC(tasks);
 
     final theme = Theme.of(context);
     if (isHead) {
@@ -156,8 +159,9 @@ class CustomMemberCard extends StatelessWidget {
       );
     }
     if ((isSMCDelivered ||
-        isBeneficiaryReferredSMC ||
-        isBeneficiaryInEligibleSMC)) {
+            isBeneficiaryReferredSMC ||
+            isBeneficiaryInEligibleSMC) &&
+        !hasBeneficiaryRefused) {
       return Column(
         children: [
           if (isSMCDelivered ||
@@ -272,17 +276,42 @@ class CustomMemberCard extends StatelessWidget {
             ),
         ],
       );
-    } else if (isBeneficiaryRefused) {
-      return Align(
-          alignment: Alignment.centerLeft,
-          child: DigitIconButton(
-            icon: Icons.info_rounded,
-            iconSize: 20,
-            iconText:
-                localizations.translate(Status.beneficiaryRefused.toValue()),
-            iconTextColor: theme.colorScheme.error,
-            iconColor: theme.colorScheme.error,
-          ));
+    } else if (isBeneficiaryRefused || hasBeneficiaryRefused) {
+      return Column(
+        children: [
+          Align(
+            alignment: Alignment.centerLeft,
+            child: DigitIconButton(
+              icon: Icons.info_rounded,
+              iconSize: 20,
+              iconText: localizations.translate(i18_local
+                  .householdOverView.householdOverViewBeneficiaryRefusedLabel),
+              iconTextColor: theme.colorScheme.error,
+              iconColor: theme.colorScheme.error,
+            ),
+          ),
+          if (isZeroDose || isIncompletementVaccine || isZeroDoseDelivered)
+            Align(
+              alignment: Alignment.centerLeft,
+              child: DigitIconButton(
+                icon: Icons.check_circle,
+                iconText: localizations.translate(
+                  isZeroDose
+                      ? i18_local
+                          .householdOverView.householdOverViewZeroDoseIconLabel
+                      : isIncompletementVaccine
+                          ? i18_local.householdOverView
+                              .householdOverViewIncompletementVaccineLabel
+                          : i18_local.householdOverView
+                              .householdOverViewZeroDoseDeliveredIconLabel,
+                ),
+                iconSize: 20,
+                iconTextColor: theme.colorScheme.onSurfaceVariant,
+                iconColor: theme.colorScheme.onSurfaceVariant,
+              ),
+            ),
+        ],
+      );
     } else {
       return Container();
     }
@@ -296,8 +325,8 @@ class CustomMemberCard extends StatelessWidget {
     final doseStatus = checkStatus(smcTasks, context.selectedCycle);
     bool smcAssessmentPendingStatus = assessmentSMCPending(smcTasks);
     bool isBeneficiaryReferredSMC = checkBeneficiaryReferredSMC(smcTasks);
-
     bool isBeneficiaryInEligibleSMC = checkBeneficiaryInEligibleSMC(smcTasks);
+    bool hasBeneficiaryRefused = checkBeneficiaryRefusedSMC(tasks);
 
     final redosePendingStatus = smcAssessmentPendingStatus
         ? true
@@ -308,6 +337,7 @@ class CustomMemberCard extends StatelessWidget {
         !isSMCDelivered &&
         !isBeneficiaryReferredSMC &&
         !isBeneficiaryInEligibleSMC &&
+        !hasBeneficiaryRefused &&
         (zeroDoseTasks == null || zeroDoseTasks.isEmpty == true)) {
       return Column(
         children: [
@@ -423,6 +453,163 @@ class CustomMemberCard extends StatelessWidget {
                   ),
                 );
               }
+            },
+          ),
+        if (smcAssessmentPendingStatus &&
+            !isBeneficiaryReferredSMC &&
+            !isBeneficiaryInEligibleSMC &&
+            !hasBeneficiaryRefused)
+          DigitButton(
+            label: localizations.translate(
+              i18.memberCard.unableToDeliverLabel,
+            ),
+            isDisabled: (projectBeneficiaries ?? []).isEmpty ? true : false,
+            type: DigitButtonType.secondary,
+            size: DigitButtonSize.large,
+            mainAxisSize: MainAxisSize.max,
+            onPressed: () async {
+              final bloc = context.read<HouseholdOverviewBloc>();
+              bloc.add(
+                HouseholdOverviewEvent.selectedIndividual(
+                  individualModel: individual,
+                ),
+              );
+              await showDialog(
+                context: context,
+                builder: (ctx) => DigitActionCard(
+                  onOutsideTap: () {
+                    Navigator.of(
+                      context,
+                      rootNavigator: true,
+                    ).pop();
+                  },
+                  actions: [
+                    DigitButton(
+                      label: localizations.translate(
+                        i18.memberCard.beneficiaryRefusedLabel,
+                      ),
+                      type: DigitButtonType.secondary,
+                      size: DigitButtonSize.large,
+                      onPressed: () {
+                        Navigator.of(context, rootNavigator: true).pop();
+                        TaskModel refusalTask = TaskModel(
+                          projectBeneficiaryClientReferenceId:
+                              projectBeneficiaryClientReferenceId,
+                          clientReferenceId: IdGen.i.identifier,
+                          tenantId: RegistrationDeliverySingleton().tenantId,
+                          rowVersion: 1,
+                          auditDetails: AuditDetails(
+                            createdBy: RegistrationDeliverySingleton()
+                                .loggedInUserUuid!,
+                            createdTime: context.millisecondsSinceEpoch(),
+                          ),
+                          projectId: RegistrationDeliverySingleton().projectId,
+                          status: Status.beneficiaryRefused.toValue(),
+                          clientAuditDetails: ClientAuditDetails(
+                            createdBy: RegistrationDeliverySingleton()
+                                .loggedInUserUuid!,
+                            createdTime: context.millisecondsSinceEpoch(),
+                            lastModifiedBy: RegistrationDeliverySingleton()
+                                .loggedInUserUuid,
+                            lastModifiedTime: context.millisecondsSinceEpoch(),
+                          ),
+                          additionalFields: TaskAdditionalFields(
+                            version: 1,
+                            fields: [
+                              AdditionalField(
+                                'taskStatus',
+                                Status.beneficiaryRefused.toValue(),
+                              ),
+                            ],
+                          ),
+                          address: individual.address?.first,
+                        );
+
+                        // TODO: Currently it's been shifted to the zero dose flow
+
+                        // context.read<DeliverInterventionBloc>().add(
+                        //       DeliverInterventionSubmitEvent(
+                        //         task: refusalTask,
+                        //         isEditing: false,
+                        //         boundaryModel:
+                        //             RegistrationDeliverySingleton().boundary!,
+                        //       ),
+                        //     );
+
+                        final reloadState =
+                            context.read<HouseholdOverviewBloc>();
+                        Future.delayed(
+                          const Duration(milliseconds: 500),
+                          () {
+                            reloadState.add(
+                              HouseholdOverviewReloadEvent(
+                                projectId:
+                                    RegistrationDeliverySingleton().projectId!,
+                                projectBeneficiaryType:
+                                    RegistrationDeliverySingleton()
+                                        .beneficiaryType!,
+                              ),
+                            );
+                          },
+                        ).then(
+                          (value) => context.router.push(
+                            CustomSplashAcknowledgementRoute(
+                              eligibilityAssessmentType:
+                                  EligibilityAssessmentType.smc,
+                              enableRouteToZeroDose: true,
+                              task: refusalTask,
+                            ),
+                          ),
+                        );
+                      },
+                    ),
+                    DigitButton(
+                      label: localizations.translate(
+                        i18.memberCard.referBeneficiaryLabel,
+                      ),
+                      type: DigitButtonType.secondary,
+                      size: DigitButtonSize.large,
+                      onPressed: () async {
+                        Navigator.of(
+                          context,
+                          rootNavigator: true,
+                        ).pop();
+                        List<String> referralReasons = ["BENEFICIARY_REFERRED"];
+                        await context.router.push(
+                          CustomReferBeneficiarySMCRoute(
+                            projectBeneficiaryClientRefId:
+                                projectBeneficiaryClientReferenceId ?? '',
+                            individual: individual,
+                            referralReasons: referralReasons,
+                          ),
+                        );
+                      },
+                    ),
+                    DigitButton(
+                      label: localizations.translate(
+                        i18.memberCard.recordAdverseEventsLabel,
+                      ),
+                      isDisabled: tasks != null && (tasks ?? []).isNotEmpty
+                          ? false
+                          : true,
+                      type: DigitButtonType.secondary,
+                      size: DigitButtonSize.large,
+                      mainAxisSize: MainAxisSize.max,
+                      onPressed: () async {
+                        Navigator.of(
+                          context,
+                          rootNavigator: true,
+                        ).pop();
+                        await context.router.push(
+                          CustomSideEffectsRoute(
+                            tasks: tasks!,
+                          ),
+                        );
+                      },
+                    ),
+                  ],
+                ),
+              );
             },
           ),
         if ((!smcAssessmentPendingStatus) && redosePendingStatus)

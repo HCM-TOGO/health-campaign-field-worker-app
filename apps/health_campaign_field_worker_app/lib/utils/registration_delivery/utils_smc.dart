@@ -281,6 +281,17 @@ bool checkBeneficiaryInEligibleVAS(List<TaskModel>? tasks) {
   return successfulTask != null;
 }
 
+bool checkBeneficiaryRefusedSMC(List<TaskModel>? tasks) {
+  if ((tasks ?? []).isEmpty) {
+    return false;
+  }
+  var successfulTask = tasks!.last.status == Status.beneficiaryRefused.toValue()
+      ? tasks!.last
+      : null;
+
+  return successfulTask != null;
+}
+
 bool checkEligibilityForAgeAndSideEffectAll(
   DigitDOBAgeConvertor age,
   ProjectTypeModel? projectType,

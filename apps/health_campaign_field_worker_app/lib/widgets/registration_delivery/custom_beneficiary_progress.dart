@@ -9,7 +9,8 @@ import 'package:registration_delivery/data/repositories/local/task.dart';
 import 'package:registration_delivery/models/entities/status.dart';
 import 'package:registration_delivery/models/entities/task.dart';
 import 'package:registration_delivery/registration_delivery.dart';
-
+import '../../../models/entities/assessment_checklist/status.dart'
+    as status_local;
 import '../../data/repositories/custom_task.dart';
 // import '../../progress_indicator/progress_indicator.dart';
 import '../progress_indicator/progress_indicator.dart';
@@ -95,7 +96,14 @@ class _CustomBeneficiaryProgressBarState
           );
           List<TaskModel> results =
               await taskRepository.progressBarSearch(taskSearchQuery);
-          final filteredResult = results
+          List<TaskModel> successfulTasks = results
+              .where((element) =>
+                  element.status == Status.administeredSuccess.toValue() ||
+                  element.status == Status.beneficiaryReferred.toValue() ||
+                  element.status ==
+                      status_local.Status.beneficiaryInEligible.toValue())
+              .toList();
+          List<TaskModel> filteredResult = successfulTasks
               .where((element) =>
                   element.additionalFields?.fields
                       .firstWhereOrNull((e) => e.key == 'ageBelow3Months') ==

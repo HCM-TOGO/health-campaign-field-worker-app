@@ -37,6 +37,7 @@ import '../../../models/entities/assessment_checklist/status.dart'
     as status_local;
 // import '../../../blocs/service/service.dart' as service;
 import '../../../models/entities/roles_type.dart';
+import '../../../models/entities/status.dart';
 import '../../../router/app_router.dart';
 import '../../../utils/app_enums.dart';
 import '../../../utils/environment_config.dart';
@@ -54,6 +55,8 @@ class ZeroDoseCheckPage extends LocalizedStatefulWidget {
   final String? projectBeneficiaryClientReferenceId;
   final IndividualModel? individual;
   final TaskModel task;
+  final bool? hasSideEffects;
+  final SideEffectModel sideEffect;
 
   ZeroDoseCheckPage({
     super.key,
@@ -64,8 +67,11 @@ class ZeroDoseCheckPage extends LocalizedStatefulWidget {
     this.isChecklistAssessmentDone = true,
     this.projectBeneficiaryClientReferenceId,
     this.individual,
+    this.hasSideEffects = false,
+    SideEffectModel? sideEffect,
     TaskModel? task,
-  }) : task = task ?? TaskModel(clientReferenceId: '');
+  })  : task = task ?? TaskModel(clientReferenceId: ''),
+        sideEffect = sideEffect ?? SideEffectModel(clientReferenceId: '');
 
   @override
   State<ZeroDoseCheckPage> createState() => ZeroDoseCheckPageState();
@@ -253,26 +259,16 @@ class ZeroDoseCheckPageState extends LocalizedState<ZeroDoseCheckPage> {
                                   return;
                                 }
                                 final itemsAttributes = initialAttributes;
-                                final parentIndexes = <int>[];
-                                for (int i = 0;
-                                    i < initialAttributes!.length;
-                                    i++) {
-                                  if (initialAttributes![i]
-                                          .code!
-                                          .split('.')
-                                          .length ==
-                                      1) {
-                                    parentIndexes.add(i);
-                                  }
-                                }
 
-                                for (int i in parentIndexes) {
+                                for (int i = 0; i < controller.length; i++) {
+                                  if (i == 0 && controller[i].text == 'YES') {
+                                    break;
+                                  }
                                   if (itemsAttributes?[i].required == true &&
-                                      (itemsAttributes?[i].dataType ==
-                                              'SingleValueList' &&
-                                          visibleChecklistIndexes
-                                              .any((e) => e == i) &&
-                                          (controller[i].text == ''))) {
+                                      itemsAttributes?[i].dataType ==
+                                          'SingleValueList' &&
+                                      visibleChecklistIndexes.contains(i) &&
+                                      controller[i].text.isEmpty) {
                                     return;
                                   }
                                 }
@@ -411,6 +407,8 @@ class ZeroDoseCheckPageState extends LocalizedState<ZeroDoseCheckPage> {
                                         .projectBeneficiaryClientReferenceId,
                                     individual: widget.individual,
                                     task: widget.task,
+                                    hasSideEffects: widget.hasSideEffects!,
+                                    sideEffect: widget.sideEffect!,
                                   ));
                                 } else {
                                   final shouldSubmit = await DigitDialog.show(
@@ -631,17 +629,17 @@ class ZeroDoseCheckPageState extends LocalizedState<ZeroDoseCheckPage> {
                                                     ?.additionalDetails
                                                     ?.additionalProjectType;
 
-                                        if (deliverState.futureDeliveries !=
-                                                null &&
-                                            deliverState
-                                                .futureDeliveries!.isNotEmpty &&
-                                            projectTypeModel
-                                                    ?.cycles?.isNotEmpty ==
-                                                true) {
+                                        if (widget.isAdministration == true) {
                                           final router = context.router;
                                           router.popUntilRouteWithName(
                                               BeneficiaryWrapperRoute.name);
-                                          if (widget.isAdministration == true) {
+                                          if (deliverState.futureDeliveries !=
+                                                  null &&
+                                              deliverState.futureDeliveries!
+                                                  .isNotEmpty &&
+                                              projectTypeModel
+                                                      ?.cycles?.isNotEmpty ==
+                                                  true) {
                                             router.push(
                                               CustomSplashAcknowledgementRoute(
                                                   enableBackToSearch: false,
@@ -649,36 +647,52 @@ class ZeroDoseCheckPageState extends LocalizedState<ZeroDoseCheckPage> {
                                                       .eligibilityAssessmentType),
                                             );
                                           } else {
-                                            router.push(
+                                            final reloadState = context
+                                                .read<HouseholdOverviewBloc>();
+
+                                            reloadState.add(
+                                              HouseholdOverviewReloadEvent(
+                                                projectId:
+                                                    RegistrationDeliverySingleton()
+                                                        .projectId!,
+                                                projectBeneficiaryType:
+                                                    RegistrationDeliverySingleton()
+                                                        .beneficiaryType!,
+                                              ),
+                                            );
+                                            context.router.popAndPush(
                                               CustomHouseholdAcknowledgementRoute(
-                                                  enableViewHousehold: true,
-                                                  eligibilityAssessmentType: widget
-                                                      .eligibilityAssessmentType),
+                                                enableViewHousehold: true,
+                                                eligibilityAssessmentType: widget
+                                                    .eligibilityAssessmentType,
+                                              ),
                                             );
                                           }
                                         } else {
-                                          final reloadState = context
-                                              .read<HouseholdOverviewBloc>();
-
-                                          reloadState.add(
-                                            HouseholdOverviewReloadEvent(
-                                              projectId:
-                                                  RegistrationDeliverySingleton()
-                                                      .projectId!,
-                                              projectBeneficiaryType:
-                                                  RegistrationDeliverySingleton()
-                                                      .beneficiaryType!,
-                                            ),
+                                          final router = context.router;
+                                          final searchBloc = context
+                                              .read<SearchHouseholdsBloc>();
+                                          searchBloc.add(
+                                            const SearchHouseholdsClearEvent(),
                                           );
-                                          context.router.popAndPush(
+                                          router.popUntilRouteWithName(
+                                              BeneficiaryWrapperRoute.name);
+                                          router.push(
                                             CustomHouseholdAcknowledgementRoute(
-                                              enableViewHousehold: true,
-                                              eligibilityAssessmentType: widget
-                                                  .eligibilityAssessmentType,
-                                            ),
+                                                enableViewHousehold: true,
+                                                eligibilityAssessmentType: widget
+                                                    .eligibilityAssessmentType),
                                           );
                                         }
                                       } else {
+                                        if (widget.hasSideEffects == true) {
+                                          context.read<SideEffectsBloc>().add(
+                                                SideEffectsSubmitEvent(
+                                                  widget.sideEffect!,
+                                                  false,
+                                                ),
+                                              );
+                                        }
                                         final clientReferenceId =
                                             IdGen.i.identifier;
                                         List<String?> ineligibilityReasons = [];
@@ -704,9 +718,13 @@ class ZeroDoseCheckPageState extends LocalizedState<ZeroDoseCheckPage> {
                                                         .millisecondsSinceEpoch(),
                                                   ),
                                                   projectId: context.projectId,
-                                                  status: status_local.Status
-                                                      .beneficiaryInEligible
-                                                      .toValue(),
+                                                  status: (widget.hasSideEffects ??
+                                                          false)
+                                                      ? Status.inComplete
+                                                          .toValue()
+                                                      : status_local.Status
+                                                          .beneficiaryInEligible
+                                                          .toValue(),
                                                   clientAuditDetails:
                                                       ClientAuditDetails(
                                                     createdBy: context
@@ -728,11 +746,18 @@ class ZeroDoseCheckPageState extends LocalizedState<ZeroDoseCheckPage> {
                                                       //       .beneficiaryInEligible
                                                       //       .toValue(),
                                                       // ),
-                                                      AdditionalField(
-                                                        'ineligibleReasons',
-                                                        ineligibilityReasons
-                                                            .join(","),
-                                                      ),
+                                                      if (widget
+                                                              .hasSideEffects ??
+                                                          false == false) ...[
+                                                        AdditionalField(
+                                                          'ineligibleReasons',
+                                                          ineligibilityReasons
+                                                              .join(","),
+                                                        ),
+                                                        AdditionalField(
+                                                            'ageBelow3Months',
+                                                            true.toString()),
+                                                      ],
                                                       AdditionalField(
                                                         additional_fields_local
                                                             .AdditionalFieldsType
@@ -753,9 +778,6 @@ class ZeroDoseCheckPageState extends LocalizedState<ZeroDoseCheckPage> {
                                                                 : ZeroDoseStatus
                                                                     .done.name,
                                                       ),
-                                                      AdditionalField(
-                                                          'ageBelow3Months',
-                                                          true.toString()),
                                                     ],
                                                   ),
                                                   address: widget.individual

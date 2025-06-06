@@ -5,6 +5,7 @@ import 'package:digit_ui_components/enum/app_enums.dart';
 import 'package:digit_ui_components/widgets/atoms/digit_button.dart';
 import 'package:digit_ui_components/widgets/molecules/panel_cards.dart';
 import 'package:flutter/material.dart';
+import 'package:registration_delivery/models/entities/task.dart';
 
 import 'package:registration_delivery/router/registration_delivery_router.gm.dart';
 import 'package:registration_delivery/utils/i18_key_constants.dart' as i18;
@@ -17,11 +18,15 @@ import '../../../utils/app_enums.dart';
 class CustomSplashAcknowledgementPage extends LocalizedStatefulWidget {
   final EligibilityAssessmentType eligibilityAssessmentType;
   final bool? enableBackToSearch;
+  final bool? enableRouteToZeroDose;
+  final TaskModel? task;
   const CustomSplashAcknowledgementPage({
     super.key,
     super.appLocalizations,
     this.enableBackToSearch,
     required this.eligibilityAssessmentType,
+    this.enableRouteToZeroDose = false,
+    this.task,
   });
 
   @override
@@ -40,6 +45,20 @@ class CustomSplashAcknowledgementPageState
           try {
             context.router.push(CustomDoseAdministeredRoute(
               eligibilityAssessmentType: widget.eligibilityAssessmentType,
+            ));
+          } catch (e) {
+            rethrow;
+          }
+        }
+      });
+    } else if (widget.enableRouteToZeroDose == true) {
+      Future.delayed(const Duration(seconds: 1), () {
+        if (mounted) {
+          try {
+            context.router.push(ZeroDoseCheckRoute(
+              eligibilityAssessmentType: widget.eligibilityAssessmentType,
+              isAdministration: false,
+              task: widget.task,
             ));
           } catch (e) {
             rethrow;
