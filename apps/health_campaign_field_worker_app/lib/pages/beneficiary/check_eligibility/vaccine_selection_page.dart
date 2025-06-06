@@ -414,16 +414,16 @@ class _VaccineSelectionPageState extends LocalizedState<VaccineSelectionPage> {
                                                   ?.additionalDetails
                                                   ?.additionalProjectType;
 
-                                      if (deliverState.futureDeliveries !=
-                                              null &&
-                                          deliverState
-                                              .futureDeliveries!.isNotEmpty &&
-                                          projectTypeModel
-                                                  ?.cycles?.isNotEmpty ==
-                                              true) {
+                                      if (widget.isAdministration == true) {
                                         router.popUntilRouteWithName(
                                             BeneficiaryWrapperRoute.name);
-                                        if (widget.isAdministration == true) {
+                                        if (deliverState.futureDeliveries !=
+                                                null &&
+                                            deliverState
+                                                .futureDeliveries!.isNotEmpty &&
+                                            projectTypeModel
+                                                    ?.cycles?.isNotEmpty ==
+                                                true) {
                                           router.push(
                                             CustomSplashAcknowledgementRoute(
                                                 enableBackToSearch: false,
@@ -431,33 +431,40 @@ class _VaccineSelectionPageState extends LocalizedState<VaccineSelectionPage> {
                                                     .eligibilityAssessmentType),
                                           );
                                         } else {
-                                          router.push(
+                                          final reloadState = context
+                                              .read<HouseholdOverviewBloc>();
+
+                                          reloadState.add(
+                                            HouseholdOverviewReloadEvent(
+                                              projectId:
+                                                  RegistrationDeliverySingleton()
+                                                      .projectId!,
+                                              projectBeneficiaryType:
+                                                  RegistrationDeliverySingleton()
+                                                      .beneficiaryType!,
+                                            ),
+                                          );
+                                          router.popAndPush(
                                             CustomHouseholdAcknowledgementRoute(
-                                                enableViewHousehold: true,
-                                                eligibilityAssessmentType: widget
-                                                    .eligibilityAssessmentType),
+                                              enableViewHousehold: true,
+                                              eligibilityAssessmentType: widget
+                                                  .eligibilityAssessmentType,
+                                            ),
                                           );
                                         }
                                       } else {
-                                        final reloadState = context
-                                            .read<HouseholdOverviewBloc>();
-
-                                        reloadState.add(
-                                          HouseholdOverviewReloadEvent(
-                                            projectId:
-                                                RegistrationDeliverySingleton()
-                                                    .projectId!,
-                                            projectBeneficiaryType:
-                                                RegistrationDeliverySingleton()
-                                                    .beneficiaryType!,
-                                          ),
+                                        final searchBloc = context
+                                            .read<SearchHouseholdsBloc>();
+                                        searchBloc.add(
+                                          const SearchHouseholdsClearEvent(),
                                         );
-                                        router.popAndPush(
+                                        router.popUntilRouteWithName(
+                                            BeneficiaryWrapperRoute.name);
+                                        router.push(
                                           CustomHouseholdAcknowledgementRoute(
-                                            enableViewHousehold: true,
-                                            eligibilityAssessmentType: widget
-                                                .eligibilityAssessmentType,
-                                          ),
+                                              enableViewHousehold: true,
+                                              eligibilityAssessmentType: widget
+                                                  .eligibilityAssessmentType),
                                         );
                                       }
                                     } else {

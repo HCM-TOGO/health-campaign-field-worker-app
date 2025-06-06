@@ -253,20 +253,8 @@ class ZeroDoseCheckPageState extends LocalizedState<ZeroDoseCheckPage> {
                                   return;
                                 }
                                 final itemsAttributes = initialAttributes;
-                                final parentIndexes = <int>[];
-                                for (int i = 0;
-                                    i < initialAttributes!.length;
-                                    i++) {
-                                  if (initialAttributes![i]
-                                          .code!
-                                          .split('.')
-                                          .length ==
-                                      1) {
-                                    parentIndexes.add(i);
-                                  }
-                                }
 
-                                for (int i in parentIndexes) {
+                                for (int i = 0; i < controller.length; i++) {
                                   if (itemsAttributes?[i].required == true &&
                                       (itemsAttributes?[i].dataType ==
                                               'SingleValueList' &&
@@ -631,17 +619,17 @@ class ZeroDoseCheckPageState extends LocalizedState<ZeroDoseCheckPage> {
                                                     ?.additionalDetails
                                                     ?.additionalProjectType;
 
-                                        if (deliverState.futureDeliveries !=
-                                                null &&
-                                            deliverState
-                                                .futureDeliveries!.isNotEmpty &&
-                                            projectTypeModel
-                                                    ?.cycles?.isNotEmpty ==
-                                                true) {
+                                        if (widget.isAdministration == true) {
                                           final router = context.router;
                                           router.popUntilRouteWithName(
                                               BeneficiaryWrapperRoute.name);
-                                          if (widget.isAdministration == true) {
+                                          if (deliverState.futureDeliveries !=
+                                                  null &&
+                                              deliverState.futureDeliveries!
+                                                  .isNotEmpty &&
+                                              projectTypeModel
+                                                      ?.cycles?.isNotEmpty ==
+                                                  true) {
                                             router.push(
                                               CustomSplashAcknowledgementRoute(
                                                   enableBackToSearch: false,
@@ -649,33 +637,41 @@ class ZeroDoseCheckPageState extends LocalizedState<ZeroDoseCheckPage> {
                                                       .eligibilityAssessmentType),
                                             );
                                           } else {
-                                            router.push(
+                                            final reloadState = context
+                                                .read<HouseholdOverviewBloc>();
+
+                                            reloadState.add(
+                                              HouseholdOverviewReloadEvent(
+                                                projectId:
+                                                    RegistrationDeliverySingleton()
+                                                        .projectId!,
+                                                projectBeneficiaryType:
+                                                    RegistrationDeliverySingleton()
+                                                        .beneficiaryType!,
+                                              ),
+                                            );
+                                            context.router.popAndPush(
                                               CustomHouseholdAcknowledgementRoute(
-                                                  enableViewHousehold: true,
-                                                  eligibilityAssessmentType: widget
-                                                      .eligibilityAssessmentType),
+                                                enableViewHousehold: true,
+                                                eligibilityAssessmentType: widget
+                                                    .eligibilityAssessmentType,
+                                              ),
                                             );
                                           }
                                         } else {
-                                          final reloadState = context
-                                              .read<HouseholdOverviewBloc>();
-
-                                          reloadState.add(
-                                            HouseholdOverviewReloadEvent(
-                                              projectId:
-                                                  RegistrationDeliverySingleton()
-                                                      .projectId!,
-                                              projectBeneficiaryType:
-                                                  RegistrationDeliverySingleton()
-                                                      .beneficiaryType!,
-                                            ),
+                                          final router = context.router;
+                                          final searchBloc = context
+                                              .read<SearchHouseholdsBloc>();
+                                          searchBloc.add(
+                                            const SearchHouseholdsClearEvent(),
                                           );
-                                          context.router.popAndPush(
+                                          router.popUntilRouteWithName(
+                                              BeneficiaryWrapperRoute.name);
+                                          router.push(
                                             CustomHouseholdAcknowledgementRoute(
-                                              enableViewHousehold: true,
-                                              eligibilityAssessmentType: widget
-                                                  .eligibilityAssessmentType,
-                                            ),
+                                                enableViewHousehold: true,
+                                                eligibilityAssessmentType: widget
+                                                    .eligibilityAssessmentType),
                                           );
                                         }
                                       } else {

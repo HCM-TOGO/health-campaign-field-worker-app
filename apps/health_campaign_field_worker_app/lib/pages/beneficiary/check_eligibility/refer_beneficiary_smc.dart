@@ -245,102 +245,94 @@ class CustomReferBeneficiarySMCPageState
 
                                     final clientReferenceId =
                                         IdGen.i.identifier;
-                                    context.read<DeliverInterventionBloc>().add(
-                                          DeliverInterventionSubmitEvent(
-                                            task: TaskModel(
-                                              projectBeneficiaryClientReferenceId:
-                                                  widget
-                                                      .projectBeneficiaryClientRefId,
-                                              clientReferenceId:
-                                                  clientReferenceId,
-                                              tenantId:
-                                                  envConfig.variables.tenantId,
-                                              rowVersion: 1,
-                                              auditDetails: AuditDetails(
-                                                createdBy:
-                                                    context.loggedInUserUuid,
-                                                createdTime: context
-                                                    .millisecondsSinceEpoch(),
-                                              ),
-                                              projectId: context.projectId,
-                                              status: Status.beneficiaryReferred
-                                                  .toValue(),
-                                              clientAuditDetails:
-                                                  ClientAuditDetails(
-                                                createdBy:
-                                                    context.loggedInUserUuid,
-                                                createdTime: context
-                                                    .millisecondsSinceEpoch(),
-                                                lastModifiedBy:
-                                                    context.loggedInUserUuid,
-                                                lastModifiedTime: context
-                                                    .millisecondsSinceEpoch(),
-                                              ),
-                                              additionalFields:
-                                                  TaskAdditionalFields(
-                                                version: 1,
-                                                fields: [
-                                                  AdditionalField(
-                                                    'taskStatus',
-                                                    Status.beneficiaryReferred
-                                                        .toValue(),
-                                                  ),
-                                                  if (widget
-                                                      .isReadministrationUnSuccessful)
-                                                    AdditionalField(
-                                                      'quantityWasted',
-                                                      widget.quantityWasted
-                                                                  .toString()
-                                                                  .length ==
-                                                              1
-                                                          ? "0${widget.quantityWasted}"
-                                                          : widget
-                                                              .quantityWasted
-                                                              .toString(),
-                                                    ),
-                                                  if (widget
-                                                      .isReadministrationUnSuccessful)
-                                                    const AdditionalField(
-                                                      'unsuccessfullDelivery',
-                                                      'true',
-                                                    ),
-                                                  if (widget.productVariantId !=
-                                                      null)
-                                                    AdditionalField(
-                                                      'productVariantId',
-                                                      widget.productVariantId,
-                                                    ),
-                                                  AdditionalField(
-                                                    additional_fields_local
-                                                        .AdditionalFieldsType
-                                                        .deliveryType
-                                                        .toValue(),
-                                                    EligibilityAssessmentStatus
-                                                        .smcDone.name,
-                                                  ),
-                                                ],
-                                              ),
-                                              address: widget
-                                                  .individual.address?.first
-                                                  .copyWith(
-                                                relatedClientReferenceId:
-                                                    clientReferenceId,
-                                                id: null,
-                                              ),
-                                            ),
-                                            isEditing: false,
-                                            boundaryModel: context.boundary,
+                                    final task = TaskModel(
+                                      projectBeneficiaryClientReferenceId:
+                                          widget.projectBeneficiaryClientRefId,
+                                      clientReferenceId: clientReferenceId,
+                                      tenantId: envConfig.variables.tenantId,
+                                      rowVersion: 1,
+                                      auditDetails: AuditDetails(
+                                        createdBy: context.loggedInUserUuid,
+                                        createdTime:
+                                            context.millisecondsSinceEpoch(),
+                                      ),
+                                      projectId: context.projectId,
+                                      status:
+                                          Status.beneficiaryReferred.toValue(),
+                                      clientAuditDetails: ClientAuditDetails(
+                                        createdBy: context.loggedInUserUuid,
+                                        createdTime:
+                                            context.millisecondsSinceEpoch(),
+                                        lastModifiedBy:
+                                            context.loggedInUserUuid,
+                                        lastModifiedTime:
+                                            context.millisecondsSinceEpoch(),
+                                      ),
+                                      additionalFields: TaskAdditionalFields(
+                                        version: 1,
+                                        fields: [
+                                          AdditionalField(
+                                            'taskStatus',
+                                            Status.beneficiaryReferred
+                                                .toValue(),
                                           ),
-                                        );
+                                          if (widget
+                                              .isReadministrationUnSuccessful)
+                                            AdditionalField(
+                                              'quantityWasted',
+                                              widget.quantityWasted
+                                                          .toString()
+                                                          .length ==
+                                                      1
+                                                  ? "0${widget.quantityWasted}"
+                                                  : widget.quantityWasted
+                                                      .toString(),
+                                            ),
+                                          if (widget
+                                              .isReadministrationUnSuccessful)
+                                            const AdditionalField(
+                                              'unsuccessfullDelivery',
+                                              'true',
+                                            ),
+                                          if (widget.productVariantId != null)
+                                            AdditionalField(
+                                              'productVariantId',
+                                              widget.productVariantId,
+                                            ),
+                                          AdditionalField(
+                                            additional_fields_local
+                                                .AdditionalFieldsType
+                                                .deliveryType
+                                                .toValue(),
+                                            EligibilityAssessmentStatus
+                                                .smcDone.name,
+                                          ),
+                                        ],
+                                      ),
+                                      address: widget.individual.address?.first
+                                          .copyWith(
+                                        relatedClientReferenceId:
+                                            clientReferenceId,
+                                        id: null,
+                                      ),
+                                    );
+                                    // TODO: Currently, it's been shifted to the zero dose flow
+
+                                    // context.read<DeliverInterventionBloc>().add(
+                                    //       DeliverInterventionSubmitEvent(
+                                    //         task: task,
+                                    //         isEditing: false,
+                                    //         boundaryModel: context.boundary,
+                                    //       ),
+                                    //     );
+                                    // final searchBloc =
+                                    //     context.read<SearchHouseholdsBloc>();
+                                    // searchBloc.add(
+                                    //   const SearchHouseholdsClearEvent(),
+                                    // );
 
                                     final reloadState =
                                         context.read<HouseholdOverviewBloc>();
-                                    final searchBloc =
-                                        context.read<SearchHouseholdsBloc>();
-                                    searchBloc.add(
-                                      const SearchHouseholdsClearEvent(),
-                                    );
-
                                     Future.delayed(
                                       const Duration(milliseconds: 500),
                                       () {
@@ -357,6 +349,7 @@ class CustomReferBeneficiarySMCPageState
                                           eligibilityAssessmentType:
                                               EligibilityAssessmentType.smc,
                                           isAdministration: false,
+                                          task: task,
                                         ),
                                         // CustomHouseholdAcknowledgementRoute(
                                         //   enableViewHousehold: true,
