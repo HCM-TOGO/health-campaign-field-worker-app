@@ -125,12 +125,12 @@ class AppRouter extends _$AppRouter {
       page: UnauthenticatedRouteWrapper.page,
       path: '/',
       children: [
-        AutoRoute(
-          page: LanguageSelectionRoute.page,
-          path: 'language_selection',
-          initial: true,
-        ),
-        AutoRoute(page: LoginRoute.page, path: 'login'),
+        // AutoRoute(
+        //   page: LanguageSelectionRoute.page,
+        //   path: 'language_selection',
+        //   initial: true,
+        // ),
+        AutoRoute(page: LoginRoute.page, path: 'login', initial: true),
       ],
     ),
     AutoRoute(
@@ -189,7 +189,9 @@ class AppRouter extends _$AppRouter {
               AutoRoute(
                   page: CustomClosedHouseholdSummaryRoute.page,
                   path: 'custom-closed-household-summary'),
-              RedirectRoute(path: 'closed-household-summary', redirectTo: 'custom-closed-household-summary'),
+              RedirectRoute(
+                  path: 'closed-household-summary',
+                  redirectTo: 'custom-closed-household-summary'),
               AutoRoute(
                   page: ClosedHouseholdAcknowledgementRoute.page,
                   path: 'closed-household-acknowledgement'),

@@ -47,6 +47,8 @@ class _BoundarySelectionPageState
   late StreamSubscription syncSubscription;
   var leastLevelBoundaries;
 
+  final String setLocale = "fr_TG";
+
   @override
   void initState() {
     context.syncRefresh();
@@ -59,6 +61,9 @@ class _BoundarySelectionPageState
         );
     super.initState();
     listenToSyncCount();
+    if (AppSharedPreferences().getSelectedLocale == null) {
+      AppSharedPreferences().setSelectedLocale(setLocale);
+    }
   }
 
   @override
