@@ -103,6 +103,7 @@ import '../pages/inventory/custom_summary_report.dart';
 import '../pages/beneficiary/check_eligibility/custom_side_effects.dart';
 import 'package:registration_delivery/models/entities/side_effect.dart';
 
+import '../pages/registration_delivery/custom_beneficiary_summary.dart';
 part 'app_router.gr.dart';
 
 @AutoRouterConfig(
@@ -127,12 +128,12 @@ class AppRouter extends _$AppRouter {
       page: UnauthenticatedRouteWrapper.page,
       path: '/',
       children: [
-        AutoRoute(
-          page: LanguageSelectionRoute.page,
-          path: 'language_selection',
-          initial: true,
-        ),
-        AutoRoute(page: LoginRoute.page, path: 'login'),
+        // AutoRoute(
+        //   page: LanguageSelectionRoute.page,
+        //   path: 'language_selection',
+        //   initial: true,
+        // ),
+        AutoRoute(page: LoginRoute.page, path: 'login', initial: true),
       ],
     ),
     AutoRoute(
@@ -348,6 +349,11 @@ class AppRouter extends _$AppRouter {
                     page: CustomSummaryRoute.page,
                     path: 'custom-beneficiary-summary',
                   ),
+                  AutoRoute(
+                    page: CustomBeneficiarySummaryRoute.page,
+                    path: 'custom-beneficiary-summary-page',
+                  ),
+
                   // AutoRoute(
                   //   page: BeneficiaryAcknowledgementRoute.page,
                   //   path: 'beneficiary-acknowledgement',

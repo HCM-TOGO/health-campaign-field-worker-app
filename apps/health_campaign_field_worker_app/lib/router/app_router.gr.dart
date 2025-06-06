@@ -102,6 +102,18 @@ abstract class _$AppRouter extends RootStackRouter {
         )),
       );
     },
+    CustomBeneficiarySummaryRoute.name: (routeData) {
+      final args = routeData.argsAs<CustomBeneficiarySummaryRouteArgs>();
+      return AutoRoutePage<dynamic>(
+        routeData: routeData,
+        child: CustomBeneficiarySummaryPage(
+          key: args.key,
+          appLocalizations: args.appLocalizations,
+          name: args.name,
+          individualModel: args.individualModel,
+        ),
+      );
+    },
     CustomClosedHouseholdSummaryRoute.name: (routeData) {
       final args = routeData.argsAs<CustomClosedHouseholdSummaryRouteArgs>(
           orElse: () => const CustomClosedHouseholdSummaryRouteArgs());
@@ -1092,6 +1104,55 @@ class CustomBeneficiaryRegistrationWrapperRouteArgs {
   @override
   String toString() {
     return 'CustomBeneficiaryRegistrationWrapperRouteArgs{key: $key, initialState: $initialState}';
+  }
+}
+
+/// generated route for
+/// [CustomBeneficiarySummaryPage]
+class CustomBeneficiarySummaryRoute
+    extends PageRouteInfo<CustomBeneficiarySummaryRouteArgs> {
+  CustomBeneficiarySummaryRoute({
+    Key? key,
+    RegistrationDeliveryLocalization? appLocalizations,
+    required dynamic name,
+    required IndividualModel individualModel,
+    List<PageRouteInfo>? children,
+  }) : super(
+          CustomBeneficiarySummaryRoute.name,
+          args: CustomBeneficiarySummaryRouteArgs(
+            key: key,
+            appLocalizations: appLocalizations,
+            name: name,
+            individualModel: individualModel,
+          ),
+          initialChildren: children,
+        );
+
+  static const String name = 'CustomBeneficiarySummaryRoute';
+
+  static const PageInfo<CustomBeneficiarySummaryRouteArgs> page =
+      PageInfo<CustomBeneficiarySummaryRouteArgs>(name);
+}
+
+class CustomBeneficiarySummaryRouteArgs {
+  const CustomBeneficiarySummaryRouteArgs({
+    this.key,
+    this.appLocalizations,
+    required this.name,
+    required this.individualModel,
+  });
+
+  final Key? key;
+
+  final RegistrationDeliveryLocalization? appLocalizations;
+
+  final dynamic name;
+
+  final IndividualModel individualModel;
+
+  @override
+  String toString() {
+    return 'CustomBeneficiarySummaryRouteArgs{key: $key, appLocalizations: $appLocalizations, name: $name, individualModel: $individualModel}';
   }
 }
 

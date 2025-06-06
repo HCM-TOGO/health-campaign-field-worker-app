@@ -818,6 +818,11 @@ class _CustomRecordReferralDetailsPageState
                                                 localizations.translate(
                                                   i18.common.corecommonRequired,
                                                 ),
+                                            'onlyAlphabets': (_) =>
+                                                localizations.translate(
+                                                  i18_local.individualDetails
+                                                      .onlyAlphabetsValidationMessage,
+                                                ),
                                           },
                                           formControlName: _beneficiaryIdKey,
                                           showErrors: (control) =>
@@ -826,9 +831,11 @@ class _CustomRecordReferralDetailsPageState
                                           builder: (field) {
                                             return CustomLabeledField(
                                               isRequired: true,
-                                              label: localizations.translate(
-                                                  i18_local.beneficiaryDetails
-                                                      .beneficiaryId).toString(),
+                                              label: localizations
+                                                  .translate(i18_local
+                                                      .beneficiaryDetails
+                                                      .beneficiaryId)
+                                                  .toString(),
                                               child: DigitTextFormInput(
                                                 onChange: (val) => {
                                                   form
@@ -1107,6 +1114,13 @@ class _CustomRecordReferralDetailsPageState
             false,
         validators: [
           Validators.required,
+          Validators.delegate((validator) {
+            final value = validator.value?.toString().trim();
+            if (value == null || value.isEmpty) return null;
+            const pattern = r"^[A-Za-z\s]+$"; 
+            final regExp = RegExp(pattern);
+            return regExp.hasMatch(value) ? null : {'onlyAlphabets': true};
+          }),
         ],
       ),
       _beneficiaryIdKey: FormControl<String>(

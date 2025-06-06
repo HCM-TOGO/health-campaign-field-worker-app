@@ -417,11 +417,14 @@ class CustomComplaintsDetailsPageState
                                       .mobileNumberInvalidFormatValidationMessage),
                               'required': (object) => localizations.translate(
                                   i18.complaints.validationRequiredError),
-                              'minLength': (object) => localizations.translate(
-                                  i18.complaints.validationMinLengthError),
-                              'maxLength': (object) => localizations
-                                  .translate(i18.common.maxCharsRequired)
-                                  .replaceAll('{}', '8'),
+                              'maxLength': (object) => localizations.translate(i18
+                                  .individualDetails
+                                  .mobileNumberInvalidFormatValidationMessage),
+                              // 'minLength': (object) => localizations.translate(
+                              //     i18.complaints.validationMinLengthError),
+                              // 'maxLength': (object) => localizations
+                              //     .translate(i18.common.maxCharsRequired)
+                              //     .replaceAll('{}', '8'),
                             },
                             builder: (field) {
                               return LabeledField(
@@ -479,11 +482,14 @@ class CustomComplaintsDetailsPageState
                                     i18.individualDetails
                                         .mobileNumberInvalidFormatValidationMessage,
                                   ),
-                              'minLength': (object) => localizations.translate(
-                                  i18.complaints.validationMinLengthError),
-                              'maxLength': (object) => localizations
-                                  .translate(i18.common.maxCharsRequired)
-                                  .replaceAll('{}', '8'),
+                              // 'minLength': (object) => localizations.translate(
+                              //     i18.complaints.validationMinLengthError),
+                              // 'maxLength': (object) => localizations
+                              //     .translate(i18.common.maxCharsRequired)
+                              //     .replaceAll('{}', '8'),
+                              'maxLength': (object) => localizations.translate(i18
+                                  .individualDetails
+                                  .mobileNumberInvalidFormatValidationMessage),
                             },
                             builder: (field) {
                               return LabeledField(
@@ -581,7 +587,7 @@ class CustomComplaintsDetailsPageState
           Validators.required,
           Validators.delegate(
               (validator) => CustomValidator.validMobileNumber(validator)),
-          Validators.minLength(8),
+          // Validators.minLength(8),
           Validators.maxLength(8)
         ],
       ),
@@ -590,18 +596,17 @@ class CustomComplaintsDetailsPageState
         disabled: shouldDisableForm,
         validators: [Validators.maxLength(64)],
       ),
+
       _supervisorContactNumber: FormControl<String>(
         value: complaintDetails?.supervisorContactNumber,
         disabled: shouldDisableForm,
         validators: [
           Validators.delegate(
               (validator) => CustomValidator.validMobileNumber(validator)),
-          // Validators.maxLength(11),
-          // Validators.minLength(11),
-          // Validators.maxLength(8),
-          // Validators.minLength(8),
+          Validators.maxLength(8),
         ],
       ),
+
       _complaintDescription: FormControl<String>(
         value: complaintDetails?.complaintDescription,
         disabled: shouldDisableForm,

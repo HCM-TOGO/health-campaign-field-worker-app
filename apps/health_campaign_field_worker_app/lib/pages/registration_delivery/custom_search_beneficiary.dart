@@ -655,53 +655,51 @@ class _CustomSearchBeneficiaryPageState
                               "\n ${localizations.translate(i18_local.beneficiaryDetails.spaq2DoseUnit)}";
                         }
 
-                        // if ((spaq1 > 0 ||
-                        //     spaq2 > 0 ||
-                        //     redVas > 0)) {
-                        FocusManager.instance.primaryFocus?.unfocus();
-                        context.read<DigitScannerBloc>().add(
-                              const DigitScannerEvent.handleScanner(),
-                            );
-                        context.router
-                            .push(CustomBeneficiaryRegistrationWrapperRoute(
-                          initialState: BeneficiaryRegistrationCreateState(
-                            searchQuery: searchHouseholdsState.searchQuery,
-                          ),
-                        ));
-                        searchController.clear();
-                        selectedFilters = [];
-                        customSearchHouseholdsBloc.add(
-                          const SearchHouseholdsClearEvent(),
-                        );
-                        // } else {
-                        //   showCustomPopup(
-                        //     context: context,
-                        //     builder: (popupContext) => Popup(
-                        //       title: localizations.translate(i18_local
-                        //           .beneficiaryDetails.insufficientStockHeading),
-                        //       onOutsideTap: () {
-                        //         Navigator.of(popupContext).pop(false);
-                        //       },
-                        //       description: descriptionText,
-                        //       type: PopUpType.alert,
-                        //       actions: [
-                        //         DigitButton(
-                        //           label: localizations.translate(
-                        //             i18_local.beneficiaryDetails.goToHome,
-                        //           ),
-                        //           onPressed: () {
-                        //             Navigator.of(
-                        //               popupContext,
-                        //               rootNavigator: true,
-                        //             ).pop();
-                        //           },
-                        //           type: DigitButtonType.primary,
-                        //           size: DigitButtonSize.large,
-                        //         ),
-                        //       ],
-                        //     ),
-                        //   );
-                        // }
+                        if ((spaq1 > 0 || spaq2 > 0)) {
+                          FocusManager.instance.primaryFocus?.unfocus();
+                          context.read<DigitScannerBloc>().add(
+                                const DigitScannerEvent.handleScanner(),
+                              );
+                          context.router
+                              .push(CustomBeneficiaryRegistrationWrapperRoute(
+                            initialState: BeneficiaryRegistrationCreateState(
+                              searchQuery: searchHouseholdsState.searchQuery,
+                            ),
+                          ));
+                          searchController.clear();
+                          selectedFilters = [];
+                          customSearchHouseholdsBloc.add(
+                            const SearchHouseholdsClearEvent(),
+                          );
+                        } else {
+                          showCustomPopup(
+                            context: context,
+                            builder: (popupContext) => Popup(
+                              title: localizations.translate(i18_local
+                                  .beneficiaryDetails.insufficientStockHeading),
+                              onOutsideTap: () {
+                                Navigator.of(popupContext).pop(false);
+                              },
+                              description: descriptionText,
+                              type: PopUpType.alert,
+                              actions: [
+                                DigitButton(
+                                  label: localizations.translate(
+                                    i18_local.beneficiaryDetails.goToHome,
+                                  ),
+                                  onPressed: () {
+                                    Navigator.of(
+                                      popupContext,
+                                      rootNavigator: true,
+                                    ).pop();
+                                  },
+                                  type: DigitButtonType.primary,
+                                  size: DigitButtonSize.large,
+                                ),
+                              ],
+                            ),
+                          );
+                        }
                       },
                     );
                   },

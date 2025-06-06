@@ -5,11 +5,13 @@ import 'package:digit_ui_components/widgets/atoms/menu_card.dart';
 import 'package:flutter/material.dart';
 
 import 'package:inventory_management/utils/i18_key_constants.dart' as i18;
+import 'package:inventory_management/utils/utils.dart';
 import 'package:inventory_management/widgets/localized.dart';
 import '../../blocs/inventory_management/custom_inventory_report.dart';
 import 'package:inventory_management/widgets/back_navigation_help_header.dart';
 
 import '../../router/app_router.dart';
+// import '../../utils/utils.dart';
 
 @RoutePage()
 class CustomInventoryReportSelectionPage extends LocalizedStatefulWidget {
@@ -75,7 +77,8 @@ class CustomInventoryReportSelectionPageState
                     ),
                   ),
                 ),
-                const SizedBox(height: spacer4),
+                if (!(InventorySingleton().isDistributor as bool)) const SizedBox(height: spacer4),
+                if (!(InventorySingleton().isDistributor as bool))
                 Padding(
                   padding: const EdgeInsets.symmetric(horizontal: spacer2),
                   child: MenuCard(

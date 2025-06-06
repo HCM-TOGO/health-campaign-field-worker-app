@@ -2,7 +2,6 @@ import 'package:auto_route/auto_route.dart';
 import 'package:collection/collection.dart';
 import 'package:dart_mappable/dart_mappable.dart';
 import 'package:qr_flutter/qr_flutter.dart';
-// import 'package:digit_components/utils/date_utils.dart' as digits;
 import '../../utils/date_utils.dart' as digits;
 import 'package:digit_components/widgets/atoms/digit_toaster.dart';
 import 'package:digit_ui_components/theme/ComponentTheme/checkbox_theme.dart';
@@ -25,7 +24,6 @@ import 'package:digit_components/widgets/atoms/digit_dropdown.dart' as dropdown;
 import 'package:health_campaign_field_worker_app/blocs/app_initialization/app_initialization.dart';
 import 'package:health_campaign_field_worker_app/models/app_config/app_config_model.dart';
 import 'package:health_campaign_field_worker_app/widgets/date/custom_digit_dob_picker.dart';
-// import 'package:health_campaign_field_worker_app/widgets/header/custom_back_button.dart';
 import 'package:intl/intl.dart';
 import 'package:reactive_forms/reactive_forms.dart';
 import 'package:registration_delivery/blocs/search_households/search_bloc_common_wrapper.dart';
@@ -33,17 +31,13 @@ import 'package:registration_delivery/blocs/search_households/search_households.
 import 'package:registration_delivery/models/entities/household.dart';
 import 'package:registration_delivery/utils/constants.dart';
 import 'package:registration_delivery/utils/extensions/extensions.dart';
-
 import 'package:registration_delivery/blocs/household_overview/household_overview.dart';
 import 'package:registration_delivery/router/registration_delivery_router.gm.dart';
 import 'package:registration_delivery/utils/i18_key_constants.dart' as i18;
 import '../../utils/i18_key_constants.dart' as i18_local;
 import 'package:registration_delivery/utils/utils.dart';
-// import 'package:registration_delivery/widgets/back_navigation_help_header.dart';
 import 'package:registration_delivery/widgets/localized.dart';
 import 'package:registration_delivery/widgets/showcase/config/showcase_constants.dart';
-import 'package:registration_delivery/widgets/showcase/showcase_button.dart';
-
 import '../../blocs/registration_delivery/custom_beneficairy_registration.dart';
 import '../../blocs/registration_delivery/custom_search_household.dart';
 import '../../models/entities/identifier_types.dart';
@@ -129,6 +123,16 @@ class CustomIndividualDetailsPageState
     }
   }
 
+  onBeneficiarySubmit(name, individual) async {
+      final router = context.router;
+      router.push(CustomBeneficiarySummaryRoute(
+        name: name,
+        individualModel: individual,
+      ));
+  }
+
+
+
   @override
   Widget build(BuildContext context) {
     final bloc = context.read<CustomBeneficiaryRegistrationBloc>();
@@ -183,47 +187,47 @@ class CustomIndividualDetailsPageState
                           mainAxisSize: MainAxisSize.max,
                           onPressed: () async {
                             if (form.control(_dobKey).value == null) {
-                                setState(() {
-                                  form.control(_dobKey).setErrors({'required': true});
-                                  form.control(_dobKey).markAsTouched();
-                                });
-                              }
-                              if (form.control(_genderKey).value == null) {
-                                setState(() {
-                                  form
-                                      .control(_genderKey)
-                                      .setErrors({'': true});
-                                });
-                              }
-                              final userId = RegistrationDeliverySingleton()
-                                  .loggedInUserUuid;
-                              final projectId =
-                                  RegistrationDeliverySingleton().projectId;
-                              form.markAllAsTouched();
-                              if (!form.valid) return;
-                              FocusManager.instance.primaryFocus?.unfocus();
+                              setState(() {
+                                form
+                                    .control(_dobKey)
+                                    .setErrors({'required': true});
+                                form.control(_dobKey).markAsTouched();
+                              });
+                            }
+                            if (form.control(_genderKey).value == null) {
+                              setState(() {
+                                form.control(_genderKey).setErrors({'': true});
+                              });
+                            }
+                            final userId = RegistrationDeliverySingleton()
+                                .loggedInUserUuid;
+                            final projectId =
+                                RegistrationDeliverySingleton().projectId;
+                            form.markAllAsTouched();
+                            if (!form.valid) return;
+                            FocusManager.instance.primaryFocus?.unfocus();
 
-                              final age = (form.control(_dobKey).value != null)
-                                  ? digits.DigitDateUtils.calculateAge(
-                                      form.control(_dobKey).value as DateTime,
-                                    )
-                                  : digits.DigitDateUtils.calculateAge(
-                                      DateTime.now(),
-                                    );
+                            final age = (form.control(_dobKey).value != null)
+                                ? digits.DigitDateUtils.calculateAge(
+                                    form.control(_dobKey).value as DateTime,
+                                  )
+                                : digits.DigitDateUtils.calculateAge(
+                                    DateTime.now(),
+                                  );
 
-                              if (age.years < 18 && widget.isHeadOfHousehold) {
-                                await DigitToast.show(
-                                  context,
-                                  options: DigitToastOptions(
-                                    localizations.translate(i18_local
-                                        .individualDetails.headAgeValidError),
-                                    true,
-                                    theme,
-                                  ),
-                                );
+                            if (age.years < 18 && widget.isHeadOfHousehold) {
+                              await DigitToast.show(
+                                context,
+                                options: DigitToastOptions(
+                                  localizations.translate(i18_local
+                                      .individualDetails.headAgeValidError),
+                                  true,
+                                  theme,
+                                ),
+                              );
 
-                                return;
-                              }
+                              return;
+                            }
                             final submit = await showDialog(
                               context: context,
                               builder: (ctx) => Popup(
@@ -471,8 +475,21 @@ class CustomIndividualDetailsPageState
                                               : null,
                                         ),
                                       );
-                                      onSubmit(individual.name?.givenName ?? "",
-                                          false);
+                                      // final boundary =
+                                      //     RegistrationDeliverySingleton()
+                                      //         .boundary;
+                                      // bloc.add(
+                                      //   BeneficiaryRegistrationSummaryEvent(
+                                      //     projectId: projectId!,
+                                      //     userUuid: userId!,
+                                      //     boundary: boundary!,
+                                      //     tag: scannerBloc
+                                      //             .state.qrCodes.isNotEmpty
+                                      //         ? scannerBloc.state.qrCodes.first
+                                      //         : null,
+                                      //   ),
+                                      // );
+                                      onBeneficiarySubmit(individual.name?.givenName ?? "",individual);
                                     }
                                   }
                                 },

@@ -1,4 +1,5 @@
 import 'package:auto_route/auto_route.dart';
+import 'package:collection/collection.dart';
 import 'package:digit_data_model/data_model.dart';
 import 'package:digit_scanner/blocs/scanner.dart';
 import 'package:digit_scanner/pages/qr_scanner.dart';
@@ -20,6 +21,8 @@ import 'package:inventory_management/utils/utils.dart';
 import 'package:inventory_management/widgets/back_navigation_help_header.dart';
 import 'package:inventory_management/widgets/inventory/no_facilities_assigned_dialog.dart';
 import '../../router/app_router.dart';
+import '../../utils/constants.dart';
+import '../../utils/extensions/extensions.dart';
 import 'custom_facility_selection.dart';
 
 @RoutePage()
@@ -62,11 +65,14 @@ class CustomWarehouseDetailsPageState
               .translate(InventorySingleton().boundary!.code ?? ''),
         ),
         _warehouseKey: FormControl<String>(
-          validators: [Validators.required],
+          validators: isDistributor ? [] : [Validators.required],
         ),
         _teamCodeKey: FormControl<String>(
-          value: stockState.primaryId ?? '',
-          validators: deliveryTeamSelected ? [Validators.required] : [],
+          value: stockState.primaryId ??
+              context.loggedInUser.userName.toString() +
+                  Constants.pipeSeparator +
+                  context.loggedInUserUuid,
+          validators: isDistributor ? [Validators.required] : [],
         ),
       });
 
@@ -90,9 +96,42 @@ class CustomWarehouseDetailsPageState
             builder: (ctx, facilityState) {
               final facilities = facilityState.whenOrNull(
                     fetched: (facilities, allFacilities) {
+                      if (ctx.selectedProject.address?.boundaryType ==
+                          Constants.stateBoundaryLevel) {
+                        List<FacilityModel> filteredFacilities = facilities
+                            .where((element) =>
+                                element.usage == Constants.stateFacility)
+                            .toList();
+                        facilities = filteredFacilities.isEmpty
+                            ? facilities
+                            : filteredFacilities;
+                      } else if (ctx.selectedProject.address?.boundaryType ==
+                          Constants.lgaBoundaryLevel) {
+                        List<FacilityModel> filteredFacilities = facilities
+                            .where(
+                              (element) =>
+                                  element.usage == Constants.lgaFacility,
+                            )
+                            .toList();
+                        facilities = filteredFacilities.isEmpty
+                            ? facilities
+                            : filteredFacilities;
+                      } else {
+                        List<FacilityModel> filteredFacilities = facilities
+                            .where(
+                              (element) =>
+                                  element.usage == Constants.healthFacility,
+                            )
+                            .toList();
+                        facilities = filteredFacilities.isEmpty
+                            ? facilities
+                            : filteredFacilities;
+                      }
+
                       final teamFacilities = [
                         FacilityModel(
                           id: 'Delivery Team',
+                          name: 'Delivery Team',
                         ),
                       ];
                       teamFacilities.addAll(
@@ -257,7 +296,10 @@ class CustomWarehouseDetailsPageState
                                                         primaryId: facility
                                                                     .id ==
                                                                 "Delivery Team"
-                                                            ? teamCode ?? ''
+                                                            ? (teamCode ?? '')
+                                                                .split(Constants
+                                                                    .pipeSeparator)
+                                                                .last
                                                             : facility.id,
                                                         primaryType: (InventorySingleton()
                                                                         .isDistributor! &&

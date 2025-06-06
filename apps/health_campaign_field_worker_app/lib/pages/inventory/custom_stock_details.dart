@@ -797,6 +797,48 @@ class CustomStockDetailsPageState
                                             }
                                           }
 
+                                          if (entryType ==
+                                                  StockRecordEntryType.loss ||
+                                              entryType ==
+                                                  StockRecordEntryType
+                                                      .damaged) {
+                                            if (isSpaq1 &&
+                                                quantity > context.spaq1) {
+                                              await DigitToast.show(
+                                                context,
+                                                options: DigitToastOptions(
+                                                    localizations.translate(context
+                                                            .isCDD
+                                                        ? i18_local
+                                                            .beneficiaryDetails
+                                                            .validationForExcessStockReturn
+                                                        : i18_local
+                                                            .beneficiaryDetails
+                                                            .validationForExcessStockDispatch),
+                                                    true,
+                                                    theme),
+                                              );
+                                              return;
+                                            } else if (!isSpaq1 &&
+                                                quantity > context.spaq2) {
+                                              await DigitToast.show(
+                                                context,
+                                                options: DigitToastOptions(
+                                                    localizations.translate(context
+                                                            .isCDD
+                                                        ? i18_local
+                                                            .beneficiaryDetails
+                                                            .validationForExcessStockReturn
+                                                        : i18_local
+                                                            .beneficiaryDetails
+                                                            .validationForExcessStockDispatch),
+                                                    true,
+                                                    theme),
+                                              );
+                                              return;
+                                            }
+                                          }
+
                                           context.read<AuthBloc>().add(
                                                 AuthAddSpaqCountsEvent(
                                                   spaq1Count: spaq1,

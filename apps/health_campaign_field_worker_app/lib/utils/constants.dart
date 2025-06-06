@@ -113,8 +113,6 @@ class Constants {
   static const String spaq1 = "SPAQ 1";
   static const String spaq2 = "SPAQ 2";
 
-
-
   // for reportSummary
 
   static const String registered = "registered";
@@ -197,12 +195,13 @@ class Constants {
 
     final enableCrashlytics = config?.firebaseConfig?.enableCrashlytics ?? true;
     if (enableCrashlytics) {
-      firebase_services.initialize(
-        options: DefaultFirebaseOptions.currentPlatform,
-        onErrorMessage: (value) {
-          AppLogger.instance.error(title: 'CRASHLYTICS', message: value);
-        },
-      );
+      // todo enable before the UAT
+      // firebase_services.initialize(
+      //   options: DefaultFirebaseOptions.currentPlatform,
+      //   onErrorMessage: (value) {
+      //     AppLogger.instance.error(title: 'CRASHLYTICS', message: value);
+      //   },
+      // );
     }
 
     _version = version;
