@@ -15,6 +15,7 @@ import 'package:health_campaign_field_worker_app/blocs/app_initialization/app_in
 import 'package:health_campaign_field_worker_app/data/local_store/no_sql/schema/app_configuration.dart';
 import 'package:registration_delivery/registration_delivery.dart';
 import 'package:registration_delivery/router/registration_delivery_router.gm.dart';
+import '../../../models/entities/additional_fields_type.dart';
 import '../../../models/entities/roles_type.dart';
 import 'package:registration_delivery/blocs/household_overview/household_overview.dart';
 import 'package:survey_form/survey_form.dart';
@@ -529,6 +530,12 @@ class _VaccineSelectionPageState extends LocalizedState<VaccineSelectionPage> {
                                                     TaskAdditionalFields(
                                                   version: 1,
                                                   fields: [
+                                                    AdditionalField(
+                                                      AdditionalFieldsType
+                                                          .cycleIndex
+                                                          .toValue(),
+                                                      "0${context.selectedCycle?.id}",
+                                                    ),
                                                     // AdditionalField(
                                                     //   'taskStatus',
                                                     //   status_local.Status
