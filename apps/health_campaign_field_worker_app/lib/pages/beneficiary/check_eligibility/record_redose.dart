@@ -922,7 +922,7 @@ class _RecordRedosePageState extends LocalizedState<RecordRedosePage> {
         createdTime: context.millisecondsSinceEpoch(),
       ),
       // setting the status here as visited to separate this task from other successful task
-      status: Status.visited.toValue(),
+      status: Status.delivered.toValue(),
     );
     // update the task resources with latest clientauditDetails and auditdetails
 
