@@ -52,8 +52,7 @@ class SummaryReportBloc extends Bloc<SummaryReportEvent, SummaryReportState> {
 
       if (status == Status.administeredSuccess) {
         administeredChildrenList.add(element);
-      } else if (status == Status.beneficiaryReferred ||
-          status == Status.beneficiaryInEligible) {
+      } else if (status == Status.beneficiaryRefused) {
         refusalCasesList.add(element);
       }
     }
