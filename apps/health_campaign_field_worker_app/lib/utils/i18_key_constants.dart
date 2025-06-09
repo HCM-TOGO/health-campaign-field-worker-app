@@ -566,6 +566,7 @@ class StockReconciliationDetails {
   const StockReconciliationDetails();
 
   String get commentRequiredError => 'RECONCILIATION_COMMENT_IS_REQUIRED';
+  String get qrCodeInvalidFormat => 'QR_CODE_INVALID_FORMAT';
 }
 
 class InventoryReportDetails {

@@ -19,6 +19,7 @@ import 'package:registration_delivery/router/registration_delivery_router.gm.dar
 import 'package:registration_delivery/utils/utils.dart';
 import 'package:registration_delivery/widgets/inventory/no_facilities_assigned_dialog.dart';
 
+import '../../../models/entities/additional_fields_type.dart';
 import '../../../utils/app_enums.dart';
 import '../../../widgets/custom_back_navigation.dart';
 import '../../../widgets/localized.dart';
@@ -104,6 +105,9 @@ class CustomReferBeneficiarySMCPageState
               },
             ) ??
             [];
+        if (healthFacilities.isEmpty) {
+          return const Center(child: CircularProgressIndicator());
+        }
 
         facilities.addAll(healthFacilities);
 
@@ -271,6 +275,11 @@ class CustomReferBeneficiarySMCPageState
                                       additionalFields: TaskAdditionalFields(
                                         version: 1,
                                         fields: [
+                                          AdditionalField(
+                                            AdditionalFieldsType.cycleIndex
+                                                .toValue(),
+                                            "0${context.selectedCycle?.id}",
+                                          ),
                                           AdditionalField(
                                             'taskStatus',
                                             Status.beneficiaryReferred

@@ -33,6 +33,7 @@ import 'package:survey_form/survey_form.dart';
 
 import '../../../models/entities/additional_fields_type.dart'
     as additional_fields_local;
+import '../../../models/entities/additional_fields_type.dart';
 import '../../../models/entities/assessment_checklist/status.dart'
     as status_local;
 // import '../../../blocs/service/service.dart' as service;
@@ -740,6 +741,12 @@ class ZeroDoseCheckPageState extends LocalizedState<ZeroDoseCheckPage> {
                                                       TaskAdditionalFields(
                                                     version: 1,
                                                     fields: [
+                                                      AdditionalField(
+                                                        AdditionalFieldsType
+                                                            .cycleIndex
+                                                            .toValue(),
+                                                        "0${context.selectedCycle?.id}",
+                                                      ),
                                                       // AdditionalField(
                                                       //   'taskStatus',
                                                       //   status_local.Status

@@ -19,6 +19,7 @@ import 'package:registration_delivery/models/entities/task.dart';
 import 'package:registration_delivery/router/registration_delivery_router.gm.dart';
 import 'package:registration_delivery/utils/i18_key_constants.dart' as i18;
 import '../../blocs/localization/app_localization.dart';
+import '../../models/entities/additional_fields_type.dart';
 import '../../models/entities/identifier_types.dart';
 // import '../../utils/registration_delivery/utils_smc.dart';
 import 'package:registration_delivery/utils/utils.dart';
@@ -86,7 +87,17 @@ class CustomMemberCard extends StatelessWidget {
     required this.variant,
   });
 
-  List<TaskModel>? _getSMCStatusData() {
+  List<TaskModel>? _getSMCStatusData(BuildContext context) {
+    List<TaskModel>? tasks = this
+        .tasks
+        ?.where((e) =>
+            e.additionalFields?.fields
+                .where((field) =>
+                    field.key == AdditionalFieldsType.cycleIndex.toValue() &&
+                    int.tryParse(field.value) == context.selectedCycle?.id)
+                .isNotEmpty ??
+            false)
+        .toList();
     return tasks
         ?.where((e) =>
             e.additionalFields?.fields.firstWhereOrNull(
@@ -100,7 +111,17 @@ class CustomMemberCard extends StatelessWidget {
         .toList();
   }
 
-  List<TaskModel>? _getZeroDoseStatusData() {
+  List<TaskModel>? _getZeroDoseStatusData(BuildContext context) {
+    List<TaskModel>? tasks = this
+        .tasks
+        ?.where((e) =>
+            e.additionalFields?.fields
+                .where((field) =>
+                    field.key == AdditionalFieldsType.cycleIndex.toValue() &&
+                    int.tryParse(field.value) == context.selectedCycle?.id)
+                .isNotEmpty ??
+            false)
+        .toList();
     return tasks
         ?.where((e) =>
             e.additionalFields?.fields.firstWhereOrNull(
@@ -133,9 +154,9 @@ class CustomMemberCard extends StatelessWidget {
   }
 
   Widget statusWidget(context) {
-    List<TaskModel>? smcTasks = _getSMCStatusData();
+    List<TaskModel>? smcTasks = _getSMCStatusData(context);
     // List<TaskModel>? vasTasks = _getVACStatusData();
-    List<TaskModel>? zeroDoseTasks = _getZeroDoseStatusData();
+    List<TaskModel>? zeroDoseTasks = _getZeroDoseStatusData(context);
     bool isZeroDose = checkBeneficiaryZeroDose(zeroDoseTasks);
     bool isIncompletementVaccine =
         checkBeneficiaryIncompletementVaccine(zeroDoseTasks);
@@ -320,8 +341,8 @@ class CustomMemberCard extends StatelessWidget {
   Widget actionButton(BuildContext context) {
     final theme = Theme.of(context);
     final textTheme = theme.digitTextTheme(context);
-    List<TaskModel>? smcTasks = _getSMCStatusData();
-    List<TaskModel>? zeroDoseTasks = _getZeroDoseStatusData();
+    List<TaskModel>? smcTasks = _getSMCStatusData(context);
+    List<TaskModel>? zeroDoseTasks = _getZeroDoseStatusData(context);
     final doseStatus = checkStatus(smcTasks, context.selectedCycle);
     bool smcAssessmentPendingStatus = assessmentSMCPending(smcTasks);
     bool isBeneficiaryReferredSMC = checkBeneficiaryReferredSMC(smcTasks);
@@ -516,6 +537,10 @@ class CustomMemberCard extends StatelessWidget {
                           additionalFields: TaskAdditionalFields(
                             version: 1,
                             fields: [
+                              AdditionalField(
+                                AdditionalFieldsType.cycleIndex.toValue(),
+                                "0${context.selectedCycle?.id}",
+                              ),
                               AdditionalField(
                                 'taskStatus',
                                 Status.beneficiaryRefused.toValue(),

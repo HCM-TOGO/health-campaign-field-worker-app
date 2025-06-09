@@ -100,6 +100,8 @@ class _CustomSearchBeneficiaryPageState
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
     final textTheme = theme.digitTextTheme(context);
+    final RegExp uuidRegex = RegExp(
+        r'^[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{12}$');
 
     return KeyboardVisibilityBuilder(
       builder: (context, isKeyboardVisible) => Scaffold(
@@ -375,12 +377,20 @@ class _CustomSearchBeneficiaryPageState
                   BlocListener<DigitScannerBloc, DigitScannerState>(
                     listener: (context, scannerState) {
                       if (scannerState.qrCodes.isNotEmpty) {
+                        final tag = scannerState.qrCodes.lastOrNull!;
+                        if (!uuidRegex.hasMatch(tag)) {
+                          Toast.showToast(
+                            context,
+                            type: ToastType.error,
+                            message:
+                                localizations.translate(i18_local.stockReconciliationDetails.qrCodeInvalidFormat),
+                          );
+                          return;
+                        }
                         context.read<SearchBlocWrapper>().tagSearchBloc.add(
                               registration_delivery.SearchHouseholdsEvent
                                   .searchByTag(
-                                tag: scannerState.qrCodes.isNotEmpty
-                                    ? scannerState.qrCodes.lastOrNull!
-                                    : '',
+                                tag: tag,
                                 projectId:
                                     RegistrationDeliverySingleton().projectId!,
                               ),

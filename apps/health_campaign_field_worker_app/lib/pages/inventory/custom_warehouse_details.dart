@@ -72,7 +72,11 @@ class CustomWarehouseDetailsPageState
               context.loggedInUser.userName.toString() +
                   Constants.pipeSeparator +
                   context.loggedInUserUuid,
-          validators: isDistributor ? [Validators.required] : [],
+          validators: isDistributor
+              ? [
+                  Validators.required,
+                ]
+              : [],
         ),
       });
 
@@ -222,6 +226,7 @@ class CustomWarehouseDetailsPageState
                                               ? () {}
                                               : () {
                                                   form.markAllAsTouched();
+
                                                   if (!form.valid) {
                                                     return;
                                                   }
@@ -232,6 +237,20 @@ class CustomWarehouseDetailsPageState
                                                   final teamCode = form
                                                       .control(_teamCodeKey)
                                                       .value as String?;
+                                                  final uuidRegex = RegExp(
+                                                      r'^[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{12}$');
+                                                  if (deliveryTeamSelected &&
+                                                      (teamCode == null ||
+                                                          !uuidRegex.hasMatch(
+                                                              teamCode))) {
+                                                    Toast.showToast(
+                                                      context,
+                                                      type: ToastType.error,
+                                                      message:
+                                                           localizations.translate(i18_local.stockReconciliationDetails.qrCodeInvalidFormat),
+                                                    );
+                                                    return;
+                                                  }
 
                                                   final facility =
                                                       deliveryTeamSelected
