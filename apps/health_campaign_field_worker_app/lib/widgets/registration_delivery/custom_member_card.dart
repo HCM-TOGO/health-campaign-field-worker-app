@@ -808,17 +808,16 @@ class CustomMemberCard extends StatelessWidget {
                                 kPadding,
                               ),
                               child: Text(
-                                individual.identifiers!
-                                        .lastWhere(
-                                          (e) =>
-                                              e.identifierType ==
-                                              IdentifierTypes
-                                                  .uniqueBeneficiaryID
-                                                  .toValue(),
-                                        )
-                                        .identifierId ??
-                                    localizations
-                                        .translate(i18.common.noResultsFound),
+                                (individual.identifiers != null && individual.identifiers!.isNotEmpty)
+                                    ? (individual.identifiers!
+                                            .lastWhereOrNull(
+                                              (e) =>
+                                                  e.identifierType ==
+                                                  IdentifierTypes.uniqueBeneficiaryID.toValue(),
+                                            )
+                                            ?.identifierId ??
+                                        localizations.translate(i18.common.noResultsFound))
+                                    : localizations.translate(i18.common.noResultsFound),
                                 style: theme.textTheme.headlineSmall,
                               ),
                             ),

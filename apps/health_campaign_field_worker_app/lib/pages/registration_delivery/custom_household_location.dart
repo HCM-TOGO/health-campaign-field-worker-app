@@ -287,7 +287,7 @@ class CustomHouseholdLocationPageState
                                     addressModel,
                                   ),
                                 );
-                                router.push(CaregiverConsentRoute());
+                                router.push(CustomHouseHoldDetailsRoute());
                               },
                               addMember: (
                                 address,
