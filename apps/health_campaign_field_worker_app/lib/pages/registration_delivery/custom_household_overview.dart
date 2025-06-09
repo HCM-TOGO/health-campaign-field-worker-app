@@ -31,6 +31,7 @@ import 'package:registration_delivery/models/entities/registration_delivery_enum
 import 'package:registration_delivery/models/entities/status.dart';
 import 'package:registration_delivery/router/registration_delivery_router.gm.dart';
 import 'package:registration_delivery/utils/i18_key_constants.dart' as i18;
+import '../../models/entities/additional_fields_type.dart';
 import '../../utils/i18_key_constants.dart' as i18_local;
 import 'package:registration_delivery/utils/utils.dart';
 import '../../utils/extensions/extensions.dart';
@@ -731,17 +732,15 @@ class _CustomHouseholdOverviewPageState
                                                 )
                                                 .toList();
 
-                                            final taskData = (projectBeneficiary ??
-                                                        [])
+                                            final taskData = (projectBeneficiary ?? [])
                                                     .isNotEmpty
                                                 ? state.householdMemberWrapper
                                                     .tasks
                                                     ?.where((element) =>
-                                                        element
-                                                            .projectBeneficiaryClientReferenceId ==
-                                                        projectBeneficiary
-                                                            ?.first
-                                                            .clientReferenceId)
+                                                        element.projectBeneficiaryClientReferenceId ==
+                                                            projectBeneficiary
+                                                                ?.first
+                                                                .clientReferenceId)
                                                     .toList()
                                                 : null;
                                             final referralData =

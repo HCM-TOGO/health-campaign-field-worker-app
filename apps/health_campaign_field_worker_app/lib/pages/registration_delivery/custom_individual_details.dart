@@ -79,6 +79,8 @@ class CustomIndividualDetailsPageState
   bool isBeneficaryRegistration = false;
   String? yesNoValue = 'no';
   bool get isRelocated => yesNoValue == 'yes';
+  final RegExp uuidRegex = RegExp(
+      r'^[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{12}$');
 
   final beneficiaryType = RegistrationDeliverySingleton().beneficiaryType!;
   Set<String>? beneficiaryId;
@@ -124,14 +126,12 @@ class CustomIndividualDetailsPageState
   }
 
   onBeneficiarySubmit(name, individual) async {
-      final router = context.router;
-      router.push(CustomBeneficiarySummaryRoute(
-        name: name,
-        individualModel: individual,
-      ));
+    final router = context.router;
+    router.push(CustomBeneficiarySummaryRoute(
+      name: name,
+      individualModel: individual,
+    ));
   }
-
-
 
   @override
   Widget build(BuildContext context) {
@@ -377,6 +377,15 @@ class CustomIndividualDetailsPageState
                                       scannerBloc.state.qrCodes.isNotEmpty
                                           ? scannerBloc.state.qrCodes.first
                                           : null;
+                                  if (tag != null && !uuidRegex.hasMatch(tag)) {
+                                    Toast.showToast(
+                                      context,
+                                      type: ToastType.error,
+                                      message:
+                                           localizations.translate(i18_local.stockReconciliationDetails.qrCodeInvalidFormat),
+                                    );
+                                    return;
+                                  }
 
                                   if (tag != null &&
                                       tag != projectBeneficiaryModel?.tag &&
@@ -445,6 +454,17 @@ class CustomIndividualDetailsPageState
                                     scannerBloc.add(
                                       const DigitScannerEvent.handleScanner(),
                                     );
+                                    if (scannerBloc.state.qrCodes.isNotEmpty &&
+                                        !uuidRegex.hasMatch(
+                                            scannerBloc.state.qrCodes.first)) {
+                                      Toast.showToast(
+                                        context,
+                                        type: ToastType.error,
+                                        message:
+                                            'Invalid QR code format. Please scan a valid code.',
+                                      );
+                                      return;
+                                    }
                                     if (scannerBloc.state.duplicate) {
                                       Toast.showToast(
                                         context,
@@ -489,7 +509,9 @@ class CustomIndividualDetailsPageState
                                       //         : null,
                                       //   ),
                                       // );
-                                      onBeneficiarySubmit(individual.name?.givenName ?? "",individual);
+                                      onBeneficiarySubmit(
+                                          individual.name?.givenName ?? "",
+                                          individual);
                                     }
                                   }
                                 },
