@@ -391,6 +391,17 @@ class _DigitDobPickerState extends State<CustomDigitDobPicker> {
       years += months ~/ 12;
       months = months % 12;
     }
+    if (widget.isHeadOfHousehold && months > 11) {
+      Toast.showToast(
+        context,
+        type: ToastType.error,
+        message: 'Months cannot be more than 11 for head of household.',
+      );
+      WidgetsBinding.instance.addPostFrameCallback((_) {
+        monthController.text = '';
+      });
+    }
+
     return DateTime(now.year - years, now.month - months);
   }
 
@@ -512,7 +523,8 @@ class _DigitDobPickerState extends State<CustomDigitDobPicker> {
                     final control = form.control('dob');
                     if (control.hasError('required') && control.touched) {
                       return Text(
-                        widget.requiredErrMsg ?? 'Required field cannot be empty',
+                        widget.requiredErrMsg ??
+                            'Required field cannot be empty',
                         style: theme.textTheme.bodyMedium!.copyWith(
                           color: theme.colorTheme.alert.error,
                         ),
