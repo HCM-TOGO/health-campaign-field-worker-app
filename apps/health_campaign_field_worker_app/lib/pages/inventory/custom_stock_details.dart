@@ -808,7 +808,10 @@ class CustomStockDetailsPageState
                                                   StockRecordEntryType.loss ||
                                               entryType ==
                                                   StockRecordEntryType
-                                                      .damaged) {
+                                                      .damaged ||
+                                              entryType ==
+                                                  StockRecordEntryType
+                                                      .returned) {
                                             if (isSpaq1 &&
                                                 quantity > context.spaq1) {
                                               await DigitToast.show(
@@ -924,7 +927,10 @@ class CustomStockDetailsPageState
                                                   StockRecordEntryType.loss ||
                                               entryType ==
                                                   StockRecordEntryType
-                                                      .damaged) {
+                                                      .damaged ||
+                                              entryType ==
+                                                  StockRecordEntryType
+                                                      .returned) {
                                             int spaqLocal1 = context.spaq1;
                                             int spaqLocal2 = context.spaq2;
 
@@ -945,7 +951,10 @@ class CustomStockDetailsPageState
                                                     StockRecordEntryType.loss ||
                                                 entryType ==
                                                     StockRecordEntryType
-                                                        .damaged) {
+                                                        .damaged ||
+                                                entryType ==
+                                                    StockRecordEntryType
+                                                        .returned) {
                                               if (isSpaq1 &&
                                                   quantity > context.spaq1) {
                                                 await DigitToast.show(
