@@ -737,7 +737,14 @@ class CustomStockDetailsPageState
                                           int totalQuantity = 0;
 
                                           totalQuantity = entryType ==
-                                                  StockRecordEntryType.dispatch
+                                                      StockRecordEntryType
+                                                          .dispatch ||
+                                                  entryType ==
+                                                      StockRecordEntryType
+                                                          .loss ||
+                                                  entryType ==
+                                                      StockRecordEntryType
+                                                          .damaged
                                               ? ((quantity != null
                                                       ? int.parse(
                                                           quantity.toString(),
@@ -866,6 +873,9 @@ class CustomStockDetailsPageState
                                               );
                                               return;
                                             } else if (!isSpaq1 &&
+                                                entryType ==
+                                                    StockRecordEntryType
+                                                        .dispatch &&
                                                 quantity > context.spaq2) {
                                               await DigitToast.show(
                                                 context,
@@ -908,7 +918,13 @@ class CustomStockDetailsPageState
                                                   );
                                             }
                                           } else if (entryType ==
-                                              StockRecordEntryType.dispatch) {
+                                                  StockRecordEntryType
+                                                      .dispatch ||
+                                              entryType ==
+                                                  StockRecordEntryType.loss ||
+                                              entryType ==
+                                                  StockRecordEntryType
+                                                      .damaged) {
                                             int spaqLocal1 = context.spaq1;
                                             int spaqLocal2 = context.spaq2;
 
@@ -923,6 +939,50 @@ class CustomStockDetailsPageState
                                                   ) *
                                                   -1;
                                             }
+
+                                            // add validation to check stock loss or damage
+                                            if (entryType ==
+                                                    StockRecordEntryType.loss ||
+                                                entryType ==
+                                                    StockRecordEntryType
+                                                        .damaged) {
+                                              if (isSpaq1 &&
+                                                  quantity > context.spaq1) {
+                                                await DigitToast.show(
+                                                  context,
+                                                  options: DigitToastOptions(
+                                                      localizations.translate(context
+                                                              .isCDD
+                                                          ? i18_local
+                                                              .beneficiaryDetails
+                                                              .validationForExcessStockReturn
+                                                          : i18_local
+                                                              .beneficiaryDetails
+                                                              .validationForExcessStockDispatch),
+                                                      true,
+                                                      theme),
+                                                );
+                                                return;
+                                              } else if (!isSpaq1 &&
+                                                  quantity > context.spaq2) {
+                                                await DigitToast.show(
+                                                  context,
+                                                  options: DigitToastOptions(
+                                                      localizations.translate(context
+                                                              .isCDD
+                                                          ? i18_local
+                                                              .beneficiaryDetails
+                                                              .validationForExcessStockReturn
+                                                          : i18_local
+                                                              .beneficiaryDetails
+                                                              .validationForExcessStockDispatch),
+                                                      true,
+                                                      theme),
+                                                );
+                                                return;
+                                              }
+                                            }
+
                                             context.read<AuthBloc>().add(
                                                   AuthAddSpaqCountsEvent(
                                                       spaq1Count: spaqLocal1,
