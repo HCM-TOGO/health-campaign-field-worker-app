@@ -638,13 +638,16 @@ class CustomMemberCard extends StatelessWidget {
             },
           ),
         if ((!smcAssessmentPendingStatus) && redosePendingStatus)
-          DigitElevatedButton(
+          CustomDigitElevatedButton(
             child: Center(
               child: Text(
                 localizations.translate(
                   i18_local.householdOverView.householdOverViewRedoseActionText,
                 ),
                 style: textTheme.headingM.copyWith(color: Colors.white),
+                textAlign: TextAlign.center,
+                overflow: TextOverflow.visible,
+                maxLines: 2,
               ),
             ),
             onPressed: () async {
@@ -940,6 +943,49 @@ class CustomMemberCard extends StatelessWidget {
             ),
           ),
         ],
+      ),
+    );
+  }
+}
+
+class CustomDigitElevatedButton extends StatelessWidget {
+  final Widget child;
+  final VoidCallback? onPressed;
+
+  const CustomDigitElevatedButton({
+    super.key,
+    required this.child,
+    required this.onPressed,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      margin: const EdgeInsets.only(
+        top: kPadding,
+        bottom: kPadding,
+      ),
+      constraints: const BoxConstraints(maxHeight: 60, minHeight: 50),
+      decoration: BoxDecoration(
+        border: Border(
+          bottom: BorderSide(
+            color: DigitTheme.instance.colors.woodsmokeBlack,
+            width: 2,
+          ),
+        ),
+      ),
+      child: ElevatedButton(
+        style: ElevatedButton.styleFrom(
+          tapTargetSize: MaterialTapTargetSize.shrinkWrap,
+          textStyle: const TextStyle(
+            color: Colors.black,
+            fontFamily: 'Roboto',
+            fontSize: 19,
+            fontWeight: FontWeight.w500,
+          ),
+        ),
+        onPressed: onPressed,
+        child: Center(child: child),
       ),
     );
   }
