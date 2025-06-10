@@ -17,6 +17,7 @@ import 'package:inventory_management/utils/extensions/extensions.dart';
 import 'package:reactive_forms/reactive_forms.dart';
 
 import 'package:inventory_management/utils/i18_key_constants.dart' as i18;
+import '../../utils/constants.dart';
 import '../../utils/i18_key_constants.dart' as i18_local;
 import 'package:inventory_management/widgets/inventory/no_facilities_assigned_dialog.dart';
 import 'package:inventory_management/widgets/localized.dart';
@@ -382,6 +383,45 @@ class CustomStockReconciliationPageState
                                                     CircularProgressIndicator(),
                                               ),
                                           fetched: (facilities, allFacilities) {
+                                            final facilities = state.whenOrNull(
+                                                  fetched: (facilities,
+                                                      allfacilities) {
+                                                    // List<FacilityModel>
+                                                    //     filteredFacilities =
+                                                    //     facilities
+                                                    //         .where(
+                                                    //           (element) =>
+                                                    //               element
+                                                    //                   .usage ==
+                                                    //               Constants
+                                                    //                   .healthFacility,
+                                                    //         )
+                                                    //         .toList();
+                                                    // facilities =
+                                                    //     filteredFacilities
+                                                    //             .isEmpty
+                                                    //         ? facilities
+                                                    //         : filteredFacilities;
+
+                                                    final teamFacilities = [
+                                                      FacilityModel(
+                                                        id: 'Delivery Team',
+                                                        name: 'Delivery Team',
+                                                      ),
+                                                    ];
+                                                    // teamFacilities.addAll(
+                                                    //   facilities,
+                                                    // );
+
+                                                    return InventorySingleton()
+                                                                .isDistributor! &&
+                                                            !InventorySingleton()
+                                                                .isWareHouseMgr!
+                                                        ? teamFacilities
+                                                        : facilities;
+                                                  },
+                                                ) ??
+                                                [];
                                             return Column(
                                               children: [
                                                 InkWell(
@@ -412,9 +452,21 @@ class CustomStockReconciliationPageState
                                                       selectedFacilityId =
                                                           facility.id;
                                                     });
+                                                    final newFacility = InventorySingleton()
+                                                                .isDistributor! &&
+                                                            !InventorySingleton()
+                                                                .isWareHouseMgr!
+                                                        ? FacilityModel(
+                                                            id: InventorySingleton()
+                                                                .loggedInUserUuid!,
+                                                          )
+                                                        : FacilityModel(
+                                                            id: selectedFacilityId
+                                                                .toString(),
+                                                          );
                                                     stockReconciliationBloc.add(
                                                       StockReconciliationSelectFacilityEvent(
-                                                        facility,
+                                                        newFacility,
                                                       ),
                                                     );
                                                   },
