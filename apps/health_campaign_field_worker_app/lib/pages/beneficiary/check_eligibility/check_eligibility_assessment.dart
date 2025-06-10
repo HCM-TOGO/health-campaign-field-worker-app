@@ -894,6 +894,7 @@ class _EligibilityChecklistViewPage
         ],
       );
     } else if (item.dataType == 'String') {
+      const pattern = r'^[A-Za-z0-9\s]+$'; // Allows A-Z, a-z, 0-9, and spaces
       return Padding(
         padding: const EdgeInsets.all(8.0),
         child: DigitTextField(
@@ -906,13 +907,9 @@ class _EligibilityChecklistViewPage
             if (((value == null || value == '') && item.required == true)) {
               return localizations.translate("${item.code}_REQUIRED");
             }
-            if (item.regex != null) {
-              return (RegExp(item.regex!).hasMatch(value!))
-                  ? null
-                  : localizations.translate("${item.code}_REGEX");
-            }
-
-            return null;
+            return (RegExp(item.regex ?? pattern).hasMatch(value!))
+                ? null
+                : localizations.translate("${item.code}_REGEX");
           },
           label: localizations.translate(
             '${selectedServiceDefinition?.code}.${item.code}',
@@ -1057,7 +1054,6 @@ class _EligibilityChecklistViewPage
       q5Key: "TAKEN_SP_OR_CTX",
       q6Key: "TAKEN_MALARIA_DOSE",
     };
-    final individualModel = widget.individual;
 
     if (responses.isNotEmpty) {
       if (responses.containsKey(q3Key) && responses[q3Key]!.isNotEmpty) {
@@ -1069,7 +1065,8 @@ class _EligibilityChecklistViewPage
       }
       if (!isIneligible &&
           (responses.containsKey(q6Key) && responses[q6Key]!.isNotEmpty)) {
-        ifAdministration = responses[q6Key] == yes ? true : false;
+        ifAdministration = responses[q6Key] == yes ? false : true;
+        isIneligible = responses[q6Key] == yes ? true : false;
       }
       if (isIneligible) {
         for (var entry in responses.entries) {
