@@ -1127,22 +1127,31 @@ class CustomStockDetailsPageState
                                                       Constants.spaq1,
                                                     );
                                               },
+                                              sentenceCaseEnabled: false,
                                               selectedOption: (form
                                                           .control(
                                                               _productVariantKey)
                                                           .value !=
                                                       null)
                                                   ? DropdownItem(
-                                                      name: localizations.translate((form
-                                                                      .control(
-                                                                          _productVariantKey)
-                                                                      .value
-                                                                  as ProductVariantModel)
-                                                              .sku ??
-                                                          (form.control(_productVariantKey).value
-                                                                  as ProductVariantModel)
-                                                              .id),
-                                                      code: (form.control(_productVariantKey).value
+                                                      name: localizations
+                                                          .translate((form
+                                                                          .control(
+                                                                              _productVariantKey)
+                                                                          .value
+                                                                      as ProductVariantModel)
+                                                                  .sku ??
+                                                              (form
+                                                                          .control(
+                                                                              _productVariantKey)
+                                                                          .value
+                                                                      as ProductVariantModel)
+                                                                  .id)
+                                                          .toUpperCase(),
+                                                      code: (form
+                                                                  .control(
+                                                                      _productVariantKey)
+                                                                  .value
                                                               as ProductVariantModel)
                                                           .id)
                                                   : const DropdownItem(
