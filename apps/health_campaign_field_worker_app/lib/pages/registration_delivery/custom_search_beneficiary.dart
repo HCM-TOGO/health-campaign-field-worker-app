@@ -102,7 +102,8 @@ class _CustomSearchBeneficiaryPageState
     final textTheme = theme.digitTextTheme(context);
     final RegExp uuidRegex = RegExp(
         r'^[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{12}$');
-
+    final trainingRegex = RegExp(r'^cps-f\d{5}$');
+    final productionRegex = RegExp(r'^CPS26-(\d{6})$');
     return KeyboardVisibilityBuilder(
       builder: (context, isKeyboardVisible) => Scaffold(
         body: NotificationListener<ScrollNotification>(
@@ -378,7 +379,9 @@ class _CustomSearchBeneficiaryPageState
                     listener: (context, scannerState) {
                       if (scannerState.qrCodes.isNotEmpty) {
                         final tag = scannerState.qrCodes.lastOrNull!;
-                        if (!uuidRegex.hasMatch(tag)) {
+                        if (!uuidRegex.hasMatch(tag) && 
+                            !trainingRegex.hasMatch(tag) &&
+                            !productionRegex.hasMatch(tag)) {
                           Toast.showToast(
                             context,
                             type: ToastType.error,

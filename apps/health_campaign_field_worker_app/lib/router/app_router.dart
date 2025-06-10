@@ -102,7 +102,7 @@ import 'package:digit_scanner/blocs/app_localization.dart';
 import '../pages/inventory/custom_summary_report.dart';
 import '../pages/beneficiary/check_eligibility/custom_side_effects.dart';
 import 'package:registration_delivery/models/entities/side_effect.dart';
-
+import '../pages/closedhousehold/custom_closed_household_details.dart';
 import '../pages/registration_delivery/custom_beneficiary_summary.dart';
 part 'app_router.gr.dart';
 
@@ -184,8 +184,15 @@ class AppRouter extends _$AppRouter {
               AutoRoute(
                 page: ClosedHouseholdDetailsRoute.page,
                 path: 'closed-household-details',
+              ),
+              AutoRoute(
+                page: CustomClosedHouseholdDetailsRoute.page,
+                path: 'custom-closed-household-details',
                 initial: true,
               ),
+              RedirectRoute(
+                  path: 'closed-household-details',
+                  redirectTo: 'custom-closed-household-details'),
               AutoRoute(
                   page: ClosedHouseholdSummaryRoute.page,
                   path: 'closed-household-summary'),

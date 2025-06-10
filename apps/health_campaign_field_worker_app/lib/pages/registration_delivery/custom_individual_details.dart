@@ -81,6 +81,8 @@ class CustomIndividualDetailsPageState
   bool get isRelocated => yesNoValue == 'yes';
   final RegExp uuidRegex = RegExp(
       r'^[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{12}$');
+  final trainingRegex = RegExp(r'^cps-f\d{5}$');
+  final productionRegex = RegExp(r'^CPS26-(\d{6})$');
 
   final beneficiaryType = RegistrationDeliverySingleton().beneficiaryType!;
   Set<String>? beneficiaryId;
@@ -377,7 +379,7 @@ class CustomIndividualDetailsPageState
                                       scannerBloc.state.qrCodes.isNotEmpty
                                           ? scannerBloc.state.qrCodes.first
                                           : null;
-                                  if (tag != null && !uuidRegex.hasMatch(tag)) {
+                                  if (tag != null && !uuidRegex.hasMatch(tag) && !trainingRegex.hasMatch(tag) && !productionRegex.hasMatch(tag)) {
                                     Toast.showToast(
                                       context,
                                       type: ToastType.error,
@@ -456,6 +458,9 @@ class CustomIndividualDetailsPageState
                                     );
                                     if (scannerBloc.state.qrCodes.isNotEmpty &&
                                         !uuidRegex.hasMatch(
+                                            scannerBloc.state.qrCodes.first) &&
+                                        !productionRegex.hasMatch(scannerBloc.state.qrCodes.first) && 
+                                            !trainingRegex.hasMatch(
                                             scannerBloc.state.qrCodes.first)) {
                                       Toast.showToast(
                                         context,
