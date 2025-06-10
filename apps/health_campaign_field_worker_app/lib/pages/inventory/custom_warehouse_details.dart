@@ -138,9 +138,9 @@ class CustomWarehouseDetailsPageState
                           name: 'Delivery Team',
                         ),
                       ];
-                      teamFacilities.addAll(
-                        facilities,
-                      );
+                      // teamFacilities.addAll(
+                      //   facilities,
+                      // );
 
                       return InventorySingleton().isDistributor! &&
                               !InventorySingleton().isWareHouseMgr!
@@ -202,6 +202,21 @@ class CustomWarehouseDetailsPageState
                               scannerState.qrCodes.isNotEmpty
                                   ? scannerState.qrCodes.firstOrNull
                                   : '';
+                          final teamFacilities = [
+                            FacilityModel(
+                              id: 'Delivery Team',
+                              name: 'Delivery Team',
+                            ),
+                          ];
+                          if (InventorySingleton().isDistributor! &&
+                              !InventorySingleton().isWareHouseMgr!) {
+                            form.control(_warehouseKey).value = localizations
+                                .translate('FAC_${teamFacilities.first.id}');
+                            controller1.text = localizations
+                                .translate('FAC_${teamFacilities.first.id}');
+                            selectedFacilityId = teamFacilities.first.id;
+                            deliveryTeamSelected = true;
+                          }
 
                           return ScrollableContent(
                             header: const Column(children: [
@@ -246,8 +261,10 @@ class CustomWarehouseDetailsPageState
                                                     Toast.showToast(
                                                       context,
                                                       type: ToastType.error,
-                                                      message:
-                                                           localizations.translate(i18_local.stockReconciliationDetails.qrCodeInvalidFormat),
+                                                      message: localizations
+                                                          .translate(i18_local
+                                                              .stockReconciliationDetails
+                                                              .qrCodeInvalidFormat),
                                                     );
                                                     return;
                                                   }
