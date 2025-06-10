@@ -1386,6 +1386,7 @@ class CustomStockDetailsPageState
                                     formControlName: _deliveryTeamKey,
                                     builder: (field) {
                                       return InputField(
+                                        keyboardType: TextInputType.none,
                                         type: InputType.search,
                                         label: localizations.translate(
                                           i18.stockReconciliationDetails
