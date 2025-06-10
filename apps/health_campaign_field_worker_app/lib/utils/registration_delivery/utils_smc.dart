@@ -116,7 +116,7 @@ bool redosePending(List<TaskModel>? tasks, ProjectCycle? selectedCycle) {
   // get the fist task which was marked as visited as this is the one which was created in redose flow
   TaskModel? redoseTask = tasks!
       .where(
-        (element) => element.status == Status.visited.toValue(),
+        (element) => element.status == Status.delivered.toValue(),
       )
       .lastOrNull;
   TaskModel? successfullTask = tasks
