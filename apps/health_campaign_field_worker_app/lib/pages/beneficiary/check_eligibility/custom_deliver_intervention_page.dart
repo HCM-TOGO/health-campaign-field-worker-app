@@ -892,6 +892,40 @@ class CustomDeliverInterventionPageState
       ),
     );
 
+    if (oldTask != null &&
+        oldTask.status == Status.beneficiaryRefused.toValue()) {
+      oldTask = oldTask.copyWith(
+        additionalFields: oldTask.additionalFields != null
+            ? TaskAdditionalFields(
+                version: oldTask.additionalFields!.version,
+                fields: [
+                  AdditionalField(
+                    'taskStatus',
+                    Status.beneficiaryRefused.toValue(),
+                  ),
+                ],
+              )
+            : TaskAdditionalFields(
+                version: 1,
+                fields: [
+                  AdditionalField(
+                    'taskStatus',
+                    Status.beneficiaryRefused.toValue(),
+                  ),
+                ],
+              ),
+      );
+      // submit the updated task
+
+      context.read<DeliverInterventionBloc>().add(
+            DeliverInterventionSubmitEvent(
+              task: oldTask,
+              isEditing: true,
+              boundaryModel: RegistrationDeliverySingleton().boundary!,
+            ),
+          );
+    }
+
     return task;
   }
 
