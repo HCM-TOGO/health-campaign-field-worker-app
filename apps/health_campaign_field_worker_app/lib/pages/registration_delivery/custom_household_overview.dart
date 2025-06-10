@@ -76,8 +76,6 @@ class _CustomHouseholdOverviewPageState
     final theme = Theme.of(context);
     final beneficiaryType = RegistrationDeliverySingleton().beneficiaryType!;
     final textTheme = theme.digitTextTheme(context);
-    final householdMemberWrapper =
-        context.read<HouseholdOverviewBloc>().state.householdMemberWrapper;
 
     return ProductVariantBlocWrapper(
       child: PopScope(
@@ -90,6 +88,8 @@ class _CustomHouseholdOverviewPageState
         },
         child: BlocBuilder<HouseholdOverviewBloc, HouseholdOverviewState>(
           builder: (ctx, state) {
+            final isClosedHousehold =
+        state.householdMemberWrapper.tasks?.lastOrNull?.status == Status.closeHousehold.toValue();
             return Scaffold(
               body: state.loading
                   ? const Center(child: CircularProgressIndicator())
@@ -594,14 +594,8 @@ class _CustomHouseholdOverviewPageState
                                         }),
                                       ),
                                       if (RegistrationDeliverySingleton()
-                                                  .householdType ==
-                                              HouseholdType.community &&
-                                          (householdMemberWrapper.tasks !=
-                                                  null &&
-                                              householdMemberWrapper.tasks
-                                                      ?.lastOrNull!.status !=
-                                                  Status.closeHousehold
-                                                      .toValue())) ...[
+                                              .householdType ==
+                                          HouseholdType.community) ...[
                                         Padding(
                                           padding: const EdgeInsets.only(
                                               top: spacer2, bottom: spacer2),
@@ -702,14 +696,10 @@ class _CustomHouseholdOverviewPageState
                                               ),
                                             )
                                           : const Offstage(),
-                                      if ((householdMemberWrapper.tasks !=
-                                              null &&
-                                          householdMemberWrapper
-                                                  .tasks?.lastOrNull!.status !=
-                                              Status.closeHousehold.toValue()))
-                                        Column(
-                                          children: (state
-                                                      .householdMemberWrapper
+                                      Offstage(
+                                        offstage: isClosedHousehold,
+                                        child: Column(
+                                          children: (state.householdMemberWrapper
                                                       .members ??
                                                   [])
                                               .map(
@@ -726,7 +716,7 @@ class _CustomHouseholdOverviewPageState
                                                       b.beneficiaryClientReferenceId ==
                                                       e.clientReferenceId)
                                                   ?.clientReferenceId;
-
+                                        
                                               final projectBeneficiary = state
                                                   .householdMemberWrapper
                                                   .projectBeneficiaries
@@ -738,15 +728,14 @@ class _CustomHouseholdOverviewPageState
                                                                     .beneficiaryType ==
                                                                 BeneficiaryType
                                                                     .individual
-                                                            ? e
-                                                                .clientReferenceId
+                                                            ? e.clientReferenceId
                                                             : state
                                                                 .householdMemberWrapper
                                                                 .household
                                                                 ?.clientReferenceId),
                                                   )
                                                   .toList();
-
+                                        
                                               final taskData = (projectBeneficiary ??
                                                           [])
                                                       .isNotEmpty
@@ -786,8 +775,7 @@ class _CustomHouseholdOverviewPageState
                                                               ?.clientReferenceId)
                                                       .toList()
                                                   : null;
-                                              final ageInYears = e
-                                                          .dateOfBirth !=
+                                              final ageInYears = e.dateOfBirth !=
                                                       null
                                                   ? DigitDateUtils.calculateAge(
                                                       DigitDateUtils
@@ -797,8 +785,7 @@ class _CustomHouseholdOverviewPageState
                                                           DateTime.now(),
                                                     ).years
                                                   : 0;
-                                              final ageInMonths = e
-                                                          .dateOfBirth !=
+                                              final ageInMonths = e.dateOfBirth !=
                                                       null
                                                   ? DigitDateUtils.calculateAge(
                                                       DigitDateUtils
@@ -821,7 +808,7 @@ class _CustomHouseholdOverviewPageState
                                                                 DateTime.now()
                                                                     .millisecondsSinceEpoch,
                                                       );
-
+                                        
                                               final isBeneficiaryRefused =
                                                   checkIfBeneficiaryRefused(
                                                 taskData,
@@ -831,7 +818,7 @@ class _CustomHouseholdOverviewPageState
                                                 referralData,
                                                 currentCycle,
                                               );
-
+                                        
                                               return BlocBuilder<
                                                   ProductVariantBloc,
                                                   ProductVariantState>(
@@ -856,19 +843,19 @@ class _CustomHouseholdOverviewPageState
                                                             () async {
                                                           final bloc = ctx.read<
                                                               HouseholdOverviewBloc>();
-
+                                        
                                                           Navigator.of(
                                                             context,
                                                             rootNavigator: true,
                                                           ).pop();
-
+                                        
                                                           final address =
                                                               e.address;
                                                           if (address == null ||
                                                               address.isEmpty) {
                                                             return;
                                                           }
-
+                                        
                                                           final projectId =
                                                               RegistrationDeliverySingleton()
                                                                   .projectId!;
@@ -880,7 +867,7 @@ class _CustomHouseholdOverviewPageState
                                                                   beneficiaryType,
                                                             ),
                                                           );
-
+                                        
                                                           await context
                                                               .router.root
                                                               .push(
@@ -893,8 +880,7 @@ class _CustomHouseholdOverviewPageState
                                                                     .householdMemberWrapper
                                                                     .household!,
                                                                 addressModel:
-                                                                    address
-                                                                        .first,
+                                                                    address.first,
                                                                 projectBeneficiaryModel: state
                                                                     .householdMemberWrapper
                                                                     .projectBeneficiaries
@@ -943,7 +929,7 @@ class _CustomHouseholdOverviewPageState
                                                                       beneficiaryType,
                                                                 ),
                                                               );
-
+                                        
                                                           Navigator.of(
                                                             context,
                                                             rootNavigator: true,
@@ -952,14 +938,16 @@ class _CustomHouseholdOverviewPageState
                                                         deleteMemberAction: () {
                                                           showCustomPopup(
                                                             context: context,
-                                                            builder: (BuildContext context) => Popup(
-                                                                title: localizations
-                                                                    .translate(i18
-                                                                        .householdOverView
-                                                                        .householdOverViewActionCardTitle),
-                                                                type: PopUpType
-                                                                    .simple,
-                                                                actions: [
+                                                            builder: (BuildContext
+                                                                    context) =>
+                                                                Popup(
+                                                                    title: localizations
+                                                                        .translate(i18
+                                                                            .householdOverView
+                                                                            .householdOverViewActionCardTitle),
+                                                                    type: PopUpType
+                                                                        .simple,
+                                                                    actions: [
                                                                   DigitButton(
                                                                       label: localizations.translate(i18
                                                                           .householdOverView
@@ -975,7 +963,8 @@ class _CustomHouseholdOverviewPageState
                                                                           ..pop()
                                                                           ..pop();
                                                                         context
-                                                                            .read<HouseholdOverviewBloc>()
+                                                                            .read<
+                                                                                HouseholdOverviewBloc>()
                                                                             .add(
                                                                               HouseholdOverviewEvent.selectedIndividual(
                                                                                 individualModel: e,
@@ -1062,33 +1051,32 @@ class _CustomHouseholdOverviewPageState
                                                                     sideEffectData,
                                                                   )
                                                                 : false,
-                                                        name:
-                                                            e.name?.givenName ??
-                                                                ' - - ',
-                                                        years: (e.dateOfBirth ==
-                                                                null
-                                                            ? null
-                                                            : DigitDateUtils
-                                                                .calculateAge(
-                                                                DigitDateUtils
-                                                                        .getFormattedDateToDateTime(
-                                                                      e.dateOfBirth!,
-                                                                    ) ??
-                                                                    DateTime
-                                                                        .now(),
-                                                              ).years),
-                                                        months: (e.dateOfBirth ==
-                                                                null
-                                                            ? null
-                                                            : DigitDateUtils
-                                                                .calculateAge(
-                                                                DigitDateUtils
-                                                                        .getFormattedDateToDateTime(
-                                                                      e.dateOfBirth!,
-                                                                    ) ??
-                                                                    DateTime
-                                                                        .now(),
-                                                              ).months),
+                                                        name: e.name?.givenName ??
+                                                            ' - - ',
+                                                        years:
+                                                            (e.dateOfBirth == null
+                                                                ? null
+                                                                : DigitDateUtils
+                                                                    .calculateAge(
+                                                                    DigitDateUtils
+                                                                            .getFormattedDateToDateTime(
+                                                                          e.dateOfBirth!,
+                                                                        ) ??
+                                                                        DateTime
+                                                                            .now(),
+                                                                  ).years),
+                                                        months:
+                                                            (e.dateOfBirth == null
+                                                                ? null
+                                                                : DigitDateUtils
+                                                                    .calculateAge(
+                                                                    DigitDateUtils
+                                                                            .getFormattedDateToDateTime(
+                                                                          e.dateOfBirth!,
+                                                                        ) ??
+                                                                        DateTime
+                                                                            .now(),
+                                                                  ).months),
                                                         gender: e.gender?.name,
                                                         isBeneficiaryRefused:
                                                             isBeneficiaryRefused &&
@@ -1130,13 +1118,12 @@ class _CustomHouseholdOverviewPageState
                                             },
                                           ).toList(),
                                         ),
+                                      ),
                                     ],
                                   ),
-                                  if ((householdMemberWrapper.tasks != null &&
-                                      householdMemberWrapper
-                                              .tasks?.lastOrNull!.status !=
-                                          Status.closeHousehold.toValue()))
-                                    DigitButton(
+                                  Offstage(
+                                    offstage: isClosedHousehold,
+                                    child: DigitButton(
                                       mainAxisSize: MainAxisSize.max,
                                       onPressed: () {
                                         int spaq1 = context.spaq1;
@@ -1153,13 +1140,13 @@ class _CustomHouseholdOverviewPageState
                                           descriptionText +=
                                               "\n ${localizations.translate(i18_local.beneficiaryDetails.spaq2DoseUnit)}";
                                         }
-
+                                    
                                         if (context.spaq1 > -1 ||
                                             context.spaq2 > -1) {
                                           addIndividual(
                                             context,
-                                            state.householdMemberWrapper
-                                                .household,
+                                            state
+                                                .householdMemberWrapper.household,
                                           );
                                         } else {
                                           showCustomPopup(
@@ -1176,8 +1163,7 @@ class _CustomHouseholdOverviewPageState
                                               type: PopUpType.simple,
                                               actions: [
                                                 DigitButton(
-                                                  label:
-                                                      localizations.translate(
+                                                  label: localizations.translate(
                                                     i18_local.beneficiaryDetails
                                                         .goToHome,
                                                   ),
@@ -1202,6 +1188,7 @@ class _CustomHouseholdOverviewPageState
                                       type: DigitButtonType.tertiary,
                                       size: DigitButtonSize.large,
                                     ),
+                                  ),
                                 ]),
                           ),
                         ],
