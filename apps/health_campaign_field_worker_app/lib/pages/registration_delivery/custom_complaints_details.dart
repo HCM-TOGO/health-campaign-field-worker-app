@@ -25,6 +25,7 @@ import '../../../widgets/header/back_navigation_help_header.dart';
 import '../../../widgets/localized.dart';
 import '../../utils/i18_key_constants.dart' as i18_local;
 
+
 @RoutePage()
 class CustomComplaintsDetailsPage extends LocalizedStatefulWidget {
   const CustomComplaintsDetailsPage({
@@ -593,7 +594,7 @@ class CustomComplaintsDetailsPageState
           Validators.delegate((validator) {
             final value = validator.value?.toString().trim();
             if (value == null || value.isEmpty) return null;
-            const pattern = r"^[A-Za-z\s]+$";
+            const pattern = r"^[A-Za-z0-9\s]+$";
             final regExp = RegExp(pattern);
             return regExp.hasMatch(value) ? null : {'onlyAlphabets': true};
           }),

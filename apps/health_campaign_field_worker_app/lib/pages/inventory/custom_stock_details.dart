@@ -528,8 +528,8 @@ class CustomStockDetailsPageState
 
                                       switch (entryType) {
                                         case StockRecordEntryType.receipt:
-                                        case StockRecordEntryType.loss:
-                                        case StockRecordEntryType.damaged:
+                                        // case StockRecordEntryType.loss:
+                                        // case StockRecordEntryType.damaged:
                                         case StockRecordEntryType.returned:
                                           if (deliveryTeamSelected) {
                                             // senderId = deliveryTeamName;
@@ -552,6 +552,8 @@ class CustomStockDetailsPageState
 
                                           break;
                                         case StockRecordEntryType.dispatch:
+                                        case StockRecordEntryType.loss:
+                                        case StockRecordEntryType.damaged:
                                           if (deliveryTeamSelected) {
                                             // receiverId = deliveryTeamName;
                                             // receiverType = "STAFF";

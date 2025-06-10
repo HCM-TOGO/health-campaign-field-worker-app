@@ -383,8 +383,9 @@ class CustomIndividualDetailsPageState
                                     Toast.showToast(
                                       context,
                                       type: ToastType.error,
-                                      message:
-                                           localizations.translate(i18_local.stockReconciliationDetails.qrCodeInvalidFormat),
+                                      message: localizations.translate(i18_local
+                                          .stockReconciliationDetails
+                                          .qrCodeInvalidFormat),
                                     );
                                     return;
                                   }
@@ -917,14 +918,7 @@ class CustomIndividualDetailsPageState
                             child: ReactiveWrapperField(
                               formControlName: _mobileNumberKey,
                               validationMessages: {
-                                'required': (_) => localizations.translate(
-                                      i18.common.corecommonRequired,
-                                    ),
                                 'mobileNumber': (object) =>
-                                    localizations.translate(i18_local
-                                        .individualDetails
-                                        .mobileNumberLengthValidationMessage),
-                                'minLength': (object) =>
                                     localizations.translate(i18_local
                                         .individualDetails
                                         .mobileNumberLengthValidationMessage),
@@ -1141,8 +1135,6 @@ class CustomIndividualDetailsPageState
           FormControl<String>(value: individual?.mobileNumber, validators: [
         Validators.delegate((validator) =>
             local_utils.CustomValidator.validMobileNumber(validator)),
-
-        Validators.minLength(8),
         Validators.maxLength(8),
         // Validators.required,
       ]),
