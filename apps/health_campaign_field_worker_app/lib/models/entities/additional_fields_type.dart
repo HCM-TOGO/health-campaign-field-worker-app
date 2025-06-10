@@ -7,6 +7,8 @@ part 'additional_fields_type.mapper.dart';
 enum AdditionalFieldsType {
   @MappableValue("zeroDoseStatus")
   zeroDoseStatus,
+  @MappableValue("hasSideEffects")
+  hasSideEffects,
   @MappableValue("deliveryStrategy")
   deliveryStrategy,
   @MappableValue("cycleIndex")

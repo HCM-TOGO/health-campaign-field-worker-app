@@ -508,11 +508,13 @@ class _VaccineSelectionPageState extends LocalizedState<VaccineSelectionPage> {
                                                       .millisecondsSinceEpoch(),
                                                 ),
                                                 projectId: context.projectId,
-                                                status: (widget.hasSideEffects ??
-                                                        false)
-                                                    ? Status.inComplete
-                                                        .toValue()
-                                                    : status_local.Status
+                                                status:
+                                                    // (widget.hasSideEffects ??
+                                                    //         false)
+                                                    //     ? Status.inComplete
+                                                    //         .toValue()
+                                                    //     :
+                                                    status_local.Status
                                                         .beneficiaryInEligible
                                                         .toValue(),
                                                 clientAuditDetails:
@@ -553,6 +555,17 @@ class _VaccineSelectionPageState extends LocalizedState<VaccineSelectionPage> {
                                                         'ageBelow3Months',
                                                         true.toString(),
                                                       ),
+                                                    ] else ...[
+                                                      AdditionalField(
+                                                          'ineligibleReasons',
+                                                          ["SIDE_EFFECTS"]
+                                                              .join(",")),
+                                                      AdditionalField(
+                                                          additional_fields_local
+                                                              .AdditionalFieldsType
+                                                              .hasSideEffects
+                                                              .toValue(),
+                                                          true.toString()),
                                                     ],
                                                     AdditionalField(
                                                       additional_fields_local

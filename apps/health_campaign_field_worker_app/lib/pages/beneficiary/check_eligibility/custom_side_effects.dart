@@ -374,6 +374,8 @@ class CustomSideEffectsPageState extends LocalizedState<CustomSideEffectsPage> {
     ).then(
       (value) => context.router.push(
         ZeroDoseCheckRoute(
+            projectBeneficiaryClientReferenceId:
+                widget.tasks.last.projectBeneficiaryClientReferenceId,
             eligibilityAssessmentType: EligibilityAssessmentType.smc,
             isAdministration: false,
             isChecklistAssessmentDone: false,
