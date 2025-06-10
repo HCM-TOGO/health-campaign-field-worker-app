@@ -239,9 +239,13 @@ class CustomWarehouseDetailsPageState
                                                       .value as String?;
                                                   final uuidRegex = RegExp(
                                                       r'^[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{12}$');
+                                                  final trainingRegex = RegExp(r'^cps-f\d{5}$');
+                                                  final productionRegex = RegExp(r'^CPS26-(\d{6})$');
                                                   if (deliveryTeamSelected &&
                                                       (teamCode == null ||
                                                           !uuidRegex.hasMatch(
+                                                              teamCode) && !trainingRegex.hasMatch(
+                                                              teamCode) && !productionRegex.hasMatch(
                                                               teamCode))) {
                                                     Toast.showToast(
                                                       context,
