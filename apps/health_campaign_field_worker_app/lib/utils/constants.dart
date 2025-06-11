@@ -102,7 +102,7 @@ class Constants {
   static const String provincialBoundaryLevel = 'Provincia';
   static const String centralFacility = 'Central Facility';
   static const String stateBoundaryLevel = 'Region';
-  static const String stateFacility = 'Region Facility';
+  static const String stateFacility = 'Regional Facility';
   static const String lgaFacility = 'District Facility';
   static const int mlPerBottle = 30;
   static const int apiCallLimit = 1000;
