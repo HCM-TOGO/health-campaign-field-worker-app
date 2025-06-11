@@ -191,6 +191,79 @@ performBackgroundService({
   }
 }
 
+
+// String? convertInToSentenceCase(String? text) {
+//   if (text == null  || text.isEmpty) {
+//     return text;
+//   }
+
+//   /// Trim the text to remove leading and trailing whitespace
+//   text = text.trim();
+
+//   /// Split the text into words
+//   List<String> words = text.split(' ');
+
+//   /// Initialize an empty list to hold the processed words
+//   List<String> sentenceCase = [];
+
+//   /// Process the first word separately to capitalize its first letter
+//   if (words.isNotEmpty) {
+//     String firstWord = words[0];
+//     String capitalizedFirstWord =
+//         firstWord[0].toUpperCase() + firstWord.substring(1).toLowerCase();
+//     sentenceCase.add(capitalizedFirstWord);
+
+//     /// Process the remaining words to make all letters lowercase
+//     for (int i = 1; i < words.length; i++) {
+//       sentenceCase.add(words[i].toLowerCase());
+//     }
+//   }
+
+//   /// Join the processed words back into a single string
+//   return sentenceCase.join(' ');
+// }
+
+String? convertInToSentenceCase(String? text) {
+  if (text == null || text.isEmpty) {
+    return text;
+  }
+
+  /// Trim the text to remove leading and trailing whitespace
+  text = text.trim();
+
+  /// Split the text into words
+  List<String> words = text.split(' ');
+
+  /// Initialize an empty list to hold the processed words
+  List<String> sentenceCase = [];
+
+  if (words.isNotEmpty) {
+    // Make the entire first word uppercase
+    String firstWord = words[0];
+    String upperFirstWord = firstWord.toUpperCase();
+    sentenceCase.add(upperFirstWord);
+
+    /// Process the remaining words to make all letters lowercase
+    for (int i = 1; i < words.length; i++) {
+      sentenceCase.add(words[i].toLowerCase());
+    }
+  }
+
+  /// Join the processed words back into a single string
+  return sentenceCase.join(' ');
+}
+
+
+/// truncate string with after a max length
+String truncateWithEllipsis(int maxLength, String text) {
+  if (text.length <= maxLength) {
+    return text;
+  } else {
+    return '${text.substring(0, maxLength)}...';
+  }
+}
+
+
 String formatDateFromMillis(int millis) {
   final date = DateTime.fromMillisecondsSinceEpoch(millis);
   final day = date.day.toString().padLeft(2, '0');

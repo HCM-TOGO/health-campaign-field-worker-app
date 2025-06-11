@@ -31,6 +31,8 @@ import '../../utils/constants.dart';
 import '../../utils/extensions/extensions.dart';
 import '../../utils/i18_key_constants.dart' as i18_local;
 
+import '../../widgets/registration_delivery/custom_dropdown_input.dart';
+
 @RoutePage()
 class CustomStockDetailsPage extends LocalizedStatefulWidget {
   const CustomStockDetailsPage({
@@ -1091,7 +1093,7 @@ class CustomStockDetailsPageState
                                               module.selectProductLabel,
                                             ),
                                             isRequired: true,
-                                            child: DigitDropdown(
+                                            child: CustomDropdown(
                                               errorMessage: field.errorText,
                                               emptyItemText:
                                                   localizations.translate(
@@ -1167,7 +1169,7 @@ class CustomStockDetailsPageState
                                         transactionReasonLabel ?? 'Reason',
                                       ),
                                       isRequired: true,
-                                      child: DigitDropdown(
+                                      child: CustomDropdown(
                                         emptyItemText: localizations.translate(
                                           i18.common.noMatchFound,
                                         ),
@@ -1687,7 +1689,7 @@ class CustomStockDetailsPageState
                                               i18.stockDetails
                                                   .transportTypeLabel,
                                             ),
-                                            child: DigitDropdown(
+                                            child: CustomDropdown(
                                               emptyItemText:
                                                   localizations.translate(
                                                 i18.common.noMatchFound,
