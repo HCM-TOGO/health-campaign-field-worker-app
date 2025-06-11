@@ -87,6 +87,7 @@ class _RecordRedosePageState extends LocalizedState<RecordRedosePage> {
   }
 
   void checkOtherDeliveryComment(bool newValue) {
+    print(newValue);
     setState(() {
       otherDeliveryComment = newValue;
     });
@@ -189,35 +190,49 @@ class _RecordRedosePageState extends LocalizedState<RecordRedosePage> {
                                               DigitElevatedButton(
                                                 onPressed: () async {
                                                   form.markAllAsTouched();
+                                                  // Check for Others and invalid input
                                                   if (form
-                                                              .control(
-                                                                  _deliveryCommentKey)
-                                                              .value ==
-                                                          "Others" &&
-                                                      (form
-                                                                  .control(
-                                                                      _otherDeliveryCommentKey)
-                                                                  .value ==
-                                                              null ||
-                                                          form
-                                                                  .control(
-                                                                      _otherDeliveryCommentKey)
-                                                                  .value ==
-                                                              "")) {
-                                                    await DigitToast.show(
-                                                      context,
-                                                      options:
-                                                          DigitToastOptions(
-                                                        localizations.translate(
-                                                            i18_local
-                                                                .deliverIntervention
-                                                                .enterReasonForRedoseLabel),
-                                                        true,
-                                                        theme,
-                                                      ),
-                                                    );
-                                                    return;
+                                                          .control(
+                                                              _deliveryCommentKey)
+                                                          .value ==
+                                                      "Others") {
+                                                    final otherValue = form
+                                                        .control(
+                                                            _otherDeliveryCommentKey)
+                                                        .value;
+                                                    final otherControl =
+                                                        form.control(
+                                                            _otherDeliveryCommentKey);
+                                                    final regExp = RegExp(
+                                                        r'^[A-Za-z\s]+$');
+                                                    if (otherValue == null ||
+                                                        otherValue.isEmpty) {
+                                                      otherControl.setErrors(
+                                                          {'required': true});
+                                                      await DigitToast.show(
+                                                        context,
+                                                        options:
+                                                            DigitToastOptions(
+                                                          localizations.translate(
+                                                              i18_local
+                                                                  .deliverIntervention
+                                                                  .enterReasonForRedoseLabel),
+                                                          true,
+                                                          theme,
+                                                        ),
+                                                      );
+                                                      return;
+                                                    }
+                                                    if (!regExp
+                                                        .hasMatch(otherValue)) {
+                                                      otherControl.setErrors({
+                                                        'onlyAlphabets': true
+                                                      });
+                                                      
+                                                      return;
+                                                    }
                                                   }
+                                                  // Re-check form validity after setting errors
                                                   if (!form.valid) {
                                                     return;
                                                   }
@@ -681,6 +696,8 @@ class _RecordRedosePageState extends LocalizedState<RecordRedosePage> {
                                                             if (value != null) {
                                                               if (value ==
                                                                   "Others") {
+                                                                print(
+                                                                    "Others selected");
                                                                 checkOtherDeliveryComment(
                                                                     true);
                                                               } else {
@@ -729,6 +746,13 @@ class _RecordRedosePageState extends LocalizedState<RecordRedosePage> {
                                                                         localizations.translate(i18_local
                                                                             .deliverIntervention
                                                                             .enterReasonForRedoseLabelMaxLength),
+                                                                    'onlyAlphabets': (_) =>
+                                                                        localizations
+                                                                            .translate(
+                                                                          i18_local
+                                                                              .deliverIntervention
+                                                                              .enterReasonForonlyAlphabetsValidation,
+                                                                        ),
                                                                   },
                                                                   builder:
                                                                       (field) {
@@ -1022,6 +1046,14 @@ class _RecordRedosePageState extends LocalizedState<RecordRedosePage> {
                 Validators.required,
                 Validators.minLength(3),
                 Validators.maxLength(100),
+                Validators.delegate((control) {
+                  final value = control.value?.toString().trim();
+                  if (value == null || value.isEmpty) return null;
+                  final regExp = RegExp(r'^[A-Za-z\s]+$');
+                  return regExp.hasMatch(value)
+                      ? null
+                      : {'onlyAlphabets': true};
+                }),
               ]
             : [],
       ),

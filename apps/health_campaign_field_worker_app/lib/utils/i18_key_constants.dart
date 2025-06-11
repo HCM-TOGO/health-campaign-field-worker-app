@@ -200,6 +200,8 @@ class HouseholdOverView {
 class DeliverIntervention {
   const DeliverIntervention();
 
+String get enterReasonForonlyAlphabetsValidation => 'ALPHABETS_ONLY_VALIDATION';
+
   String get vaccinsSelectionLabel => 'VACCINS_DETAILS_LABEL';
 
   String get otherReasonLabel =>
