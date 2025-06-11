@@ -390,7 +390,7 @@ class CustomComplaintsDetailsPageState
                                   .replaceAll('{}', '50'),
                               'onlyAlphabets': (_) => localizations.translate(
                                     i18_local.individualDetails
-                                        .onlyAlphabetsValidationMessage,
+                                        .onlyAlphabetsNumbersSpacesValidationMessage,
                                   ),
                             },
                             builder: (field) {
@@ -466,7 +466,7 @@ class CustomComplaintsDetailsPageState
                                   .replaceAll('{}', '64'),
                               'onlyAlphabets': (_) => localizations.translate(
                                     i18_local.individualDetails
-                                        .onlyAlphabetsValidationMessage,
+                                        .onlyAlphabetsNumbersSpacesValidationMessage,
                                   ),
                             },
                             builder: (field) {
@@ -595,6 +595,7 @@ class CustomComplaintsDetailsPageState
             final value = validator.value?.toString().trim();
             if (value == null || value.isEmpty) return null;
             const pattern = r"^[A-Za-z0-9\s]+$";
+            // const pattern = r"^[A-Za-z0-9\s-]+$";
             final regExp = RegExp(pattern);
             return regExp.hasMatch(value) ? null : {'onlyAlphabets': true};
           }),
@@ -619,7 +620,8 @@ class CustomComplaintsDetailsPageState
           Validators.delegate((validator) {
             final value = validator.value?.toString().trim();
             if (value == null || value.isEmpty) return null;
-            const pattern = r"^[A-Za-z\s]+$";
+            // const pattern = r"^[A-Za-z\s]+$";
+            const pattern = r"^[A-Za-z0-9\s]+$";
             final regExp = RegExp(pattern);
             return regExp.hasMatch(value) ? null : {'onlyAlphabets': true};
           }),
