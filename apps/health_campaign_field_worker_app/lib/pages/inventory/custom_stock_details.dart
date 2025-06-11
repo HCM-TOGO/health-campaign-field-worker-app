@@ -91,7 +91,7 @@ class CustomStockDetailsPageState
       ]),
       _transactionReasonKey: FormControl<String>(),
       _waybillNumberKey: FormControl<String>(
-        validators: [Validators.minLength(2), Validators.maxLength(200)],
+        validators: [Validators.minLength(0), Validators.maxLength(200)],
       ),
       _waybillQuantityKey: FormControl<String>(),
       _batchNumberKey: FormControl<String>(),
@@ -549,7 +549,6 @@ class CustomStockDetailsPageState
                                               .last;
                                           ;
                                           receiverType = primaryType;
-
                                           break;
                                         case StockRecordEntryType.dispatch:
                                         case StockRecordEntryType.loss:
@@ -820,7 +819,10 @@ class CustomStockDetailsPageState
                                                 context,
                                                 options: DigitToastOptions(
                                                     localizations.translate(context
-                                                            .isCDD
+                                                                .isCDD ||
+                                                            entryType ==
+                                                                StockRecordEntryType
+                                                                    .returned
                                                         ? i18_local
                                                             .beneficiaryDetails
                                                             .validationForExcessStockReturn
@@ -837,7 +839,10 @@ class CustomStockDetailsPageState
                                                 context,
                                                 options: DigitToastOptions(
                                                     localizations.translate(context
-                                                            .isCDD
+                                                                .isCDD ||
+                                                            entryType ==
+                                                                StockRecordEntryType
+                                                                    .returned
                                                         ? i18_local
                                                             .beneficiaryDetails
                                                             .validationForExcessStockReturn
@@ -963,7 +968,10 @@ class CustomStockDetailsPageState
                                                   context,
                                                   options: DigitToastOptions(
                                                       localizations.translate(context
-                                                              .isCDD
+                                                                  .isCDD ||
+                                                              entryType ==
+                                                                  StockRecordEntryType
+                                                                      .returned
                                                           ? i18_local
                                                               .beneficiaryDetails
                                                               .validationForExcessStockReturn
@@ -980,7 +988,10 @@ class CustomStockDetailsPageState
                                                   context,
                                                   options: DigitToastOptions(
                                                       localizations.translate(context
-                                                              .isCDD
+                                                                  .isCDD ||
+                                                              entryType ==
+                                                                  StockRecordEntryType
+                                                                      .returned
                                                           ? i18_local
                                                               .beneficiaryDetails
                                                               .validationForExcessStockReturn
