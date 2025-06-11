@@ -538,9 +538,10 @@ class CustomStockReconciliationPageState
                                                     return DropdownItem(
                                                       name: localizations
                                                           .translate(
-                                                        variant.sku ??
-                                                            variant.id,
-                                                      ),
+                                                            variant.sku ??
+                                                                variant.id,
+                                                          )
+                                                          .toUpperCase(),
                                                       code: variant.id,
                                                     );
                                                   }).toList(),
@@ -594,6 +595,7 @@ class CustomStockReconciliationPageState
                                                           ),
                                                         );
                                                   },
+                                                  sentenceCaseEnabled: false,
                                                 ),
                                               );
                                             },
