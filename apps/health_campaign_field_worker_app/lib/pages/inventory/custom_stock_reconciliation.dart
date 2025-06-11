@@ -17,6 +17,7 @@ import 'package:inventory_management/utils/extensions/extensions.dart';
 import 'package:reactive_forms/reactive_forms.dart';
 
 import 'package:inventory_management/utils/i18_key_constants.dart' as i18;
+import '../../blocs/project/project.dart';
 import '../../utils/constants.dart';
 import '../../utils/i18_key_constants.dart' as i18_local;
 import 'package:inventory_management/widgets/inventory/no_facilities_assigned_dialog.dart';
@@ -365,7 +366,6 @@ class CustomStockReconciliationPageState
                                         .digitTextTheme(context)
                                         .headingXl,
                                   ),
-                                  // if (InventorySingleton().isWareHouseMgr!)
                                   BlocConsumer<FacilityBloc, FacilityState>(
                                     listener: (context, state) =>
                                         state.whenOrNull(
@@ -383,45 +383,79 @@ class CustomStockReconciliationPageState
                                                     CircularProgressIndicator(),
                                               ),
                                           fetched: (facilities, allFacilities) {
-                                            final facilities = state.whenOrNull(
-                                                  fetched: (facilities,
-                                                      allfacilities) {
-                                                    // List<FacilityModel>
-                                                    //     filteredFacilities =
-                                                    //     facilities
-                                                    //         .where(
-                                                    //           (element) =>
-                                                    //               element
-                                                    //                   .usage ==
-                                                    //               Constants
-                                                    //                   .healthFacility,
-                                                    //         )
-                                                    //         .toList();
-                                                    // facilities =
-                                                    //     filteredFacilities
-                                                    //             .isEmpty
-                                                    //         ? facilities
-                                                    //         : filteredFacilities;
+                                            // Start with the full list of facilities.
+                                            var filteredFacilitiesList =
+                                                List<FacilityModel>.from(
+                                                    facilities);
 
-                                                    final teamFacilities = [
-                                                      FacilityModel(
-                                                        id: 'Delivery Team',
-                                                        name: 'Delivery Team',
-                                                      ),
-                                                    ];
-                                                    // teamFacilities.addAll(
-                                                    //   facilities,
-                                                    // );
+                                            // Get the selected project from the context.
+                                            final selectedProject = context
+                                                .read<ProjectBloc>()
+                                                .state
+                                                .selectedProject;
 
-                                                    return InventorySingleton()
-                                                                .isDistributor! &&
-                                                            !InventorySingleton()
-                                                                .isWareHouseMgr!
-                                                        ? teamFacilities
-                                                        : facilities;
-                                                  },
-                                                ) ??
-                                                [];
+                                            // Map your boundary types to facility usages.
+                                            if (selectedProject
+                                                    ?.address?.boundaryType ==
+                                                Constants.stateBoundaryLevel) {
+                                              // This is the REGIONAL filter. The boundary is 'Region', so we filter for 'Region Facility'.
+                                              final usageFiltered =
+                                                  filteredFacilitiesList
+                                                      .where((element) =>
+                                                          element.usage ==
+                                                          Constants
+                                                              .stateFacility)
+                                                      .toList();
+                                              filteredFacilitiesList =
+                                                  usageFiltered.isEmpty
+                                                      ? filteredFacilitiesList
+                                                      : usageFiltered;
+                                            } else if (selectedProject
+                                                    ?.address?.boundaryType ==
+                                                Constants.lgaBoundaryLevel) {
+                                              // This is the DISTRICT filter. The boundary is 'District', so we filter for 'District Facility'.
+                                              final usageFiltered =
+                                                  filteredFacilitiesList
+                                                      .where((element) =>
+                                                          element.usage ==
+                                                          Constants.lgaFacility)
+                                                      .toList();
+                                              filteredFacilitiesList =
+                                                  usageFiltered.isEmpty
+                                                      ? filteredFacilitiesList
+                                                      : usageFiltered;
+                                            } else {
+                                              // This is the default case for any other boundary type.  It will filter for 'Health Facility'.
+                                              final usageFiltered =
+                                                  filteredFacilitiesList
+                                                      .where((element) =>
+                                                          element.usage ==
+                                                          Constants
+                                                              .healthFacility)
+                                                      .toList();
+                                              filteredFacilitiesList =
+                                                  usageFiltered.isEmpty
+                                                      ? filteredFacilitiesList
+                                                      : usageFiltered;
+                                            }
+
+                                            // Define the special 'Delivery Team' option for distributors.
+                                            final teamFacilities = [
+                                              FacilityModel(
+                                                  id: 'Delivery Team',
+                                                  name: 'Delivery Team'),
+                                            ];
+
+                                            // Apply the final user-role filter to the *already boundary-filtered* list.
+                                            final facilitiesToDisplay =
+                                                InventorySingleton()
+                                                            .isDistributor! &&
+                                                        // ignore: avoid_dynamic_calls
+                                                        !InventorySingleton()
+                                                            .isWareHouseMgr!
+                                                    ? teamFacilities
+                                                    : filteredFacilitiesList;
+
                                             return Column(
                                               children: [
                                                 InkWell(
@@ -429,12 +463,14 @@ class CustomStockReconciliationPageState
                                                     final stockReconciliationBloc =
                                                         context.read<
                                                             StockReconciliationBloc>();
-                                                    final facility = await context
-                                                            .router
-                                                            .push(CustomInventoryFacilitySelectionRoute(
-                                                                facilities:
-                                                                    facilities))
-                                                        as FacilityModel?;
+                                                    final facility =
+                                                        await context.router
+                                                            .push(
+                                                      CustomInventoryFacilitySelectionRoute(
+                                                        facilities:
+                                                            facilitiesToDisplay,
+                                                      ),
+                                                    ) as FacilityModel?;
 
                                                     if (facility == null)
                                                       return;
@@ -442,28 +478,25 @@ class CustomStockReconciliationPageState
                                                             .control(_facilityKey)
                                                             .value =
                                                         localizations.translate(
-                                                      'FAC_${facility.id}',
-                                                    );
+                                                            'FAC_${facility.id}');
                                                     controller1.text =
                                                         localizations.translate(
-                                                      'FAC_${facility.id}',
-                                                    );
+                                                            'FAC_${facility.id}');
                                                     setState(() {
                                                       selectedFacilityId =
                                                           facility.id;
                                                     });
                                                     final newFacility = InventorySingleton()
                                                                 .isDistributor! &&
+                                                            // ignore: avoid_dynamic_calls
                                                             !InventorySingleton()
                                                                 .isWareHouseMgr!
                                                         ? FacilityModel(
                                                             id: InventorySingleton()
-                                                                .loggedInUserUuid!,
-                                                          )
+                                                                .loggedInUserUuid!)
                                                         : FacilityModel(
                                                             id: selectedFacilityId
-                                                                .toString(),
-                                                          );
+                                                                .toString());
                                                     stockReconciliationBloc.add(
                                                       StockReconciliationSelectFacilityEvent(
                                                         newFacility,
@@ -496,6 +529,8 @@ class CustomStockReconciliationPageState
                                           });
                                     },
                                   ),
+
+                                  // ... The rest of your component (Product Selection, etc.) remains unchanged.
                                   BlocBuilder<InventoryProductVariantBloc,
                                       InventoryProductVariantState>(
                                     builder: (context, state) {
