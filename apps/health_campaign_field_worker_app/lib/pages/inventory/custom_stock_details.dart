@@ -946,11 +946,13 @@ class CustomStockDetailsPageState
                                                     quantity.toString(),
                                                   ) *
                                                   -1;
+                                              spaqLocal2 = 0;
                                             } else {
                                               spaqLocal2 = int.parse(
                                                     quantity.toString(),
                                                   ) *
                                                   -1;
+                                              spaqLocal1 = 0;
                                             }
 
                                             // add validation to check stock loss or damage
