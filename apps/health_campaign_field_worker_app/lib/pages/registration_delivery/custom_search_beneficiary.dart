@@ -14,6 +14,9 @@ import 'package:digit_ui_components/widgets/molecules/show_pop_up.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_keyboard_visibility/flutter_keyboard_visibility.dart';
+import 'package:health_campaign_field_worker_app/models/entities/assessment_checklist/status.dart';
+import 'package:health_campaign_field_worker_app/pages/registration_delivery/custom_status_filter.dart';
+import 'package:registration_delivery/utils/global_search_parameters.dart';
 import '../../blocs/registration_delivery/custom_beneficairy_registration.dart';
 import '../../widgets/custom_back_navigation.dart';
 import 'package:registration_delivery/blocs/search_households/search_bloc_common_wrapper.dart';
@@ -26,7 +29,7 @@ import '../../blocs/search/individual_global_search_smc.dart';
 import '../../blocs/search/search_households_smc.dart'
     as searchHouseholdSMCBloc;
 import '../../utils/i18_key_constants.dart' as i18_local;
-import 'package:registration_delivery/models/entities/status.dart';
+// import 'package:registration_delivery/models/entities/status.dart';
 import 'package:registration_delivery/router/registration_delivery_router.gm.dart';
 import 'package:registration_delivery/utils/utils.dart';
 import 'package:registration_delivery/widgets/beneficiary/view_beneficiary_card.dart';
@@ -38,6 +41,7 @@ import '../../router/app_router.dart';
 import '../../../utils/i18_key_constants.dart' as i18_local;
 import 'package:digit_scanner/utils/i18_key_constants.dart' as i18_scanner;
 import '../../utils/search/global_search_parameters_smc.dart';
+import '../../widgets/registration_delivery/custom_digit_chip.dart';
 import '../../widgets/showcase/showcase_wrappers.dart';
 import '../inventory/qr_scanner.dart';
 import 'custom_view_beneficiary_card.dart';
@@ -68,7 +72,6 @@ class _CustomSearchBeneficiaryPageState
   double long = 0.0;
   List<String> selectedFilters = [];
 
-  // late final SearchBlocWrapper blocWrapper; // Declare BlocWrapper
   late final CustomSearchHouseholdsBloc customSearchHouseholdsBloc;
 
   searchHouseholdSMCBloc.SearchHouseholdsSMCState searchHouseholdsSMCState =
@@ -304,9 +307,9 @@ class _CustomSearchBeneficiaryPageState
                                                     padding:
                                                         const EdgeInsets.all(
                                                             spacer1),
-                                                    child: DigitChip(
+                                                    child: CustomDigitChip(
                                                       label:
-                                                          '${localizations.translate(getStatus(selectedFilters[index]))}'
+                                                          '${localizations.translate(customGetStatus(selectedFilters[index]))}'
                                                           ' (${searchHouseholdsState.totalResults})',
                                                       capitalizedFirstLetter:
                                                           false,
@@ -379,14 +382,15 @@ class _CustomSearchBeneficiaryPageState
                     listener: (context, scannerState) {
                       if (scannerState.qrCodes.isNotEmpty) {
                         final tag = scannerState.qrCodes.lastOrNull!;
-                        if (!uuidRegex.hasMatch(tag) && 
+                        if (!uuidRegex.hasMatch(tag) &&
                             !trainingRegex.hasMatch(tag) &&
                             !productionRegex.hasMatch(tag)) {
                           Toast.showToast(
                             context,
                             type: ToastType.error,
-                            message:
-                                localizations.translate(i18_local.stockReconciliationDetails.qrCodeInvalidFormat),
+                            message: localizations.translate(i18_local
+                                .stockReconciliationDetails
+                                .qrCodeInvalidFormat),
                           );
                           return;
                         }
@@ -776,17 +780,14 @@ class _CustomSearchBeneficiaryPageState
                   ).pop();
                 },
                 additionalWidgets: [
-                  StatusFilter(
+                  CustomStatusFilter(
                     selectedFilters: selectedFilters,
                   ),
                 ]));
 
     if (filters != null && filters.isNotEmpty) {
       setState(() {
-        selectedFilters = [];
-      });
-      setState(() {
-        selectedFilters.addAll(filters);
+        selectedFilters = List<String>.from(filters);
       });
       triggerGlobalSearchEvent();
     } else {
@@ -850,6 +851,36 @@ class _CustomSearchBeneficiaryPageState
     return isValid;
   }
 
+  String customGetStatus(String selectedFilter) {
+  final statusMap = {
+    Status.delivered.toValue(): Status.delivered,
+    Status.notAdministered.toValue(): Status.notAdministered,
+    Status.visited.toValue(): Status.visited,
+    Status.notVisited.toValue(): Status.notVisited,
+    Status.beneficiaryRefused.toValue(): Status.beneficiaryRefused,
+    Status.beneficiaryReferred.toValue(): Status.beneficiaryReferred,
+    Status.administeredSuccess.toValue(): Status.administeredSuccess,
+    Status.administeredFailed.toValue(): Status.administeredFailed,
+    Status.inComplete.toValue(): Status.inComplete,
+    Status.toAdminister.toValue(): Status.toAdminister,
+    Status.closeHousehold.toValue(): Status.closeHousehold,
+    Status.registered.toValue(): Status.registered,
+    Status.notRegistered.toValue(): Status.notRegistered,
+    Status.beneficiaryInEligible.toValue(): Status.beneficiaryInEligible,
+  };
+
+  var mappedStatus = statusMap.entries
+      .where((element) => element.value.name == selectedFilter)
+      .first
+      .key;
+  print('mappedStatus: $mappedStatus and selectedFilter: $selectedFilter');
+  if (mappedStatus != null) {
+    return mappedStatus;
+  } else {
+    return selectedFilter;
+  }
+}
+
   void triggerGlobalSearchEvent({bool isPagination = false}) {
     if (!isPagination) {
       customSearchHouseholdsBloc.add(
@@ -857,44 +888,71 @@ class _CustomSearchBeneficiaryPageState
       );
     }
 
-    if (searchController.text.trim().length < 3 && !isProximityEnabled) {
+    if (searchController.text.trim().length < 3 && !isProximityEnabled && 
+        selectedFilters.isEmpty) {
       customSearchHouseholdsBloc.add(
         const SearchHouseholdsClearEvent(),
       );
       return;
     } else {
-      if (isProximityEnabled && searchController.text.trim().length < 3) {
-        customSearchHouseholdsBloc.add(
-          const SearchHouseholdsLoadingEvent(),
-        );
-        customSearchHouseholdsBloc
-            .add(CustomSearchHouseholdsEvent.searchByProximity(
-          latitude: lat,
-          longititude: long,
-          projectId: RegistrationDeliverySingleton().projectId!,
-          maxRadius: RegistrationDeliverySingleton().maxRadius!,
-          offset:
-              isPagination ? customSearchHouseholdsBloc.state.offset : offset,
-          limit: isPagination ? customSearchHouseholdsBloc.state.limit : limit,
-        ));
-      } else {
-        customSearchHouseholdsBloc.add(
-          const SearchHouseholdsLoadingEvent(),
-        );
-        customSearchHouseholdsBloc.add(
-          CustomSearchHouseholdsEvent.searchByHouseholdHead(
-            searchText: searchController.text.trim(),
-            projectId: RegistrationDeliverySingleton().projectId!,
+      if (RegistrationDeliverySingleton().beneficiaryType ==
+          BeneficiaryType.individual) {
+        if (isProximityEnabled && searchController.text.trim().length < 3 &&
+            selectedFilters.isEmpty) {
+          customSearchHouseholdsBloc.add(
+            const SearchHouseholdsLoadingEvent(),
+          );
+          customSearchHouseholdsBloc
+              .add(CustomSearchHouseholdsEvent.searchByProximity(
             latitude: lat,
-            longitude: long,
-            isProximityEnabled: isProximityEnabled,
-            maxRadius: RegistrationDeliverySingleton().maxRadius,
+            longititude: long,
+            projectId: RegistrationDeliverySingleton().projectId!,
+            maxRadius: RegistrationDeliverySingleton().maxRadius!,
             offset:
                 isPagination ? customSearchHouseholdsBloc.state.offset : offset,
             limit:
                 isPagination ? customSearchHouseholdsBloc.state.limit : limit,
-          ),
-        );
+          ));
+        } else if (selectedFilters.isNotEmpty) {
+          customSearchHouseholdsBloc
+              .add(CustomSearchHouseholdsEvent.individualGlobalSearch(
+                  globalSearchParams: GlobalSearchParameters(
+            isProximityEnabled: isProximityEnabled,
+            latitude: lat,
+            longitude: long,
+            projectId: RegistrationDeliverySingleton().projectId!,
+            maxRadius: RegistrationDeliverySingleton().maxRadius,
+            nameSearch: searchController.text.trim().length > 2
+                ? searchController.text.trim()
+                : blocWrapper.searchHouseholdsBloc.state.searchQuery,
+            filter: selectedFilters,
+            offset:
+                isPagination ? customSearchHouseholdsBloc.state.offset : offset,
+            limit:
+                isPagination ? customSearchHouseholdsBloc.state.limit : limit,
+            // householdType: RegistrationDeliverySingleton().householdType,
+          )));
+          print("searchouseholdsBloc.state.offset: ${customSearchHouseholdsBloc.state}");
+        } else if (searchController.text.trim().length >= 3) {
+          customSearchHouseholdsBloc.add(
+            const SearchHouseholdsLoadingEvent(),
+          );
+          customSearchHouseholdsBloc.add(
+            CustomSearchHouseholdsEvent.searchByHouseholdHead(
+              searchText: searchController.text.trim(),
+              projectId: RegistrationDeliverySingleton().projectId!,
+              latitude: lat,
+              longitude: long,
+              isProximityEnabled: isProximityEnabled,
+              maxRadius: RegistrationDeliverySingleton().maxRadius,
+              offset: isPagination
+                  ? customSearchHouseholdsBloc.state.offset
+                  : offset,
+              limit:
+                  isPagination ? customSearchHouseholdsBloc.state.limit : limit,
+            ),
+          );
+        }
       }
     }
   }
