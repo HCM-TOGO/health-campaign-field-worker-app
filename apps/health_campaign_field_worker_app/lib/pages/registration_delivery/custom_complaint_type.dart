@@ -10,6 +10,7 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:reactive_forms/reactive_forms.dart';
 import 'package:recase/recase.dart';
 
+import '../../utils/upper_case.dart';
 import '/utils/i18_key_constants.dart' as i18;
 import '/widgets/header/back_navigation_help_header.dart';
 import '/widgets/localized.dart';
@@ -177,6 +178,9 @@ class CustomComplaintTypePageState
                                   control.invalid && control.touched,
                               builder: (field) {
                                 return DigitTextFormInput(
+                                  inputFormatters: [
+                                          UpperCaseTextFormatter(),
+                                        ],
                                   charCount: true,
                                   errorMessage: field.errorText,
                                   initialValue: field.value,

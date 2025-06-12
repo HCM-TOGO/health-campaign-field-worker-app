@@ -28,6 +28,8 @@ import '../../utils/i18_key_constants.dart' as i18_local;
 import 'package:referral_reconciliation/utils/utils.dart';
 import 'package:referral_reconciliation/widgets/localized.dart';
 
+import '../../utils/upper_case.dart';
+
 @RoutePage()
 class CustomReferralReasonChecklistPage extends LocalizedStatefulWidget {
   final String? referralClientRefId;
@@ -428,6 +430,7 @@ class _CustomReferralReasonChecklistPageState
                                       isRequired: false,
                                       controller: controller[index],
                                       inputFormatters: [
+                                        UpperCaseTextFormatter(),
                                         FilteringTextInputFormatter.allow(
                                             RegExp(
                                           "[a-zA-Z0-9]",
@@ -467,6 +470,7 @@ class _CustomReferralReasonChecklistPageState
                                       controller: controller[index],
                                       errorMessage: field.errorText,
                                       inputFormatters: [
+                                        UpperCaseTextFormatter(),
                                         FilteringTextInputFormatter.allow(
                                             RegExp(
                                           "[0-9]",
@@ -809,6 +813,7 @@ class _CustomReferralReasonChecklistPageState
               ),
               controller: controller[index],
               inputFormatters: [
+                UpperCaseTextFormatter(),
                 FilteringTextInputFormatter.allow(RegExp(
                   "[a-zA-Z0-9 ]",
                 )),
@@ -840,6 +845,7 @@ class _CustomReferralReasonChecklistPageState
           controller: controller[index],
           errorMessage: field.errorText,
           inputFormatters: [
+            UpperCaseTextFormatter(),
             FilteringTextInputFormatter.allow(RegExp(
               "[0-9]",
             )),

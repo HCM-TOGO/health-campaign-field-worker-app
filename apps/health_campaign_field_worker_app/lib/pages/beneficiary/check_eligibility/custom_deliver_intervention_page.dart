@@ -37,6 +37,7 @@ import '../../../utils/app_enums.dart';
 import '../../../utils/i18_key_constants.dart' as i18_local;
 import '../../../models/entities/additional_fields_type.dart'
     as additional_fields_local;
+import '../../../utils/upper_case.dart';
 import '../../../widgets/custom_back_navigation.dart';
 
 @RoutePage()
@@ -568,6 +569,9 @@ class CustomDeliverInterventionPageState
                                                               .deliverIntervention
                                                               .currentCycle),
                                                       child: DigitTextFormInput(
+                                                        inputFormatters: [
+                                                          UpperCaseTextFormatter(),
+                                                        ],
                                                         readOnly: true,
                                                         keyboardType:
                                                             TextInputType
@@ -641,6 +645,9 @@ class CustomDeliverInterventionPageState
                                                         .doseadministeredby,
                                                   ),
                                                   child: DigitTextFormInput(
+                                                    inputFormatters: [
+                                                      UpperCaseTextFormatter(),
+                                                    ],
                                                     suffixIcon:
                                                         Icons.arrow_drop_down,
                                                     readOnly: true,

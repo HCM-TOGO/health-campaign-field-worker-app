@@ -19,6 +19,7 @@ import 'package:referral_reconciliation/blocs/referral_recon_record.dart';
 import 'package:referral_reconciliation/utils/utils.dart';
 import 'package:referral_reconciliation/widgets/back_navigation_help_header.dart';
 import 'package:referral_reconciliation/widgets/localized.dart';
+import '../../utils/upper_case.dart';
 import '../referral_reconcillation/custom_referral_facility_selection_page.dart';
 import 'package:health_campaign_field_worker_app/router/app_router.dart';
 
@@ -251,6 +252,9 @@ class _CustomReferralFacilityPageState
                                                             .administrationUnitFormLabel,
                                                       ),
                                                       child: DigitTextFormInput(
+                                                        inputFormatters: [
+                                          UpperCaseTextFormatter(),
+                                        ],
                                                         readOnly: true,
                                                         initialValue:
                                                             field.value,
@@ -346,6 +350,9 @@ class _CustomReferralFacilityPageState
                                                           ),
                                                           child:
                                                               DigitTextFormInput(
+                                                                inputFormatters: [
+                                          UpperCaseTextFormatter(),
+                                        ],
                                                             onChange: (val) => {
                                                               form
                                                                   .control(
@@ -380,6 +387,9 @@ class _CustomReferralFacilityPageState
                                                         ),
                                                         child:
                                                             DigitTextFormInput(
+                                                              inputFormatters: [
+                                          UpperCaseTextFormatter(),
+                                        ],
                                                           onChange: (val) => {
                                                             form
                                                                 .control(
@@ -409,6 +419,9 @@ class _CustomReferralFacilityPageState
                                                         ),
                                                         child:
                                                             DigitTextFormInput(
+                                                              inputFormatters: [
+                                          UpperCaseTextFormatter(),
+                                        ],
                                                           onChange: (val) => {
                                                             form
                                                                 .control(

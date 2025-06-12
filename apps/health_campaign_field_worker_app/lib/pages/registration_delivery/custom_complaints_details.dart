@@ -24,6 +24,7 @@ import '../../../utils/utils.dart' show CustomValidator;
 import '../../../widgets/header/back_navigation_help_header.dart';
 import '../../../widgets/localized.dart';
 import '../../utils/i18_key_constants.dart' as i18_local;
+import '../../utils/upper_case.dart';
 
 
 @RoutePage()
@@ -294,6 +295,9 @@ class CustomComplaintsDetailsPageState
                             i18.householdLocation.administrationAreaFormLabel,
                           ),
                           child: DigitTextFormInput(
+                            inputFormatters: [
+                                          UpperCaseTextFormatter(),
+                                        ],
                             isRequired: true,
                             readOnly: true,
                             initialValue:
@@ -400,6 +404,9 @@ class CustomComplaintsDetailsPageState
                                 ),
                                 isRequired: true,
                                 child: DigitTextFormInput(
+                                  inputFormatters: [
+                                          UpperCaseTextFormatter(),
+                                        ],
                                   readOnly: (isRaisedForSelf)
                                       ? (field.value == null ||
                                               field.value.isEmpty)
@@ -449,6 +456,7 @@ class CustomComplaintsDetailsPageState
                                   isRequired: true,
                                   keyboardType: TextInputType.number,
                                   inputFormatters: [
+                                    UpperCaseTextFormatter(),
                                     FilteringTextInputFormatter.digitsOnly,
                                   ],
                                   errorMessage: field.errorText,
@@ -475,6 +483,9 @@ class CustomComplaintsDetailsPageState
                                   i18.complaints.supervisorName,
                                 ),
                                 child: DigitTextFormInput(
+                                  inputFormatters: [
+                                          UpperCaseTextFormatter(),
+                                        ],
                                   errorMessage: field.errorText,
                                   initialValue: field.value,
                                   onChange: (value) => form
@@ -510,6 +521,7 @@ class CustomComplaintsDetailsPageState
                                   keyboardType: TextInputType.number,
                                   initialValue: field.value,
                                   inputFormatters: [
+                                    UpperCaseTextFormatter(),
                                     FilteringTextInputFormatter.digitsOnly,
                                   ],
                                   errorMessage: field.errorText,

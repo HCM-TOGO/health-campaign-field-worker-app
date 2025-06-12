@@ -29,6 +29,7 @@ import 'blocs/search/search_households_smc.dart';
 import 'data/local_store/app_shared_preferences.dart';
 import 'data/network_manager.dart';
 import 'data/remote_client.dart';
+import 'data/repositories/local/registration_delivery/custom_individual_global_repository.dart';
 import 'data/repositories/local/search/individual_global_search_smc.dart';
 import 'data/repositories/remote/bandwidth_check.dart';
 import 'data/repositories/remote/localization.dart';
@@ -89,6 +90,12 @@ class MainApplicationState extends State<MainApplication>
         ),
         RepositoryProvider<IndividualGlobalSearchSMCRepository>(
           create: (context) => IndividualGlobalSearchSMCRepository(
+            widget.sql,
+            IndividualOpLogManager(widget.isar),
+          ),
+        ),
+        RepositoryProvider<CustomIndividualGlobalSearchRepository>(
+          create: (context) => CustomIndividualGlobalSearchRepository(
             widget.sql,
             IndividualOpLogManager(widget.isar),
           ),

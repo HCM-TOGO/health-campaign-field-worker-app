@@ -16,6 +16,7 @@ import 'package:closed_household/utils/utils.dart';
 import 'package:closed_household/widgets/back_navigation_help_header.dart';
 import 'package:closed_household/widgets/localized.dart';
 import '../../utils/i18_key_constants.dart' as i18_local;
+import '../../utils/upper_case.dart';
 
 @RoutePage()
 class CustomClosedHouseholdDetailsPage extends LocalizedStatefulWidget {
@@ -170,6 +171,9 @@ class CustomClosedHouseholdDetailsPageState
                                   i18.closeHousehold.villageName,
                                 ),
                                 child: DigitTextFormInput(
+                                  inputFormatters: [
+                                          UpperCaseTextFormatter(),
+                                        ],
                                   errorMessage: field.errorText,
                                   readOnly: true,
                                   initialValue: form
@@ -190,6 +194,9 @@ class CustomClosedHouseholdDetailsPageState
                                 ),
                                 capitalizedFirstLetter: false,
                                 child: DigitTextFormInput(
+                                  inputFormatters: [
+                                          UpperCaseTextFormatter(),
+                                        ],
                                   errorMessage: field.errorText,
                                   readOnly: true,
                                   initialValue: (form
@@ -226,6 +233,9 @@ class CustomClosedHouseholdDetailsPageState
                                   i18.closeHousehold.headNameLabel,
                                 ),
                                 child: DigitTextFormInput(
+                                  inputFormatters: [
+                                          UpperCaseTextFormatter(),
+                                        ],
                                   maxLength: 64,
                                   charCount: true,
                                   onChange: (val) => {

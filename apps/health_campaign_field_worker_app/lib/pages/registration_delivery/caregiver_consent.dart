@@ -30,6 +30,7 @@ import '../../utils/environment_config.dart';
 import '../../utils/extensions/extensions.dart';
 import '../../utils/i18_key_constants.dart' as i18_local;
 import '../../utils/registration_delivery/registration_delivery_utils.dart';
+import '../../utils/upper_case.dart';
 import 'custom_beneficiary_acknowledgement.dart';
 
 enum CaregiverConsentEnum { yes, no, none }
@@ -320,6 +321,9 @@ class CaregiverConsentPageState extends LocalizedState<CaregiverConsentPage> {
                     label: localizations.translate(
                         i18_local.caregiverConsent.caregiverConsentReason),
                     child: DigitTextFormInput(
+                      inputFormatters: [
+                                          UpperCaseTextFormatter(),
+                                        ],
                       controller: consentComment,
                     ),
                   )

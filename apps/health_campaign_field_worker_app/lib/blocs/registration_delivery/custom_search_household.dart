@@ -23,6 +23,7 @@ import 'package:registration_delivery/models/entities/task.dart';
 import 'package:registration_delivery/utils/global_search_parameters.dart';
 import 'package:registration_delivery/utils/typedefs.dart';
 
+import '../../data/repositories/local/registration_delivery/custom_individual_global_repository.dart';
 import '../../data/repositories/local/registration_delivery/custom_registration_delivery.dart';
 
 part 'custom_search_household.freezed.dart';
@@ -47,6 +48,7 @@ class CustomSearchHouseholdsBloc
   final SideEffectDataRepository sideEffectDataRepository;
   final ReferralDataRepository referralDataRepository;
   final IndividualGlobalSearchRepository individualGlobalSearchRepository;
+  final CustomIndividualGlobalSearchRepository customIndividualGlobalSearchRepository;
   final HouseHoldGlobalSearchRepository houseHoldGlobalSearchRepository;
 
   CustomSearchHouseholdsBloc(
@@ -62,6 +64,7 @@ class CustomSearchHouseholdsBloc
       required this.addressRepository,
       required this.referralDataRepository,
       required this.individualGlobalSearchRepository,
+      required this.customIndividualGlobalSearchRepository,
       required this.houseHoldGlobalSearchRepository})
       : super(const CustomSearchHouseholdsState()) {
     on(_handleInitialize);
@@ -98,7 +101,7 @@ class CustomSearchHouseholdsBloc
     emit(state.copyWith(loading: true));
 
     final results =
-        await individualGlobalSearchRepository.individualGlobalSearch(
+        await customIndividualGlobalSearchRepository.individualGlobalSearch(
       GlobalSearchParameters(
         projectId: event.globalSearchParams.projectId,
         isProximityEnabled: event.globalSearchParams.isProximityEnabled,

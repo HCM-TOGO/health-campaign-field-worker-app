@@ -38,6 +38,7 @@ import '../../../router/app_router.dart';
 import '../../../utils/app_enums.dart';
 import '../../../utils/environment_config.dart';
 import '../../../utils/i18_key_constants.dart' as i18_local;
+import '../../../utils/upper_case.dart';
 import '../../../utils/utils.dart';
 import '../../../widgets/header/back_navigation_help_header.dart';
 import '../../../widgets/localized.dart';
@@ -767,6 +768,9 @@ class _RecordRedosePageState extends LocalizedState<RecordRedosePage> {
                                                                       ),
                                                                       child:
                                                                           DigitTextFormInput(
+                                                                        inputFormatters: [
+                                                                          UpperCaseTextFormatter(),
+                                                                        ],
                                                                         isRequired:
                                                                             true,
                                                                         readOnly:
@@ -1110,6 +1114,9 @@ class CustomResourceBeneficiaryCardState
                   ),
                   isRequired: true,
                   child: DigitTextFormInput(
+                    inputFormatters: [
+                      UpperCaseTextFormatter(),
+                    ],
                     suffixIcon: Icons.arrow_drop_down,
                     readOnly: true,
                     initialValue: widget.eligibilityAssessmentType ==

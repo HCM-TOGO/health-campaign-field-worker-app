@@ -29,6 +29,7 @@ import 'package:inventory_management/widgets/component_wrapper/facility_bloc_wra
 import 'package:inventory_management/widgets/component_wrapper/product_variant_bloc_wrapper.dart';
 
 import '../../router/app_router.dart';
+import '../../utils/upper_case.dart';
 
 @RoutePage()
 class CustomStockReconciliationPage extends LocalizedStatefulWidget {
@@ -509,6 +510,9 @@ class CustomStockReconciliationPageState
                                                           _facilityKey,
                                                       builder: (field) {
                                                         return InputField(
+                                                          inputFormatters: [
+                                          UpperCaseTextFormatter(),
+                                        ],
                                                           type:
                                                               InputType.search,
                                                           isRequired: true,
@@ -764,6 +768,9 @@ class CustomStockReconciliationPageState
                                     formControlName: _reconciliationCommentsKey,
                                     builder: (field) {
                                       return InputField(
+                                        inputFormatters: [
+                                          UpperCaseTextFormatter(),
+                                        ],
                                         type: InputType.textArea,
                                         label: localizations.translate(
                                           i18.stockReconciliationDetails

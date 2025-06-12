@@ -19,6 +19,8 @@ import 'package:digit_scanner/utils/i18_key_constants.dart' as i18;
 import 'package:digit_scanner/blocs/scanner.dart';
 import 'package:digit_scanner/widgets/vision_detector_views/detector_view.dart';
 
+import '../../utils/upper_case.dart';
+
 @RoutePage()
 class DigitScannerPage extends LocalizedStatefulWidget {
   final bool singleValue;
@@ -511,6 +513,9 @@ class _DigitScannerPageState extends LocalizedState<DigitScannerPage> {
                                     formControlName: _manualCodeFormKey,
                                     builder: (field) {
                                       return InputField(
+                                        inputFormatters: [
+                                          UpperCaseTextFormatter(),
+                                        ],
                                           label: localizations.translate(
                                             i18.scanner.resourceCode,
                                           ),
