@@ -3,6 +3,7 @@ import 'package:collection/collection.dart';
 import 'package:digit_components/widgets/atoms/digit_toaster.dart';
 import 'package:digit_data_model/data_model.dart';
 import 'package:digit_scanner/blocs/scanner.dart';
+import 'package:flutter/services.dart';
 import '../../utils/upper_case.dart';
 import './qr_scanner.dart';
 import 'package:digit_ui_components/digit_components.dart';
@@ -1383,8 +1384,8 @@ class CustomStockDetailsPageState
                                                     builder: (field) {
                                                       return InputField(
                                                         inputFormatters: [
-                                          UpperCaseTextFormatter(),
-                                        ],
+                                                          UpperCaseTextFormatter(),
+                                                        ],
                                                         type: InputType.search,
                                                         isRequired: true,
                                                         label: localizations
@@ -1541,6 +1542,7 @@ class CustomStockDetailsPageState
                                       ),
                                       isRequired: true,
                                       child: BaseDigitFormInput(
+                                        inputFormatters: [FilteringTextInputFormatter.digitsOnly],
                                         errorMessage: field.errorText,
                                         keyboardType: const TextInputType
                                             .numberWithOptions(
@@ -1785,8 +1787,8 @@ class CustomStockDetailsPageState
                                   builder: (field) {
                                     return InputField(
                                       inputFormatters: [
-                                          UpperCaseTextFormatter(),
-                                        ],
+                                        UpperCaseTextFormatter(),
+                                      ],
                                       type: InputType.textArea,
                                       label: localizations.translate(
                                         i18.stockDetails.commentsLabel,
