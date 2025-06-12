@@ -1,5 +1,6 @@
 import 'package:closed_household/closed_household.dart';
 import 'package:closed_household/router/closed_household_router.gm.dart';
+import 'package:health_campaign_field_worker_app/models/entities/assessment_checklist/status.dart';
 
 import 'package:inventory_management/router/inventory_router.gm.dart';
 import 'package:recase/recase.dart';
@@ -575,7 +576,7 @@ class _HomePageState extends LocalizedState<HomePage> {
       i18.home.clfLabel: homeShowcaseData.clf.showcaseKey,
       i18.home.mySurveyForm:
           homeShowcaseData.supervisorMySurveyForm.showcaseKey,
-           i18.home.summaryLabel: homeShowcaseData.summaryReport.showcaseKey,
+      i18.home.summaryLabel: homeShowcaseData.summaryReport.showcaseKey,
     };
 
     final homeItemsLabel = <String>[
@@ -610,7 +611,7 @@ class _HomePageState extends LocalizedState<HomePage> {
         .where((f) => f != i18.home.db)
         .map((label) => homeItemsShowcaseMap[label]!)
         .toList();
-        if (context.isCDD) filteredLabels.add(i18.home.summaryLabel);
+    if (context.isCDD) filteredLabels.add(i18.home.summaryLabel);
 
     if ((envConfig.variables.envType == EnvType.demo && kReleaseMode) ||
         envConfig.variables.envType == EnvType.uat) {
@@ -815,8 +816,22 @@ void setPackagesSingleton(BuildContext context) {
               appConfiguration.symptomsTypes!.map((e) => e.code).toList(),
           referralReasons:
               appConfiguration.referralReasons!.map((e) => e.code).toList(),
-          searchHouseHoldFilter: [],
-          searchCLFFilters: [],
+          searchHouseHoldFilter: [
+            Status.beneficiaryRefused.toValue(),
+            Status.beneficiaryReferred.toValue(),
+            Status.beneficiaryInEligible.toValue(),
+            Status.administeredSuccess.toValue(),
+            Status.closeHousehold.toValue(),
+            Status.administeredFailed.toValue(),
+          ],
+          searchCLFFilters: [
+            Status.beneficiaryRefused.toValue(),
+            Status.beneficiaryReferred.toValue(),
+            Status.beneficiaryInEligible.toValue(),
+            Status.administeredSuccess.toValue(),
+            Status.closeHousehold.toValue(),
+            Status.administeredFailed.toValue(),
+          ],
           houseStructureTypes: [],
           refusalReasons: [],
           loggedInUser: context.loggedInUserModel,
