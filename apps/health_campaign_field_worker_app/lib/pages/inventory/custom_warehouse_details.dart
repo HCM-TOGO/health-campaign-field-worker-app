@@ -238,26 +238,37 @@ class CustomWarehouseDetailsPageState
                                           label: localizations.translate(
                                             i18.householdDetails.actionLabel,
                                           ),
-                                          onPressed: () {
-                                            form.markAllAsTouched();
+                                          onPressed: !form.valid
+                                              ? () {}
+                                              : () {
+                                                  form.markAllAsTouched();
 
-                                            // if (!form.valid) {
-                                            //   return;
-                                            // }
-                                            final dateOfRecord = form
-                                                .control(_dateOfEntryKey)
-                                                .value as DateTime;
+                                                  if (!form.valid) {
+                                                    return;
+                                                  }
+                                                  final dateOfRecord = form
+                                                      .control(_dateOfEntryKey)
+                                                      .value as DateTime;
 
-                                            final teamCode = form
-                                                .control(_teamCodeKey)
-                                                .value as String?;
-                                            final uuidRegex = RegExp(
-                                                r'^[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{12}$');
-                                            final trainingRegex =
-                                                RegExp(r'^cps-f\d{5}$');
-                                            final productionRegex =
-                                                RegExp(r'^CPS26-(\d{6})$');
-                                            /* if (deliveryTeamSelected &&
+                                                  // final teamCode = form
+                                                  //     .control(_teamCodeKey)
+                                                  final teamCode =
+                                                      (context.loggedInUser
+                                                                  .userName
+                                                                  .toString() +
+                                                              Constants
+                                                                  .pipeSeparator +
+                                                              context
+                                                                  .loggedInUserUuid)
+                                                          as String?;
+                                                  final uuidRegex = RegExp(
+                                                      r'^[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{12}$');
+                                                  final trainingRegex =
+                                                      RegExp(r'^cps-f\d{5}$');
+                                                  final productionRegex =
+                                                      RegExp(
+                                                          r'^CPS26-(\d{6})$');
+                                                  /* if (deliveryTeamSelected &&
                                                       (teamCode == null ||
                                                           !uuidRegex.hasMatch(
                                                               teamCode) && !trainingRegex.hasMatch(
@@ -274,83 +285,89 @@ class CustomWarehouseDetailsPageState
                                                     return;
                                                    }*/
 
-                                            final facility =
-                                                deliveryTeamSelected
-                                                    ? FacilityModel(
-                                                        id: teamCode ??
-                                                            'Delivery Team',
-                                                      )
-                                                    : selectedFacilityId != null
-                                                        ? FacilityModel(
-                                                            id: selectedFacilityId
-                                                                .toString(),
-                                                          )
-                                                        : null;
+                                                  final facility =
+                                                      deliveryTeamSelected
+                                                          ? FacilityModel(
+                                                              id: teamCode ??
+                                                                  'Delivery Team',
+                                                            )
+                                                          : selectedFacilityId !=
+                                                                  null
+                                                              ? FacilityModel(
+                                                                  id: selectedFacilityId
+                                                                      .toString(),
+                                                                )
+                                                              : null;
 
-                                            context
-                                                .read<DigitScannerBloc>()
-                                                .add(
-                                                  const DigitScannerEvent
-                                                      .handleScanner(
-                                                      qrCode: [], barCode: []),
-                                                );
-                                            if (facility == null) {
-                                              Toast.showToast(
-                                                type: ToastType.error,
-                                                context,
-                                                message:
-                                                    localizations.translate(
-                                                  i18.stockDetails
-                                                      .facilityRequired,
-                                                ),
-                                              );
-                                            } else if (deliveryTeamSelected &&
-                                                (teamCode == null ||
-                                                    teamCode.trim().isEmpty)) {
-                                              Toast.showToast(
-                                                context,
-                                                type: ToastType.error,
-                                                message:
-                                                    localizations.translate(
-                                                  i18.stockDetails
-                                                      .teamCodeRequired,
-                                                ),
-                                              );
-                                            } else {
-                                              recordStockBloc.add(
-                                                RecordStockSaveTransactionDetailsEvent(
-                                                  dateOfRecord: dateOfRecord,
-                                                  facilityModel: InventorySingleton()
-                                                              .isDistributor! &&
-                                                          !InventorySingleton()
-                                                              .isWareHouseMgr!
-                                                      ? FacilityModel(
-                                                          id: teamCode
-                                                              .toString(),
-                                                        )
-                                                      : facility,
-                                                  primaryId: facility.id ==
-                                                          "Delivery Team"
-                                                      ? (teamCode ?? '')
-                                                          .split(Constants
-                                                              .pipeSeparator)
-                                                          .last
-                                                      : facility.id,
-                                                  primaryType: (InventorySingleton()
-                                                                  .isDistributor! &&
-                                                              !InventorySingleton()
-                                                                  .isWareHouseMgr! &&
-                                                              deliveryTeamSelected) ||
-                                                          deliveryTeamSelected
-                                                      ? "STAFF"
-                                                      : "WAREHOUSE",
-                                                ),
-                                              );
-                                              context.router.push(
-                                                CustomStockDetailsRoute(),
-                                              );
-                                            }
-                                          },
+                                                  context
+                                                      .read<DigitScannerBloc>()
+                                                      .add(
+                                                        const DigitScannerEvent
+                                                            .handleScanner(
+                                                            qrCode: [],
+                                                            barCode: []),
+                                                      );
+                                                  if (facility == null) {
+                                                    Toast.showToast(
+                                                      type: ToastType.error,
+                                                      context,
+                                                      message: localizations
+                                                          .translate(
+                                                        i18.stockDetails
+                                                            .facilityRequired,
+                                                      ),
+                                                    );
+                                                  } else if (deliveryTeamSelected &&
+                                                      (teamCode == null ||
+                                                          teamCode
+                                                              .trim()
+                                                              .isEmpty)) {
+                                                    Toast.showToast(
+                                                      context,
+                                                      type: ToastType.error,
+                                                      message: localizations
+                                                          .translate(
+                                                        i18.stockDetails
+                                                            .teamCodeRequired,
+                                                      ),
+                                                    );
+                                                  } else {
+                                                    recordStockBloc.add(
+                                                      RecordStockSaveTransactionDetailsEvent(
+                                                        dateOfRecord:
+                                                            dateOfRecord,
+                                                        facilityModel: InventorySingleton()
+                                                                    .isDistributor! &&
+                                                                !InventorySingleton()
+                                                                    .isWareHouseMgr!
+                                                            ? FacilityModel(
+                                                                id: teamCode
+                                                                    .toString(),
+                                                              )
+                                                            : facility,
+                                                        primaryId: facility
+                                                                    .id ==
+                                                                "Delivery Team"
+                                                            ? (teamCode ?? '')
+                                                                .split(Constants
+                                                                    .pipeSeparator)
+                                                                .last
+                                                            : facility.id,
+                                                        primaryType: (InventorySingleton()
+                                                                        .isDistributor! &&
+                                                                    !InventorySingleton()
+                                                                        .isWareHouseMgr! &&
+                                                                    deliveryTeamSelected) ||
+                                                                deliveryTeamSelected
+                                                            ? "STAFF"
+                                                            : "WAREHOUSE",
+                                                      ),
+                                                    );
+                                                    context.router.push(
+                                                      CustomStockDetailsRoute(),
+                                                    );
+                                                  }
+                                                },
                                         );
                                       },
                                     ),
@@ -495,7 +512,11 @@ class CustomWarehouseDetailsPageState
                                                 i18.stockReconciliationDetails
                                                     .teamCodeLabel,
                                               ),
-                                              initialValue: userUuid,
+                                              initialValue: context
+                                                      .loggedInUser.userName
+                                                      .toString() +
+                                                  Constants.pipeSeparator +
+                                                  context.loggedInUserUuid,
                                               isRequired: deliveryTeamSelected,
                                               suffixIcon: Icons.qr_code_2,
                                               onSuffixTap: null,
