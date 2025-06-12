@@ -43,6 +43,7 @@ import '../../../router/app_router.dart';
 import '../../../utils/app_enums.dart';
 import '../../../utils/environment_config.dart';
 import '../../../utils/i18_key_constants.dart' as i18_local;
+import '../../../utils/upper_case.dart';
 import '../../../utils/utils.dart';
 import '../../../widgets/custom_back_navigation.dart';
 // import '../../../widgets/showcase/showcase_wrappers.dart';
@@ -118,6 +119,11 @@ class ZeroDoseCheckPageState extends LocalizedState<ZeroDoseCheckPage> {
     final theme = Theme.of(context);
     final deliveryInterventionState =
         context.read<DeliverInterventionBloc>().state;
+    final relatedClientRefId = context
+        .read<HouseholdOverviewBloc>()
+        .state
+        .selectedIndividual
+        ?.clientReferenceId;
 
     final householdMemberWrapper =
         context.read<HouseholdOverviewBloc>().state.householdMemberWrapper;
@@ -909,6 +915,9 @@ class ZeroDoseCheckPageState extends LocalizedState<ZeroDoseCheckPage> {
                                                               .deliverIntervention
                                                               .currentCycle),
                                                       child: DigitTextFormInput(
+                                                        inputFormatters: [
+                                                          UpperCaseTextFormatter(),
+                                                        ],
                                                         readOnly: true,
                                                         keyboardType:
                                                             TextInputType

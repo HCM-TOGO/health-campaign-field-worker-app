@@ -5,6 +5,7 @@ import 'package:qr_flutter/qr_flutter.dart';
 import '../../utils/date_utils.dart' as digits;
 import 'package:digit_components/widgets/atoms/digit_toaster.dart';
 import 'package:digit_ui_components/theme/ComponentTheme/checkbox_theme.dart';
+import '../../utils/upper_case.dart';
 import '../../widgets/custom_back_navigation.dart';
 import 'package:digit_data_model/data_model.dart';
 import 'package:digit_data_model/models/entities/household_type.dart';
@@ -574,6 +575,9 @@ class CustomIndividualDetailsPageState
                                             .nameLabelTextNewUpdate,
                                   ),
                                   child: DigitTextFormInput(
+                                    inputFormatters: [
+                                          UpperCaseTextFormatter(),
+                                        ],
                                     initialValue:
                                         form.control(_individualNameKey).value,
                                     onChange: (value) {
@@ -689,6 +693,9 @@ class CustomIndividualDetailsPageState
                                       capitalizedFirstLetter: false,
                                       isRequired: false,
                                       child: DigitTextFormInput(
+                                        inputFormatters: [
+                                          UpperCaseTextFormatter(),
+                                        ],
                                         readOnly:
                                             form.control(_idTypeKey).value ==
                                                 'DEFAULT',

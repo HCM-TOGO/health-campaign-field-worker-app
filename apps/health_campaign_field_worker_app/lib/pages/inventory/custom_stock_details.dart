@@ -3,6 +3,7 @@ import 'package:collection/collection.dart';
 import 'package:digit_components/widgets/atoms/digit_toaster.dart';
 import 'package:digit_data_model/data_model.dart';
 import 'package:digit_scanner/blocs/scanner.dart';
+import '../../utils/upper_case.dart';
 import './qr_scanner.dart';
 import 'package:digit_ui_components/digit_components.dart';
 import 'package:digit_ui_components/services/location_bloc.dart';
@@ -1381,6 +1382,9 @@ class CustomStockDetailsPageState
                                                         control.touched,
                                                     builder: (field) {
                                                       return InputField(
+                                                        inputFormatters: [
+                                          UpperCaseTextFormatter(),
+                                        ],
                                                         type: InputType.search,
                                                         isRequired: true,
                                                         label: localizations
@@ -1410,6 +1414,9 @@ class CustomStockDetailsPageState
                                     formControlName: _deliveryTeamKey,
                                     builder: (field) {
                                       return InputField(
+                                        inputFormatters: [
+                                          UpperCaseTextFormatter(),
+                                        ],
                                         keyboardType: TextInputType.none,
                                         type: InputType.search,
                                         label: localizations.translate(
@@ -1644,6 +1651,9 @@ class CustomStockDetailsPageState
                                     formControlName: _waybillNumberKey,
                                     builder: (field) {
                                       return InputField(
+                                        inputFormatters: [
+                                          UpperCaseTextFormatter(),
+                                        ],
                                         type: InputType.text,
                                         label: localizations.translate(
                                           i18.stockDetails.waybillNumberLabel,
@@ -1658,6 +1668,9 @@ class CustomStockDetailsPageState
                                     formControlName: _waybillQuantityKey,
                                     builder: (field) {
                                       return InputField(
+                                        inputFormatters: [
+                                          UpperCaseTextFormatter(),
+                                        ],
                                         keyboardType: const TextInputType
                                             .numberWithOptions(
                                           decimal: true,
@@ -1681,6 +1694,9 @@ class CustomStockDetailsPageState
                                     formControlName: _batchNumberKey,
                                     builder: (field) {
                                       return InputField(
+                                        inputFormatters: [
+                                          UpperCaseTextFormatter(),
+                                        ],
                                         keyboardType: const TextInputType
                                             .numberWithOptions(
                                           decimal: true,
@@ -1752,6 +1768,9 @@ class CustomStockDetailsPageState
                                     formControlName: _vehicleNumberKey,
                                     builder: (field) {
                                       return InputField(
+                                        inputFormatters: [
+                                          UpperCaseTextFormatter(),
+                                        ],
                                         type: InputType.text,
                                         label: localizations.translate(
                                           i18.stockDetails.vehicleNumberLabel,
@@ -1765,6 +1784,9 @@ class CustomStockDetailsPageState
                                   formControlName: _commentsKey,
                                   builder: (field) {
                                     return InputField(
+                                      inputFormatters: [
+                                          UpperCaseTextFormatter(),
+                                        ],
                                       type: InputType.textArea,
                                       label: localizations.translate(
                                         i18.stockDetails.commentsLabel,

@@ -13,6 +13,8 @@ import 'package:complaints/utils/utils.dart';
 import 'package:complaints/widgets/localized.dart';
 import 'package:flutter/services.dart';
 
+import '../../utils/upper_case.dart';
+
 @RoutePage()
 class CustomComplaintsInboxSearchPage extends LocalizedStatefulWidget {
   const CustomComplaintsInboxSearchPage({
@@ -133,6 +135,9 @@ class CustomComplaintsInboxSearchPageState
                                           i18.complaints.inboxNumberLabel,
                                         ),
                                         child: DigitTextFormInput(
+                                          inputFormatters: [
+                                          UpperCaseTextFormatter(),
+                                        ],
                                           onChange: (value){
                                             formGroup.control(_complaintNumber).value = value;
                                           },
@@ -159,6 +164,7 @@ class CustomComplaintsInboxSearchPageState
                                           charCount: true,
                                           keyboardType: TextInputType.number,
                                           inputFormatters: [
+                                            UpperCaseTextFormatter(),
                                             FilteringTextInputFormatter
                                                 .digitsOnly,
                                           ],

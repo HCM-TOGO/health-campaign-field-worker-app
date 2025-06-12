@@ -30,6 +30,7 @@ import 'package:inventory_management/widgets/back_navigation_help_header.dart';
 import '../../blocs/inventory_management/custom_inventory_report.dart';
 import '../../utils/constants.dart';
 import '../../utils/extensions/extensions.dart';
+import '../../utils/upper_case.dart';
 
 @RoutePage()
 class CustomInventoryReportDetailsPage extends LocalizedStatefulWidget {
@@ -356,6 +357,9 @@ class CustomInventoryReportDetailsPageState
                                                   formControlName: _facilityKey,
                                                   builder: (field) {
                                                     return InputField(
+                                                      inputFormatters: [
+                                          UpperCaseTextFormatter(),
+                                        ],
                                                       type: InputType.search,
                                                       isRequired: true,
                                                       controller: controller1,

@@ -28,6 +28,7 @@ import '../../blocs/registration_delivery/custom_beneficairy_registration.dart';
 import '../../models/entities/identifier_types.dart';
 import '../../router/app_router.dart';
 import '../../utils/constants.dart';
+import '../../utils/upper_case.dart';
 import '../../utils/utils.dart' as local_utils;
 import 'caregiver_consent.dart';
 
@@ -372,6 +373,9 @@ class CustomHouseholdLocationPageState
                                     .administrationAreaFormLabel,
                               ),
                               child: DigitTextFormInput(
+                                inputFormatters: [
+                                          UpperCaseTextFormatter(),
+                                        ],
                                 readOnly: true,
                                 errorMessage: field.errorText,
                                 initialValue:
@@ -400,6 +404,9 @@ class CustomHouseholdLocationPageState
                                 i18.householdLocation.landmarkFormLabel,
                               ),
                               child: DigitTextFormInput(
+                                inputFormatters: [
+                                          UpperCaseTextFormatter()
+                                        ],
                                 errorMessage: field.errorText,
                                 onChange: (value) {
                                   form.control(_landmarkKey).value = value;
@@ -430,6 +437,9 @@ class CustomHouseholdLocationPageState
                                           .householdLocation.buildingNameLabel),
                                       isRequired: true,
                                       child: DigitTextFormInput(
+                                        inputFormatters: [
+                                          UpperCaseTextFormatter(),
+                                        ],
                                         errorMessage: field.errorText,
                                         onChange: (value) {
                                           form.control(_buildingNameKey).value =

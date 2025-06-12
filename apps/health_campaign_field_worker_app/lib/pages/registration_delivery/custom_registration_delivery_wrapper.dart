@@ -24,6 +24,7 @@ import 'package:registration_delivery/models/entities/task.dart';
 import 'package:registration_delivery/utils/utils.dart';
 
 import '../../blocs/registration_delivery/custom_search_household.dart';
+import '../../data/repositories/local/registration_delivery/custom_individual_global_repository.dart';
 import '../../data/repositories/local/registration_delivery/custom_registration_delivery.dart';
 
 @RoutePage()
@@ -61,6 +62,7 @@ class CustomRegistrationDeliveryWrapperPage extends StatelessWidget {
                       .repository<SideEffectModel, SideEffectSearchModel>(context),
                   referralDataRepository: context.repository<ReferralModel, ReferralSearchModel>(context),
                   individualGlobalSearchRepository: context.read<IndividualGlobalSearchRepository>(),
+                  customIndividualGlobalSearchRepository: context.read<CustomIndividualGlobalSearchRepository>(),
                   houseHoldGlobalSearchRepository: context.read<HouseHoldGlobalSearchRepository>());
             },
           ),

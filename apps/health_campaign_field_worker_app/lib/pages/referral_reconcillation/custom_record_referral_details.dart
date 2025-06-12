@@ -24,6 +24,7 @@ import 'package:referral_reconciliation/models/entities/hf_referral.dart';
 import 'package:referral_reconciliation/utils/utils.dart';
 import 'package:referral_reconciliation/widgets/localized.dart';
 import '../../router/app_router.dart';
+import '../../utils/upper_case.dart';
 import '../../widgets/registration_delivery/custom_labeled_field.dart';
 
 @RoutePage()
@@ -796,6 +797,9 @@ class _CustomRecordReferralDetailsPageState
                                                     .nameOfTheChildLabel,
                                               ),
                                               child: DigitTextFormInput(
+                                                inputFormatters: [
+                                          UpperCaseTextFormatter(),
+                                        ],
                                                 onChange: (val) => {
                                                   form
                                                       .control(_nameOfChildKey)
@@ -837,6 +841,9 @@ class _CustomRecordReferralDetailsPageState
                                                       .beneficiaryId)
                                                   .toString(),
                                               child: DigitTextFormInput(
+                                                inputFormatters: [
+                                          UpperCaseTextFormatter(),
+                                        ],
                                                 onChange: (val) => {
                                                   form
                                                       .control(
@@ -896,6 +903,7 @@ class _CustomRecordReferralDetailsPageState
                                                 i18.common.ageInMonths,
                                               ),
                                               child: DigitTextFormInput(
+                                                
                                                 onChange: (val) => {
                                                   form
                                                       .control(_ageKey)
@@ -906,6 +914,7 @@ class _CustomRecordReferralDetailsPageState
                                                 keyboardType:
                                                     TextInputType.number,
                                                 inputFormatters: [
+                                                  UpperCaseTextFormatter(),
                                                   FilteringTextInputFormatter
                                                       .digitsOnly,
                                                   LengthLimitingTextInputFormatter(

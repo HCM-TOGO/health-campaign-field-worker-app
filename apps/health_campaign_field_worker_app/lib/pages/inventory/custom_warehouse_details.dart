@@ -23,6 +23,7 @@ import 'package:inventory_management/widgets/inventory/no_facilities_assigned_di
 import '../../router/app_router.dart';
 import '../../utils/constants.dart';
 import '../../utils/extensions/extensions.dart';
+import '../../utils/upper_case.dart';
 import 'custom_facility_selection.dart';
 
 @RoutePage()
@@ -383,6 +384,9 @@ class CustomWarehouseDetailsPageState
                                         formControlName: _dateOfEntryKey,
                                         builder: (field) {
                                           return InputField(
+                                            inputFormatters: [
+                                          UpperCaseTextFormatter(),
+                                        ],
                                             type: InputType.date,
                                             label: dateLabel,
                                             confirmText:
@@ -402,6 +406,9 @@ class CustomWarehouseDetailsPageState
                                         formControlName: _administrativeUnitKey,
                                         builder: (field) {
                                           return InputField(
+                                            inputFormatters: [
+                                          UpperCaseTextFormatter(),
+                                        ],
                                             isRequired: true,
                                             type: InputType.text,
                                             label: localizations.translate(
@@ -461,6 +468,9 @@ class CustomWarehouseDetailsPageState
                                                 control.touched,
                                             builder: (field) {
                                               return InputField(
+                                                inputFormatters: [
+                                          UpperCaseTextFormatter(),
+                                        ],
                                                 type: InputType.search,
                                                 label: localizations.translate(
                                                   i18.stockReconciliationDetails
@@ -481,6 +491,9 @@ class CustomWarehouseDetailsPageState
                                           formControlName: _teamCodeKey,
                                           builder: (field) {
                                             return InputField(
+                                              inputFormatters: [
+                                          UpperCaseTextFormatter(),
+                                        ],
                                               keyboardType: TextInputType.none,
                                               type: InputType.search,
                                               label: localizations.translate(

@@ -27,6 +27,7 @@ import 'package:survey_form/widgets/back_navigation_help_header.dart';
 import 'package:survey_form/widgets/localized.dart';
 
 import '../../router/app_router.dart';
+import '../../utils/upper_case.dart';
 
 @RoutePage()
 class CustomSurveyFormViewPage extends LocalizedStatefulWidget {
@@ -410,6 +411,7 @@ class CustomSurveyFormViewPageState
                                             : null,
                                         isRequired: e.required ?? false,
                                         child: DigitTextFormInput(
+                                          
                                           onChange: (value) {
                                             field.didChange(value);
                                             controller[index].text = value;
@@ -419,6 +421,7 @@ class CustomSurveyFormViewPageState
                                           errorMessage: field.errorText,
                                           controller: controller[index],
                                           inputFormatters: [
+                                            UpperCaseTextFormatter(),
                                             FilteringTextInputFormatter.allow(
                                                 RegExp(
                                               "[a-zA-Z0-9]",
@@ -474,6 +477,7 @@ class CustomSurveyFormViewPageState
                                         errorMessage: field.errorText,
                                         keyboardType: TextInputType.number,
                                         inputFormatters: [
+                                          UpperCaseTextFormatter(),
                                           FilteringTextInputFormatter.allow(
                                               RegExp(
                                             "[0-9]",
@@ -927,6 +931,9 @@ class CustomSurveyFormViewPageState
                                   capitalizedFirstLetter: false,
                                   charCondition: true,
                                   child: DigitTextFormInput(
+                                    inputFormatters: [
+                                          UpperCaseTextFormatter(),
+                                        ],
                                     onChange: (value) {
                                       field.didChange(value);
                                       additionalController[index].text = value;
@@ -994,6 +1001,7 @@ class CustomSurveyFormViewPageState
                 errorMessage: field.errorText,
                 controller: controller[index],
                 inputFormatters: [
+                  UpperCaseTextFormatter(),
                   FilteringTextInputFormatter.allow(RegExp(
                     "[a-zA-Z0-9 ]",
                   )),
@@ -1042,6 +1050,7 @@ class CustomSurveyFormViewPageState
                 },
                 keyboardType: TextInputType.number,
                 inputFormatters: [
+                  UpperCaseTextFormatter(),
                   FilteringTextInputFormatter.allow(RegExp(
                     "[0-9]",
                   )),

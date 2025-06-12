@@ -101,12 +101,11 @@ class _VaccineSelectionPageState extends LocalizedState<VaccineSelectionPage> {
         ?.dateOfBirth;
     final theme = Theme.of(context);
 
-    // final relatedClientRefId =  context
-    //     .read<HouseholdOverviewBloc>()
-    //     .state
-    //     .selectedIndividual
-    //     ?.clientReferenceId;
-    // final years = DigitDateUtils.getYears
+    final relatedClientRefId =  context
+        .read<HouseholdOverviewBloc>()
+        .state
+        .selectedIndividual
+        ?.clientReferenceId;
     final ageInDays = calculateAgeInDaysFromDob(dob!);
 
     return BlocBuilder<AppInitializationBloc, AppInitializationState>(
@@ -303,6 +302,7 @@ class _VaccineSelectionPageState extends LocalizedState<VaccineSelectionPage> {
                                                     serviceDefId:
                                                         selectedServiceDefinition
                                                             ?.id,
+                                                    relatedClientReferenceId: relatedClientRefId,
                                                     attributes: attributes,
                                                     rowVersion: 1,
                                                     accountId:

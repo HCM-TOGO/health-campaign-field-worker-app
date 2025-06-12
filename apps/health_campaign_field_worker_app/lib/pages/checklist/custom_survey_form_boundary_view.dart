@@ -12,6 +12,7 @@ import 'package:survey_form/widgets/back_navigation_help_header.dart';
 import 'package:survey_form/widgets/localized.dart';
 
 import '../../router/app_router.dart';
+import '../../utils/upper_case.dart';
 
 @RoutePage()
 class CustomSurveyFormBoundaryViewPage extends LocalizedStatefulWidget {
@@ -83,6 +84,9 @@ class CustomSurveyFormBoundaryViewPageState
                     i18.householdLocation.administrationAreaFormLabel,
                   ),
                   child: DigitTextFormInput(
+                    inputFormatters: [
+                      UpperCaseTextFormatter(),
+                    ],
                     readOnly: true,
                     initialValue: localizations.translate(
                         SurveyFormSingleton().boundary!.code.toString()),
