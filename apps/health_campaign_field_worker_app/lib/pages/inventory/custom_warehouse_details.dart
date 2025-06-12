@@ -86,6 +86,7 @@ class CustomWarehouseDetailsPageState
     final theme = Theme.of(context);
     final recordStockBloc = BlocProvider.of<RecordStockBloc>(context);
     final textTheme = theme.digitTextTheme(context);
+    final userUuid = context.loggedInUserUuid;
 
     return InventorySingleton().projectId.isEmpty
         ? Center(
@@ -199,10 +200,10 @@ class CustomWarehouseDetailsPageState
                                 !InventorySingleton().isWareHouseMgr!,
                             stockState),
                         builder: (context, form, child) {
-                          form.control(_teamCodeKey).value =
-                              scannerState.qrCodes.isNotEmpty
-                                  ? scannerState.qrCodes.firstOrNull
-                                  : '';
+                          // form.control(_teamCodeKey).value =
+                          //     scannerState.qrCodes.isNotEmpty
+                          //         ? scannerState.qrCodes.firstOrNull
+                          //         : '';
                           final teamFacilities = [
                             FacilityModel(
                               id: 'Delivery Team',
@@ -234,7 +235,6 @@ class CustomWarehouseDetailsPageState
                                           type: DigitButtonType.primary,
                                           mainAxisSize: MainAxisSize.max,
                                           size: DigitButtonSize.large,
-                                          isDisabled: !form.valid,
                                           label: localizations.translate(
                                             i18.householdDetails.actionLabel,
                                           ),
@@ -250,14 +250,25 @@ class CustomWarehouseDetailsPageState
                                                       .control(_dateOfEntryKey)
                                                       .value as DateTime;
 
-                                                  final teamCode = form
-                                                      .control(_teamCodeKey)
-                                                      .value as String?;
+                                                  // final teamCode = form
+                                                  //     .control(_teamCodeKey)
+                                                  final teamCode =
+                                                      (context.loggedInUser
+                                                                  .userName
+                                                                  .toString() +
+                                                              Constants
+                                                                  .pipeSeparator +
+                                                              context
+                                                                  .loggedInUserUuid)
+                                                          as String?;
                                                   final uuidRegex = RegExp(
                                                       r'^[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{12}$');
-                                                  final trainingRegex = RegExp(r'^cps-f\d{5}$');
-                                                  final productionRegex = RegExp(r'^CPS26-(\d{6})$');
-                                                  if (deliveryTeamSelected &&
+                                                  final trainingRegex =
+                                                      RegExp(r'^cps-f\d{5}$');
+                                                  final productionRegex =
+                                                      RegExp(
+                                                          r'^CPS26-(\d{6})$');
+                                                  /* if (deliveryTeamSelected &&
                                                       (teamCode == null ||
                                                           !uuidRegex.hasMatch(
                                                               teamCode) && !trainingRegex.hasMatch(
@@ -272,7 +283,7 @@ class CustomWarehouseDetailsPageState
                                                               .qrCodeInvalidFormat),
                                                     );
                                                     return;
-                                                  }
+                                                   }*/
 
                                                   final facility =
                                                       deliveryTeamSelected
@@ -385,8 +396,8 @@ class CustomWarehouseDetailsPageState
                                         builder: (field) {
                                           return InputField(
                                             inputFormatters: [
-                                          UpperCaseTextFormatter(),
-                                        ],
+                                              UpperCaseTextFormatter(),
+                                            ],
                                             type: InputType.date,
                                             label: dateLabel,
                                             confirmText:
@@ -407,8 +418,8 @@ class CustomWarehouseDetailsPageState
                                         builder: (field) {
                                           return InputField(
                                             inputFormatters: [
-                                          UpperCaseTextFormatter(),
-                                        ],
+                                              UpperCaseTextFormatter(),
+                                            ],
                                             isRequired: true,
                                             type: InputType.text,
                                             label: localizations.translate(
@@ -469,8 +480,8 @@ class CustomWarehouseDetailsPageState
                                             builder: (field) {
                                               return InputField(
                                                 inputFormatters: [
-                                          UpperCaseTextFormatter(),
-                                        ],
+                                                  UpperCaseTextFormatter(),
+                                                ],
                                                 type: InputType.search,
                                                 label: localizations.translate(
                                                   i18.stockReconciliationDetails
@@ -492,53 +503,23 @@ class CustomWarehouseDetailsPageState
                                           builder: (field) {
                                             return InputField(
                                               inputFormatters: [
-                                          UpperCaseTextFormatter(),
-                                        ],
+                                                UpperCaseTextFormatter(),
+                                              ],
+                                              readOnly: true,
                                               keyboardType: TextInputType.none,
                                               type: InputType.search,
                                               label: localizations.translate(
                                                 i18.stockReconciliationDetails
                                                     .teamCodeLabel,
                                               ),
-                                              initialValue: form
-                                                  .control(_teamCodeKey)
-                                                  .value,
+                                              initialValue: context
+                                                      .loggedInUser.userName
+                                                      .toString() +
+                                                  Constants.pipeSeparator +
+                                                  context.loggedInUserUuid,
                                               isRequired: deliveryTeamSelected,
                                               suffixIcon: Icons.qr_code_2,
-                                              onSuffixTap: (value) {
-                                                //[TODO: Add route to auto_route]
-                                                Navigator.of(context).push(
-                                                  MaterialPageRoute(
-                                                    builder: (context) =>
-                                                        const DigitScannerPage(
-                                                      quantity: 5,
-                                                      isGS1code: false,
-                                                      singleValue: false,
-                                                    ),
-                                                    settings:
-                                                        const RouteSettings(
-                                                            name:
-                                                                '/qr-scanner'),
-                                                  ),
-                                                );
-                                              },
-                                              onChange: (val) {
-                                                String? value = val;
-                                                if (value != null &&
-                                                    value.trim().isNotEmpty) {
-                                                  context
-                                                      .read<DigitScannerBloc>()
-                                                      .add(
-                                                        DigitScannerEvent
-                                                            .handleScanner(
-                                                          barCode: [],
-                                                          qrCode: [value],
-                                                        ),
-                                                      );
-                                                } else {
-                                                  clearQRCodes();
-                                                }
-                                              },
+                                              onSuffixTap: null,
                                             );
                                           })
                                   ]),
