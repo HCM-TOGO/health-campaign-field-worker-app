@@ -290,7 +290,6 @@ import 'package:flutter/services.dart';
 import 'package:intl/intl.dart';
 import 'package:reactive_forms/reactive_forms.dart';
 import 'package:registration_delivery/blocs/app_localization.dart';
-import '../localized.dart';
 import '/utils/i18_key_constants.dart' as i18_local;
 
 class CustomDigitDobPicker extends StatefulWidget {
@@ -316,7 +315,6 @@ class CustomDigitDobPicker extends StatefulWidget {
 
   const CustomDigitDobPicker({
     super.key,
-    // super.appLocalizations,
     required this.datePickerFormControl,
     this.readOnly = false,
     this.isHeadOfHousehold = false, // <-- Add this
