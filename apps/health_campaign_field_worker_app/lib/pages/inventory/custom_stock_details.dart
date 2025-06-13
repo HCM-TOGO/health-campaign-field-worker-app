@@ -1542,7 +1542,9 @@ class CustomStockDetailsPageState
                                       ),
                                       isRequired: true,
                                       child: BaseDigitFormInput(
-                                        inputFormatters: [FilteringTextInputFormatter.digitsOnly],
+                                        inputFormatters: [
+                                          FilteringTextInputFormatter.digitsOnly
+                                        ],
                                         errorMessage: field.errorText,
                                         keyboardType: const TextInputType
                                             .numberWithOptions(
@@ -1656,6 +1658,10 @@ class CustomStockDetailsPageState
                                         inputFormatters: [
                                           UpperCaseTextFormatter(),
                                         ],
+                                        keyboardType: const TextInputType
+                                            .numberWithOptions(
+                                          decimal: false,
+                                        ),
                                         type: InputType.text,
                                         label: localizations.translate(
                                           i18.stockDetails.waybillNumberLabel,
