@@ -289,6 +289,8 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:intl/intl.dart';
 import 'package:reactive_forms/reactive_forms.dart';
+import 'package:registration_delivery/blocs/app_localization.dart';
+import '/utils/i18_key_constants.dart' as i18_local;
 
 class CustomDigitDobPicker extends StatefulWidget {
   final String datePickerFormControl;
@@ -342,6 +344,8 @@ class _DigitDobPickerState extends State<CustomDigitDobPicker> {
   final yearController = TextEditingController();
   final monthController = TextEditingController();
   DateTime? selectedDate;
+  late RegistrationDeliveryLocalization _localizations;
+  RegistrationDeliveryLocalization get localizations => _localizations;
 
   @override
   void initState() {
@@ -392,11 +396,12 @@ class _DigitDobPickerState extends State<CustomDigitDobPicker> {
       months = months % 12;
     }
     if (widget.isHeadOfHousehold && months > 11) {
-      Toast.showToast(
-        context,
-        type: ToastType.error,
-        message: 'Months cannot be more than 11 for head of household.',
-      );
+      Toast.showToast(context,
+          type: ToastType.error,
+          message: localizations
+              .translate(i18_local.individualDetails.monthsExceedErrorText)
+          // message: 'Months cannot be more than 11 for head of household.',
+          );
       WidgetsBinding.instance.addPostFrameCallback((_) {
         monthController.text = '';
       });

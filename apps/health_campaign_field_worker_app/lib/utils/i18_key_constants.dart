@@ -200,7 +200,8 @@ class HouseholdOverView {
 class DeliverIntervention {
   const DeliverIntervention();
 
-String get enterReasonForonlyAlphabetsValidation => 'ALPHABETS_ONLY_VALIDATION';
+  String get enterReasonForonlyAlphabetsValidation =>
+      'ALPHABETS_ONLY_VALIDATION';
 
   String get vaccinsSelectionLabel => 'VACCINS_DETAILS_LABEL';
 
@@ -1378,8 +1379,8 @@ class IndividualDetails {
       'INDIVIDUAL_DETAILS_ONLY_ALPHABETS_VALIDATION_MESSAGE';
 
   String get onlyAlphabetsNumbersSpacesValidationMessage =>
-  'INDIVIDUAL_DETAILS_ONLY_ALPHABETS_NUMBERS_SPACES_VALIDATION_MESSAGE';
-    
+      'INDIVIDUAL_DETAILS_ONLY_ALPHABETS_NUMBERS_SPACES_VALIDATION_MESSAGE';
+
   String get headAgeValidError => "HEAD_AGE_VALID_ERROR";
 
   String get individualsDetailsLabelText => 'INDIVIDUAL_LABEL_TEXT';
@@ -1443,6 +1444,8 @@ class IndividualDetails {
       'LINK_QR_CODE_TO_BENEFICIARY_LABEL';
 
   String get relocatedBeneficiaryQuestion => 'RELOCATED_BENEFICIARY_QUESTION';
+
+  String get monthsExceedErrorText => 'MONTHS_EXCEED_ERROR_TEXT';
 }
 
 class BeneficiaryDetails {
