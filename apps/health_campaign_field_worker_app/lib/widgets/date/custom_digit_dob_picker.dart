@@ -290,6 +290,7 @@ import 'package:flutter/services.dart';
 import 'package:intl/intl.dart';
 import 'package:reactive_forms/reactive_forms.dart';
 import 'package:registration_delivery/blocs/app_localization.dart';
+import '../localized.dart';
 import '/utils/i18_key_constants.dart' as i18_local;
 
 class CustomDigitDobPicker extends StatefulWidget {
@@ -315,6 +316,7 @@ class CustomDigitDobPicker extends StatefulWidget {
 
   const CustomDigitDobPicker({
     super.key,
+    // super.appLocalizations,
     required this.datePickerFormControl,
     this.readOnly = false,
     this.isHeadOfHousehold = false, // <-- Add this
@@ -399,8 +401,7 @@ class _DigitDobPickerState extends State<CustomDigitDobPicker> {
       Toast.showToast(context,
           type: ToastType.error,
           message: localizations
-              .translate(i18_local.individualDetails.monthsExceedErrorText)
-          // message: 'Months cannot be more than 11 for head of household.',
+              .translate(i18_local.householdDetails.monthsValidationErrorMsg)
           );
       WidgetsBinding.instance.addPostFrameCallback((_) {
         monthController.text = '';
@@ -537,7 +538,7 @@ class _DigitDobPickerState extends State<CustomDigitDobPicker> {
                     }
                     if (control.hasError('ageLimit')) {
                       return Text(
-                        "Age should not be more than 59 months",
+                        i18_local.householdDetails.ageValidationErrorMsg,
                         style: theme.textTheme.bodyMedium!.copyWith(
                           color: theme.colorTheme.alert.error,
                         ),

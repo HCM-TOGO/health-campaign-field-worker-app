@@ -346,6 +346,20 @@ class ReferBeneficiary {
 class HouseholdDetails {
   const HouseholdDetails();
 
+  String get monthsValidationErrorMsg => 'MONTHS_VALIDATION_ERROR_MSG';
+
+  String get previousBeneficiaryQRCode => "PREVIOUS_BENEFICIARY_QR_CODE_LABEL";
+
+  String get yesLabelText => 'YES_LABEL_TEXT';
+
+  String get noLabelText => 'NO_LABEL_TEXT';
+
+  String get ageValidationErrorMsg => 'AGE_VALIDATION_ERROR_MSG';
+
+  String get capitalYesLabelText => 'CAPITAL_YES_LABEL_TEXT';
+
+  String get capitalNoLabelText => 'CAPITAL_NO_LABEL_TEXT';
+
   String get selectRecordErrorMsg => 'PLEASE_SELECT_RECORD';
 
   String get addBeneficiartText => 'ADD_BENEFICIARY_TEXT';
