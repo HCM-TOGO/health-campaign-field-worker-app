@@ -78,8 +78,8 @@ class CustomIndividualDetailsPageState
   bool isEditIndividual = false;
   bool isAddIndividual = false;
   bool isBeneficaryRegistration = false;
-  String? yesNoValue = 'no';
-  bool get isRelocated => yesNoValue == 'yes';
+  String? yesNoValue;
+  bool get isRelocated => yesNoValue == localizations.translate(i18_local.householdDetails.yesLabelText);
   final RegExp uuidRegex = RegExp(
       r'^[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{12}$');
   final trainingRegex = RegExp(r'^cps-f\d{5}$');
@@ -144,6 +144,7 @@ class CustomIndividualDetailsPageState
     DateTime before150Years = DateTime(now.year - 150, now.month, now.day);
     DateTime lastDate = DateTime(now.year, now.month - 3, now.day);
     DateTime firstDate = DateTime(now.year, now.month - 59, now.day);
+    yesNoValue ??= localizations.translate(i18_local.householdDetails.noLabelText);
 
     final textTheme = theme.digitTextTheme(context);
 
@@ -877,8 +878,12 @@ class CustomIndividualDetailsPageState
                                   children: [
                                     Expanded(
                                       child: RadioListTile<String>(
-                                        title: const Text('Yes'),
-                                        value: 'yes',
+                                        title: Text(localizations.translate(
+                                          i18_local.householdDetails.capitalYesLabelText,
+                                        )),
+                                        value: localizations.translate(
+                                          i18_local.householdDetails.yesLabelText,
+                                        ),
                                         groupValue: yesNoValue,
                                         onChanged: (value) {
                                           setState(() {
@@ -891,8 +896,12 @@ class CustomIndividualDetailsPageState
                                     ),
                                     Expanded(
                                       child: RadioListTile<String>(
-                                        title: const Text('No'),
-                                        value: 'no',
+                                        title: Text(localizations.translate(
+                                          i18_local.householdDetails.capitalNoLabelText,
+                                        )),
+                                        value: localizations.translate(
+                                          i18_local.householdDetails.noLabelText,
+                                        ),
                                         groupValue: yesNoValue,
                                         onChanged: (value) {
                                           setState(() {
@@ -910,7 +919,7 @@ class CustomIndividualDetailsPageState
                         if (!widget.isHeadOfHousehold && isRelocated)
                           DigitButton(
                             capitalizeLetters: false,
-                            label: "Previous Beneficiary QR Code",
+                            label: localizations.translate(i18_local.householdDetails.previousBeneficiaryQRCode),
                             mainAxisSize: MainAxisSize.max,
                             type: DigitButtonType.secondary,
                             size: DigitButtonSize.large,

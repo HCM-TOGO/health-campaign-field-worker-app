@@ -399,8 +399,7 @@ class _DigitDobPickerState extends State<CustomDigitDobPicker> {
       Toast.showToast(context,
           type: ToastType.error,
           message: localizations
-              .translate(i18_local.individualDetails.monthsExceedErrorText)
-          // message: 'Months cannot be more than 11 for head of household.',
+              .translate(i18_local.householdDetails.monthsValidationErrorMsg)
           );
       WidgetsBinding.instance.addPostFrameCallback((_) {
         monthController.text = '';
@@ -537,7 +536,7 @@ class _DigitDobPickerState extends State<CustomDigitDobPicker> {
                     }
                     if (control.hasError('ageLimit')) {
                       return Text(
-                        "Age should not be more than 59 months",
+                        i18_local.householdDetails.ageValidationErrorMsg,
                         style: theme.textTheme.bodyMedium!.copyWith(
                           color: theme.colorTheme.alert.error,
                         ),
