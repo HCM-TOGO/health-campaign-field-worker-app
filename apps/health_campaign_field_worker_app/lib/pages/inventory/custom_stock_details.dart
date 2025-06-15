@@ -568,7 +568,9 @@ class CustomStockDetailsPageState
                                             receiverId = secondaryParty?.id;
                                             receiverType = "WAREHOUSE";
                                           }
-                                          senderId = primaryId;
+                                          senderId = primaryId!
+                                              .split(Constants.pipeSeparator)
+                                              .last;
                                           senderType = primaryType;
                                           break;
                                       }
@@ -1542,7 +1544,9 @@ class CustomStockDetailsPageState
                                       ),
                                       isRequired: true,
                                       child: BaseDigitFormInput(
-                                        inputFormatters: [FilteringTextInputFormatter.digitsOnly],
+                                        inputFormatters: [
+                                          FilteringTextInputFormatter.digitsOnly
+                                        ],
                                         errorMessage: field.errorText,
                                         keyboardType: const TextInputType
                                             .numberWithOptions(
