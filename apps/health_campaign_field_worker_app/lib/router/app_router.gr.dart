@@ -786,6 +786,7 @@ abstract class _$AppRouter extends RootStackRouter {
           task: args.task,
           hasSideEffects: args.hasSideEffects,
           sideEffect: args.sideEffect,
+          isZeroDoseAlreadyDone: args.isZeroDoseAlreadyDone,
         ),
       );
     },
@@ -3604,6 +3605,7 @@ class VaccineSelectionRoute extends PageRouteInfo<VaccineSelectionRouteArgs> {
     required TaskModel task,
     bool? hasSideEffects = false,
     required SideEffectModel sideEffect,
+    bool isZeroDoseAlreadyDone = false,
     List<PageRouteInfo>? children,
   }) : super(
           VaccineSelectionRoute.name,
@@ -3619,6 +3621,7 @@ class VaccineSelectionRoute extends PageRouteInfo<VaccineSelectionRouteArgs> {
             task: task,
             hasSideEffects: hasSideEffects,
             sideEffect: sideEffect,
+            isZeroDoseAlreadyDone: isZeroDoseAlreadyDone,
           ),
           initialChildren: children,
         );
@@ -3641,6 +3644,7 @@ class VaccineSelectionRouteArgs {
     required this.task,
     this.hasSideEffects = false,
     required this.sideEffect,
+    this.isZeroDoseAlreadyDone = false,
   });
 
   final Key? key;
@@ -3663,9 +3667,11 @@ class VaccineSelectionRouteArgs {
 
   final SideEffectModel sideEffect;
 
+  final bool isZeroDoseAlreadyDone;
+
   @override
   String toString() {
-    return 'VaccineSelectionRouteArgs{key: $key, appLocalizations: $appLocalizations, isAdministration: $isAdministration, eligibilityAssessmentType: $eligibilityAssessmentType, isChecklistAssessmentDone: $isChecklistAssessmentDone, projectBeneficiaryClientReferenceId: $projectBeneficiaryClientReferenceId, individual: $individual, task: $task, hasSideEffects: $hasSideEffects, sideEffect: $sideEffect}';
+    return 'VaccineSelectionRouteArgs{key: $key, appLocalizations: $appLocalizations, isAdministration: $isAdministration, eligibilityAssessmentType: $eligibilityAssessmentType, isChecklistAssessmentDone: $isChecklistAssessmentDone, projectBeneficiaryClientReferenceId: $projectBeneficiaryClientReferenceId, individual: $individual, task: $task, hasSideEffects: $hasSideEffects, sideEffect: $sideEffect, isZeroDoseAlreadyDone: $isZeroDoseAlreadyDone}';
   }
 }
 
