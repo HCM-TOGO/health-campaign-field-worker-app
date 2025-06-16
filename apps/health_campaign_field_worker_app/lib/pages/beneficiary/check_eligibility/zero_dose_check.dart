@@ -403,20 +403,39 @@ class ZeroDoseCheckPageState extends LocalizedState<ZeroDoseCheckPage> {
                                           ),
                                         ),
                                       );
-
+                                  final projectBeneficiaryClientReferenceId =
+                                      context
+                                          .read<HouseholdOverviewBloc>()
+                                          .state
+                                          .selectedIndividual
+                                          ?.clientReferenceId;
+                                  final currentCycle =
+                                                  RegistrationDeliverySingleton()
+                                                      .projectType
+                                                      ?.cycles
+                                                      ?.firstWhereOrNull(
+                                                        (e) =>
+                                                            (e.startDate) <
+                                                                DateTime.now()
+                                                                    .millisecondsSinceEpoch &&
+                                                            (e.endDate) >
+                                                                DateTime.now()
+                                                                    .millisecondsSinceEpoch,
+                                                      );
+                                  final isZeroDoseAlreadyDone =currentCycle!.id > 1;
                                   context.router.push(VaccineSelectionRoute(
-                                    isAdministration: widget.isAdministration,
-                                    eligibilityAssessmentType:
-                                        widget.eligibilityAssessmentType,
-                                    isChecklistAssessmentDone:
-                                        widget.isChecklistAssessmentDone,
-                                    projectBeneficiaryClientReferenceId: widget
-                                        .projectBeneficiaryClientReferenceId,
-                                    individual: widget.individual,
-                                    task: widget.task,
-                                    hasSideEffects: widget.hasSideEffects!,
-                                    sideEffect: widget.sideEffect!,
-                                  ));
+                                      isAdministration: widget.isAdministration,
+                                      eligibilityAssessmentType:
+                                          widget.eligibilityAssessmentType,
+                                      isChecklistAssessmentDone:
+                                          widget.isChecklistAssessmentDone,
+                                      projectBeneficiaryClientReferenceId: projectBeneficiaryClientReferenceId,
+                                      individual: widget.individual,
+                                      task: widget.task,
+                                      hasSideEffects: widget.hasSideEffects!,
+                                      sideEffect: widget.sideEffect!,
+                                      isZeroDoseAlreadyDone:
+                                          isZeroDoseAlreadyDone));
                                 } else {
                                   final shouldSubmit = await DigitDialog.show(
                                     context,
