@@ -410,7 +410,8 @@ class CustomWarehouseDetailsPageState
                                             initialValue: DateFormat(
                                                     'd MMMM yyyy')
                                                 .format(field.control.value),
-                                            readOnly: true,
+                                            readOnly: false,
+                                            lastDate: DateTime.now(),
                                           );
                                         }),
                                     ReactiveWrapperField(
