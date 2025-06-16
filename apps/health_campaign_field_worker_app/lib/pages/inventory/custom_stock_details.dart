@@ -1660,6 +1660,10 @@ class CustomStockDetailsPageState
                                         inputFormatters: [
                                           UpperCaseTextFormatter(),
                                         ],
+                                        keyboardType: const TextInputType
+                                            .numberWithOptions(
+                                          decimal: false,
+                                        ),
                                         type: InputType.text,
                                         label: localizations.translate(
                                           i18.stockDetails.waybillNumberLabel,
