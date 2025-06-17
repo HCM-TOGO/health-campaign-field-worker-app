@@ -9,6 +9,7 @@ import 'package:digit_ui_components/widgets/atoms/pop_up_card.dart';
 import 'package:digit_ui_components/widgets/molecules/digit_card.dart';
 import 'package:digit_ui_components/widgets/molecules/show_pop_up.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:intl/intl.dart';
 import 'package:inventory_management/inventory_management.dart';
@@ -511,8 +512,8 @@ class CustomStockReconciliationPageState
                                                       builder: (field) {
                                                         return InputField(
                                                           inputFormatters: [
-                                          UpperCaseTextFormatter(),
-                                        ],
+                                                            UpperCaseTextFormatter(),
+                                                          ],
                                                           type:
                                                               InputType.search,
                                                           isRequired: true,
@@ -751,11 +752,14 @@ class CustomStockReconciliationPageState
                                           ),
                                           isRequired: true,
                                           child: BaseDigitFormInput(
+                                            inputFormatters: [
+                                              FilteringTextInputFormatter
+                                                  .digitsOnly
+                                            ],
                                             errorMessage: field.errorText,
                                             keyboardType: const TextInputType
                                                 .numberWithOptions(
-                                              decimal: false,
-                                            ),
+                                                decimal: false, signed: false),
                                             initialValue: '0',
                                             onChange: (value) {
                                               field.control.markAsTouched();
@@ -771,14 +775,14 @@ class CustomStockReconciliationPageState
                                         inputFormatters: [
                                           UpperCaseTextFormatter(),
                                         ],
-                                        type: InputType.textArea,
+                                        type: InputType.text,
                                         label: localizations.translate(
                                           i18.stockReconciliationDetails
                                               .commentsLabel,
                                         ),
                                         textAreaScroll: TextAreaScroll.smart,
                                         onChange: (value) {
-                                          field.control.value = value;
+                                          field.control.updateValue(value.toUpperCase());
                                         },
                                       );
                                     },

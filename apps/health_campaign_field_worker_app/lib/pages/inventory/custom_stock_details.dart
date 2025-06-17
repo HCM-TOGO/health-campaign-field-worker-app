@@ -1797,7 +1797,7 @@ class CustomStockDetailsPageState
                                       inputFormatters: [
                                         UpperCaseTextFormatter(),
                                       ],
-                                      type: InputType.textArea,
+                                      type: InputType.text,
                                       label: localizations.translate(
                                         i18.stockDetails.commentsLabel,
                                       ),

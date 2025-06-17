@@ -18,6 +18,7 @@ import 'package:health_campaign_field_worker_app/models/entities/assessment_chec
 import 'package:health_campaign_field_worker_app/pages/registration_delivery/custom_status_filter.dart';
 import 'package:registration_delivery/utils/global_search_parameters.dart';
 import '../../blocs/registration_delivery/custom_beneficairy_registration.dart';
+import '../../utils/upper_case.dart';
 import '../../widgets/custom_back_navigation.dart';
 import 'package:registration_delivery/blocs/search_households/search_bloc_common_wrapper.dart';
 import 'package:registration_delivery/blocs/search_households/search_households.dart'
@@ -231,6 +232,7 @@ class _CustomSearchBeneficiaryPageState
                                   Padding(
                                     padding: const EdgeInsets.all(spacer2),
                                     child: DigitSearchBar(
+                                      inputFormatters: [UpperCaseTextFormatter()],
                                       controller: searchController,
                                       icon: const SizedBox.shrink(),
                                       hintText: (RegistrationDeliverySingleton()
