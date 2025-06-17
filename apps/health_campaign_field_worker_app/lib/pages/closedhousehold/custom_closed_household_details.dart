@@ -172,8 +172,8 @@ class CustomClosedHouseholdDetailsPageState
                                 ),
                                 child: DigitTextFormInput(
                                   inputFormatters: [
-                                          UpperCaseTextFormatter(),
-                                        ],
+                                    UpperCaseTextFormatter(),
+                                  ],
                                   errorMessage: field.errorText,
                                   readOnly: true,
                                   initialValue: form
@@ -195,8 +195,8 @@ class CustomClosedHouseholdDetailsPageState
                                 capitalizedFirstLetter: false,
                                 child: DigitTextFormInput(
                                   inputFormatters: [
-                                          UpperCaseTextFormatter(),
-                                        ],
+                                    UpperCaseTextFormatter(),
+                                  ],
                                   errorMessage: field.errorText,
                                   readOnly: true,
                                   initialValue: (form
@@ -234,8 +234,8 @@ class CustomClosedHouseholdDetailsPageState
                                 ),
                                 child: DigitTextFormInput(
                                   inputFormatters: [
-                                          UpperCaseTextFormatter(),
-                                        ],
+                                    UpperCaseTextFormatter(),
+                                  ],
                                   maxLength: 64,
                                   charCount: true,
                                   onChange: (val) => {
@@ -250,7 +250,7 @@ class CustomClosedHouseholdDetailsPageState
                                         )
                                         .value = val,
                                   },
-                                  errorMessage: field.errorText,
+                                  // errorMessage: field.errorText,
                                   initialValue: form
                                       .control(
                                         _householdHeadNameKey,
