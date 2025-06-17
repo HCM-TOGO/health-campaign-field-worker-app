@@ -290,9 +290,11 @@ import 'package:flutter/services.dart';
 import 'package:intl/intl.dart';
 import 'package:reactive_forms/reactive_forms.dart';
 import 'package:registration_delivery/blocs/app_localization.dart';
-import '/utils/i18_key_constants.dart' as i18_local;
+import '../localized.dart';
+import 'package:registration_delivery/utils/i18_key_constants.dart' as i18;
+import '../../utils/i18_key_constants.dart' as i18_local;
 
-class CustomDigitDobPicker extends StatefulWidget {
+class CustomDigitDobPicker extends LocalizedStatefulWidget {
   final String datePickerFormControl;
   final bool readOnly;
   final bool isHeadOfHousehold; // <-- Add this
@@ -315,6 +317,7 @@ class CustomDigitDobPicker extends StatefulWidget {
 
   const CustomDigitDobPicker({
     super.key,
+    super.appLocalizations,
     required this.datePickerFormControl,
     this.readOnly = false,
     this.isHeadOfHousehold = false, // <-- Add this
@@ -340,12 +343,12 @@ class CustomDigitDobPicker extends StatefulWidget {
   State<CustomDigitDobPicker> createState() => _DigitDobPickerState();
 }
 
-class _DigitDobPickerState extends State<CustomDigitDobPicker> {
+class _DigitDobPickerState extends LocalizedState<CustomDigitDobPicker> {
   final yearController = TextEditingController();
   final monthController = TextEditingController();
   DateTime? selectedDate;
-  late RegistrationDeliveryLocalization _localizations;
-  RegistrationDeliveryLocalization get localizations => _localizations;
+  // late RegistrationDeliveryLocalization _localizations;
+  // RegistrationDeliveryLocalization get localizations => _localizations;
 
   @override
   void initState() {
@@ -536,7 +539,7 @@ class _DigitDobPickerState extends State<CustomDigitDobPicker> {
                     }
                     if (control.hasError('ageLimit')) {
                       return Text(
-                        i18_local.householdDetails.ageValidationErrorMsg,
+                        localizations.translate(i18_local.householdDetails.ageValidationErrorMsg),
                         style: theme.textTheme.bodyMedium!.copyWith(
                           color: theme.colorTheme.alert.error,
                         ),
