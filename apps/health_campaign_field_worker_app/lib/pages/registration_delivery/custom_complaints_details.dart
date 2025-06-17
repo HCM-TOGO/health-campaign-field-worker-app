@@ -26,7 +26,6 @@ import '../../../widgets/localized.dart';
 import '../../utils/i18_key_constants.dart' as i18_local;
 import '../../utils/upper_case.dart';
 
-
 @RoutePage()
 class CustomComplaintsDetailsPage extends LocalizedStatefulWidget {
   const CustomComplaintsDetailsPage({
@@ -296,8 +295,8 @@ class CustomComplaintsDetailsPageState
                           ),
                           child: DigitTextFormInput(
                             inputFormatters: [
-                                          UpperCaseTextFormatter(),
-                                        ],
+                              UpperCaseTextFormatter(),
+                            ],
                             isRequired: true,
                             readOnly: true,
                             initialValue:
@@ -405,8 +404,8 @@ class CustomComplaintsDetailsPageState
                                 isRequired: true,
                                 child: DigitTextFormInput(
                                   inputFormatters: [
-                                          UpperCaseTextFormatter(),
-                                        ],
+                                    UpperCaseTextFormatter(),
+                                  ],
                                   readOnly: (isRaisedForSelf)
                                       ? (field.value == null ||
                                               field.value.isEmpty)
@@ -484,8 +483,8 @@ class CustomComplaintsDetailsPageState
                                 ),
                                 child: DigitTextFormInput(
                                   inputFormatters: [
-                                          UpperCaseTextFormatter(),
-                                        ],
+                                    UpperCaseTextFormatter(),
+                                  ],
                                   errorMessage: field.errorText,
                                   initialValue: field.value,
                                   onChange: (value) => form
@@ -554,7 +553,7 @@ class CustomComplaintsDetailsPageState
                                   isRequired: true,
                                   onChange: (value) => form
                                       .control(_complaintDescription)
-                                      .value = value,
+                                      .value = value.toUpperCase(),
                                 ),
                               );
                             }),
