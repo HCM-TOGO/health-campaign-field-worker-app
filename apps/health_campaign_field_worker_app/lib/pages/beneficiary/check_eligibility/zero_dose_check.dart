@@ -403,12 +403,6 @@ class ZeroDoseCheckPageState extends LocalizedState<ZeroDoseCheckPage> {
                                           ),
                                         ),
                                       );
-                                  final projectBeneficiaryClientReferenceId =
-                                      context
-                                          .read<HouseholdOverviewBloc>()
-                                          .state
-                                          .selectedIndividual
-                                          ?.clientReferenceId;
                                   final currentCycle =
                                                   RegistrationDeliverySingleton()
                                                       .projectType
@@ -429,7 +423,7 @@ class ZeroDoseCheckPageState extends LocalizedState<ZeroDoseCheckPage> {
                                           widget.eligibilityAssessmentType,
                                       isChecklistAssessmentDone:
                                           widget.isChecklistAssessmentDone,
-                                      projectBeneficiaryClientReferenceId: projectBeneficiaryClientReferenceId,
+                                      projectBeneficiaryClientReferenceId: widget.projectBeneficiaryClientReferenceId,
                                       individual: widget.individual,
                                       task: widget.task,
                                       hasSideEffects: widget.hasSideEffects!,

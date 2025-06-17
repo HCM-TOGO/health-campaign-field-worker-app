@@ -210,6 +210,7 @@ class CustomReferBeneficiarySMCPageState
                                             widget
                                                 .projectBeneficiaryClientRefId,
                                         referrerId: context.loggedInUserUuid,
+                                        recipientType: "STAFF",
                                         reasons: [reason],
                                         tenantId: envConfig.variables.tenantId,
                                         rowVersion: 1,

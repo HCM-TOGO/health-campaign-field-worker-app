@@ -572,11 +572,7 @@ class _VaccineSelectionPageState extends LocalizedState<VaccineSelectionPage> {
                                         List<String?> ineligibilityReasons = [];
                                         ineligibilityReasons.add(
                                             "CHILD_AGE_LESS_THAN_3_MONTHS");
-                                        context
-                                            .read<DeliverInterventionBloc>()
-                                            .add(
-                                              DeliverInterventionSubmitEvent(
-                                                task: TaskModel(
+                                        TaskModel task = TaskModel(
                                                   projectBeneficiaryClientReferenceId:
                                                       widget
                                                           .projectBeneficiaryClientReferenceId,
@@ -662,7 +658,12 @@ class _VaccineSelectionPageState extends LocalizedState<VaccineSelectionPage> {
                                                         clientReferenceId,
                                                     id: null,
                                                   ),
-                                                ),
+                                                );
+                                        context
+                                            .read<DeliverInterventionBloc>()
+                                            .add(
+                                              DeliverInterventionSubmitEvent(
+                                                task: task,
                                                 isEditing: false,
                                                 boundaryModel: context.boundary,
                                                 navigateToSummary: false,
@@ -673,6 +674,19 @@ class _VaccineSelectionPageState extends LocalizedState<VaccineSelectionPage> {
                                                     .householdMemberWrapper,
                                               ),
                                             );
+                                        final reloadState = context
+                                            .read<HouseholdOverviewBloc>();
+
+                                        reloadState.add(
+                                          HouseholdOverviewReloadEvent(
+                                            projectId:
+                                                RegistrationDeliverySingleton()
+                                                    .projectId!,
+                                            projectBeneficiaryType:
+                                                RegistrationDeliverySingleton()
+                                                    .beneficiaryType!,
+                                          ),
+                                        );
                                         final searchBloc = context
                                             .read<SearchHouseholdsBloc>();
                                         searchBloc.add(
