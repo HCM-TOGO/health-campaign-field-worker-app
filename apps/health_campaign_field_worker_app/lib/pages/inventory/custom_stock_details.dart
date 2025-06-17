@@ -1662,7 +1662,7 @@ class CustomStockDetailsPageState
                                         ],
                                         keyboardType: const TextInputType
                                             .numberWithOptions(
-                                          decimal: false,
+                                          decimal: true,
                                         ),
                                         type: InputType.text,
                                         label: localizations.translate(
@@ -1679,11 +1679,13 @@ class CustomStockDetailsPageState
                                     builder: (field) {
                                       return InputField(
                                         inputFormatters: [
-                                          UpperCaseTextFormatter(),
+                                          FilteringTextInputFormatter
+                                              .digitsOnly, // This is key
+                                          // UpperCaseTextFormatter(), // Remove this if you only want numbers
                                         ],
                                         keyboardType: const TextInputType
                                             .numberWithOptions(
-                                          decimal: true,
+                                          decimal: false,
                                         ),
                                         type: InputType.text,
                                         label: localizations.translate(
