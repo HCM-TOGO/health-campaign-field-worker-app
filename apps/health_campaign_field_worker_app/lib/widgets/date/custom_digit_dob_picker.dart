@@ -289,9 +289,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:intl/intl.dart';
 import 'package:reactive_forms/reactive_forms.dart';
-import 'package:registration_delivery/blocs/app_localization.dart';
 import '../localized.dart';
-import 'package:registration_delivery/utils/i18_key_constants.dart' as i18;
 import '../../utils/i18_key_constants.dart' as i18_local;
 
 class CustomDigitDobPicker extends LocalizedStatefulWidget {
@@ -505,7 +503,9 @@ class _DigitDobPickerState extends LocalizedState<CustomDigitDobPicker> {
                           prefixTextStyle: textTheme.bodyS.copyWith(
                             color: theme.colorTheme.text.secondary,
                           ),
-                          prefixText: widget.monthsHintLabel,
+                          // prefixText: widget.monthsHintLabel,
+                          prefixText: localizations
+                            .translate(i18_local.individualDetails.monthsHintText),
                           maxLength: 3,
                           controller: monthController,
                           inputFormatters: [
