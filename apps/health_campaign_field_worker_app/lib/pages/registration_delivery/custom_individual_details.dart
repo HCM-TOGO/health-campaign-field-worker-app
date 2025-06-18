@@ -79,7 +79,9 @@ class CustomIndividualDetailsPageState
   bool isAddIndividual = false;
   bool isBeneficaryRegistration = false;
   String? yesNoValue;
-  bool get isRelocated => yesNoValue == localizations.translate(i18_local.householdDetails.yesLabelText);
+  bool get isRelocated =>
+      yesNoValue ==
+      localizations.translate(i18_local.householdDetails.yesLabelText);
   final RegExp uuidRegex = RegExp(
       r'^[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{12}$');
   final trainingRegex = RegExp(r'^cps-f\d{5}$');
@@ -144,7 +146,8 @@ class CustomIndividualDetailsPageState
     DateTime before150Years = DateTime(now.year - 150, now.month, now.day);
     DateTime lastDate = DateTime(now.year, now.month - 3, now.day);
     DateTime firstDate = DateTime(now.year, now.month - 59, now.day);
-    yesNoValue ??= localizations.translate(i18_local.householdDetails.noLabelText);
+    yesNoValue ??=
+        localizations.translate(i18_local.householdDetails.noLabelText);
 
     final textTheme = theme.digitTextTheme(context);
 
@@ -381,7 +384,10 @@ class CustomIndividualDetailsPageState
                                       scannerBloc.state.qrCodes.isNotEmpty
                                           ? scannerBloc.state.qrCodes.first
                                           : null;
-                                  if (tag != null && !uuidRegex.hasMatch(tag) && !trainingRegex.hasMatch(tag) && !productionRegex.hasMatch(tag)) {
+                                  if (tag != null &&
+                                      !uuidRegex.hasMatch(tag) &&
+                                      !trainingRegex.hasMatch(tag) &&
+                                      !productionRegex.hasMatch(tag)) {
                                     Toast.showToast(
                                       context,
                                       type: ToastType.error,
@@ -462,8 +468,9 @@ class CustomIndividualDetailsPageState
                                     if (scannerBloc.state.qrCodes.isNotEmpty &&
                                         !uuidRegex.hasMatch(
                                             scannerBloc.state.qrCodes.first) &&
-                                        !productionRegex.hasMatch(scannerBloc.state.qrCodes.first) && 
-                                            !trainingRegex.hasMatch(
+                                        !productionRegex.hasMatch(
+                                            scannerBloc.state.qrCodes.first) &&
+                                        !trainingRegex.hasMatch(
                                             scannerBloc.state.qrCodes.first)) {
                                       Toast.showToast(
                                         context,
@@ -577,8 +584,8 @@ class CustomIndividualDetailsPageState
                                   ),
                                   child: DigitTextFormInput(
                                     inputFormatters: [
-                                          UpperCaseTextFormatter(),
-                                        ],
+                                      UpperCaseTextFormatter(),
+                                    ],
                                     initialValue:
                                         form.control(_individualNameKey).value,
                                     onChange: (value) {
@@ -852,7 +859,17 @@ class CustomIndividualDetailsPageState
                             size: DigitButtonSize.large,
                             isDisabled: false,
                             onPressed: () {
-                              context.router.push(QRScannerRoute());
+                              Navigator.of(context).push(
+                                MaterialPageRoute(
+                                  builder: (context) => const DigitScannerPage(
+                                    quantity: 5,
+                                    isGS1code: false,
+                                    singleValue: false,
+                                  ),
+                                  settings:
+                                      const RouteSettings(name: '/qr-scanner'),
+                                ),
+                              );
                             },
                           ),
                         if (!widget.isHeadOfHousehold)
@@ -879,10 +896,12 @@ class CustomIndividualDetailsPageState
                                     Expanded(
                                       child: RadioListTile<String>(
                                         title: Text(localizations.translate(
-                                          i18_local.householdDetails.capitalYesLabelText,
+                                          i18_local.householdDetails
+                                              .capitalYesLabelText,
                                         )),
                                         value: localizations.translate(
-                                          i18_local.householdDetails.yesLabelText,
+                                          i18_local
+                                              .householdDetails.yesLabelText,
                                         ),
                                         groupValue: yesNoValue,
                                         onChanged: (value) {
@@ -897,10 +916,12 @@ class CustomIndividualDetailsPageState
                                     Expanded(
                                       child: RadioListTile<String>(
                                         title: Text(localizations.translate(
-                                          i18_local.householdDetails.capitalNoLabelText,
+                                          i18_local.householdDetails
+                                              .capitalNoLabelText,
                                         )),
                                         value: localizations.translate(
-                                          i18_local.householdDetails.noLabelText,
+                                          i18_local
+                                              .householdDetails.noLabelText,
                                         ),
                                         groupValue: yesNoValue,
                                         onChanged: (value) {
@@ -919,13 +940,24 @@ class CustomIndividualDetailsPageState
                         if (!widget.isHeadOfHousehold && isRelocated)
                           DigitButton(
                             capitalizeLetters: false,
-                            label: localizations.translate(i18_local.householdDetails.previousBeneficiaryQRCode),
+                            label: localizations.translate(i18_local
+                                .householdDetails.previousBeneficiaryQRCode),
                             mainAxisSize: MainAxisSize.max,
                             type: DigitButtonType.secondary,
                             size: DigitButtonSize.large,
                             isDisabled: false,
                             onPressed: () {
-                              context.router.push(QRScannerRoute());
+                              Navigator.of(context).push(
+                                MaterialPageRoute(
+                                  builder: (context) => const DigitScannerPage(
+                                    quantity: 5,
+                                    isGS1code: false,
+                                    singleValue: false,
+                                  ),
+                                  settings:
+                                      const RouteSettings(name: '/qr-scanner'),
+                                ),
+                              );
                             },
                           ),
                         individualDetailsShowcaseData.mobile.buildWith(
