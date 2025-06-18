@@ -405,7 +405,8 @@ class CustomHouseholdLocationPageState
                               ),
                               child: DigitTextFormInput(
                                 inputFormatters: [
-                                          UpperCaseTextFormatter()
+                                          UpperCaseTextFormatter(),
+                                          // FilteringTextInputFormatter.allow(RegExp(r'^[a-zA-Z0-9]*$'))
                                         ],
                                 errorMessage: field.errorText,
                                 onChange: (value) {
@@ -497,7 +498,7 @@ class CustomHouseholdLocationPageState
             (validator) => CustomValidator.requiredMin(validator)),
         Validators.maxLength(64),
         Validators.delegate((validator) =>
-            local_utils.CustomValidator.onlyAlphabetsAndDigits(validator)),
+            local_utils.CustomValidator.onlyAlphabetsAndDigitsNoSpaces(validator))
       ]),
       _postalCodeKey:
           FormControl<String>(value: addressModel?.pincode, validators: [
