@@ -25,6 +25,8 @@ import 'package:referral_reconciliation/utils/utils.dart';
 import 'package:referral_reconciliation/widgets/localized.dart';
 import 'package:referral_reconciliation/widgets/view_referral_card.dart';
 
+import '../../utils/upper_case.dart';
+
 @RoutePage()
 class CustomSearchReferralReconciliationsPage extends LocalizedStatefulWidget {
   const CustomSearchReferralReconciliationsPage({
@@ -119,6 +121,9 @@ class _CustomSearchReferralReconciliationsPageState
                                       Column(
                                         children: [
                                           DigitSearchBar(
+                                            inputFormatters: [
+                                              UpperCaseTextFormatter()
+                                            ],
                                             controller: searchController,
                                             hintText: localizations.translate(
                                               i18_local.searchBeneficiary

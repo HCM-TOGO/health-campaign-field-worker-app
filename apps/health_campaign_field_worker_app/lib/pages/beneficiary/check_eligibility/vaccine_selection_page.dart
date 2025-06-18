@@ -219,12 +219,13 @@ class _VaccineSelectionPageState extends LocalizedState<VaccineSelectionPage> {
                                     for (int i = 0;
                                         i < initialAttributes!.length;
                                         i++) {
+                                      if(itemsAttributes?[i].dataType == 'SingleValueList' ) {
+                                        controller[i].text = 'NOT_SELECTED';
+                                      }
                                       if (itemsAttributes?[i].required ==
                                               true &&
                                           ((itemsAttributes?[i].dataType ==
                                                       'SingleValueList' &&
-                                                  visibleChecklistIndexes
-                                                      .any((e) => e == i) &&
                                                   (controller[i].text == '')) ||
                                               (itemsAttributes?[i].dataType !=
                                                       'SingleValueList' &&
