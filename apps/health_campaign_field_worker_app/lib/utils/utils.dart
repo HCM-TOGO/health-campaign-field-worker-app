@@ -116,6 +116,18 @@ class CustomValidator {
     return regExp.hasMatch(value) ? null : {'onlyAlphabetsAndDigits': true};
   }
 
+  static Map<String, dynamic>? onlyAlphabetsAndDigitsNoSpaces(
+      AbstractControl<dynamic> control) {
+    final value = control.value?.toString().trim();
+
+    if (value == null || value.isEmpty) return null;
+
+    final pattern = r'^[a-zA-Z0-9]*$'; // Allows A-Z, a-z, 0-9
+    final regExp = RegExp(pattern);
+
+    return regExp.hasMatch(value) ? null : {'onlyAlphabetsAndDigits': true};
+  }
+
   static Map<String, dynamic>? validStockCount(
     AbstractControl<dynamic> control,
   ) {
