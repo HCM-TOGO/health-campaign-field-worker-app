@@ -104,6 +104,7 @@ class Constants {
   static const String stateBoundaryLevel = 'Region';
   static const String stateFacility = 'Regional Facility';
   static const String lgaFacility = 'District Facility';
+  static const String countryBoundaryLevel = 'Country';
   static const int mlPerBottle = 30;
   static const int apiCallLimit = 1000;
   static const String pipeSeparator = '||';
