@@ -363,47 +363,54 @@ class ZeroDoseCheckPageState extends LocalizedState<ZeroDoseCheckPage> {
                                   context.read<ServiceBloc>().add(
                                         ServiceCreateEvent(
                                           serviceModel: ServiceModel(
-                                            createdAt: DigitDateUtils
-                                                .getDateFromTimestamp(
-                                              DateTime.now()
-                                                  .toLocal()
-                                                  .millisecondsSinceEpoch,
-                                              dateFormat: Constants
-                                                  .checklistViewDateFormat,
-                                            ),
-                                            tenantId: selectedServiceDefinition!
-                                                .tenantId,
-                                            clientId: referenceId,
-                                            serviceDefId:
-                                                selectedServiceDefinition?.id,
-                                            attributes: attributes,
-                                            rowVersion: 1,
-                                            accountId: context.projectId,
-                                            auditDetails: AuditDetails(
-                                              createdBy:
-                                                  context.loggedInUserUuid,
-                                              createdTime: DateTime.now()
-                                                  .millisecondsSinceEpoch,
-                                            ),
-                                            clientAuditDetails:
-                                                ClientAuditDetails(
-                                              createdBy:
-                                                  context.loggedInUserUuid,
-                                              createdTime: context
-                                                  .millisecondsSinceEpoch(),
-                                              lastModifiedBy:
-                                                  context.loggedInUserUuid,
-                                              lastModifiedTime: context
-                                                  .millisecondsSinceEpoch(),
-                                            ),
-                                            additionalDetails: {
-                                              "boundaryCode":
-                                                  context.boundary.code
-                                            },
-                                          ),
+                                              createdAt: DigitDateUtils
+                                                  .getDateFromTimestamp(
+                                                DateTime.now()
+                                                    .toLocal()
+                                                    .millisecondsSinceEpoch,
+                                                dateFormat: Constants
+                                                    .checklistViewDateFormat,
+                                              ),
+                                              tenantId:
+                                                  selectedServiceDefinition!
+                                                      .tenantId,
+                                              clientId: referenceId,
+                                              serviceDefId:
+                                                  selectedServiceDefinition?.id,
+                                              attributes: attributes,
+                                              rowVersion: 1,
+                                              accountId: context.projectId,
+                                              auditDetails: AuditDetails(
+                                                createdBy:
+                                                    context.loggedInUserUuid,
+                                                createdTime: DateTime.now()
+                                                    .millisecondsSinceEpoch,
+                                              ),
+                                              clientAuditDetails:
+                                                  ClientAuditDetails(
+                                                createdBy:
+                                                    context.loggedInUserUuid,
+                                                createdTime: context
+                                                    .millisecondsSinceEpoch(),
+                                                lastModifiedBy:
+                                                    context.loggedInUserUuid,
+                                                lastModifiedTime: context
+                                                    .millisecondsSinceEpoch(),
+                                              ),
+                                              additionalFields:
+                                                  ServiceAdditionalFields(
+                                                version: 1,
+                                                fields: [
+                                                  AdditionalField(
+                                                      'boundaryCode',
+                                                      context.boundary.code),
+                                                ],
+                                              )),
                                         ),
                                       );
-                                  final projectBeneficiaryClientReferenceId = widget.projectBeneficiaryClientReferenceId ?? relatedClientRefId;
+                                  final projectBeneficiaryClientReferenceId =
+                                      widget.projectBeneficiaryClientReferenceId ??
+                                          relatedClientRefId;
                                   final currentCycle =
                                       RegistrationDeliverySingleton()
                                           .projectType
@@ -425,7 +432,7 @@ class ZeroDoseCheckPageState extends LocalizedState<ZeroDoseCheckPage> {
                                           widget.eligibilityAssessmentType,
                                       isChecklistAssessmentDone:
                                           widget.isChecklistAssessmentDone,
-                                      projectBeneficiaryClientReferenceId: 
+                                      projectBeneficiaryClientReferenceId:
                                           projectBeneficiaryClientReferenceId,
                                       individual: widget.individual,
                                       task: widget.task,
@@ -516,48 +523,54 @@ class ZeroDoseCheckPageState extends LocalizedState<ZeroDoseCheckPage> {
                                           context.read<ServiceBloc>().add(
                                                 ServiceCreateEvent(
                                                   serviceModel: ServiceModel(
-                                                    createdAt: DigitDateUtils
-                                                        .getDateFromTimestamp(
-                                                      DateTime.now()
-                                                          .toLocal()
-                                                          .millisecondsSinceEpoch,
-                                                      dateFormat: Constants
-                                                          .checklistViewDateFormat,
-                                                    ),
-                                                    tenantId:
-                                                        selectedServiceDefinition!
-                                                            .tenantId,
-                                                    clientId: referenceId,
-                                                    serviceDefId:
-                                                        selectedServiceDefinition
-                                                            ?.id,
-                                                    attributes: attributes,
-                                                    rowVersion: 1,
-                                                    accountId:
-                                                        context.projectId,
-                                                    auditDetails: AuditDetails(
-                                                      createdBy: context
-                                                          .loggedInUserUuid,
-                                                      createdTime: DateTime
-                                                              .now()
-                                                          .millisecondsSinceEpoch,
-                                                    ),
-                                                    clientAuditDetails:
-                                                        ClientAuditDetails(
-                                                      createdBy: context
-                                                          .loggedInUserUuid,
-                                                      createdTime: context
-                                                          .millisecondsSinceEpoch(),
-                                                      lastModifiedBy: context
-                                                          .loggedInUserUuid,
-                                                      lastModifiedTime: context
-                                                          .millisecondsSinceEpoch(),
-                                                    ),
-                                                    additionalDetails: {
-                                                      "boundaryCode":
-                                                          context.boundary.code
-                                                    },
-                                                  ),
+                                                      createdAt: DigitDateUtils
+                                                          .getDateFromTimestamp(
+                                                        DateTime.now()
+                                                            .toLocal()
+                                                            .millisecondsSinceEpoch,
+                                                        dateFormat: Constants
+                                                            .checklistViewDateFormat,
+                                                      ),
+                                                      tenantId:
+                                                          selectedServiceDefinition!
+                                                              .tenantId,
+                                                      clientId: referenceId,
+                                                      serviceDefId:
+                                                          selectedServiceDefinition
+                                                              ?.id,
+                                                      attributes: attributes,
+                                                      rowVersion: 1,
+                                                      accountId:
+                                                          context.projectId,
+                                                      auditDetails:
+                                                          AuditDetails(
+                                                        createdBy: context
+                                                            .loggedInUserUuid,
+                                                        createdTime: DateTime
+                                                                .now()
+                                                            .millisecondsSinceEpoch,
+                                                      ),
+                                                      clientAuditDetails:
+                                                          ClientAuditDetails(
+                                                        createdBy: context
+                                                            .loggedInUserUuid,
+                                                        createdTime: context
+                                                            .millisecondsSinceEpoch(),
+                                                        lastModifiedBy: context
+                                                            .loggedInUserUuid,
+                                                        lastModifiedTime: context
+                                                            .millisecondsSinceEpoch(),
+                                                      ),
+                                                      additionalFields:
+                                                          ServiceAdditionalFields(
+                                                        version: 1,
+                                                        fields: [
+                                                          AdditionalField(
+                                                              'boundaryCode',
+                                                              context.boundary
+                                                                  .code),
+                                                        ],
+                                                      )),
                                                 ),
                                               );
                                           Navigator.of(

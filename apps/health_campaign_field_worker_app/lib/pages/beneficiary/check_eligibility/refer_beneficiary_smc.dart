@@ -211,7 +211,7 @@ class CustomReferBeneficiarySMCPageState
                                                 .projectBeneficiaryClientRefId,
                                         referrerId: context.loggedInUserUuid,
                                         recipientId: healthFacilities.first.id,
-                                        recipientType: "STAFF",
+                                        recipientType: "FACILITY",
                                         reasons: [reason],
                                         tenantId: envConfig.variables.tenantId,
                                         rowVersion: 1,
