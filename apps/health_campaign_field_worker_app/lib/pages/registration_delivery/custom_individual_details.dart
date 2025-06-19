@@ -78,10 +78,11 @@ class CustomIndividualDetailsPageState
   bool isEditIndividual = false;
   bool isAddIndividual = false;
   bool isBeneficaryRegistration = false;
+  final String yes = "yes";
+  final String no = "no";
   String? yesNoValue;
   bool get isRelocated =>
-      yesNoValue ==
-      localizations.translate(i18_local.householdDetails.yesLabelText);
+      yesNoValue == yes;
   final RegExp uuidRegex = RegExp(
       r'^[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{12}$');
   final trainingRegex = RegExp(r'^cps-f\d{5}$');
@@ -146,8 +147,7 @@ class CustomIndividualDetailsPageState
     DateTime before150Years = DateTime(now.year - 150, now.month, now.day);
     DateTime lastDate = DateTime(now.year, now.month - 3, now.day);
     DateTime firstDate = DateTime(now.year, now.month - 59, now.day);
-    yesNoValue ??=
-        localizations.translate(i18_local.householdDetails.noLabelText);
+    yesNoValue ??= no;
 
     final textTheme = theme.digitTextTheme(context);
 
@@ -792,7 +792,7 @@ class CustomIndividualDetailsPageState
                                   .yearsAndMonthsErrorTextUpdate,
                             ),
                             isHeadOfHousehold: widget.isHeadOfHousehold,
-                            initialDate: before150Years,
+                            initialDate: widget.isHeadOfHousehold ? before150Years : firstDate,
                             requiredErrMsg: localizations.translate(
                               i18.common.corecommonRequired,
                             ),
@@ -899,10 +899,7 @@ class CustomIndividualDetailsPageState
                                           i18_local.householdDetails
                                               .capitalYesLabelText,
                                         )),
-                                        value: localizations.translate(
-                                          i18_local
-                                              .householdDetails.yesLabelText,
-                                        ),
+                                        value: yes,
                                         groupValue: yesNoValue,
                                         onChanged: (value) {
                                           setState(() {
@@ -919,10 +916,7 @@ class CustomIndividualDetailsPageState
                                           i18_local.householdDetails
                                               .capitalNoLabelText,
                                         )),
-                                        value: localizations.translate(
-                                          i18_local
-                                              .householdDetails.noLabelText,
-                                        ),
+                                        value: no,
                                         groupValue: yesNoValue,
                                         onChanged: (value) {
                                           setState(() {

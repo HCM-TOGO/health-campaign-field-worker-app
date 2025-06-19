@@ -196,7 +196,7 @@ class _VaccineSelectionPageState extends LocalizedState<VaccineSelectionPage> {
                           return ScrollableContent(
                             header: const Column(children: [
                               CustomBackNavigationHelpHeaderWidget(
-                                showHelp: true,
+                                showHelp: false,
                               )
                             ]),
                             enableFixedDigitButton: true,
@@ -219,7 +219,8 @@ class _VaccineSelectionPageState extends LocalizedState<VaccineSelectionPage> {
                                     for (int i = 0;
                                         i < initialAttributes!.length;
                                         i++) {
-                                      if(itemsAttributes?[i].dataType == 'SingleValueList' ) {
+                                      if (itemsAttributes?[i].dataType ==
+                                          'SingleValueList') {
                                         controller[i].text = 'NOT_SELECTED';
                                       }
                                       if (itemsAttributes?[i].required ==
@@ -364,52 +365,57 @@ class _VaccineSelectionPageState extends LocalizedState<VaccineSelectionPage> {
                                             context.read<ServiceBloc>().add(
                                                   ServiceCreateEvent(
                                                     serviceModel: ServiceModel(
-                                                      createdAt: DigitDateUtils
-                                                          .getDateFromTimestamp(
-                                                        DateTime.now()
-                                                            .toLocal()
-                                                            .millisecondsSinceEpoch,
-                                                        dateFormat: Constants
-                                                            .checklistViewDateFormat,
-                                                      ),
-                                                      tenantId:
-                                                          selectedServiceDefinition!
-                                                              .tenantId,
-                                                      clientId: referenceId,
-                                                      serviceDefId:
-                                                          selectedServiceDefinition
-                                                              ?.id,
-                                                      relatedClientReferenceId:
-                                                          widget
-                                                              .projectBeneficiaryClientReferenceId,
-                                                      attributes: attributes,
-                                                      rowVersion: 1,
-                                                      accountId:
-                                                          context.projectId,
-                                                      auditDetails:
-                                                          AuditDetails(
-                                                        createdBy: context
-                                                            .loggedInUserUuid,
-                                                        createdTime: DateTime
-                                                                .now()
-                                                            .millisecondsSinceEpoch,
-                                                      ),
-                                                      clientAuditDetails:
-                                                          ClientAuditDetails(
-                                                        createdBy: context
-                                                            .loggedInUserUuid,
-                                                        createdTime: context
-                                                            .millisecondsSinceEpoch(),
-                                                        lastModifiedBy: context
-                                                            .loggedInUserUuid,
-                                                        lastModifiedTime: context
-                                                            .millisecondsSinceEpoch(),
-                                                      ),
-                                                      additionalDetails: {
-                                                        "boundaryCode": context
-                                                            .boundary.code
-                                                      },
-                                                    ),
+                                                        createdAt: DigitDateUtils
+                                                            .getDateFromTimestamp(
+                                                          DateTime.now()
+                                                              .toLocal()
+                                                              .millisecondsSinceEpoch,
+                                                          dateFormat: Constants
+                                                              .checklistViewDateFormat,
+                                                        ),
+                                                        tenantId:
+                                                            selectedServiceDefinition!
+                                                                .tenantId,
+                                                        clientId: referenceId,
+                                                        serviceDefId:
+                                                            selectedServiceDefinition
+                                                                ?.id,
+                                                        relatedClientReferenceId:
+                                                            widget
+                                                                .projectBeneficiaryClientReferenceId,
+                                                        attributes: attributes,
+                                                        rowVersion: 1,
+                                                        accountId:
+                                                            context.projectId,
+                                                        auditDetails:
+                                                            AuditDetails(
+                                                          createdBy: context
+                                                              .loggedInUserUuid,
+                                                          createdTime: DateTime
+                                                                  .now()
+                                                              .millisecondsSinceEpoch,
+                                                        ),
+                                                        clientAuditDetails:
+                                                            ClientAuditDetails(
+                                                          createdBy: context
+                                                              .loggedInUserUuid,
+                                                          createdTime: context
+                                                              .millisecondsSinceEpoch(),
+                                                          lastModifiedBy: context
+                                                              .loggedInUserUuid,
+                                                          lastModifiedTime: context
+                                                              .millisecondsSinceEpoch(),
+                                                        ),
+                                                        additionalFields:
+                                                            ServiceAdditionalFields(
+                                                          version: 1,
+                                                          fields: [
+                                                            AdditionalField(
+                                                                'boundaryCode',
+                                                                context.boundary
+                                                                    .code),
+                                                          ],
+                                                        )),
                                                   ),
                                                 );
 
@@ -574,92 +580,85 @@ class _VaccineSelectionPageState extends LocalizedState<VaccineSelectionPage> {
                                         ineligibilityReasons.add(
                                             "CHILD_AGE_LESS_THAN_3_MONTHS");
                                         TaskModel task = TaskModel(
-                                                  projectBeneficiaryClientReferenceId:
-                                                      widget
-                                                          .projectBeneficiaryClientReferenceId,
-                                                  clientReferenceId:
-                                                      clientReferenceId,
-                                                  tenantId: envConfig
-                                                      .variables.tenantId,
-                                                  rowVersion: 1,
-                                                  auditDetails: AuditDetails(
-                                                    createdBy: context
-                                                        .loggedInUserUuid,
-                                                    createdTime: context
-                                                        .millisecondsSinceEpoch(),
-                                                  ),
-                                                  projectId: context.projectId,
-                                                  status: status_local.Status
-                                                      .beneficiaryInEligible
-                                                      .toValue(),
-                                                  clientAuditDetails:
-                                                      ClientAuditDetails(
-                                                    createdBy: context
-                                                        .loggedInUserUuid,
-                                                    createdTime: context
-                                                        .millisecondsSinceEpoch(),
-                                                    lastModifiedBy: context
-                                                        .loggedInUserUuid,
-                                                    lastModifiedTime: context
-                                                        .millisecondsSinceEpoch(),
-                                                  ),
-                                                  additionalFields:
-                                                      TaskAdditionalFields(
-                                                    version: 1,
-                                                    fields: [
-                                                      AdditionalField(
-                                                        AdditionalFieldsType
-                                                            .cycleIndex
-                                                            .toValue(),
-                                                        "0${context.selectedCycle?.id}",
-                                                      ),
-                                                      if (widget
-                                                              .hasSideEffects ==
-                                                          false) ...[
-                                                        AdditionalField(
-                                                          'ineligibleReasons',
-                                                          ineligibilityReasons
-                                                              .join(","),
-                                                        ),
-                                                        AdditionalField(
-                                                          'ageBelow3Months',
-                                                          true.toString(),
-                                                        ),
-                                                      ] else ...[
-                                                        AdditionalField(
-                                                            'ineligibleReasons',
-                                                            ["SIDE_EFFECTS"]
-                                                                .join(",")),
-                                                        AdditionalField(
-                                                            additional_fields_local
-                                                                .AdditionalFieldsType
-                                                                .hasSideEffects
-                                                                .toValue(),
-                                                            true.toString()),
-                                                      ],
-                                                      AdditionalField(
-                                                        additional_fields_local
-                                                            .AdditionalFieldsType
-                                                            .deliveryType
-                                                            .toValue(),
-                                                        EligibilityAssessmentStatus
-                                                            .smcDone.name,
-                                                      ),
-                                                      AdditionalField(
-                                                        'zeroDoseStatus',
-                                                        ZeroDoseStatus
-                                                            .done.name,
-                                                      ),
-                                                    ],
-                                                  ),
-                                                  address: widget.individual
-                                                      ?.address?.first
-                                                      .copyWith(
-                                                    relatedClientReferenceId:
-                                                        clientReferenceId,
-                                                    id: null,
-                                                  ),
-                                                );
+                                          projectBeneficiaryClientReferenceId:
+                                              widget
+                                                  .projectBeneficiaryClientReferenceId,
+                                          clientReferenceId: clientReferenceId,
+                                          tenantId:
+                                              envConfig.variables.tenantId,
+                                          rowVersion: 1,
+                                          auditDetails: AuditDetails(
+                                            createdBy: context.loggedInUserUuid,
+                                            createdTime: context
+                                                .millisecondsSinceEpoch(),
+                                          ),
+                                          projectId: context.projectId,
+                                          status: status_local
+                                              .Status.beneficiaryInEligible
+                                              .toValue(),
+                                          clientAuditDetails:
+                                              ClientAuditDetails(
+                                            createdBy: context.loggedInUserUuid,
+                                            createdTime: context
+                                                .millisecondsSinceEpoch(),
+                                            lastModifiedBy:
+                                                context.loggedInUserUuid,
+                                            lastModifiedTime: context
+                                                .millisecondsSinceEpoch(),
+                                          ),
+                                          additionalFields:
+                                              TaskAdditionalFields(
+                                            version: 1,
+                                            fields: [
+                                              AdditionalField(
+                                                AdditionalFieldsType.cycleIndex
+                                                    .toValue(),
+                                                "0${context.selectedCycle?.id}",
+                                              ),
+                                              if (widget.hasSideEffects ==
+                                                  false) ...[
+                                                AdditionalField(
+                                                  'ineligibleReasons',
+                                                  ineligibilityReasons
+                                                      .join(","),
+                                                ),
+                                                AdditionalField(
+                                                  'ageBelow3Months',
+                                                  true.toString(),
+                                                ),
+                                              ] else ...[
+                                                AdditionalField(
+                                                    'ineligibleReasons',
+                                                    ["SIDE_EFFECTS"].join(",")),
+                                                AdditionalField(
+                                                    additional_fields_local
+                                                        .AdditionalFieldsType
+                                                        .hasSideEffects
+                                                        .toValue(),
+                                                    true.toString()),
+                                              ],
+                                              AdditionalField(
+                                                additional_fields_local
+                                                    .AdditionalFieldsType
+                                                    .deliveryType
+                                                    .toValue(),
+                                                EligibilityAssessmentStatus
+                                                    .smcDone.name,
+                                              ),
+                                              AdditionalField(
+                                                'zeroDoseStatus',
+                                                ZeroDoseStatus.done.name,
+                                              ),
+                                            ],
+                                          ),
+                                          address: widget
+                                              .individual?.address?.first
+                                              .copyWith(
+                                            relatedClientReferenceId:
+                                                clientReferenceId,
+                                            id: null,
+                                          ),
+                                        );
                                         context
                                             .read<DeliverInterventionBloc>()
                                             .add(

@@ -166,32 +166,21 @@ class _EligibilityChecklistViewPage
                                 return;
                               }
                               final itemsAttributes = initialAttributes;
-                              final parentIndexes = <int>[];
-                              for (int i = 0;
-                                  i < initialAttributes!.length;
-                                  i++) {
-                                if (initialAttributes![i]
-                                        .code!
-                                        .split('.')
-                                        .length ==
-                                    1) {
-                                  parentIndexes.add(i);
-                                }
-                              }
-
-                              for (int i in parentIndexes) {
-                                if (itemsAttributes?[i].required == true &&
-                                    ((itemsAttributes?[i].dataType ==
-                                                'SingleValueList' &&
-                                            visibleChecklistIndexes
-                                                .any((e) => e == i) &&
-                                            (controller[i].text == '')) ||
-                                        (itemsAttributes?[i].dataType !=
-                                                'SingleValueList' &&
-                                            (controller[i].text == '' &&
-                                                !(widget.referralClientRefId !=
-                                                    null))))) {
-                                  return;
+                              if (itemsAttributes != null) {
+                                for (int i = 0; i < itemsAttributes.length; i++) {
+                                  if (itemsAttributes[i].required == true &&
+                                      ((itemsAttributes[i].dataType ==
+                                                  'SingleValueList' &&
+                                              visibleChecklistIndexes
+                                                  .any((e) => e == i) &&
+                                              (controller[i].text == '')) ||
+                                          (itemsAttributes[i].dataType !=
+                                                  'SingleValueList' &&
+                                                   visibleChecklistIndexes
+                                                  .any((e) => e == i) &&
+                                              (controller[i].text == '')))) {
+                                    return;
+                                  }
                                 }
                               }
 
@@ -407,10 +396,18 @@ class _EligibilityChecklistViewPage
                                                   lastModifiedTime: context
                                                       .millisecondsSinceEpoch(),
                                                 ),
-                                                additionalDetails: {
-                                                  "boundaryCode":
-                                                      context.boundary.code
-                                                },
+                                                // additionalDetails: {
+                                                //   "boundaryCode":
+                                                //       context.boundary.code
+                                                // },
+                                                additionalFields: 
+                                                  ServiceAdditionalFields(
+                                                    version: 1,
+                                                    fields: [
+                                                      AdditionalField('boundaryCode', context.boundary.code),
+                                                    ],
+                                                  )
+                                                
                                               ),
                                             ),
                                           );
