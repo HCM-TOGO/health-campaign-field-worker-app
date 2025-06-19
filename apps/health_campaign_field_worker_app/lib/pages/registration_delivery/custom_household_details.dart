@@ -387,7 +387,7 @@ class CustomHouseHoldDetailsPageState
                                   i18.householdDetails.dateOfRegistrationLabel,
                                 ),
                                 child: AbsorbPointer(
-                                  absorbing: true,
+                                  absorbing: false,
                                   child: DigitDateFormInput(
                                     readOnly: false,
                                     confirmText: localizations.translate(
