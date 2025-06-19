@@ -400,10 +400,14 @@ class _DigitDobPickerState extends LocalizedState<CustomDigitDobPicker> {
       Toast.showToast(context,
           type: ToastType.error,
           message: localizations
-              .translate(i18_local.householdDetails.monthsValidationErrorMsg)
-          );
+              .translate(i18_local.householdDetails.monthsValidationErrorMsg));
       WidgetsBinding.instance.addPostFrameCallback((_) {
         monthController.text = '';
+        // Clear selectedDate here
+        setState(() {
+          selectedDate = null;
+        });
+        _updateFormControl(null); // Also clear the form control
       });
     }
 
@@ -504,8 +508,8 @@ class _DigitDobPickerState extends LocalizedState<CustomDigitDobPicker> {
                             color: theme.colorTheme.text.secondary,
                           ),
                           // prefixText: widget.monthsHintLabel,
-                          prefixText: localizations
-                            .translate(i18_local.individualDetails.monthsHintText),
+                          prefixText: localizations.translate(
+                              i18_local.individualDetails.monthsHintText),
                           maxLength: 3,
                           controller: monthController,
                           inputFormatters: [
@@ -539,7 +543,8 @@ class _DigitDobPickerState extends LocalizedState<CustomDigitDobPicker> {
                     }
                     if (control.hasError('ageLimit')) {
                       return Text(
-                        localizations.translate(i18_local.householdDetails.ageValidationErrorMsg),
+                        localizations.translate(
+                            i18_local.householdDetails.ageValidationErrorMsg),
                         style: theme.textTheme.bodyMedium!.copyWith(
                           color: theme.colorTheme.alert.error,
                         ),
