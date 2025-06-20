@@ -4,6 +4,7 @@ import 'package:digit_ui_components/digit_components.dart';
 import 'package:digit_ui_components/theme/digit_extended_theme.dart';
 import 'package:digit_ui_components/widgets/molecules/digit_card.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:health_campaign_field_worker_app/widgets/custom_back_navigation.dart';
 import 'package:reactive_forms/reactive_forms.dart';
@@ -253,8 +254,8 @@ class _CustomReferralFacilityPageState
                                                       ),
                                                       child: DigitTextFormInput(
                                                         inputFormatters: [
-                                          UpperCaseTextFormatter(),
-                                        ],
+                                                          UpperCaseTextFormatter(),
+                                                        ],
                                                         readOnly: true,
                                                         initialValue:
                                                             field.value,
@@ -350,9 +351,9 @@ class _CustomReferralFacilityPageState
                                                           ),
                                                           child:
                                                               DigitTextFormInput(
-                                                                inputFormatters: [
-                                          UpperCaseTextFormatter(),
-                                        ],
+                                                            inputFormatters: [
+                                                              UpperCaseTextFormatter(),
+                                                            ],
                                                             onChange: (val) => {
                                                               form
                                                                   .control(
@@ -387,9 +388,9 @@ class _CustomReferralFacilityPageState
                                                         ),
                                                         child:
                                                             DigitTextFormInput(
-                                                              inputFormatters: [
-                                          UpperCaseTextFormatter(),
-                                        ],
+                                                          inputFormatters: [
+                                                            UpperCaseTextFormatter(),
+                                                          ],
                                                           onChange: (val) => {
                                                             form
                                                                 .control(
@@ -419,9 +420,13 @@ class _CustomReferralFacilityPageState
                                                         ),
                                                         child:
                                                             DigitTextFormInput(
-                                                              inputFormatters: [
-                                          UpperCaseTextFormatter(),
-                                        ],
+                                                          inputFormatters: [
+                                                            UpperCaseTextFormatter(),
+                                                            FilteringTextInputFormatter
+                                                                .allow(RegExp(
+                                                              r"[a-zA-Z0-9\s\-.,\/!@#\$%\^&\*\(\)]",
+                                                            )),
+                                                          ],
                                                           onChange: (val) => {
                                                             form
                                                                 .control(
@@ -543,8 +548,7 @@ class _CustomReferralFacilityPageState
                       ).first.facilityId}',
                 )
               : localizations.translate(
-                  'FAC_${facilities.where((e) => e.boundaryCode ==
-                   ReferralReconSingleton().boundary?.boundaryCode).first.facilityId}',
+                  'FAC_${facilities.where((e) => e.boundaryCode == ReferralReconSingleton().boundary?.boundaryCode).first.facilityId}',
                 ),
         ),
         validators: [Validators.required],
