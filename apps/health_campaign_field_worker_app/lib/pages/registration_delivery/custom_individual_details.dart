@@ -81,8 +81,7 @@ class CustomIndividualDetailsPageState
   final String yes = "yes";
   final String no = "no";
   String? yesNoValue;
-  bool get isRelocated =>
-      yesNoValue == yes;
+  bool get isRelocated => yesNoValue == yes;
   final RegExp uuidRegex = RegExp(
       r'^[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{12}$');
   final trainingRegex = RegExp(r'^cps-f\d{5}$');
@@ -792,7 +791,9 @@ class CustomIndividualDetailsPageState
                                   .yearsAndMonthsErrorTextUpdate,
                             ),
                             isHeadOfHousehold: widget.isHeadOfHousehold,
-                            initialDate: widget.isHeadOfHousehold ? before150Years : firstDate,
+                            initialDate: widget.isHeadOfHousehold
+                                ? before150Years
+                                : firstDate,
                             requiredErrMsg: localizations.translate(
                               i18.common.corecommonRequired,
                             ),
@@ -968,6 +969,10 @@ class CustomIndividualDetailsPageState
                                     .translate(i18_local.individualDetails
                                         .mobileNumberLengthValidationMessage)
                                     .replaceAll('{}', '8'),
+                                'startsWith7or9': (object) =>
+                                    localizations.translate(i18_local
+                                        .individualDetails
+                                        .mobileNumberStartWith7or9ValidationMessage),
                               },
                               builder: (field) => LabeledField(
                                 label: localizations.translate(
@@ -1178,6 +1183,8 @@ class CustomIndividualDetailsPageState
         Validators.delegate((validator) =>
             local_utils.CustomValidator.validMobileNumber(validator)),
         Validators.maxLength(8),
+        Validators.delegate((validator) =>
+            local_utils.CustomValidator.startsWith7or9(validator)),
         // Validators.required,
       ]),
     });

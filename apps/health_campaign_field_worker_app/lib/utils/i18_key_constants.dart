@@ -1441,6 +1441,9 @@ class IndividualDetails {
   String get mobileNumberLengthValidationMessage =>
       'INDIVIDUAL_DETAILS_MOBILE_NUMBER_LENGTH';
 
+  String get mobileNumberStartWith7or9ValidationMessage =>
+      'INDIVIDUAL_DETAILS_MOBILE_NUMBER_START_WITH_7_OR_9';
+
   String get yearsHintText => 'YEARS_HINT_TEXT';
   String get monthsHintText => 'MONTHS_HINT_TEXT';
 
