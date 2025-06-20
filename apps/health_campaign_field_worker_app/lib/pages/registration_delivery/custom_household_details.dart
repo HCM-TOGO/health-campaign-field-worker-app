@@ -403,6 +403,10 @@ class CustomHouseHoldDetailsPageState
                                             .control(_dateOfRegistrationKey)
                                             .value)
                                         .toString(),
+                                    firstDate: DateTime.now().subtract(
+                                        const Duration(
+                                            days: 15)), // Last 15 days
+                                    lastDate: DateTime.now(),
                                   ),
                                 ),
                               ),
