@@ -1525,6 +1525,10 @@ class CustomStockDetailsPageState
                                     "min": (object) => localizations.translate(
                                           '${quantityCountLabel}_MIN_ERROR',
                                         ),
+                                    "required": (object) =>
+                                        localizations.translate(
+                                          i18.common.corecommonRequired,
+                                        ),
                                   },
                                   showErrors: (control) =>
                                       control.invalid && control.touched,
@@ -1553,15 +1557,16 @@ class CustomStockDetailsPageState
                                           decimal: true,
                                         ),
                                         onChange: (val) {
-                                          field.control.markAsTouched();
-                                          if (int.parse(val) > 10000000000) {
-                                            field.control.value = 10000;
+                                          if (val.isEmpty || val.trim() == '') {
+                                            field.control.value = null;
                                           } else {
-                                            if (val != '') {
+                                            if (int.parse(val) > 10000000000) {
+                                              field.control.value = 10000;
+                                              field.control.markAsTouched();
+                                            } else {
                                               field.control.value =
                                                   int.parse(val);
-                                            } else {
-                                              field.control.value = null;
+                                              field.control.markAsTouched();
                                             }
                                           }
                                         },
