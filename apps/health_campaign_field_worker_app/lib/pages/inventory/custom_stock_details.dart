@@ -1245,6 +1245,21 @@ class CustomStockDetailsPageState
 
                                         if (context.selectedProject.address
                                                 ?.boundaryType ==
+                                            Constants.countryBoundaryLevel) {
+                                          filteredFacilities = entryType ==
+                                                  StockRecordEntryType.receipt
+                                              ? allFacilities
+                                                  .where((element) =>
+                                                      element.usage ==
+                                                      Constants.centralFacility)
+                                                  .toList()
+                                              : allFacilities
+                                                  .where((element) =>
+                                                      element.usage ==
+                                                      Constants.lgaFacility)
+                                                  .toList();
+                                        } else if (context.selectedProject
+                                                .address?.boundaryType ==
                                             Constants.stateBoundaryLevel) {
                                           filteredFacilities = entryType ==
                                                   StockRecordEntryType.receipt
