@@ -467,7 +467,10 @@ class _VaccineSelectionPageState extends LocalizedState<VaccineSelectionPage> {
                                         final updatedFields = [
                                           ...oldFields,
                                           AdditionalField(
-                                            'zeroDoseStatus',
+                                            additional_fields_local
+                                                .AdditionalFieldsType
+                                                .zeroDoseStatus
+                                                .toValue(),
                                             ZeroDoseStatus.done.name,
                                           ),
                                         ];
@@ -646,7 +649,10 @@ class _VaccineSelectionPageState extends LocalizedState<VaccineSelectionPage> {
                                                     .smcDone.name,
                                               ),
                                               AdditionalField(
-                                                'zeroDoseStatus',
+                                                additional_fields_local
+                                                    .AdditionalFieldsType
+                                                    .zeroDoseStatus
+                                                    .toValue(),
                                                 ZeroDoseStatus.done.name,
                                               ),
                                             ],

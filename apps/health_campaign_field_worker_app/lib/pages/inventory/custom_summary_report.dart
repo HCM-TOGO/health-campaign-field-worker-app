@@ -52,6 +52,7 @@ class _CustomSummaryReportState
   static const _refusalsCasesKey = 'refusalsCases';
   static const _usedTablet_3_11monthKey = 'usedTablet3_11month';
   static const _usedTablet_12_59monthKey = 'usedTablet12s_59month';
+  static const _zeroDoseChildrenKey = 'zeroDoseChildren';
 
   FormGroup _form() {
     return fb.group({});
@@ -141,6 +142,12 @@ class _CustomSummaryReportState
                               key: _usedTablet_12_59monthKey,
                               width: 180,
                             ),
+                            DigitGridColumn(
+                              label: localizations.translate(i18Local
+                                  .homeShowcase.summaryReportZeroDoseChildren),
+                              key: _zeroDoseChildrenKey,
+                              width: 180,
+                            ),
                           ],
                           rows: [
                             for (final entry
@@ -182,6 +189,12 @@ class _CustomSummaryReportState
                                     value:
                                         (entry.value[Constants.tablet_12_59] ??
                                                 0)
+                                            .toString(),
+                                  ),
+                                  DigitGridCell(
+                                    key: _zeroDoseChildrenKey,
+                                    value:
+                                        (entry.value[Constants.zeroDose] ?? 0)
                                             .toString(),
                                   ),
                                 ],
