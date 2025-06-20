@@ -226,6 +226,44 @@ class _CustomSearchBeneficiaryPageState
                                                 ),
                                               )
                                             ]),
+                                            Row(
+                                              children: [
+                                                Padding(
+                                                  padding: const EdgeInsets.all(
+                                                      spacer2),
+                                                  child: DigitSwitch(
+                                                    label: localizations
+                                                        .translate(i18_local
+                                                            .beneficiaryDetails
+                                                            .searchbybeneficiaryidtextupdate),
+                                                    value:
+                                                        isSearchByBeneficaryIdEnabled,
+                                                    onChanged: (value) {
+                                                      customSearchHouseholdsBloc
+                                                          .add(
+                                                        const SearchHouseholdsClearEvent(),
+                                                      );
+                                                      searchController.clear();
+                                                      context
+                                                          .read<
+                                                              IndividualGlobalSearchSMCBloc>()
+                                                          .add(const searchHouseholdSMCBloc
+                                                              .SearchHouseholdsSMCEvent.clear());
+                                                      setState(() {
+                                                        isSearchByBeneficaryIdEnabled =
+                                                            value;
+                                                        isProximityEnabled =
+                                                            false;
+                                                        searchController
+                                                            .clear();
+                                                        blocWrapper
+                                                            .clearEvent();
+                                                      });
+                                                    },
+                                                  ),
+                                                ),
+                                              ],
+                                            )
                                           ],
                                         )
                                       : const Offstage(),

@@ -167,7 +167,9 @@ class _EligibilityChecklistViewPage
                               }
                               final itemsAttributes = initialAttributes;
                               if (itemsAttributes != null) {
-                                for (int i = 0; i < itemsAttributes.length; i++) {
+                                for (int i = 0;
+                                    i < itemsAttributes.length;
+                                    i++) {
                                   if (itemsAttributes[i].required == true &&
                                       ((itemsAttributes[i].dataType ==
                                                   'SingleValueList' &&
@@ -176,7 +178,7 @@ class _EligibilityChecklistViewPage
                                               (controller[i].text == '')) ||
                                           (itemsAttributes[i].dataType !=
                                                   'SingleValueList' &&
-                                                   visibleChecklistIndexes
+                                              visibleChecklistIndexes
                                                   .any((e) => e == i) &&
                                               (controller[i].text == '')))) {
                                     return;
@@ -356,59 +358,61 @@ class _EligibilityChecklistViewPage
                                       context.read<ServiceBloc>().add(
                                             ServiceCreateEvent(
                                               serviceModel: ServiceModel(
-                                                createdAt: DigitDateUtils
-                                                    .getDateFromTimestamp(
-                                                  DateTime.now()
-                                                      .toLocal()
-                                                      .millisecondsSinceEpoch,
-                                                  dateFormat: Constants
-                                                      .checklistViewDateFormat,
-                                                ),
-                                                tenantId:
-                                                    selectedServiceDefinition!
-                                                        .tenantId,
-                                                clientId: isHealthFacilityWorker &&
-                                                        widget.referralClientRefId !=
-                                                            null
-                                                    ? widget.referralClientRefId
-                                                        .toString()
-                                                    : referenceId,
-                                                serviceDefId:
-                                                    selectedServiceDefinition
-                                                        ?.id,
-                                                attributes: attributes,
-                                                rowVersion: 1,
-                                                accountId: context.projectId,
-                                                auditDetails: AuditDetails(
-                                                  createdBy:
-                                                      context.loggedInUserUuid,
-                                                  createdTime: DateTime.now()
-                                                      .millisecondsSinceEpoch,
-                                                ),
-                                                clientAuditDetails:
-                                                    ClientAuditDetails(
-                                                  createdBy:
-                                                      context.loggedInUserUuid,
-                                                  createdTime: context
-                                                      .millisecondsSinceEpoch(),
-                                                  lastModifiedBy:
-                                                      context.loggedInUserUuid,
-                                                  lastModifiedTime: context
-                                                      .millisecondsSinceEpoch(),
-                                                ),
-                                                // additionalDetails: {
-                                                //   "boundaryCode":
-                                                //       context.boundary.code
-                                                // },
-                                                additionalFields: 
-                                                  ServiceAdditionalFields(
+                                                  createdAt: DigitDateUtils
+                                                      .getDateFromTimestamp(
+                                                    DateTime.now()
+                                                        .toLocal()
+                                                        .millisecondsSinceEpoch,
+                                                    dateFormat: Constants
+                                                        .checklistViewDateFormat,
+                                                  ),
+                                                  tenantId:
+                                                      selectedServiceDefinition!
+                                                          .tenantId,
+                                                  clientId: isHealthFacilityWorker &&
+                                                          widget.referralClientRefId !=
+                                                              null
+                                                      ? widget
+                                                          .referralClientRefId
+                                                          .toString()
+                                                      : referenceId,
+                                                  serviceDefId:
+                                                      selectedServiceDefinition
+                                                          ?.id,
+                                                  attributes: attributes,
+                                                  rowVersion: 1,
+                                                  accountId: context.projectId,
+                                                  auditDetails: AuditDetails(
+                                                    createdBy: context
+                                                        .loggedInUserUuid,
+                                                    createdTime: DateTime.now()
+                                                        .millisecondsSinceEpoch,
+                                                  ),
+                                                  clientAuditDetails:
+                                                      ClientAuditDetails(
+                                                    createdBy: context
+                                                        .loggedInUserUuid,
+                                                    createdTime: context
+                                                        .millisecondsSinceEpoch(),
+                                                    lastModifiedBy: context
+                                                        .loggedInUserUuid,
+                                                    lastModifiedTime: context
+                                                        .millisecondsSinceEpoch(),
+                                                  ),
+                                                  // additionalDetails: {
+                                                  //   "boundaryCode":
+                                                  //       context.boundary.code
+                                                  // },
+                                                  additionalFields:
+                                                      ServiceAdditionalFields(
                                                     version: 1,
                                                     fields: [
-                                                      AdditionalField('boundaryCode', context.boundary.code),
+                                                      AdditionalField(
+                                                          'boundaryCode',
+                                                          context
+                                                              .boundary.code),
                                                     ],
-                                                  )
-                                                
-                                              ),
+                                                  )),
                                             ),
                                           );
 
@@ -1044,9 +1048,11 @@ class _EligibilityChecklistViewPage
     var isIneligible = false;
     var q3Key = "KBEA3";
     var q5Key = "KBEA4";
+    var q2Key = "KBEA2";
     var q6Key = "KBEA2.YES.KBEA2A.POSITIVE.KBEA2AA";
 
     Map<String, String> keyVsReason = {
+      q2Key: "FEVER",
       q3Key: "CHILD_ALLERGIC_TO_DRUGS",
       q5Key: "TAKEN_SP_OR_CTX",
       q6Key: "TAKEN_MALARIA_DOSE",
@@ -1060,11 +1066,15 @@ class _EligibilityChecklistViewPage
           (responses.containsKey(q5Key) && responses[q5Key]!.isNotEmpty)) {
         isIneligible = responses[q5Key] == yes ? true : false;
       }
-      if (!isIneligible &&
+      if (responses.containsKey(q2Key) &&
+          responses[q2Key]!.isNotEmpty &&
+          responses[q2Key] == yes) {
+            if (!isIneligible &&
           (responses.containsKey(q6Key) && responses[q6Key]!.isNotEmpty)) {
         ifAdministration = responses[q6Key] == yes ? false : true;
         isIneligible = responses[q6Key] == yes ? true : false;
       }
+          }
       if (isIneligible) {
         for (var entry in responses.entries) {
           if (entry.key == q3Key || entry.key == q5Key) {
@@ -1085,29 +1095,34 @@ class _EligibilityChecklistViewPage
   ) {
     var isReferral = false;
     var q1Key = "KBEA1";
+    var q2Key = "KBEA2";
     var q3Key = "KBEA2.YES.KBEA2A";
     var q4Key = "KBEA2.YES.KBEA2A.POSITIVE.KBEA2AA";
     Map<String, String> referralKeysVsCode = {
       q1Key: "SICK",
+      q2Key: "FEVER",
       q3Key: "MALARIA_CHECK",
       q4Key: "MALARIA_DOSE_CHECK"
     };
     // TODO Configure the reasons ,verify hardcoded strings
-
     if (responses.isNotEmpty) {
       if (responses.containsKey(q1Key) && responses[q1Key]!.isNotEmpty) {
         isReferral = responses[q1Key] == yes ? true : false;
       }
-      if (!isReferral &&
-          (responses.containsKey(q3Key) && responses[q3Key]!.isNotEmpty)) {
-        isReferral = (responses[q3Key] == negative ||
-                responses[q3Key] == test_unavailable)
-            ? true
-            : false;
-      }
-      if (!isReferral &&
-          (responses.containsKey(q4Key) && responses[q4Key]!.isNotEmpty)) {
-        isReferral = responses[q4Key] == no ? true : false;
+      if (responses.containsKey(q2Key) &&
+          responses[q2Key]!.isNotEmpty &&
+          responses[q2Key] == yes) {
+        if (!isReferral &&
+            (responses.containsKey(q3Key) && responses[q3Key]!.isNotEmpty)) {
+          isReferral = (responses[q3Key] == negative ||
+                  responses[q3Key] == test_unavailable)
+              ? true
+              : false;
+        }
+        if (!isReferral &&
+            (responses.containsKey(q4Key) && responses[q4Key]!.isNotEmpty)) {
+          isReferral = responses[q4Key] == no ? true : false;
+        }
       }
     }
     if (isReferral) {
