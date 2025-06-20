@@ -424,7 +424,7 @@ class CustomSurveyFormViewPageState
                                             UpperCaseTextFormatter(),
                                             FilteringTextInputFormatter.allow(
                                                 RegExp(
-                                              "[a-zA-Z0-9]",
+                                              r"[a-zA-Z0-9\s\-.,\/!@#\$%\^&\*\(\)]",
                                             )),
                                           ],
                                         ));
@@ -932,8 +932,8 @@ class CustomSurveyFormViewPageState
                                   charCondition: true,
                                   child: DigitTextFormInput(
                                     inputFormatters: [
-                                          UpperCaseTextFormatter(),
-                                        ],
+                                      UpperCaseTextFormatter(),
+                                    ],
                                     onChange: (value) {
                                       field.didChange(value);
                                       additionalController[index].text = value;

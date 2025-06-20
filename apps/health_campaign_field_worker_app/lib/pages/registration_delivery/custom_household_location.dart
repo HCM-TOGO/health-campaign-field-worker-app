@@ -498,7 +498,7 @@ class CustomHouseholdLocationPageState
             (validator) => CustomValidator.requiredMin(validator)),
         Validators.maxLength(64),
         Validators.delegate((validator) =>
-            local_utils.CustomValidator.onlyAlphabetsAndDigitsNoSpaces(validator))
+            local_utils.CustomValidator.onlyAlphabetsAndDigits(validator))
       ]),
       _postalCodeKey:
           FormControl<String>(value: addressModel?.pincode, validators: [

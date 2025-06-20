@@ -1664,6 +1664,10 @@ class CustomStockDetailsPageState
                                       return InputField(
                                         inputFormatters: [
                                           UpperCaseTextFormatter(),
+                                          FilteringTextInputFormatter.allow(
+                                              RegExp(
+                                            r"[a-zA-Z0-9\s\-]",
+                                          )),
                                         ],
                                         keyboardType: const TextInputType
                                             .numberWithOptions(
@@ -1713,6 +1717,10 @@ class CustomStockDetailsPageState
                                       return InputField(
                                         inputFormatters: [
                                           UpperCaseTextFormatter(),
+                                          FilteringTextInputFormatter.allow(
+                                              RegExp(
+                                            r"[a-zA-Z0-9\s\-]",
+                                          )),
                                         ],
                                         keyboardType: const TextInputType
                                             .numberWithOptions(
@@ -1787,6 +1795,10 @@ class CustomStockDetailsPageState
                                       return InputField(
                                         inputFormatters: [
                                           UpperCaseTextFormatter(),
+                                          FilteringTextInputFormatter.allow(
+                                              RegExp(
+                                            r"[a-zA-Z0-9\s\-.,\/!@#\$%\^&\*\(\)]",
+                                          )),
                                         ],
                                         type: InputType.text,
                                         label: localizations.translate(
