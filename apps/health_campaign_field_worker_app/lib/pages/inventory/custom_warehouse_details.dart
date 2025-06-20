@@ -501,6 +501,8 @@ class CustomWarehouseDetailsPageState
                                                     'd MMMM yyyy')
                                                 .format(field.control.value),
                                             readOnly: false,
+                                            firstDate: DateTime.now().subtract(
+                                                const Duration(days: 15)),
                                             lastDate: DateTime.now(),
                                           );
                                         }),
