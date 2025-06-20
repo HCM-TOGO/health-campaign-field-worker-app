@@ -639,15 +639,23 @@ class CustomIndividualDetailsPageState
                               capitalizedFirstLetter: false,
                               isRequired: false,
                               child: DigitDropdown<String>(
+                                //check if the value is null or empty. if yes default to "Default"
                                 selectedOption: (form
-                                            .control(_idTypeKey)
-                                            .value !=
-                                        null)
+                                                .control(_idTypeKey)
+                                                .value !=
+                                            null &&
+                                        form.control(_idTypeKey).value != '')
                                     ? DropdownItem(
                                         name: localizations.translate(
                                             form.control(_idTypeKey).value),
                                         code: form.control(_idTypeKey).value)
-                                    : const DropdownItem(name: '', code: ''),
+                                    : DropdownItem(
+                                        // This block handles the default case
+                                        name: localizations.translate(
+                                            'DEFAULT'), // Display "Default"
+                                        code:
+                                            'DEFAULT', // Set the internal code to 'DEFAULT'
+                                      ),
                                 items: [
                                   ...RegistrationDeliverySingleton()
                                       .idTypeOptions!
