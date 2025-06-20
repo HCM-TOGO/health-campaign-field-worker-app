@@ -93,6 +93,22 @@ class CustomValidator {
     return {'mobileNumber': true}; // Invalid
   }
 
+  static Map<String, dynamic>? startsWith7or9(
+      AbstractControl<dynamic> control) {
+    if (control.value == null || control.value.toString().isEmpty) {
+      return null;
+    }
+
+    final value = control.value.toString();
+    const pattern = r'^[79]'; // Starts with 7 or 9
+
+    if (RegExp(pattern).hasMatch(value)) {
+      return null; // Valid
+    }
+
+    return {'startsWith7or9': true}; // Invalid
+  }
+
   static Map<String, dynamic>? onlyAlphabets(AbstractControl<dynamic> control) {
     final value = control.value?.toString().trim();
 

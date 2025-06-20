@@ -1,4 +1,5 @@
 import 'dart:async';
+import 'package:collection/collection.dart';
 import 'package:digit_data_model/data_model.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:freezed_annotation/freezed_annotation.dart';
@@ -8,8 +9,12 @@ import 'package:registration_delivery/models/entities/task_resource.dart';
 import 'package:registration_delivery/utils/typedefs.dart';
 
 import '../../models/entities/assessment_checklist/status.dart';
+import '../../utils/app_enums.dart';
 import '../../utils/constants.dart';
 import '../../utils/date_utils.dart';
+
+import '../../../models/entities/additional_fields_type.dart'
+    as additional_fields_local;
 
 part 'custom_summary_report_bloc.freezed.dart';
 
@@ -42,6 +47,7 @@ class SummaryReportBloc extends Bloc<SummaryReportEvent, SummaryReportState> {
     List<ProductVariantModel> productVariantList = [];
     List<TaskResourceModel> spaq1List = [];
     List<TaskResourceModel> spaq2List = [];
+    List<TaskModel> zeroDoseChildrenList = [];
     householdMemberList = await (householdMemberRepository)
         .search(HouseholdMemberSearchModel(isHeadOfHousehold: false));
     taskList = await (taskDataRepository).search(TaskSearchModel());
@@ -54,6 +60,14 @@ class SummaryReportBloc extends Bloc<SummaryReportEvent, SummaryReportState> {
         administeredChildrenList.add(element);
       } else if (status == Status.beneficiaryRefused) {
         refusalCasesList.add(element);
+      }
+
+      if (element.additionalFields?.fields.firstWhereOrNull((element) =>
+              element.key ==
+              additional_fields_local.AdditionalFieldsType.zeroDoseStatus
+                  .toValue()) !=
+          null) {
+        zeroDoseChildrenList.add(element);
       }
     }
 
@@ -76,10 +90,12 @@ class SummaryReportBloc extends Bloc<SummaryReportEvent, SummaryReportState> {
     Map<String, List<TaskModel>> dateVsRefusalCasesList = {};
     Map<String, List<TaskResourceModel>> dateVsSpaq1List = {};
     Map<String, List<TaskResourceModel>> dateVsSpaq2List = {};
+    Map<String, List<TaskModel>> dateVsZeroDoseChildrenList = {};
     Set<String> uniqueDates = {};
     Map<String, int> dateVsHouseholdMembersCount = {};
     Map<String, int> dateVsAdministeredChilderenCount = {};
     Map<String, int> dateVsRefusalCasesCount = {};
+    Map<String, int> dateVsZeroDoseChildrenCount = {};
     Map<String, int> dateVsSpaq1Count = {};
     Map<String, int> dateVsSpaq2Count = {};
     Map<String, Map<String, int>> dateVsEntityVsCountMap = {};
@@ -100,6 +116,11 @@ class SummaryReportBloc extends Bloc<SummaryReportEvent, SummaryReportState> {
           element.clientAuditDetails!.createdTime);
       dateVsRefusalCasesList.putIfAbsent(dateKey, () => []).add(element);
     }
+    for (var element in zeroDoseChildrenList) {
+      var dateKey = DigitDateUtils.getDateFromTimestamp(
+          element.clientAuditDetails!.createdTime);
+      dateVsZeroDoseChildrenList.putIfAbsent(dateKey, () => []).add(element);
+    }
     for (var element in spaq1List) {
       var dateKey = DigitDateUtils.getDateFromTimestamp(
           element.auditDetails!.createdTime);
@@ -116,6 +137,7 @@ class SummaryReportBloc extends Bloc<SummaryReportEvent, SummaryReportState> {
       dateVsHouseholdMembersList,
       dateVsAdministeredChilderenList,
       dateVsRefusalCasesList,
+      dateVsZeroDoseChildrenList,
       dateVsSpaq1List,
       dateVsSpaq2List,
       uniqueDates,
@@ -127,6 +149,8 @@ class SummaryReportBloc extends Bloc<SummaryReportEvent, SummaryReportState> {
     populateDateVsCountMap(
         dateVsAdministeredChilderenList, dateVsAdministeredChilderenCount);
     populateDateVsCountMap(dateVsRefusalCasesList, dateVsRefusalCasesCount);
+    populateDateVsCountMap(
+        dateVsZeroDoseChildrenList, dateVsZeroDoseChildrenCount);
     populateDateVsCountMap(dateVsSpaq1List, dateVsSpaq1Count);
     populateDateVsCountMap(dateVsSpaq2List, dateVsSpaq2Count);
 
@@ -135,6 +159,7 @@ class SummaryReportBloc extends Bloc<SummaryReportEvent, SummaryReportState> {
       dateVsHouseholdMembersCount,
       dateVsAdministeredChilderenCount,
       dateVsRefusalCasesCount,
+      dateVsZeroDoseChildrenCount,
       dateVsSpaq1Count,
       dateVsSpaq2Count,
       uniqueDates,
@@ -150,6 +175,7 @@ class SummaryReportBloc extends Bloc<SummaryReportEvent, SummaryReportState> {
     Map<String, List<HouseholdMemberModel>> dateVsHouseholdMembersList,
     Map<String, List<TaskModel>> dateVsAdministeredChilderenList,
     Map<String, List<TaskModel>> dateVsRefusalCasesList,
+    Map<String, List<TaskModel>> dateVsZeroDoseChildrenList,
     Map<String, List<TaskResourceModel>> dateVsSpaq1List,
     Map<String, List<TaskResourceModel>> dateVsSpaq2List,
     Set<String> uniqueDates,
@@ -157,6 +183,7 @@ class SummaryReportBloc extends Bloc<SummaryReportEvent, SummaryReportState> {
     uniqueDates.addAll(dateVsHouseholdMembersList.keys.toSet());
     uniqueDates.addAll(dateVsAdministeredChilderenList.keys.toSet());
     uniqueDates.addAll(dateVsRefusalCasesList.keys.toSet());
+    uniqueDates.addAll(dateVsZeroDoseChildrenList.keys.toSet());
     uniqueDates.addAll(dateVsSpaq1List.keys.toSet());
     uniqueDates.addAll(dateVsSpaq2List.keys.toSet());
   }
@@ -173,6 +200,7 @@ class SummaryReportBloc extends Bloc<SummaryReportEvent, SummaryReportState> {
     Map<String, int> dateVsHouseholdMembersCount,
     Map<String, int> dateVsAdministeredChilderenCount,
     Map<String, int> dateVsRefusalCasesCount,
+    Map<String, int> dateVsZeroDoseChildrenCount,
     Map<String, int> dateVsSpaq1Count,
     Map<String, int> dateVsSpaq2Count,
     Set<String> uniqueDates,
@@ -193,6 +221,11 @@ class SummaryReportBloc extends Bloc<SummaryReportEvent, SummaryReportState> {
           dateVsRefusalCasesCount[date] != null) {
         var count = dateVsRefusalCasesCount[date];
         elementVsCount[Constants.refusals] = count ?? 0;
+      }
+      if (dateVsZeroDoseChildrenCount.containsKey(date) &&
+          dateVsZeroDoseChildrenCount[date] != null) {
+        var count = dateVsZeroDoseChildrenCount[date];
+        elementVsCount[Constants.zeroDose] = count ?? 0;
       }
       if (dateVsSpaq1Count.containsKey(date) &&
           dateVsSpaq1Count[date] != null) {

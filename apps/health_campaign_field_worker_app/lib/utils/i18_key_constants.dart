@@ -426,6 +426,10 @@ class HomeShowcase {
     return 'HOME_SHOWCASE_SUMMARY_REPORT_REFUALS_CASES';
   }
 
+  String get summaryReportZeroDoseChildren {
+    return 'HOME_SHOWCASE_SUMMARY_REPORT_ZERO_DOSE_CHILDREN';
+  }
+
   String get summaryReportSPAQ1 {
     return 'HOME_SHOWCASE_SUMMARY_REPORT_SPAQ1';
   }

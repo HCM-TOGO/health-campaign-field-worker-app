@@ -614,7 +614,10 @@ class ZeroDoseCheckPageState extends LocalizedState<ZeroDoseCheckPage> {
                                         final updatedFields = [
                                           ...oldFields,
                                           AdditionalField(
-                                            'zeroDoseStatus',
+                                            additional_fields_local
+                                                .AdditionalFieldsType
+                                                .zeroDoseStatus
+                                                .toValue(),
                                             zeroDose
                                                 ? ZeroDoseStatus.zeroDose.name
                                                 : incompletementVaccine
@@ -822,7 +825,10 @@ class ZeroDoseCheckPageState extends LocalizedState<ZeroDoseCheckPage> {
                                                             .smcDone.name,
                                                       ),
                                                       AdditionalField(
-                                                        'zeroDoseStatus',
+                                                        additional_fields_local
+                                                            .AdditionalFieldsType
+                                                            .zeroDoseStatus
+                                                            .toValue(),
                                                         zeroDose
                                                             ? ZeroDoseStatus
                                                                 .zeroDose.name
