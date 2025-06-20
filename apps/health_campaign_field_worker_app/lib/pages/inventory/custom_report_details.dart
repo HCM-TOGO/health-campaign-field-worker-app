@@ -229,6 +229,28 @@ class CustomInventoryReportDetailsPageState
                                                             .address
                                                             ?.boundaryType ==
                                                         Constants
+                                                            .countryBoundaryLevel) {
+                                                      List<FacilityModel>
+                                                          filteredFacilities =
+                                                          allfacilities
+                                                              .where(
+                                                                (element) =>
+                                                                    element
+                                                                        .usage ==
+                                                                    Constants
+                                                                        .stateFacility,
+                                                              )
+                                                              .toList();
+                                                      facilities =
+                                                          filteredFacilities
+                                                                  .isEmpty
+                                                              ? facilities
+                                                              : filteredFacilities;
+                                                    } else if (ctx
+                                                            .selectedProject
+                                                            .address
+                                                            ?.boundaryType ==
+                                                        Constants
                                                             .stateBoundaryLevel) {
                                                       List<FacilityModel>
                                                           filteredFacilities =
@@ -358,8 +380,8 @@ class CustomInventoryReportDetailsPageState
                                                   builder: (field) {
                                                     return InputField(
                                                       inputFormatters: [
-                                          UpperCaseTextFormatter(),
-                                        ],
+                                                        UpperCaseTextFormatter(),
+                                                      ],
                                                       type: InputType.search,
                                                       isRequired: true,
                                                       controller: controller1,

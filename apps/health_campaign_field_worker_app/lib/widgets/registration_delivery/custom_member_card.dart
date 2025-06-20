@@ -8,6 +8,7 @@ import 'package:digit_ui_components/widgets/atoms/digit_action_card.dart';
 import 'package:digit_ui_components/widgets/atoms/digit_button.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:intl/intl.dart';
 import 'package:registration_delivery/blocs/app_localization.dart';
 import 'package:registration_delivery/blocs/delivery_intervention/deliver_intervention.dart';
 import 'package:registration_delivery/blocs/household_overview/household_overview.dart';
@@ -35,6 +36,7 @@ import '../../../models/entities/assessment_checklist/status.dart'
     as status_local;
 import '../../models/entities/additional_fields_type.dart'
     as additional_fields_local;
+import '../../utils/date_utils.dart' as digits;
 
 class CustomMemberCard extends StatelessWidget {
   final List<ProductVariantModel> variant;
@@ -348,6 +350,12 @@ class CustomMemberCard extends StatelessWidget {
     bool isBeneficiaryReferredSMC = checkBeneficiaryReferredSMC(smcTasks);
     bool isBeneficiaryInEligibleSMC = checkBeneficiaryInEligibleSMC(smcTasks);
     bool hasBeneficiaryRefused = checkBeneficiaryRefusedSMC(tasks);
+    final age = individual.dateOfBirth != null
+        ? digits.DigitDateUtils.calculateAge(
+            DateFormat(Constants.defaultDateFormat)
+                .parse(individual.dateOfBirth!))
+        : digits.DigitDateUtils.calculateAge(DateTime.now());
+    final ageInMonths = age.years * 12 + age.months;
 
     final redosePendingStatus = smcAssessmentPendingStatus
         ? true
@@ -359,6 +367,7 @@ class CustomMemberCard extends StatelessWidget {
         !isBeneficiaryReferredSMC &&
         !isBeneficiaryInEligibleSMC &&
         !hasBeneficiaryRefused &&
+        ageInMonths < 3 &&
         (zeroDoseTasks == null || zeroDoseTasks.isEmpty == true)) {
       return Column(
         children: [
@@ -811,16 +820,21 @@ class CustomMemberCard extends StatelessWidget {
                                 kPadding,
                               ),
                               child: Text(
-                                (individual.identifiers != null && individual.identifiers!.isNotEmpty)
+                                (individual.identifiers != null &&
+                                        individual.identifiers!.isNotEmpty)
                                     ? (individual.identifiers!
                                             .lastWhereOrNull(
                                               (e) =>
                                                   e.identifierType ==
-                                                  IdentifierTypes.uniqueBeneficiaryID.toValue(),
+                                                  IdentifierTypes
+                                                      .uniqueBeneficiaryID
+                                                      .toValue(),
                                             )
                                             ?.identifierId ??
-                                        localizations.translate(i18.common.noResultsFound))
-                                    : localizations.translate(i18.common.noResultsFound),
+                                        localizations.translate(
+                                            i18.common.noResultsFound))
+                                    : localizations
+                                        .translate(i18.common.noResultsFound),
                                 style: theme.textTheme.headlineSmall,
                               ),
                             ),
