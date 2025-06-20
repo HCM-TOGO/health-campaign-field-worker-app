@@ -122,38 +122,38 @@ class CustomWarehouseDetailsPageState
                       } else if (ctx.selectedProject.address?.boundaryType ==
                           Constants.stateBoundaryLevel) {
                         filteredFacilityResult =
-                            allFacilities // Filter the complete list
+                            facilities // Filter the complete list
                                 .where((element) =>
                                     element.usage == Constants.stateFacility)
                                 .toList();
                         // Keep original if filter yields no results
-                        filteredFacilityResult = filteredFacilityResult.isEmpty
+                        facilities = filteredFacilityResult.isEmpty
                             ? facilities // Fallback to facilities if no match
                             : filteredFacilityResult;
                         // if boundary type is LGA(ie District)
                       } else if (ctx.selectedProject.address?.boundaryType ==
                           Constants.lgaBoundaryLevel) {
                         filteredFacilityResult =
-                            allFacilities // Filter the complete list
+                            facilities // Filter the complete list
                                 .where(
                                   (element) =>
                                       element.usage == Constants.lgaFacility,
                                 )
                                 .toList();
-                        filteredFacilityResult = filteredFacilityResult.isEmpty
+                        facilities = filteredFacilityResult.isEmpty
                             ? facilities // Fallback to facilities if no match
                             : filteredFacilityResult;
                       }
                       // if boundary type is Health Facility or the default case if no other boundary type matches
                       else {
                         filteredFacilityResult =
-                            allFacilities // Filter the complete list
+                            facilities // Filter the complete list
                                 .where(
                                   (element) =>
                                       element.usage == Constants.healthFacility,
                                 )
                                 .toList();
-                        filteredFacilityResult = filteredFacilityResult.isEmpty
+                        facilities = filteredFacilityResult.isEmpty
                             ? facilities // Fallback to allFacilities if no match
                             : filteredFacilityResult;
                       }
