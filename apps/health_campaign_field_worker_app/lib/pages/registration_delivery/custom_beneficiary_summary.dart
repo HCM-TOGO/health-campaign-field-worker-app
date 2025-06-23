@@ -62,23 +62,9 @@ class CustomSummaryBeneficiaryPageState
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
     final textTheme = theme.digitTextTheme(context);
-    final bloc = context.read<CustomBeneficiaryRegistrationBloc>();
 
     return PopScope(
-      onPopInvoked: (val) {
-        // context.read<CustomBeneficiaryRegistrationBloc>().add(
-        //       BeneficiaryRegistrationAddMemberEvent(
-        //         projectId: RegistrationDeliverySingleton().projectId!,
-        //         userUuid: RegistrationDeliverySingleton().loggedInUserUuid!,
-        //         householdModel: bloc.state.householdModel!,
-        //         beneficiaryType:
-        //             RegistrationDeliverySingleton().beneficiaryType!,
-        //         individualModel: widget.individualModel,
-        //         addressModel: bloc.state.householdModel!.address!,
-        //         // boundary: RegistrationDeliverySingleton().boundary!,
-        //       ),
-        //     );
-      },
+      onPopInvoked: (val) {},
       child: Scaffold(
           body: BlocConsumer<CustomBeneficiaryRegistrationBloc,
               BeneficiaryRegistrationState>(
@@ -86,23 +72,36 @@ class CustomSummaryBeneficiaryPageState
           final router = context.router;
           householdState.mapOrNull(
             persisted: (value) {
-              if (value.navigateToRoot) {
-                (router.parent() as StackRouter).maybePop();
-              } else {
-                router.popUntil((route) =>
-                    route.settings.name == SearchBeneficiaryRoute.name);
-                context.read<SearchBlocWrapper>().searchHouseholdsBloc.add(
-                      SearchHouseholdsEvent.searchByHousehold(
-                        householdModel: value.householdModel,
-                        projectId: RegistrationDeliverySingleton().projectId!,
-                        isProximityEnabled: false,
-                      ),
-                    );
-                router.push(CustomBeneficiaryAcknowledgementRoute(
-                  enableViewHousehold: true,
-                  acknowledgementType: AcknowledgementType.addMember,
-                ));
-              }
+              // removed navigate to root condition
+              // if (value.navigateToRoot) {
+              //   (router.parent() as StackRouter).maybePop();
+              // } else {
+              customSearchHouseholdsBloc
+                  .add(const CustomSearchHouseholdsEvent.clear());
+              customSearchHouseholdsBloc.add(
+                CustomSearchHouseholdsEvent.searchByHouseholdHead(
+                  searchText: widget.name.trim(),
+                  projectId: RegistrationDeliverySingleton().projectId!,
+                  isProximityEnabled: false,
+                  maxRadius: RegistrationDeliverySingleton().maxRadius,
+                  limit: customSearchHouseholdsBloc.state.limit,
+                  offset: 0,
+                ),
+              );
+              router.popUntil((route) =>
+                  route.settings.name == SearchBeneficiaryRoute.name);
+              context.read<SearchBlocWrapper>().searchHouseholdsBloc.add(
+                    SearchHouseholdsEvent.searchByHousehold(
+                      householdModel: value.householdModel,
+                      projectId: RegistrationDeliverySingleton().projectId!,
+                      isProximityEnabled: false,
+                    ),
+                  );
+              router.push(CustomBeneficiaryAcknowledgementRoute(
+                enableViewHousehold: true,
+                acknowledgementType: AcknowledgementType.addMember,
+              ));
+              // }
             },
           );
         },
@@ -218,39 +217,8 @@ class CustomSummaryBeneficiaryPageState
                                         : null,
                                   ),
                                 );
-                                customSearchHouseholdsBloc.add(
-                                    const CustomSearchHouseholdsEvent.clear());
-                                customSearchHouseholdsBloc.add(
-                                  CustomSearchHouseholdsEvent
-                                      .searchByHouseholdHead(
-                                    searchText: widget.name.trim(),
-                                    projectId: RegistrationDeliverySingleton()
-                                        .projectId!,
-                                    isProximityEnabled: false,
-                                    maxRadius: RegistrationDeliverySingleton()
-                                        .maxRadius,
-                                    limit:
-                                        customSearchHouseholdsBloc.state.limit,
-                                    offset: 0,
-                                  ),
-                                );
-                                context.router.popUntil((route) =>
-                                    route.settings.name ==
-                                    SearchBeneficiaryRoute.name);
-                                // await Future.delayed(
-                                //     const Duration(seconds: 1));
-                                // context.router
-                                //     .push(CustomStockReconciliationRoute());
-
-                                context.router
-                                    .push(CustomBeneficiaryAcknowledgementRoute(
-                                  enableViewHousehold: true,
-                                  acknowledgementType:
-                                      AcknowledgementType.addMember,
-                                ));
                               }
                             }
-                            ;
                           },
                         );
                       },
