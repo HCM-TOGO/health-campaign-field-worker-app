@@ -1128,7 +1128,7 @@ class CustomResourceBeneficiaryCardState
     } else if (sku == 'Blue VAS') {
       return 'VAS - Blue Capsule';
     } else if (sku == Constants.spaq1 || sku == Constants.spaq2) {
-      return local_utils.getSpaqName(sku);
+      return localizations.translate(local_utils.getSpaqName(sku));
     }
     return sku; // Fallback to original if no match
   }
