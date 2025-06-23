@@ -152,6 +152,9 @@ class Common {
   String get locationCapturing => 'CAPTURING_LOCATION';
   String get profileUpdateSuccess => 'PROFILE_UPDATE_SUCCESS';
   String get pleaseEnterRequiredDetails => 'PLEASE_ENTER_REQUIRED_DETAILS';
+
+  String get spaq1Name => 'SPAQ1_NAME';
+  String get spaq2Name => 'SPAQ2_NAME';
 }
 
 class HouseholdOverView {

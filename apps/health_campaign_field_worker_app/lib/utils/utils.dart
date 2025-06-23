@@ -227,6 +227,17 @@ String formatDateFromMillis(int millis) {
   return '$day $month $year';
 }
 
+String getSpaqName(String spaqCode) {
+  if (spaqCode.isEmpty) {
+    return '';
+  }
+  if (!Constants.spaqCodeNameMap.containsKey(spaqCode)) {
+    return spaqCode; // Return the code itself if not found
+  }
+  // Return the corresponding name from the map
+  return Constants.spaqCodeNameMap[spaqCode] ?? '';
+}
+
 String _monthShort(int month) {
   const months = [
     'Jan',

@@ -31,6 +31,7 @@ import 'package:inventory_management/widgets/component_wrapper/product_variant_b
 
 import '../../router/app_router.dart';
 import '../../utils/upper_case.dart';
+import '../../utils/utils.dart' as local_utils;
 
 @RoutePage()
 class CustomStockReconciliationPage extends LocalizedStatefulWidget {
@@ -95,11 +96,12 @@ class CustomStockReconciliationPageState
                     projectId: InventorySingleton().projectId,
                     dateOfReconciliation: DateTime.now(),
                   ),
-                  stockRepository:
-                      context.repository<StockModel, StockSearchModel>(context),
-                  stockReconciliationRepository: context.repository<
-                      StockReconciliationModel,
-                      StockReconciliationSearchModel>(context),
+                  stockRepository: ContextUtilityExtensions(context)
+                      .repository<StockModel, StockSearchModel>(context),
+                  stockReconciliationRepository:
+                      ContextUtilityExtensions(context).repository<
+                          StockReconciliationModel,
+                          StockReconciliationSearchModel>(context),
                 ),
                 child: BlocConsumer<StockReconciliationBloc,
                     StockReconciliationState>(
@@ -261,21 +263,27 @@ class CustomStockReconciliationPageState
                                                     createdBy:
                                                         InventorySingleton()
                                                             .loggedInUserUuid,
-                                                    createdTime: context
-                                                        .millisecondsSinceEpoch(),
+                                                    createdTime:
+                                                        ContextUtilityExtensions(
+                                                                context)
+                                                            .millisecondsSinceEpoch(),
                                                   ),
                                                   clientAuditDetails:
                                                       ClientAuditDetails(
                                                     createdBy:
                                                         InventorySingleton()
                                                             .loggedInUserUuid,
-                                                    createdTime: context
-                                                        .millisecondsSinceEpoch(),
+                                                    createdTime:
+                                                        ContextUtilityExtensions(
+                                                                context)
+                                                            .millisecondsSinceEpoch(),
                                                     lastModifiedBy:
                                                         InventorySingleton()
                                                             .loggedInUserUuid,
-                                                    lastModifiedTime: context
-                                                        .millisecondsSinceEpoch(),
+                                                    lastModifiedTime:
+                                                        ContextUtilityExtensions(
+                                                                context)
+                                                            .millisecondsSinceEpoch(),
                                                   ),
                                                 );
 
@@ -577,10 +585,11 @@ class CustomStockReconciliationPageState
                                                       .map((variant) {
                                                     return DropdownItem(
                                                       name: localizations
-                                                          .translate(
+                                                          .translate(local_utils
+                                                              .getSpaqName(
                                                             variant.sku ??
                                                                 variant.id,
-                                                          )
+                                                          ))
                                                           .toUpperCase(),
                                                       code: variant.id,
                                                     );
@@ -591,6 +600,8 @@ class CustomStockReconciliationPageState
                                                       ? DropdownItem(
                                                           name: localizations
                                                               .translate(
+                                                                  local_utils
+                                                                      .getSpaqName(
                                                             (field.control.value
                                                                         as ProductVariantModel)
                                                                     .sku ??
@@ -598,7 +609,7 @@ class CustomStockReconciliationPageState
                                                                             .value
                                                                         as ProductVariantModel)
                                                                     .id,
-                                                          ),
+                                                          )),
                                                           code: (field.control
                                                                       .value
                                                                   as ProductVariantModel)
@@ -782,7 +793,8 @@ class CustomStockReconciliationPageState
                                         ),
                                         textAreaScroll: TextAreaScroll.smart,
                                         onChange: (value) {
-                                          field.control.updateValue(value.toUpperCase());
+                                          field.control
+                                              .updateValue(value.toUpperCase());
                                         },
                                       );
                                     },
