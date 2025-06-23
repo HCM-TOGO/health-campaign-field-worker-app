@@ -105,10 +105,14 @@ import '../pages/beneficiary/check_eligibility/custom_side_effects.dart';
 import 'package:registration_delivery/models/entities/side_effect.dart';
 import '../pages/closedhousehold/custom_closed_household_details.dart';
 import '../pages/registration_delivery/custom_beneficiary_summary.dart';
+import '../pages/attendance/custom_manage_attendance.dart';
+import '../pages/attendance/custom_session_select.dart';
+import '../pages/attendance/custom_mark_attendance.dart';
+import 'package:attendance_management/models/entities/attendee.dart';
+import 'package:attendance_management/models/entities/attendance_register.dart';
 
 import 'package:complaints/blocs/localization/app_localization.dart';
 part 'app_router.gr.dart';
-
 
 @AutoRouterConfig(
   // INFO : Need to add the router modules here
@@ -217,8 +221,24 @@ class AppRouter extends _$AppRouter {
           path: 'manage-attendance',
         ),
         AutoRoute(
+          page: CustomManageAttendanceRoute.page,
+          path: 'custom-manage-attendance',
+        ),
+        RedirectRoute(
+          path: 'manage-attendance',
+          redirectTo: 'custom-manage-attendance',
+        ),
+        AutoRoute(
           page: AttendanceDateSessionSelectionRoute.page,
           path: 'attendance-date-session-selection',
+        ),
+        AutoRoute(
+          page: CustomAttendanceDateSessionSelectionRoute.page,
+          path: 'custom-attendance-date-session-selection',
+        ),
+        RedirectRoute(
+          path: 'attendance-date-session-selection',
+          redirectTo: 'custom-attendance-date-session-selection',
         ),
         AutoRoute(
           page: CustomSummaryReportRoute.page,
@@ -227,6 +247,14 @@ class AppRouter extends _$AppRouter {
         AutoRoute(
           page: MarkAttendanceRoute.page,
           path: 'mark-attendance',
+        ),
+        AutoRoute(
+          page: CustomMarkAttendanceRoute.page,
+          path: 'custom-mark-attendance',
+        ),
+        RedirectRoute(
+          path: 'mark-attendance',
+          redirectTo: 'custom-mark-attendance',
         ),
         AutoRoute(
           page: AttendanceAcknowledgementRoute.page,
