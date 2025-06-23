@@ -29,6 +29,7 @@ import 'package:referral_reconciliation/utils/utils.dart';
 import 'package:referral_reconciliation/widgets/localized.dart';
 
 import '../../utils/upper_case.dart';
+import '../../widgets/digit_ui_component/custom_digit_input_field.dart';
 
 @RoutePage()
 class CustomReferralReasonChecklistPage extends LocalizedStatefulWidget {
@@ -579,7 +580,7 @@ class _CustomReferralReasonChecklistPageState
                                                 right: 4.0,
                                                 bottom: 16,
                                               ),
-                                              child: DigitTextField(
+                                              child: CustomDigitTextField(
                                                 maxLength: 1000,
                                                 controller:
                                                     additionalController[index],
@@ -599,6 +600,12 @@ class _CustomReferralReasonChecklistPageState
 
                                                   return null;
                                                 },
+                                                textCapitalization:
+                                                    TextCapitalization
+                                                        .characters,
+                                                inputFormatter: [
+                                                  UpperCaseTextFormatter(),
+                                                ],
                                               ),
                                             )
                                           : const SizedBox();
@@ -929,7 +936,7 @@ class _CustomReferralReasonChecklistPageState
                       right: 4.0,
                       bottom: 16,
                     ),
-                    child: DigitTextField(
+                    child: CustomDigitTextField(
                       maxLength: 1000,
                       controller: additionalController[index],
                       label: '${localizations.translate(
@@ -944,6 +951,8 @@ class _CustomReferralReasonChecklistPageState
 
                         return null;
                       },
+                      textCapitalization: TextCapitalization.characters,
+                      inputFormatter: [UpperCaseTextFormatter()],
                     ),
                   )
                 : const SizedBox();
