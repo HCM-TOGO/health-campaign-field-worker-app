@@ -38,6 +38,7 @@ import '../../../utils/i18_key_constants.dart' as i18_local;
 import '../../../models/entities/additional_fields_type.dart'
     as additional_fields_local;
 import '../../../utils/upper_case.dart';
+import '../../../utils/utils.dart' as local_utils;
 import '../../../widgets/custom_back_navigation.dart';
 
 @RoutePage()
@@ -806,11 +807,11 @@ class CustomDeliverInterventionPageState
       rowVersion: 1,
       auditDetails: AuditDetails(
         createdBy: RegistrationDeliverySingleton().loggedInUserUuid!,
-        createdTime: context.millisecondsSinceEpoch(),
+        createdTime: ContextUtilityExtensions(context).millisecondsSinceEpoch(),
       ),
       clientAuditDetails: ClientAuditDetails(
         createdBy: RegistrationDeliverySingleton().loggedInUserUuid!,
-        createdTime: context.millisecondsSinceEpoch(),
+        createdTime: ContextUtilityExtensions(context).millisecondsSinceEpoch(),
       ),
     );
 
@@ -835,11 +836,13 @@ class CustomDeliverInterventionPageState
                     .toString(),
                 clientAuditDetails: ClientAuditDetails(
                   createdBy: RegistrationDeliverySingleton().loggedInUserUuid!,
-                  createdTime: context.millisecondsSinceEpoch(),
+                  createdTime: ContextUtilityExtensions(context)
+                      .millisecondsSinceEpoch(),
                 ),
                 auditDetails: AuditDetails(
                   createdBy: RegistrationDeliverySingleton().loggedInUserUuid!,
-                  createdTime: context.millisecondsSinceEpoch(),
+                  createdTime: ContextUtilityExtensions(context)
+                      .millisecondsSinceEpoch(),
                 ),
               ))
           .toList(),
@@ -1124,6 +1127,8 @@ class CustomResourceBeneficiaryCardState
       return 'VAS - Red Capsule';
     } else if (sku == 'Blue VAS') {
       return 'VAS - Blue Capsule';
+    } else if (sku == Constants.spaq1 || sku == Constants.spaq2) {
+      return localizations.translate(local_utils.getSpaqName(sku));
     }
     return sku; // Fallback to original if no match
   }

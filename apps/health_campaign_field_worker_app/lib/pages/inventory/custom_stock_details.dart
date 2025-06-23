@@ -5,6 +5,7 @@ import 'package:digit_data_model/data_model.dart';
 import 'package:digit_scanner/blocs/scanner.dart';
 import 'package:flutter/services.dart';
 import '../../utils/upper_case.dart';
+import '../../utils/utils.dart';
 import './qr_scanner.dart';
 import 'package:digit_ui_components/digit_components.dart';
 import 'package:digit_ui_components/services/location_bloc.dart';
@@ -1118,10 +1119,10 @@ class CustomStockDetailsPageState
                                                   .map((variant) {
                                                 return DropdownItem(
                                                   name: localizations
-                                                      .translate(
+                                                      .translate(getSpaqName(
                                                         variant.sku ??
                                                             variant.id,
-                                                      )
+                                                      ))
                                                       .toUpperCase(),
                                                   code: variant.id,
                                                 );
@@ -1152,18 +1153,12 @@ class CustomStockDetailsPageState
                                                       null)
                                                   ? DropdownItem(
                                                       name: localizations
-                                                          .translate((form
-                                                                          .control(
-                                                                              _productVariantKey)
-                                                                          .value
-                                                                      as ProductVariantModel)
-                                                                  .sku ??
-                                                              (form
-                                                                          .control(
-                                                                              _productVariantKey)
-                                                                          .value
-                                                                      as ProductVariantModel)
-                                                                  .id)
+                                                          .translate(getSpaqName(
+                                                              (form.control(_productVariantKey).value as ProductVariantModel)
+                                                                      .sku ??
+                                                                  (form.control(_productVariantKey).value
+                                                                          as ProductVariantModel)
+                                                                      .id))
                                                           .toUpperCase(),
                                                       code: (form
                                                                   .control(

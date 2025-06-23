@@ -27,6 +27,7 @@ import 'package:registration_delivery/utils/utils.dart';
 
 import '../../../router/app_router.dart';
 import '../../../utils/app_enums.dart';
+import '../../../utils/utils.dart';
 
 @RoutePage()
 class CustomDeliverySummaryPage extends LocalizedStatefulWidget {
@@ -461,13 +462,14 @@ class CustomDeliverySummaryPageState
                                               i18.common.coreCommonNA)
                                           : variants
                                                   ?.map((e) =>
-                                                      '${getLocalizedMessage(e.productName)} : ${e.quantityDelivered}')
+                                                      '${getLocalizedMessage(localizations.translate(getSpaqName(e.productName)))} : ${e.quantityDelivered}')
                                                   .toList()
                                                   .join('\n') ??
                                               localizations.translate(
                                                   i18.common.coreCommonNA),
                                       labelFlex: 5,
                                       padding: EdgeInsets.zero,
+                                      maxLines: 4,
                                     ),
                                   ]),
                             ]);

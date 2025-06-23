@@ -31,6 +31,7 @@ import '../../blocs/inventory_management/custom_inventory_report.dart';
 import '../../utils/constants.dart';
 import '../../utils/extensions/extensions.dart';
 import '../../utils/upper_case.dart';
+import '../../utils/utils.dart';
 
 @RoutePage()
 class CustomInventoryReportDetailsPage extends LocalizedStatefulWidget {
@@ -443,9 +444,10 @@ class CustomInventoryReportDetailsPageState
                                                           return DropdownItem(
                                                             name: localizations
                                                                 .translate(
+                                                                    getSpaqName(
                                                               variant.sku ??
                                                                   variant.id,
-                                                            ),
+                                                            )),
                                                             code: variant.id,
                                                           );
                                                         }).toList(),
@@ -474,19 +476,25 @@ class CustomInventoryReportDetailsPageState
                                                               context.read<
                                                                   CustomInventoryReportBloc>());
                                                         },
+                                                        sentenceCaseEnabled:
+                                                            false,
                                                         selectedOption: (form
                                                                     .control(
                                                                         _productVariantKey)
                                                                     .value !=
                                                                 null)
                                                             ? DropdownItem(
-                                                                name: localizations.translate((form.control(_productVariantKey).value
-                                                                            as ProductVariantModel)
-                                                                        .sku ??
-                                                                    (form.control(_productVariantKey).value
-                                                                            as ProductVariantModel)
-                                                                        .id),
-                                                                code: (form.control(_productVariantKey).value
+                                                                name: localizations
+                                                                    .translate(getSpaqName((form.control(_productVariantKey).value as ProductVariantModel)
+                                                                            .sku ??
+                                                                        (form.control(_productVariantKey).value
+                                                                                as ProductVariantModel)
+                                                                            .id))
+                                                                    .toUpperCase(),
+                                                                code: (form
+                                                                            .control(
+                                                                                _productVariantKey)
+                                                                            .value
                                                                         as ProductVariantModel)
                                                                     .id)
                                                             : const DropdownItem(

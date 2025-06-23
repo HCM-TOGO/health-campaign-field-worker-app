@@ -223,6 +223,11 @@ class _VaccineSelectionPageState extends LocalizedState<VaccineSelectionPage> {
                                           'SingleValueList') {
                                         controller[i].text = 'NOT_SELECTED';
                                       }
+                                      if (itemsAttributes?[i].dataType ==
+                                              'MultiValueList' &&
+                                          controller[i].text == '') {
+                                        controller[i].text = 'NOT_SELECTED';
+                                      }
                                       if (itemsAttributes?[i].required ==
                                               true &&
                                           ((itemsAttributes?[i].dataType ==

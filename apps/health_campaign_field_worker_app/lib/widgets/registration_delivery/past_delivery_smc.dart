@@ -139,7 +139,8 @@ Widget buildTableContentSMC(
                             if (translated == 'SPAQ 1') {
                               return [
                                 TextSpan(
-                                  text: translated,
+                                  text: localizations
+                                      .translate(getSpaqName(translated)),
                                   style: const TextStyle(
                                     fontWeight: FontWeight.bold,
                                     color: Colors.orange,
@@ -149,7 +150,8 @@ Widget buildTableContentSMC(
                             } else if (translated == 'SPAQ 2') {
                               return [
                                 TextSpan(
-                                  text: translated,
+                                  text: localizations
+                                      .translate(getSpaqName(translated)),
                                   style: const TextStyle(
                                     fontWeight: FontWeight.bold,
                                     color: Colors.red,

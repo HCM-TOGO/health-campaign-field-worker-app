@@ -114,6 +114,13 @@ class Constants {
   static const String spaq1 = "SPAQ 1";
   static const String spaq2 = "SPAQ 2";
 
+  static const String spaq1Name = "SPAQ1_NAME";
+  static const String spaq2Name = "SPAQ2_NAME";
+
+  static const Map<String, String> spaqCodeNameMap = {
+    Constants.spaq1: Constants.spaq1Name,
+    Constants.spaq2: Constants.spaq2Name,
+  };
   // for reportSummary
 
   static const String registered = "registered";
