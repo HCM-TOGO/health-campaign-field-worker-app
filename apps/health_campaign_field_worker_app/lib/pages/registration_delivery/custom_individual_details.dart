@@ -489,29 +489,29 @@ class CustomIndividualDetailsPageState
                                         type: ToastType.error,
                                       );
                                     } else {
-                                      bloc.add(
-                                        BeneficiaryRegistrationAddMemberEvent(
-                                          beneficiaryType:
-                                              RegistrationDeliverySingleton()
-                                                  .beneficiaryType!,
-                                          householdModel: householdModel,
-                                          individualModel: individual,
-                                          addressModel: addressModel,
-                                          userUuid:
-                                              RegistrationDeliverySingleton()
-                                                  .loggedInUserUuid!,
-                                          projectId:
-                                              RegistrationDeliverySingleton()
-                                                  .projectId!,
-                                          tag: scannerBloc
-                                                  .state.qrCodes.isNotEmpty
-                                              ? scannerBloc.state.qrCodes.first
-                                              : null,
-                                        ),
-                                      );
-                                      // final boundary =
-                                      //     RegistrationDeliverySingleton()
-                                      //         .boundary;
+                                      // bloc.add(
+                                      //   BeneficiaryRegistrationAddMemberEvent(
+                                      //     beneficiaryType:
+                                      //         RegistrationDeliverySingleton()
+                                      //             .beneficiaryType!,
+                                      //     householdModel: householdModel,
+                                      //     individualModel: individual,
+                                      //     addressModel: addressModel,
+                                      //     userUuid:
+                                      //         RegistrationDeliverySingleton()
+                                      //             .loggedInUserUuid!,
+                                      //     projectId:
+                                      //         RegistrationDeliverySingleton()
+                                      //             .projectId!,
+                                      //     tag: scannerBloc
+                                      //             .state.qrCodes.isNotEmpty
+                                      //         ? scannerBloc.state.qrCodes.first
+                                      //         : null,
+                                      //   ),
+                                      // );
+                                      final boundary =
+                                          RegistrationDeliverySingleton()
+                                              .boundary;
                                       // bloc.add(
                                       //   BeneficiaryRegistrationSummaryEvent(
                                       //     projectId: projectId!,
