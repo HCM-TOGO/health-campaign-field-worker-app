@@ -1,5 +1,6 @@
 import 'package:auto_route/auto_route.dart';
 import 'package:digit_data_model/data_model.dart';
+import 'package:digit_scanner/blocs/scanner.dart';
 import 'package:digit_ui_components/digit_components.dart';
 import 'package:digit_ui_components/theme/digit_extended_theme.dart';
 import 'package:digit_ui_components/utils/date_utils.dart';
@@ -62,17 +63,21 @@ class CustomSummaryBeneficiaryPageState
     final theme = Theme.of(context);
     final textTheme = theme.digitTextTheme(context);
     final bloc = context.read<CustomBeneficiaryRegistrationBloc>();
-    final router = context.router;
 
     return PopScope(
       onPopInvoked: (val) {
-        context.read<CustomBeneficiaryRegistrationBloc>().add(
-              BeneficiaryRegistrationCreateEvent(
-                projectId: RegistrationDeliverySingleton().projectId!,
-                userUuid: RegistrationDeliverySingleton().loggedInUserUuid!,
-                boundary: RegistrationDeliverySingleton().boundary!,
-              ),
-            );
+        // context.read<CustomBeneficiaryRegistrationBloc>().add(
+        //       BeneficiaryRegistrationAddMemberEvent(
+        //         projectId: RegistrationDeliverySingleton().projectId!,
+        //         userUuid: RegistrationDeliverySingleton().loggedInUserUuid!,
+        //         householdModel: bloc.state.householdModel!,
+        //         beneficiaryType:
+        //             RegistrationDeliverySingleton().beneficiaryType!,
+        //         individualModel: widget.individualModel,
+        //         addressModel: bloc.state.householdModel!.address!,
+        //         // boundary: RegistrationDeliverySingleton().boundary!,
+        //       ),
+        //     );
       },
       child: Scaffold(
           body: BlocConsumer<CustomBeneficiaryRegistrationBloc,
@@ -95,7 +100,7 @@ class CustomSummaryBeneficiaryPageState
                     );
                 router.push(CustomBeneficiaryAcknowledgementRoute(
                   enableViewHousehold: true,
-                  acknowledgementType: AcknowledgementType.addHousehold,
+                  acknowledgementType: AcknowledgementType.addMember,
                 ));
               }
             },
@@ -189,6 +194,30 @@ class CustomSummaryBeneficiaryPageState
                             );
                             if (submit ?? false) {
                               if (context.mounted) {
+                                final CustomSearchHouseholdsBloc
+                                    customSearchHouseholdsBloc =
+                                    context.read<CustomSearchHouseholdsBloc>();
+                                final scannerBloc =
+                                    context.read<DigitScannerBloc>();
+                                bloc.add(
+                                  BeneficiaryRegistrationAddMemberEvent(
+                                    beneficiaryType:
+                                        RegistrationDeliverySingleton()
+                                            .beneficiaryType!,
+                                    householdModel:
+                                        householdState.householdModel!,
+                                    individualModel: widget.individualModel,
+                                    addressModel:
+                                        householdState.householdModel!.address!,
+                                    userUuid: RegistrationDeliverySingleton()
+                                        .loggedInUserUuid!,
+                                    projectId: RegistrationDeliverySingleton()
+                                        .projectId!,
+                                    tag: scannerBloc.state.qrCodes.isNotEmpty
+                                        ? scannerBloc.state.qrCodes.first
+                                        : null,
+                                  ),
+                                );
                                 customSearchHouseholdsBloc.add(
                                     const CustomSearchHouseholdsEvent.clear());
                                 customSearchHouseholdsBloc.add(
@@ -205,17 +234,23 @@ class CustomSummaryBeneficiaryPageState
                                     offset: 0,
                                   ),
                                 );
-                                router.popUntil((route) =>
+                                context.router.popUntil((route) =>
                                     route.settings.name ==
                                     SearchBeneficiaryRoute.name);
-                                router
+                                // await Future.delayed(
+                                //     const Duration(seconds: 1));
+                                // context.router
+                                //     .push(CustomStockReconciliationRoute());
+
+                                context.router
                                     .push(CustomBeneficiaryAcknowledgementRoute(
                                   enableViewHousehold: true,
                                   acknowledgementType:
                                       AcknowledgementType.addMember,
                                 ));
                               }
-                            };
+                            }
+                            ;
                           },
                         );
                       },
@@ -330,14 +365,16 @@ class CustomSummaryBeneficiaryPageState
                                   LabelValueItem(
                                       label: localizations.translate(i18
                                           .individualDetails.genderLabelText),
-                                      value: widget.individualModel?.gender != null
-                                                  ? localizations.translate(
-                                                      widget.individualModel
-                                                              ?.gender?.name
-                                                              .toUpperCase() ??
-                                                          '')
-                                                  : localizations.translate(
-                                                      i18.common.coreCommonNA),
+                                      value:
+                                          widget.individualModel?.gender != null
+                                              ? localizations.translate(widget
+                                                      .individualModel
+                                                      ?.gender
+                                                      ?.name
+                                                      .toUpperCase() ??
+                                                  '')
+                                              : localizations.translate(
+                                                  i18.common.coreCommonNA),
                                       labelFlex: 5,
                                       padding:
                                           const EdgeInsets.only(top: spacer2)),
