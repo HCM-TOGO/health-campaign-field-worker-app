@@ -407,6 +407,22 @@ class CustomStockReconciliationPageState
                                             // Map your boundary types to facility usages.
                                             if (selectedProject
                                                     ?.address?.boundaryType ==
+                                                Constants
+                                                    .countryBoundaryLevel) {
+                                              // This is the NATIONAL filter. The boundary is 'Country'
+                                              final usageFiltered =
+                                                  allFacilities
+                                                      .where((element) =>
+                                                          element.usage ==
+                                                          Constants
+                                                              .stateFacility)
+                                                      .toList();
+                                              filteredFacilitiesList =
+                                                  usageFiltered.isEmpty
+                                                      ? filteredFacilitiesList
+                                                      : usageFiltered;
+                                            } else if (selectedProject
+                                                    ?.address?.boundaryType ==
                                                 Constants.stateBoundaryLevel) {
                                               // This is the REGIONAL filter. The boundary is 'Region', so we filter for 'Region Facility'.
                                               final usageFiltered =
@@ -602,14 +618,14 @@ class CustomStockReconciliationPageState
                                                               .translate(
                                                                   local_utils
                                                                       .getSpaqName(
-                                                            (field.control.value
-                                                                        as ProductVariantModel)
-                                                                    .sku ??
-                                                                (field.control
-                                                                            .value
-                                                                        as ProductVariantModel)
-                                                                    .id,
-                                                          )).toUpperCase(),
+                                                                (field.control.value
+                                                                            as ProductVariantModel)
+                                                                        .sku ??
+                                                                    (field.control.value
+                                                                            as ProductVariantModel)
+                                                                        .id,
+                                                              ))
+                                                              .toUpperCase(),
                                                           code: (field.control
                                                                       .value
                                                                   as ProductVariantModel)
