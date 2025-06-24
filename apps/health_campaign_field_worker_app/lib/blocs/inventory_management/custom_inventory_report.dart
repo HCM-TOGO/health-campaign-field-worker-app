@@ -86,7 +86,7 @@ class CustomInventoryReportBloc
         receiverId = null;
         senderId = facilityId;
       }
-      final data = (receiverId != null
+      Iterable<StockModel> data = (receiverId != null
               ? await stockRepository.search(
                   StockSearchModel(
                     transactionType: transactionType,
@@ -109,6 +109,12 @@ class CustomInventoryReportBloc
               element.auditDetails != null &&
               element.auditDetails?.createdBy ==
                   InventorySingleton().loggedInUserUuid);
+
+      if (reportType == InventoryReportType.dispatch) {
+        data = data.where(
+          (element) => element.transactionReason == null,
+        );
+      }
 
       final groupedData = data.groupListsBy(
         (element) => DateFormat('dd MMM yyyy').format(
