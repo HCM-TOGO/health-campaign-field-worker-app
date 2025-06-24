@@ -447,7 +447,7 @@ class CustomInventoryReportDetailsPageState
                                                                     getSpaqName(
                                                               variant.sku ??
                                                                   variant.id,
-                                                            )),
+                                                            )).toUpperCase(),
                                                             code: variant.id,
                                                           );
                                                         }).toList(),
