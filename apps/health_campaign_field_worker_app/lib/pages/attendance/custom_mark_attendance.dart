@@ -308,33 +308,36 @@ class _CustomMarkAttendancePageState extends State<CustomMarkAttendancePage> {
                                             ),
                                           ),
                                   ]),
-                              DigitCard(
-                                margin:
-                                    EdgeInsets.all(theme.spacerTheme.spacer3),
-                                children: [
-                                  ReactiveForm(
-                                    formGroup: form,
-                                    child: ReactiveWrapperField(
-                                      formControlName: _commentKey,
-                                      builder: (field) => LabeledField(
-                                        label: localizations
-                                            .translate(i18.common.commentKey),
-                                        child: DigitTextFormInput(
-                                          errorMessage: field.errorText,
-                                          onChange: (value) {
-                                            form.control(_commentKey).value =
-                                                value;
-                                          },
-                                          initialValue:
-                                              form.control(_commentKey).value,
-                                          inputFormatters: [
-                                            UpperCaseTextFormatter(),
-                                          ],
+                              Offstage(
+                                offstage: viewOnly,
+                                child: DigitCard(
+                                  margin:
+                                      EdgeInsets.all(theme.spacerTheme.spacer3),
+                                  children: [
+                                    ReactiveForm(
+                                      formGroup: form,
+                                      child: ReactiveWrapperField(
+                                        formControlName: _commentKey,
+                                        builder: (field) => LabeledField(
+                                          label: localizations
+                                              .translate(i18.common.commentKey),
+                                          child: DigitTextFormInput(
+                                            errorMessage: field.errorText,
+                                            onChange: (value) {
+                                              form.control(_commentKey).value =
+                                                  value;
+                                            },
+                                            initialValue:
+                                                form.control(_commentKey).value,
+                                            inputFormatters: [
+                                              UpperCaseTextFormatter(),
+                                            ],
+                                          ),
                                         ),
                                       ),
-                                    ),
-                                  )
-                                ],
+                                    )
+                                  ],
+                                ),
                               ),
                             ],
                           );
