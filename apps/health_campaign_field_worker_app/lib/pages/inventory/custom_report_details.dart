@@ -18,7 +18,7 @@ import 'package:inventory_management/widgets/component_wrapper/facility_bloc_wra
 import 'package:inventory_management/widgets/component_wrapper/product_variant_bloc_wrapper.dart';
 import 'package:inventory_management/widgets/inventory/no_facilities_assigned_dialog.dart';
 import 'package:inventory_management/widgets/localized.dart';
-import 'package:inventory_management/widgets/reports/readonly_pluto_grid.dart';
+import '../../widgets/reports/readonly_pluto_grid.dart';
 // import 'package:inventory_management/blocs/inventory_report.dart';
 import 'package:inventory_management/blocs/product_variant.dart';
 import 'package:inventory_management/blocs/stock_reconciliation.dart';
@@ -564,9 +564,10 @@ class CustomInventoryReportDetailsPageState
                                                     key: quantityKey,
                                                     width: 200,
                                                   ),
-                                                  if (widget.reportType ==
-                                                          InventoryReportType
-                                                              .returned ||
+                                                  if (
+                                                      // widget.reportType ==
+                                                      //       InventoryReportType
+                                                      //           .returned ||
                                                       (widget.reportType ==
                                                               InventoryReportType
                                                                   .dispatch &&
@@ -617,9 +618,10 @@ class CustomInventoryReportDetailsPageState
                                                                     .quantity ??
                                                                 '',
                                                           ),
-                                                          if (widget.reportType ==
-                                                                  InventoryReportType
-                                                                      .returned ||
+                                                          if (
+                                                              // widget.reportType ==
+                                                              //       InventoryReportType
+                                                              //           .returned ||
                                                               (widget.reportType ==
                                                                       InventoryReportType
                                                                           .dispatch &&
