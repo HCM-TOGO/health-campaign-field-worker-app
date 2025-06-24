@@ -49,12 +49,12 @@ class CustomRecordReferralDetailsPage extends LocalizedStatefulWidget {
 class _CustomRecordReferralDetailsPageState
     extends LocalizedState<CustomRecordReferralDetailsPage> {
   static const _nameOfChildKey = 'nameOfChild';
-  static const _evaluationFacilityKey = 'evaluationFacility';
+  // static const _evaluationFacilityKey = 'evaluationFacility';
   static const _referralReason = 'referralReason';
-  static const _referredByKey = 'referredBy';
+  // static const _referredByKey = 'referredBy';
   static const _genderKey = 'gender';
-  static const _cycleKey = 'cycle';
-  static const _beneficiaryIdKey = 'beneficiaryId';
+  // static const _cycleKey = 'cycle';
+  static const _beneficiaryIdKey = '';
   static const _referralCodeKey = 'referralCode';
   static const _ageKey = 'ageInMonths';
   String selectedReasonIndex = '';
@@ -798,8 +798,8 @@ class _CustomRecordReferralDetailsPageState
                                               ),
                                               child: DigitTextFormInput(
                                                 inputFormatters: [
-                                          UpperCaseTextFormatter(),
-                                        ],
+                                                  UpperCaseTextFormatter(),
+                                                ],
                                                 onChange: (val) => {
                                                   form
                                                       .control(_nameOfChildKey)
@@ -842,8 +842,8 @@ class _CustomRecordReferralDetailsPageState
                                                   .toString(),
                                               child: DigitTextFormInput(
                                                 inputFormatters: [
-                                          UpperCaseTextFormatter(),
-                                        ],
+                                                  UpperCaseTextFormatter(),
+                                                ],
                                                 onChange: (val) => {
                                                   form
                                                       .control(
@@ -903,7 +903,6 @@ class _CustomRecordReferralDetailsPageState
                                                 i18.common.ageInMonths,
                                               ),
                                               child: DigitTextFormInput(
-                                                
                                                 onChange: (val) => {
                                                   form
                                                       .control(_ageKey)
@@ -1126,7 +1125,7 @@ class _CustomRecordReferralDetailsPageState
           Validators.delegate((validator) {
             final value = validator.value?.toString().trim();
             if (value == null || value.isEmpty) return null;
-            const pattern = r"^[A-Za-z\s]+$"; 
+            const pattern = r"^[A-Za-z\s]+$";
             final regExp = RegExp(pattern);
             return regExp.hasMatch(value) ? null : {'onlyAlphabets': true};
           }),
