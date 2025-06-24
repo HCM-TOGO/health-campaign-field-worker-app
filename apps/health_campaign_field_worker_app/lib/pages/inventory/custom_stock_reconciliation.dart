@@ -609,7 +609,7 @@ class CustomStockReconciliationPageState
                                                                             .value
                                                                         as ProductVariantModel)
                                                                     .id,
-                                                          )),
+                                                          )).toUpperCase(),
                                                           code: (field.control
                                                                       .value
                                                                   as ProductVariantModel)

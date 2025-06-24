@@ -18,6 +18,8 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:intl/intl.dart';
 import 'package:reactive_forms/reactive_forms.dart';
 
+import '../../utils/utils.dart' as local_utils;
+
 import '../../../utils/i18_key_constants.dart' as i18;
 // import 'package:';
 import '../../../utils/utils.dart' show CustomValidator;
@@ -432,6 +434,10 @@ class CustomComplaintsDetailsPageState
                               'maxLength': (object) => localizations.translate(i18
                                   .individualDetails
                                   .mobileNumberInvalidFormatValidationMessage),
+                              'startsWith7or9': (object) =>
+                                  localizations.translate(i18_local
+                                      .individualDetails
+                                      .mobileNumberStartWith7or9ValidationMessage),
                               // 'minLength': (object) => localizations.translate(
                               //     i18.complaints.validationMinLengthError),
                               // 'maxLength': (object) => localizations
@@ -510,6 +516,10 @@ class CustomComplaintsDetailsPageState
                               'maxLength': (object) => localizations.translate(i18
                                   .individualDetails
                                   .mobileNumberInvalidFormatValidationMessage),
+                              'startsWith7or9': (object) =>
+                                  localizations.translate(i18_local
+                                      .individualDetails
+                                      .mobileNumberStartWith7or9ValidationMessage),
                             },
                             builder: (field) {
                               return LabeledField(
@@ -620,7 +630,9 @@ class CustomComplaintsDetailsPageState
           Validators.delegate(
               (validator) => CustomValidator.validMobileNumber(validator)),
           // Validators.minLength(8),
-          Validators.maxLength(8)
+          Validators.maxLength(8),
+          Validators.delegate((validator) =>
+              local_utils.CustomValidator.startsWith7or9(validator)),
         ],
       ),
       _supervisorName: FormControl<String>(
@@ -645,6 +657,8 @@ class CustomComplaintsDetailsPageState
           Validators.delegate(
               (validator) => CustomValidator.validMobileNumber(validator)),
           Validators.maxLength(8),
+          Validators.delegate((validator) =>
+              local_utils.CustomValidator.startsWith7or9(validator)),
         ],
       ),
       _complaintDescription: FormControl<String>(
