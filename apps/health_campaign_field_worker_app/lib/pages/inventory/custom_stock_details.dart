@@ -1,5 +1,4 @@
 import 'package:auto_route/auto_route.dart';
-import 'package:collection/collection.dart';
 import 'package:digit_components/widgets/atoms/digit_toaster.dart';
 import 'package:digit_data_model/data_model.dart';
 import 'package:digit_scanner/blocs/scanner.dart';
@@ -19,7 +18,6 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:gs1_barcode_parser/gs1_barcode_parser.dart';
 import 'package:inventory_management/inventory_management.dart';
-import 'package:inventory_management/router/inventory_router.gm.dart';
 import 'package:reactive_forms/reactive_forms.dart';
 
 import 'package:inventory_management/utils/i18_key_constants.dart' as i18;
@@ -868,6 +866,134 @@ class CustomStockDetailsPageState
                                                 ),
                                               );
                                         } else {
+                                          final now = DateTime.now();
+                                          final startOfToday = DateTime(
+                                                  now.year, now.month, now.day)
+                                              .millisecondsSinceEpoch;
+                                          final endOfToday = DateTime(
+                                                  now.year,
+                                                  now.month,
+                                                  now.day,
+                                                  23,
+                                                  59,
+                                                  59,
+                                                  999)
+                                              .millisecondsSinceEpoch;
+                                          List<StockModel> sentStocks =
+                                              await context
+                                                  .repository<StockModel,
+                                                      StockSearchModel>()
+                                                  .search(
+                                                    StockSearchModel(
+                                                      // ignore: avoid_dynamic_calls
+                                                      productVariantId: form
+                                                          .control(
+                                                              _productVariantKey)
+                                                          .value
+                                                          .id,
+                                                      senderId: primaryId!
+                                                          .split(Constants
+                                                              .pipeSeparator)
+                                                          .last,
+                                                      // receiverId: [
+                                                      //   deliveryTeamSelected
+                                                      //       ? "FAC_Delivery Team"
+                                                      //       : selectedFacilityId!
+                                                      // ],
+                                                      transactionType: [
+                                                        TransactionType
+                                                            .dispatched
+                                                            .toValue()
+                                                      ],
+                                                    ),
+                                                  );
+                                          int sentStocksCount = sentStocks
+                                              .where((element) =>
+                                                  element.transactionReason ==
+                                                      null &&
+                                                  element.auditDetails !=
+                                                      null &&
+                                                  element.receiverId ==
+                                                      (deliveryTeamSelected
+                                                          ? 'FAC_${selectedFacilityId}'
+                                                          : selectedFacilityId) &&
+                                                  element.auditDetails
+                                                          ?.createdBy ==
+                                                      InventorySingleton()
+                                                          .loggedInUserUuid &&
+                                                  element.auditDetails!
+                                                          .createdTime >=
+                                                      startOfToday &&
+                                                  element.auditDetails!
+                                                          .createdTime <=
+                                                      endOfToday)
+                                              .fold<int>(
+                                                  0,
+                                                  (sum, element) =>
+                                                      sum +
+                                                      int.tryParse(
+                                                          element.quantity ?? '0')!);
+
+                                          List<StockModel>
+                                              receivedFromReturnStocks =
+                                              await context
+                                                  .repository<StockModel,
+                                                      StockSearchModel>()
+                                                  .search(
+                                                    StockSearchModel(
+                                                      // ignore: avoid_dynamic_calls
+                                                      productVariantId: form
+                                                          .control(
+                                                              _productVariantKey)
+                                                          .value
+                                                          .id,
+                                                      // receiverId: [
+                                                      //   primaryId!
+                                                      //       .split(Constants
+                                                      //           .pipeSeparator)
+                                                      //       .last
+                                                      // ],
+                                                      senderId: deliveryTeamSelected
+                                                          ? 'FAC_${selectedFacilityId}'
+                                                          : selectedFacilityId,
+                                                      transactionType: [
+                                                        TransactionType.received
+                                                            .toValue()
+                                                      ],
+                                                    ),
+                                                  );
+                                          int receivedFromReturnStocksCount =
+                                              receivedFromReturnStocks
+                                                  .where((element) =>
+                                                      element.transactionReason ==
+                                                          TransactionReason
+                                                              .returned
+                                                              .toValue() &&
+                                                      element.auditDetails !=
+                                                          null &&
+                                                      element.receiverId ==
+                                                          primaryId!
+                                                              .split(Constants
+                                                                  .pipeSeparator)
+                                                              .last &&
+                                                      // element.auditDetails
+                                                      //         ?.createdBy ==
+                                                      //     InventorySingleton()
+                                                      //         .loggedInUserUuid &&
+                                                      element.auditDetails!
+                                                              .createdTime >=
+                                                          startOfToday &&
+                                                      element.auditDetails!
+                                                              .createdTime <=
+                                                          endOfToday)
+                                                  .fold<int>(
+                                                      0,
+                                                      (sum, element) =>
+                                                          sum +
+                                                          int.tryParse(element
+                                                                  .quantity ??
+                                                              '0')!);
+
                                           if (entryType ==
                                               StockRecordEntryType.dispatch) {
                                             if (isSpaq1 &&
@@ -943,8 +1069,24 @@ class CustomStockDetailsPageState
                                               entryType ==
                                                   StockRecordEntryType
                                                       .returned) {
-                                            int spaqLocal1 = context.spaq1;
-                                            int spaqLocal2 = context.spaq2;
+                                            int? spaq1Quantity = entryType ==
+                                                    StockRecordEntryType
+                                                        .returned
+                                                ? sentStocksCount -
+                                                    receivedFromReturnStocksCount
+                                                : context.spaq1;
+                                            int? spaq2Quantity = entryType ==
+                                                    StockRecordEntryType
+                                                        .returned
+                                                ? sentStocksCount -
+                                                    receivedFromReturnStocksCount
+                                                : context.spaq2;
+                                            int spaqLocal1 = spaq1Quantity! > 0
+                                                ? spaq1Quantity!
+                                                : 0;
+                                            int spaqLocal2 = spaq2Quantity! > 0
+                                                ? spaq2Quantity!
+                                                : 0;
 
                                             if (isSpaq1) {
                                               spaqLocal1 = int.parse(
@@ -970,6 +1112,8 @@ class CustomStockDetailsPageState
                                                     StockRecordEntryType
                                                         .returned) {
                                               if (isSpaq1 &&
+                                                      (quantity >
+                                                          spaq1Quantity!) ||
                                                   quantity > context.spaq1) {
                                                 await DigitToast.show(
                                                   context,
@@ -990,7 +1134,9 @@ class CustomStockDetailsPageState
                                                 );
                                                 return;
                                               } else if (!isSpaq1 &&
-                                                  quantity > context.spaq2) {
+                                                  (quantity > spaq2Quantity! ||
+                                                      quantity >
+                                                          context.spaq2)) {
                                                 await DigitToast.show(
                                                   context,
                                                   options: DigitToastOptions(
