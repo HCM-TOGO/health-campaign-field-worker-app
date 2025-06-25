@@ -204,13 +204,12 @@ class Constants {
 
     final enableCrashlytics = config?.firebaseConfig?.enableCrashlytics ?? true;
     if (enableCrashlytics) {
-      // todo enable before the UAT
-      // firebase_services.initialize(
-      //   options: DefaultFirebaseOptions.currentPlatform,
-      //   onErrorMessage: (value) {
-      //     AppLogger.instance.error(title: 'CRASHLYTICS', message: value);
-      //   },
-      // );
+      firebase_services.initialize(
+        options: DefaultFirebaseOptions.currentPlatform,
+        onErrorMessage: (value) {
+          AppLogger.instance.error(title: 'CRASHLYTICS', message: value);
+        },
+      );
     }
 
     _version = version;
