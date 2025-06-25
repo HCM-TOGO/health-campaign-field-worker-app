@@ -139,9 +139,15 @@ class CustomSurveyFormViewPageState
                                 .read<LocationBloc>()
                                 .add(const LocationEvent.load());
 
-                            // Wait for the location to be obtained
-                            final locationState =
-                                context.read<LocationBloc>().state;
+                            // Wait for the location to be obtained by listening to the BLoC's stream
+                            final locationState = await context
+                                .read<LocationBloc>()
+                                .stream
+                                .firstWhere(
+                                  (state) =>
+                                      state.latitude != null &&
+                                      state.longitude != null,
+                                );
                             double? latitude = locationState.latitude;
                             double? longitude = locationState.longitude;
 
@@ -411,7 +417,6 @@ class CustomSurveyFormViewPageState
                                             : null,
                                         isRequired: e.required ?? false,
                                         child: DigitTextFormInput(
-                                          
                                           onChange: (value) {
                                             field.didChange(value);
                                             controller[index].text = value;
