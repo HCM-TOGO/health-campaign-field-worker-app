@@ -77,25 +77,26 @@ class CustomInventoryReportSelectionPageState
                     ),
                   ),
                 ),
-                if (!(InventorySingleton().isDistributor as bool)) const SizedBox(height: spacer4),
                 if (!(InventorySingleton().isDistributor as bool))
-                Padding(
-                  padding: const EdgeInsets.symmetric(horizontal: spacer2),
-                  child: MenuCard(
-                    heading: localizations.translate(
-                      i18.inventoryReportSelection.inventoryReportIssuedLabel,
-                    ),
-                    description: localizations.translate(i18
-                        .inventoryReportSelection
-                        .inventoryReportIssuedDescription),
-                    icon: Icons.logout,
-                    onTap: () => context.router.push(
-                      CustomInventoryReportDetailsRoute(
-                        reportType: InventoryReportType.dispatch,
+                  const SizedBox(height: spacer4),
+                if (!(InventorySingleton().isDistributor as bool))
+                  Padding(
+                    padding: const EdgeInsets.symmetric(horizontal: spacer2),
+                    child: MenuCard(
+                      heading: localizations.translate(
+                        i18.inventoryReportSelection.inventoryReportIssuedLabel,
+                      ),
+                      description: localizations.translate(i18
+                          .inventoryReportSelection
+                          .inventoryReportIssuedDescription),
+                      icon: Icons.logout,
+                      onTap: () => context.router.push(
+                        CustomInventoryReportDetailsRoute(
+                          reportType: InventoryReportType.dispatch,
+                        ),
                       ),
                     ),
                   ),
-                ),
                 const SizedBox(height: spacer4),
                 Padding(
                   padding: const EdgeInsets.symmetric(horizontal: spacer2),
@@ -153,25 +154,26 @@ class CustomInventoryReportSelectionPageState
                   ),
                 ),
                 const SizedBox(height: spacer4),
-                Padding(
-                  padding: const EdgeInsets.symmetric(horizontal: spacer2),
-                  child: MenuCard(
-                    heading: localizations.translate(
-                      i18.inventoryReportSelection
-                          .inventoryReportReconciliationLabel,
-                    ),
-                    description: localizations.translate(
-                      i18.inventoryReportSelection
-                          .inventoryReportReconciliationDescription,
-                    ),
-                    icon: Icons.store,
-                    onTap: () => context.router.push(
-                      CustomInventoryReportDetailsRoute(
-                        reportType: InventoryReportType.reconciliation,
+                if (!(InventorySingleton().isDistributor as bool))
+                  Padding(
+                    padding: const EdgeInsets.symmetric(horizontal: spacer2),
+                    child: MenuCard(
+                      heading: localizations.translate(
+                        i18.inventoryReportSelection
+                            .inventoryReportReconciliationLabel,
+                      ),
+                      description: localizations.translate(
+                        i18.inventoryReportSelection
+                            .inventoryReportReconciliationDescription,
+                      ),
+                      icon: Icons.store,
+                      onTap: () => context.router.push(
+                        CustomInventoryReportDetailsRoute(
+                          reportType: InventoryReportType.reconciliation,
+                        ),
                       ),
                     ),
                   ),
-                ),
               ]),
               const SizedBox(height: spacer4),
             ],

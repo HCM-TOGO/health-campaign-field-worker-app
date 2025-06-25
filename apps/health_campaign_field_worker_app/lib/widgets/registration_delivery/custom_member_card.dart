@@ -862,14 +862,7 @@ class CustomMemberCard extends StatelessWidget {
                   ),
                 ],
               ),
-              ((tasks ?? [])
-                              .where(
-                                (element) =>
-                                    element.status ==
-                                    Status.administeredSuccess.toValue(),
-                              )
-                              .lastOrNull ==
-                          null &&
+              ((tasks == null || tasks!.isEmpty) &&
                       !isSMCDelivered &&
                       !isVASDelivered &&
                       // !isNotEligibleSMC &&

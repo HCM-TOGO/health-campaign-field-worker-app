@@ -1059,34 +1059,73 @@ class CustomStockDetailsPageState
                                                   );
                                             }
                                           } else if (entryType ==
+                                              StockRecordEntryType.returned) {
+                                            int? spaq1Quantity = sentStocksCount -
+                                                receivedFromReturnStocksCount;
+                                            int? spaq2Quantity = sentStocksCount -
+                                                receivedFromReturnStocksCount;
+                                            int spaqLocal1 = spaq1Quantity > 0
+                                                ? spaq1Quantity
+                                                : 0;
+                                            int spaqLocal2 = spaq2Quantity > 0
+                                                ? spaq2Quantity
+                                                : 0;
+
+                                            if (isSpaq1 &&
+                                                quantity > spaq1Quantity) {
+                                              await DigitToast.show(
+                                                context,
+                                                options: DigitToastOptions(
+                                                    localizations.translate(
+                                                        i18_local
+                                                            .beneficiaryDetails
+                                                            .validationForExcessStockAcceptReturn),
+                                                    true,
+                                                    theme),
+                                              );
+                                              return;
+                                            } else if (!isSpaq1 &&
+                                                quantity > spaq2Quantity) {
+                                              await DigitToast.show(
+                                                context,
+                                                options: DigitToastOptions(
+                                                    localizations.translate(
+                                                        i18_local
+                                                            .beneficiaryDetails
+                                                            .validationForExcessStockAcceptReturn),
+                                                    true,
+                                                    theme),
+                                              );
+                                              return;
+                                            }
+
+                                            if (isSpaq1) {
+                                              spaqLocal1 = int.parse(
+                                                quantity.toString(),
+                                              );
+                                              spaqLocal2 = 0;
+                                            } else {
+                                              spaqLocal2 = int.parse(
+                                                quantity.toString(),
+                                              );
+                                              spaqLocal1 = 0;
+                                            }
+
+                                            context.read<AuthBloc>().add(
+                                                  AuthAddSpaqCountsEvent(
+                                                      spaq1Count: spaqLocal1,
+                                                      spaq2Count: spaqLocal2),
+                                                );
+                                          } else if (entryType ==
                                                   StockRecordEntryType
                                                       .dispatch ||
                                               entryType ==
                                                   StockRecordEntryType.loss ||
                                               entryType ==
                                                   StockRecordEntryType
-                                                      .damaged ||
-                                              entryType ==
-                                                  StockRecordEntryType
-                                                      .returned) {
-                                            int? spaq1Quantity = entryType ==
-                                                    StockRecordEntryType
-                                                        .returned
-                                                ? sentStocksCount -
-                                                    receivedFromReturnStocksCount
-                                                : context.spaq1;
-                                            int? spaq2Quantity = entryType ==
-                                                    StockRecordEntryType
-                                                        .returned
-                                                ? sentStocksCount -
-                                                    receivedFromReturnStocksCount
-                                                : context.spaq2;
-                                            int spaqLocal1 = spaq1Quantity! > 0
-                                                ? spaq1Quantity!
-                                                : 0;
-                                            int spaqLocal2 = spaq2Quantity! > 0
-                                                ? spaq2Quantity!
-                                                : 0;
+                                                      .damaged) {
+                                            int spaqLocal1 = context.spaq1;
+                                            int spaqLocal2 = context.spaq2;
 
                                             if (isSpaq1) {
                                               spaqLocal1 = int.parse(
@@ -1110,23 +1149,17 @@ class CustomStockDetailsPageState
                                                         .damaged ||
                                                 entryType ==
                                                     StockRecordEntryType
+                                                        .dispatch ||
+                                                entryType ==
+                                                    StockRecordEntryType
                                                         .returned) {
                                               if (isSpaq1 &&
-                                                      (quantity >
-                                                          spaq1Quantity!) ||
                                                   quantity > context.spaq1) {
                                                 await DigitToast.show(
                                                   context,
                                                   options: DigitToastOptions(
-                                                      localizations.translate(context
-                                                                  .isCDD ||
-                                                              entryType ==
-                                                                  StockRecordEntryType
-                                                                      .returned
-                                                          ? i18_local
-                                                              .beneficiaryDetails
-                                                              .validationForExcessStockReturn
-                                                          : i18_local
+                                                      localizations.translate(
+                                                          i18_local
                                                               .beneficiaryDetails
                                                               .validationForExcessStockDispatch),
                                                       true,
@@ -1134,21 +1167,12 @@ class CustomStockDetailsPageState
                                                 );
                                                 return;
                                               } else if (!isSpaq1 &&
-                                                  (quantity > spaq2Quantity! ||
-                                                      quantity >
-                                                          context.spaq2)) {
+                                                  quantity > context.spaq2) {
                                                 await DigitToast.show(
                                                   context,
                                                   options: DigitToastOptions(
-                                                      localizations.translate(context
-                                                                  .isCDD ||
-                                                              entryType ==
-                                                                  StockRecordEntryType
-                                                                      .returned
-                                                          ? i18_local
-                                                              .beneficiaryDetails
-                                                              .validationForExcessStockReturn
-                                                          : i18_local
+                                                      localizations.translate(
+                                                          i18_local
                                                               .beneficiaryDetails
                                                               .validationForExcessStockDispatch),
                                                       true,

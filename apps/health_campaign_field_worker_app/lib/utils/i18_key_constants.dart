@@ -1481,6 +1481,8 @@ class BeneficiaryDetails {
       'SEARCH_BY_BENEFICIARY_ID_TEXT_UPDATE';
   String get validationForExcessStockReturn =>
       "ERROR_VALIDATION_FOR_EXCESS_STOCK_RETURN";
+  String get validationForExcessStockAcceptReturn =>
+      "ERROR_VALIDATION_FOR_EXCESS_STOCK_ACCEPT_RETURN";
   String get errorHeader => "ERROR_VALIDATION_HEADER";
   String get goToHome => "GO_BACK_HOME";
   String get insufficientStockMessage => 'INSUFFICIENT_STOCK_MESSAGE_REGISTER';
