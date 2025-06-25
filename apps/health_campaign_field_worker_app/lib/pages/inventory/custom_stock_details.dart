@@ -88,7 +88,7 @@ class CustomStockDetailsPageState
         Validators.number(),
         Validators.required,
         Validators.min(1),
-        Validators.max(10000),
+        Validators.max(100000000),
       ]),
       _transactionReasonKey: FormControl<String>(),
       _waybillNumberKey: FormControl<String>(
