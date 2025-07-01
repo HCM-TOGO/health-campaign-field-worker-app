@@ -25,6 +25,10 @@ class AdditionalFieldsTypeMapper extends EnumMapper<AdditionalFieldsType> {
   @override
   AdditionalFieldsType decode(dynamic value) {
     switch (value) {
+      case "zeroDoseStatus":
+        return AdditionalFieldsType.zeroDoseStatus;
+      case "hasSideEffects":
+        return AdditionalFieldsType.hasSideEffects;
       case "deliveryStrategy":
         return AdditionalFieldsType.deliveryStrategy;
       case "cycleIndex":
@@ -55,6 +59,8 @@ class AdditionalFieldsTypeMapper extends EnumMapper<AdditionalFieldsType> {
         return AdditionalFieldsType.age;
       case "deliveryComment":
         return AdditionalFieldsType.deliveryComment;
+      case "deliveryType":
+        return AdditionalFieldsType.deliveryType;
       case "latitude":
         return AdditionalFieldsType.latitude;
       case "longitude":
@@ -71,6 +77,10 @@ class AdditionalFieldsTypeMapper extends EnumMapper<AdditionalFieldsType> {
   @override
   dynamic encode(AdditionalFieldsType self) {
     switch (self) {
+      case AdditionalFieldsType.zeroDoseStatus:
+        return "zeroDoseStatus";
+      case AdditionalFieldsType.hasSideEffects:
+        return "hasSideEffects";
       case AdditionalFieldsType.deliveryStrategy:
         return "deliveryStrategy";
       case AdditionalFieldsType.cycleIndex:
@@ -101,6 +111,8 @@ class AdditionalFieldsTypeMapper extends EnumMapper<AdditionalFieldsType> {
         return "age";
       case AdditionalFieldsType.deliveryComment:
         return "deliveryComment";
+      case AdditionalFieldsType.deliveryType:
+        return "deliveryType";
       case AdditionalFieldsType.latitude:
         return "latitude";
       case AdditionalFieldsType.longitude:

@@ -25,6 +25,7 @@ class _HomePageShowcaseData {
         deleteAll,
         db,
         closedHouseHold,
+        summaryReport,
       ];
 
   final distributorProgressBar = ShowcaseItemBuilder(
@@ -50,6 +51,10 @@ class _HomePageShowcaseData {
   final wareHouseManagerStockReconciliation = ShowcaseItemBuilder(
     messageLocalizationKey:
         i18.homeShowcase.wareHouseManagerStockReconciliation,
+  );
+
+  final summaryReport = ShowcaseItemBuilder(
+    messageLocalizationKey: i18.homeShowcase.summaryReport,
   );
 
   final wareHouseManagerChecklist = ShowcaseItemBuilder(

@@ -1,6 +1,7 @@
 import 'dart:async';
 import 'dart:convert';
 
+import 'package:digit_data_model/models/project_type/project_type_model.dart';
 import 'package:digit_ui_components/utils/app_logger.dart';
 import 'package:dio/dio.dart';
 import 'package:isar/isar.dart';
@@ -10,6 +11,7 @@ import '../../../models/mdms/service_registry/pgr_service_defenitions.dart';
 import '../../../models/mdms/service_registry/service_registry_model.dart';
 import '../../../models/role_actions/role_actions_model.dart';
 import '../../local_store/no_sql/schema/app_configuration.dart';
+import '../../local_store/no_sql/schema/project_types.dart';
 import '../../local_store/no_sql/schema/row_versions.dart';
 import '../../local_store/no_sql/schema/service_registry.dart';
 
@@ -89,6 +91,21 @@ class MdmsRepository {
     }
   }
 
+  Future<ProjectTypePrimaryWrapper> searchProjectType(
+    String apiEndPoint,
+    Map<String, dynamic> body,
+  ) async {
+    try {
+      final response = await _client.post(apiEndPoint, data: body);
+
+      return ProjectTypePrimaryWrapper.fromJson(
+        json.decode(response.toString())['MdmsRes'],
+      );
+    } catch (_) {
+      rethrow;
+    }
+  }
+
   Future<PGRServiceDefinitions> searchPGRServiceDefinitions(
     String apiEndPoint,
     Map<String, dynamic> body,
@@ -128,6 +145,8 @@ class MdmsRepository {
     }
 
     final element = result.hcmWrapperModel;
+    final hcmProducts = result.hcmProductsWrapperModel;
+    print("Current HCM Products: $hcmProducts");
     final appConfig = result.hcmWrapperModel?.appConfig.first;
     final commonMasters = result.commonMasters;
     final backgroundServiceConfig = BackgroundServiceConfig()
@@ -196,6 +215,15 @@ class MdmsRepository {
 
       return deletionReasonOption;
     }).toList();
+
+    final List<VaccineData>? vaccinationData = hcmProducts?.vaccinationData
+        .map((e) => VaccineData()
+          ..name = e.name
+          ..code = e.code
+          ..active = e.active
+          ..ageInDays = e.ageInDays)
+        .toList();
+    appConfiguration.vaccinationData = vaccinationData;
 
     final List<HouseholdMemberDeletionReasonOptions>?
         householdMemberDeletionReasonOptions =
@@ -304,6 +332,7 @@ class MdmsRepository {
       ..interfaces = interfaceList ?? [];
     appConfiguration.genderOptions = genderOptions;
     appConfiguration.idTypeOptions = idTypeOptions;
+    appConfiguration.vaccinationData = vaccinationData;
     appConfiguration.privacyPolicyConfig = privacyPolicy;
     appConfiguration.deliveryCommentOptions = deliveryCommentOptions;
     appConfiguration.householdDeletionReasonOptions =
@@ -390,6 +419,66 @@ class MdmsRepository {
       return RoleActionsWrapperModel.fromJson(json.decode(response.toString()));
     } catch (_) {
       rethrow;
+    }
+  }
+
+  FutureOr<void> writeToProjectTypeDB(
+    ProjectTypePrimaryWrapper result,
+    Isar isar,
+  ) async {
+    final List<ProjectTypeListCycle> newProjectTypeList = [];
+    final data = result.projectTypeWrapper?.projectTypes;
+    if (data != null && data.isNotEmpty) {
+      await isar.writeTxn(() async => await isar.projectTypeListCycles.clear());
+    }
+    for (final element in data ?? <ProjectType>[]) {
+      final newprojectType = ProjectTypeListCycle();
+
+      newprojectType.projectTypeId = element.id;
+      newprojectType.code = element.code;
+      newprojectType.group = element.group;
+      newprojectType.name = element.name;
+      newprojectType.beneficiaryType = element.beneficiaryType;
+      newprojectType.observationStrategy = element.observationStrategy;
+      newprojectType.resources = element.resources?.map((e) {
+        final productVariants = ProductVariants()
+          ..productVariantId = e.productVariantId
+          ..quantity = e.quantity.toString();
+
+        return productVariants;
+      }).toList();
+      newprojectType.cycles = element.cycles?.map((e) {
+        final newcycle = Cycles()
+          ..id = e.id
+          ..startDate = e.startDate
+          ..endDate = e.endDate
+          ..mandatoryWaitSinceLastCycleInDays =
+              e.mandatoryWaitSinceLastCycleInDays
+          ..deliveries = e.deliveries?.map((ele) {
+            final newDeliveries = Deliveries();
+            newDeliveries.deliveryStrategy = ele.deliveryStrategy;
+            newDeliveries.mandatoryWaitSinceLastDeliveryInDays =
+                ele.mandatoryWaitSinceLastDeliveryInDays;
+            newDeliveries.doseCriteriaModel = ele.doseCriteria?.map((e) {
+              final doseCriterias = DoseCriteria()
+                ..condition = e.condition
+                ..productVariants = e.productVariants?.map((p) {
+                  final productVariants = ProductVariants()
+                    ..quantity = p.quantity.toString()
+                    ..productVariantId = p.productVariantId.toString();
+
+                  return productVariants;
+                }).toList();
+
+              return doseCriterias;
+            }).toList();
+
+            return newDeliveries;
+          }).toList();
+
+        return newcycle;
+      }).toList();
+      newProjectTypeList.add(newprojectType);
     }
   }
 }

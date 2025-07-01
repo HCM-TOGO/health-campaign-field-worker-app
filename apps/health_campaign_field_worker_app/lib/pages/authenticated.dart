@@ -1,5 +1,4 @@
 import 'dart:async';
-
 import 'package:connectivity_plus/connectivity_plus.dart';
 import 'package:digit_data_model/data_model.dart';
 import 'package:digit_showcase/showcase_widget.dart';
@@ -16,6 +15,8 @@ import 'package:flutter_portal/flutter_portal.dart';
 import 'package:isar/isar.dart';
 import 'package:location/location.dart';
 import 'package:qr_flutter/qr_flutter.dart';
+import 'package:registration_delivery/registration_delivery.dart';
+import 'package:survey_form/survey_form.dart';
 import 'package:sync_service/sync_service_lib.dart';
 
 import '../blocs/app_initialization/app_initialization.dart';
@@ -125,6 +126,21 @@ class AuthenticatedPageWrapper extends StatelessWidget {
                   drawer: showDrawer ? drawerWidget(context) : null,
                   body: MultiBlocProvider(
                     providers: [
+                      BlocProvider(
+                        create: (_) => ServiceBloc(
+                          const ServiceEmptyState(),
+                          serviceDataRepository: context
+                              .repository<ServiceModel, ServiceSearchModel>(),
+                        ),
+                      ),
+
+                      BlocProvider(
+                        create: (_) => ServiceBloc(
+                          const ServiceEmptyState(),
+                          serviceDataRepository: context
+                              .repository<ServiceModel, ServiceSearchModel>(),
+                        ),
+                      ),
                       // INFO : Need to add bloc of package Here
                       BlocProvider(
                         create: (context) {
@@ -191,6 +207,23 @@ class AuthenticatedPageWrapper extends StatelessWidget {
                           downSyncLocalRepository: ctx.read<
                               LocalRepository<DownsyncModel,
                                   DownsyncSearchModel>>(),
+                          householdLocalRepository: ctx.read<
+                              LocalRepository<HouseholdModel,
+                                  HouseholdSearchModel>>(),
+                          householdMemberLocalRepository: ctx.read<
+                              LocalRepository<HouseholdMemberModel,
+                                  HouseholdMemberSearchModel>>(),
+                          projectBeneficiaryLocalRepository: ctx.read<
+                              LocalRepository<ProjectBeneficiaryModel,
+                                  ProjectBeneficiarySearchModel>>(),
+                          taskLocalRepository: ctx.read<
+                              LocalRepository<TaskModel, TaskSearchModel>>(),
+                          sideEffectLocalRepository: ctx.read<
+                              LocalRepository<SideEffectModel,
+                                  SideEffectSearchModel>>(),
+                          referralLocalRepository: ctx.read<
+                              LocalRepository<ReferralModel,
+                                  ReferralSearchModel>>(),
                         ),
                       ),
                     ],
@@ -297,74 +330,30 @@ class AuthenticatedPageWrapper extends StatelessWidget {
                       : null,
                 )
               ],
-              SidebarItem(
-                title: AppLocalizations.of(context).translate(
-                  i18.common.coreCommonProfile,
-                ),
-                icon: Icons.person,
-                onPressed: () async {
-                  final connectivityResult =
-                      await (Connectivity().checkConnectivity());
-                  final isOnline = connectivityResult.firstOrNull ==
-                          ConnectivityResult.wifi ||
-                      connectivityResult.firstOrNull ==
-                          ConnectivityResult.mobile;
 
-                  if (isOnline) {
-                    if (context.mounted) {
-                      Navigator.of(context, rootNavigator: true).pop();
-                      context.router.push(ProfileRoute());
-                    }
-                  } else {
-                    if (context.mounted) {
-                      showCustomPopup(
-                        context: context,
-                        builder: (ctx) => Popup(
-                          title: AppLocalizations.of(context).translate(
-                            i18.common.connectionLabel,
-                          ),
-                          description: AppLocalizations.of(context).translate(
-                            i18.common.connectionContent,
-                          ),
-                          actions: [
-                            DigitButton(
-                                label: AppLocalizations.of(context).translate(
-                                  i18.common.coreCommonOk,
-                                ),
-                                onPressed: () =>
-                                    Navigator.of(context, rootNavigator: true)
-                                        .pop(),
-                                type: DigitButtonType.primary,
-                                size: DigitButtonSize.large)
-                          ],
-                        ),
-                      );
-                    }
-                  }
-                },
-              ),
-              if (isDistributor) ...[
-                SidebarItem(
-                  title: AppLocalizations.of(context).translate(
-                    i18.common.coreCommonViewDownloadedData,
-                  ),
-                  icon: Icons.download,
-                  onPressed: () {
-                    Navigator.of(context, rootNavigator: true).pop();
-                    context.router.push(const BeneficiariesReportRoute());
-                  },
-                )
-              ],
+              // if (isDistributor) ...[
+              //   SidebarItem(
+              //     title: AppLocalizations.of(context).translate(
+              //       i18.common.coreCommonViewDownloadedData,
+              //     ),
+              //     icon: Icons.download,
+              //     onPressed: () {
+              //       Navigator.of(context, rootNavigator: true).pop();
+              //       context.router.push(const BeneficiariesReportRoute());
+              //     },
+              //   )
+              // ],
             ],
             logOutDigitButtonLabel: AppLocalizations.of(context)
                 .translate(i18.common.coreCommonLogout),
-            onLogOut: () {
-              context.read<BoundaryBloc>().add(const BoundaryResetEvent());
-              context.read<AuthBloc>().add(const AuthLogoutEvent());
+            onLogOut: () async {
+              final isConnected = await getIsConnected();
+
+              if (isConnected) {
+                context.read<BoundaryBloc>().add(const BoundaryResetEvent());
+                context.read<AuthBloc>().add(const AuthLogoutEvent());
+              }
             },
-            footer: PoweredByDigit(
-              version: Constants().version,
-            ),
           ),
         ),
       );
