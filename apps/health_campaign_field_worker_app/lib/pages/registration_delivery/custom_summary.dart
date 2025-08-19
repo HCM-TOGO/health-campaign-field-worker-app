@@ -1,4 +1,6 @@
 import 'package:auto_route/auto_route.dart';
+import 'package:collection/collection.dart';
+import 'package:digit_data_model/blocs/boundary/boundary.dart';
 import 'package:digit_ui_components/digit_components.dart';
 import 'package:digit_ui_components/theme/digit_extended_theme.dart';
 import 'package:digit_ui_components/utils/date_utils.dart';
@@ -49,6 +51,9 @@ class CustomSummaryPageState extends LocalizedState<CustomSummaryPage> {
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
     final textTheme = theme.digitTextTheme(context);
+    final boundaryState = context.read<BoundaryBloc>().state;
+    final selectedBoundary = boundaryState.selectedBoundaryMap.entries
+        .lastWhereOrNull((element) => element.value != null);
 
     return PopScope(
       onPopInvoked: (val) {
@@ -57,6 +62,7 @@ class CustomSummaryPageState extends LocalizedState<CustomSummaryPage> {
                 projectId: RegistrationDeliverySingleton().projectId!,
                 userUuid: RegistrationDeliverySingleton().loggedInUserUuid!,
                 boundary: RegistrationDeliverySingleton().boundary!,
+                selectedBoundaryCode: selectedBoundary!.value!.code.toString(),
               ),
             );
       },
@@ -200,6 +206,9 @@ class CustomSummaryPageState extends LocalizedState<CustomSummaryPage> {
                                           boundary:
                                               RegistrationDeliverySingleton()
                                                   .boundary!,
+                                          selectedBoundaryCode:
+                                              selectedBoundary!.value!.code
+                                                  .toString(),
                                           tag: projectBeneficiaryModel?.tag,
                                           navigateToSummary: false),
                                     );

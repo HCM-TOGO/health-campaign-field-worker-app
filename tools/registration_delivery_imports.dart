@@ -1032,7 +1032,7 @@ void _addRegNDeliveryConstantsToConstantsFile(
 
   var localRepositories = [
     '''
-      HouseholdMemberLocalRepository(sql, HouseholdMemberOpLogManager(isar)),
+      CustomHouseholdMemberLocalRepository(sql, HouseholdMemberOpLogManager(isar)),
       HouseholdLocalRepository(sql, HouseholdOpLogManager(isar)),
       ProjectBeneficiaryLocalRepository(
         sql,
@@ -1154,7 +1154,7 @@ void _addRepoToNetworkManagerProviderWrapper(
     "import 'package:registration_delivery/registration_delivery.dart';",
   ];
   var localRepositories = [
-    "RepositoryProvider<LocalRepository<HouseholdMemberModel, HouseholdMemberSearchModel>>(create: (_) => HouseholdMemberLocalRepository(sql,HouseholdMemberOpLogManager(isar),),),",
+    "RepositoryProvider<LocalRepository<HouseholdMemberModel, HouseholdMemberSearchModel>>(create: (_) => CustomHouseholdMemberLocalRepository(sql,HouseholdMemberOpLogManager(isar),),),",
     "RepositoryProvider<LocalRepository<HouseholdModel, HouseholdSearchModel>>(create: (_) => HouseholdLocalRepository(sql,HouseholdOpLogManager(isar),),),",
     "RepositoryProvider<LocalRepository<ProjectBeneficiaryModel, ProjectBeneficiarySearchModel>>(create: (_) => ProjectBeneficiaryLocalRepository(sql,ProjectBeneficiaryOpLogManager(isar),),),",
     "RepositoryProvider<LocalRepository<TaskModel, TaskSearchModel>>(create: (_) => TaskLocalRepository(sql,TaskOpLogManager(isar),),),",

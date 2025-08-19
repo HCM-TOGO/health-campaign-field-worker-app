@@ -1116,6 +1116,12 @@ class _VaccineSelectionPageState extends LocalizedState<VaccineSelectionPage> {
                                         final clientReferenceId =
                                             IdGen.i.identifier;
                                         List<String?> ineligibilityReasons = [];
+                                        final boundaryState =
+                                            context.read<BoundaryBloc>().state;
+                                        final selectedBoundary = boundaryState
+                                            .selectedBoundaryMap.entries
+                                            .lastWhereOrNull((element) =>
+                                                element.value != null);
                                         ineligibilityReasons.add(
                                             "CHILD_AGE_LESS_THAN_3_MONTHS");
                                         TaskModel task = TaskModel(
@@ -1191,6 +1197,13 @@ class _VaccineSelectionPageState extends LocalizedState<VaccineSelectionPage> {
                                                     .toValue(),
                                                 ZeroDoseStatus.done.name,
                                               ),
+
+                                              if (context.isDistributor)
+                                                AdditionalField(
+                                                  'boundaryCode',
+                                                  selectedBoundary!.value!.code
+                                                      .toString()),
+
                                               if (selectedCodes.isNotEmpty)
                                                 AdditionalField(
                                                   additional_fields_local
@@ -1206,6 +1219,7 @@ class _VaccineSelectionPageState extends LocalizedState<VaccineSelectionPage> {
                                                       .noSelectedVaccines
                                                       .toValue(),
                                                   noSelectedCodes.join('.'),
+
                                                 ),
                                               ...getIndividualAdditionalFields(
                                                   widget.individual)

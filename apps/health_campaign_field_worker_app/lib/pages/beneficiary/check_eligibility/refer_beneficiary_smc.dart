@@ -251,6 +251,12 @@ class CustomReferBeneficiarySMCPageState
 
                                     final clientReferenceId =
                                         IdGen.i.identifier;
+                                    final boundaryState =
+                                        context.read<BoundaryBloc>().state;
+                                    final selectedBoundary = boundaryState
+                                        .selectedBoundaryMap.entries
+                                        .lastWhereOrNull(
+                                            (element) => element.value != null);
                                     final task = TaskModel(
                                       projectBeneficiaryClientReferenceId:
                                           widget.projectBeneficiaryClientRefId,
@@ -318,6 +324,12 @@ class CustomReferBeneficiarySMCPageState
                                             EligibilityAssessmentStatus
                                                 .smcDone.name,
                                           ),
+                                          if (context.isDistributor)
+                                            AdditionalField(
+                                              'boundaryCode',
+                                              selectedBoundary!.value!.code
+                                                  .toString(),
+                                            ),
                                           ...getIndividualAdditionalFields(
                                               widget.individual)
                                         ],

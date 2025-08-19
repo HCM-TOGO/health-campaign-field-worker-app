@@ -581,6 +581,12 @@ class CustomMemberCard extends StatelessWidget {
                         onPressed: () {
                           Navigator.of(context, rootNavigator: true).pop();
                           final clientReferenceId = IdGen.i.identifier;
+                          final boundaryState =
+                              context.read<BoundaryBloc>().state;
+                          final selectedBoundary = boundaryState
+                              .selectedBoundaryMap.entries
+                              .lastWhereOrNull(
+                                  (element) => element.value != null);
                           TaskModel refusalTask = TaskModel(
                             projectBeneficiaryClientReferenceId:
                                 projectBeneficiaryClientReferenceId,
@@ -615,6 +621,11 @@ class CustomMemberCard extends StatelessWidget {
                                   'taskStatus',
                                   Status.beneficiaryRefused.toValue(),
                                 ),
+                                if (context.isDistributor)
+                                  AdditionalField(
+                                    'boundaryCode',
+                                    selectedBoundary!.value!.code.toString(),
+                                  ),
                                 ...getIndividualAdditionalFields(individual)
                               ],
                             ),

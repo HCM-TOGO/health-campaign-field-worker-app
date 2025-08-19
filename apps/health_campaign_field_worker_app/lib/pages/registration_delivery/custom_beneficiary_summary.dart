@@ -1,4 +1,5 @@
 import 'package:auto_route/auto_route.dart';
+import 'package:collection/collection.dart';
 import 'package:digit_data_model/data_model.dart';
 import 'package:digit_scanner/blocs/scanner.dart';
 import 'package:digit_ui_components/digit_components.dart';
@@ -198,6 +199,12 @@ class CustomSummaryBeneficiaryPageState
                                     context.read<CustomSearchHouseholdsBloc>();
                                 final scannerBloc =
                                     context.read<DigitScannerBloc>();
+                                final boundaryState =
+                                    context.read<BoundaryBloc>().state;
+                                final selectedBoundary = boundaryState
+                                    .selectedBoundaryMap.entries
+                                    .lastWhereOrNull(
+                                        (element) => element.value != null);
                                 bloc.add(
                                   BeneficiaryRegistrationAddMemberEvent(
                                     beneficiaryType:
@@ -210,6 +217,9 @@ class CustomSummaryBeneficiaryPageState
                                         householdState.householdModel!.address!,
                                     userUuid: RegistrationDeliverySingleton()
                                         .loggedInUserUuid!,
+                                    selectedBoundaryCode: selectedBoundary!
+                                        .value!.code
+                                        .toString(),
                                     projectId: RegistrationDeliverySingleton()
                                         .projectId!,
                                     tag: scannerBloc.state.qrCodes.isNotEmpty

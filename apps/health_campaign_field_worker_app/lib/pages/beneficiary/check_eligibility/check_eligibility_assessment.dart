@@ -1,5 +1,6 @@
 import 'dart:math';
 
+import 'package:collection/collection.dart';
 import 'package:digit_components/digit_components.dart';
 import 'package:digit_components/utils/date_utils.dart';
 import 'package:digit_components/widgets/digit_sync_dialog.dart';
@@ -444,6 +445,12 @@ class _EligibilityChecklistViewPage
                                 ),
                               );
                               if (shouldSubmit ?? false) {
+                                final boundaryState =
+                                    context.read<BoundaryBloc>().state;
+                                final selectedBoundary = boundaryState
+                                    .selectedBoundaryMap.entries
+                                    .lastWhereOrNull(
+                                        (element) => element.value != null);
                                 if (context.mounted &&
                                     ((ifDeliver || ifAdministration) ||
                                         ifIneligible ||
@@ -508,6 +515,12 @@ class _EligibilityChecklistViewPage
                                                 : EligibilityAssessmentStatus
                                                     .vasDone.name,
                                           ),
+                                          if (context.isDistributor)
+                                            AdditionalField(
+                                              'boundaryCode',
+                                              selectedBoundary!.value!.code
+                                                  .toString(),
+                                            ),
                                           ...getIndividualAdditionalFields(
                                             widget.individual,
                                           ),

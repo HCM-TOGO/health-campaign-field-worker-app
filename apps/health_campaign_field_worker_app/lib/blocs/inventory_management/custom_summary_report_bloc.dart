@@ -10,8 +10,12 @@ import 'package:registration_delivery/models/entities/task_resource.dart';
 import 'package:registration_delivery/utils/typedefs.dart';
 import 'package:registration_delivery/utils/utils.dart';
 
+
+import '../../data/repositories/local/registration_delivery/custom_household_member.dart';
+
 import '../../../models/entities/additional_fields_type.dart'
     as additional_fields_local;
+
 import '../../models/entities/assessment_checklist/status.dart';
 import '../../utils/constants.dart';
 import '../../utils/date_utils.dart';
@@ -21,7 +25,7 @@ part 'custom_summary_report_bloc.freezed.dart';
 typedef SummaryReportEmitter = Emitter<SummaryReportState>;
 
 class SummaryReportBloc extends Bloc<SummaryReportEvent, SummaryReportState> {
-  final HouseholdMemberDataRepository householdMemberRepository;
+  final CustomHouseholdMemberLocalRepository householdMemberRepository;
   final TaskDataRepository taskDataRepository;
   final ProductVariantDataRepository productVariantDataRepository;
 
@@ -41,7 +45,10 @@ class SummaryReportBloc extends Bloc<SummaryReportEvent, SummaryReportState> {
     emit(const SummaryReportLoadingState());
 
     List<HouseholdMemberModel> householdMemberListData = [];
+    List<HouseholdMemberModel> householdMemberList = [];
     List<TaskModel> taskListData = [];
+    List<HouseholdMemberModel> communityHouseholdMemberList = [];
+    List<TaskModel> communityTaskList = [];
     List<TaskModel> refusalCasesList = [];
     List<TaskModel> administeredChildrenList = [];
     List<ProductVariantModel> productVariantList = [];
@@ -55,14 +62,19 @@ class SummaryReportBloc extends Bloc<SummaryReportEvent, SummaryReportState> {
                   (e.startDate) < DateTime.now().millisecondsSinceEpoch &&
                   (e.endDate) > DateTime.now().millisecondsSinceEpoch,
             );
+
+    householdMemberListData =
+        await (householdMemberRepository).search(HouseholdMemberSearchModel(
+      isHeadOfHousehold: false,
+    ));
+
     final currentUserUuId =
         RegistrationDeliverySingleton().loggedInUserUuid ?? '';
-    householdMemberListData = await (householdMemberRepository)
-        .search(HouseholdMemberSearchModel(isHeadOfHousehold: false));
+
     taskListData = await (taskDataRepository).search(TaskSearchModel());
     productVariantList = await (productVariantDataRepository)
         .search(ProductVariantSearchModel());
-    final householdMemberList = currentCycle == null
+    householdMemberList = currentCycle == null
         ? householdMemberListData
         : householdMemberListData.where((member) {
             final createdTime = member.auditDetails?.createdTime ?? 0;
@@ -84,7 +96,28 @@ class SummaryReportBloc extends Bloc<SummaryReportEvent, SummaryReportState> {
                 createdTime <= currentCycle.endDate &&
                 createdBy == currentUserUuId;
           }).toList();
+    for (var element in householdMemberList) {
+      var boundaryCodeField = element.additionalFields?.fields.firstWhereOrNull(
+        (field) => field.key == 'boundaryCode',
+      );
+      var boundaryCode = boundaryCodeField?.value;
+
+      if (boundaryCode == event.selectedBoundaryCode) {
+        communityHouseholdMemberList.add(element);
+      }
+    }
+
     for (var element in taskList) {
+      var boundaryCodeField = element.additionalFields?.fields.firstWhereOrNull(
+        (field) => field.key == 'boundaryCode',
+      );
+      var boundaryCode = boundaryCodeField?.value;
+
+      if (boundaryCode == event.selectedBoundaryCode) {
+        communityTaskList.add(element);
+      }
+    }
+    for (var element in communityTaskList) {
       if (element.status == null) continue;
       final status = StatusMapper.fromValue(element.status);
 
@@ -151,7 +184,8 @@ class SummaryReportBloc extends Bloc<SummaryReportEvent, SummaryReportState> {
     Map<String, int> dateVsSpaq2Count = {};
     Map<String, Map<String, int>> dateVsEntityVsCountMap = {};
 
-    for (var element in householdMemberList) {
+    for (var element in communityHouseholdMemberList) {
+
       var dateKey = DigitDateUtils.getDateFromTimestamp(
           element.clientAuditDetails!.createdTime);
       if (element.clientAuditDetails!.createdTime >= currentCycle!.startDate &&
@@ -378,6 +412,7 @@ class SummaryReportBloc extends Bloc<SummaryReportEvent, SummaryReportState> {
 class SummaryReportEvent with _$SummaryReportEvent {
   const factory SummaryReportEvent.loadSummaryData({
     required String userId,
+    required String selectedBoundaryCode,
   }) = SummaryReportLoadDataEvent;
 
   const factory SummaryReportEvent.loading() = SummaryReportLoadingEvent;

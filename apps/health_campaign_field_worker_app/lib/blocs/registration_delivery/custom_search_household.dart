@@ -48,7 +48,8 @@ class CustomSearchHouseholdsBloc
   final SideEffectDataRepository sideEffectDataRepository;
   final ReferralDataRepository referralDataRepository;
   final IndividualGlobalSearchRepository individualGlobalSearchRepository;
-  final CustomIndividualGlobalSearchRepository customIndividualGlobalSearchRepository;
+  final CustomIndividualGlobalSearchRepository
+      customIndividualGlobalSearchRepository;
   final HouseHoldGlobalSearchRepository houseHoldGlobalSearchRepository;
 
   CustomSearchHouseholdsBloc(

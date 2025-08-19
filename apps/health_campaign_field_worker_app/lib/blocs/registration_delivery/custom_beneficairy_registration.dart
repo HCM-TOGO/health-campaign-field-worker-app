@@ -285,6 +285,15 @@ class CustomBeneficiaryRegistrationBloc
                   createdBy: event.userUuid,
                   createdTime: createdAt,
                 ),
+                additionalFields: HouseholdMemberAdditionalFields(
+                  version: 1,
+                  fields: [
+                    AdditionalField(
+                      'boundaryCode',
+                      event.selectedBoundaryCode.toString(),
+                    ),
+                  ],
+                ),
               ),
             );
           } catch (error) {
@@ -381,6 +390,15 @@ class CustomBeneficiaryRegistrationBloc
               auditDetails: AuditDetails(
                 createdBy: event.userUuid,
                 createdTime: createdAt,
+              ),
+              additionalFields: HouseholdMemberAdditionalFields(
+                version: 1,
+                fields: [
+                  AdditionalField(
+                    'boundaryCode',
+                    event.selectedBoundaryCode.toString(),
+                  ),
+                ],
               ),
             ),
           );
@@ -745,6 +763,15 @@ class CustomBeneficiaryRegistrationBloc
                 lastModifiedBy: event.userUuid,
                 createdBy: event.userUuid,
               ),
+              additionalFields: HouseholdMemberAdditionalFields(
+                version: 1,
+                fields: [
+                  AdditionalField(
+                    'boundaryCode',
+                    event.selectedBoundaryCode.toString(),
+                  ),
+                ],
+              ),
             ),
           );
         } catch (error) {
@@ -795,6 +822,7 @@ class BeneficiaryRegistrationEvent with _$BeneficiaryRegistrationEvent {
     required HouseholdModel householdModel,
     required IndividualModel individualModel,
     required AddressModel addressModel,
+    required String selectedBoundaryCode,
     required String userUuid,
     required String projectId,
     String? tag,
@@ -818,6 +846,7 @@ class BeneficiaryRegistrationEvent with _$BeneficiaryRegistrationEvent {
           {required String userUuid,
           required String projectId,
           required BoundaryModel boundary,
+          required String selectedBoundaryCode,
           String? tag,
           @Default(true) bool navigateToSummary}) =
       BeneficiaryRegistrationCreateEvent;

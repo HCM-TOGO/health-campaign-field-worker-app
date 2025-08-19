@@ -13,7 +13,7 @@ import 'package:flutter/widgets.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:reactive_forms/reactive_forms.dart';
 import 'package:registration_delivery/blocs/app_localization.dart';
-import 'package:registration_delivery/utils/extensions/extensions.dart';
+// import 'package:registration_delivery/utils/extensions/extensions.dart';
 
 import 'package:registration_delivery/utils/i18_key_constants.dart' as i18;
 import 'package:health_campaign_field_worker_app/utils/i18_key_constants.dart'
@@ -36,7 +36,7 @@ import '../../../models/entities/additional_fields_type.dart'
 import '../../../models/entities/identifier_types.dart';
 import '../../../router/app_router.dart';
 import '../../../utils/app_enums.dart';
-import '../../../utils/utils.dart' show getIndividualAdditionalFields;
+import '../../../utils/utils.dart';
 
 @RoutePage()
 class CustomDoseAdministeredPage extends LocalizedStatefulWidget {
@@ -129,6 +129,12 @@ class CustomDoseAdministeredPageState
 
                               if (doseAdministered == true && context.mounted) {
                                 // Iterate through future deliveries
+                                final boundaryState =
+                                    context.read<BoundaryBloc>().state;
+                                final selectedBoundary = boundaryState
+                                    .selectedBoundaryMap.entries
+                                    .lastWhereOrNull(
+                                        (element) => element.value != null);
 
                                 for (var e in bloc.futureDeliveries!) {
                                   int doseIndex = e.id;
@@ -190,8 +196,10 @@ class CustomDoseAdministeredPageState
                                                   createdBy:
                                                       RegistrationDeliverySingleton()
                                                           .loggedInUserUuid!,
-                                                  createdTime: context
-                                                      .millisecondsSinceEpoch(),
+                                                  createdTime:
+                                                      ContextUtilityExtensions(
+                                                              context)
+                                                          .millisecondsSinceEpoch(),
                                                 ),
                                                 clientAuditDetails:
                                                     ClientAuditDetails(
@@ -270,6 +278,12 @@ class CustomDoseAdministeredPageState
                                                 : EligibilityAssessmentStatus
                                                     .vasDone.name,
                                           ),
+                                          if (context.isCDD)
+                                            AdditionalField(
+                                              'boundaryCode',
+                                              selectedBoundary!.value!.code
+                                                  .toString(),
+                                            ),
                                           ...getIndividualAdditionalFields(
                                             overViewBloc.selectedIndividual,
                                           ),

@@ -32,6 +32,7 @@ mixin _$BeneficiaryRegistrationEvent {
             HouseholdModel householdModel,
             IndividualModel individualModel,
             AddressModel addressModel,
+            String selectedBoundaryCode,
             String userUuid,
             String projectId,
             String? tag,
@@ -43,8 +44,13 @@ mixin _$BeneficiaryRegistrationEvent {
     required TResult Function(IndividualModel model, String? tag,
             HouseholdModel householdModel, AddressModel addressModel)
         updateIndividualDetails,
-    required TResult Function(String userUuid, String projectId,
-            BoundaryModel boundary, String? tag, bool navigateToSummary)
+    required TResult Function(
+            String userUuid,
+            String projectId,
+            BoundaryModel boundary,
+            String selectedBoundaryCode,
+            String? tag,
+            bool navigateToSummary)
         create,
     required TResult Function(String userUuid, String projectId,
             BoundaryModel boundary, String? tag, bool navigateToSummary)
@@ -67,6 +73,7 @@ mixin _$BeneficiaryRegistrationEvent {
             HouseholdModel householdModel,
             IndividualModel individualModel,
             AddressModel addressModel,
+            String selectedBoundaryCode,
             String userUuid,
             String projectId,
             String? tag,
@@ -79,7 +86,7 @@ mixin _$BeneficiaryRegistrationEvent {
             HouseholdModel householdModel, AddressModel addressModel)?
         updateIndividualDetails,
     TResult? Function(String userUuid, String projectId, BoundaryModel boundary,
-            String? tag, bool navigateToSummary)?
+            String selectedBoundaryCode, String? tag, bool navigateToSummary)?
         create,
     TResult? Function(String userUuid, String projectId, BoundaryModel boundary,
             String? tag, bool navigateToSummary)?
@@ -102,6 +109,7 @@ mixin _$BeneficiaryRegistrationEvent {
             HouseholdModel householdModel,
             IndividualModel individualModel,
             AddressModel addressModel,
+            String selectedBoundaryCode,
             String userUuid,
             String projectId,
             String? tag,
@@ -114,7 +122,7 @@ mixin _$BeneficiaryRegistrationEvent {
             HouseholdModel householdModel, AddressModel addressModel)?
         updateIndividualDetails,
     TResult Function(String userUuid, String projectId, BoundaryModel boundary,
-            String? tag, bool navigateToSummary)?
+            String selectedBoundaryCode, String? tag, bool navigateToSummary)?
         create,
     TResult Function(String userUuid, String projectId, BoundaryModel boundary,
             String? tag, bool navigateToSummary)?
@@ -306,6 +314,7 @@ class _$BeneficiaryRegistrationSaveAddressEventImpl
             HouseholdModel householdModel,
             IndividualModel individualModel,
             AddressModel addressModel,
+            String selectedBoundaryCode,
             String userUuid,
             String projectId,
             String? tag,
@@ -317,8 +326,13 @@ class _$BeneficiaryRegistrationSaveAddressEventImpl
     required TResult Function(IndividualModel model, String? tag,
             HouseholdModel householdModel, AddressModel addressModel)
         updateIndividualDetails,
-    required TResult Function(String userUuid, String projectId,
-            BoundaryModel boundary, String? tag, bool navigateToSummary)
+    required TResult Function(
+            String userUuid,
+            String projectId,
+            BoundaryModel boundary,
+            String selectedBoundaryCode,
+            String? tag,
+            bool navigateToSummary)
         create,
     required TResult Function(String userUuid, String projectId,
             BoundaryModel boundary, String? tag, bool navigateToSummary)
@@ -344,6 +358,7 @@ class _$BeneficiaryRegistrationSaveAddressEventImpl
             HouseholdModel householdModel,
             IndividualModel individualModel,
             AddressModel addressModel,
+            String selectedBoundaryCode,
             String userUuid,
             String projectId,
             String? tag,
@@ -356,7 +371,7 @@ class _$BeneficiaryRegistrationSaveAddressEventImpl
             HouseholdModel householdModel, AddressModel addressModel)?
         updateIndividualDetails,
     TResult? Function(String userUuid, String projectId, BoundaryModel boundary,
-            String? tag, bool navigateToSummary)?
+            String selectedBoundaryCode, String? tag, bool navigateToSummary)?
         create,
     TResult? Function(String userUuid, String projectId, BoundaryModel boundary,
             String? tag, bool navigateToSummary)?
@@ -382,6 +397,7 @@ class _$BeneficiaryRegistrationSaveAddressEventImpl
             HouseholdModel householdModel,
             IndividualModel individualModel,
             AddressModel addressModel,
+            String selectedBoundaryCode,
             String userUuid,
             String projectId,
             String? tag,
@@ -394,7 +410,7 @@ class _$BeneficiaryRegistrationSaveAddressEventImpl
             HouseholdModel householdModel, AddressModel addressModel)?
         updateIndividualDetails,
     TResult Function(String userUuid, String projectId, BoundaryModel boundary,
-            String? tag, bool navigateToSummary)?
+            String selectedBoundaryCode, String? tag, bool navigateToSummary)?
         create,
     TResult Function(String userUuid, String projectId, BoundaryModel boundary,
             String? tag, bool navigateToSummary)?
@@ -598,6 +614,7 @@ class _$BeneficiaryRegistrationSaveHouseDetailsEventImpl
             HouseholdModel householdModel,
             IndividualModel individualModel,
             AddressModel addressModel,
+            String selectedBoundaryCode,
             String userUuid,
             String projectId,
             String? tag,
@@ -609,8 +626,13 @@ class _$BeneficiaryRegistrationSaveHouseDetailsEventImpl
     required TResult Function(IndividualModel model, String? tag,
             HouseholdModel householdModel, AddressModel addressModel)
         updateIndividualDetails,
-    required TResult Function(String userUuid, String projectId,
-            BoundaryModel boundary, String? tag, bool navigateToSummary)
+    required TResult Function(
+            String userUuid,
+            String projectId,
+            BoundaryModel boundary,
+            String selectedBoundaryCode,
+            String? tag,
+            bool navigateToSummary)
         create,
     required TResult Function(String userUuid, String projectId,
             BoundaryModel boundary, String? tag, bool navigateToSummary)
@@ -636,6 +658,7 @@ class _$BeneficiaryRegistrationSaveHouseDetailsEventImpl
             HouseholdModel householdModel,
             IndividualModel individualModel,
             AddressModel addressModel,
+            String selectedBoundaryCode,
             String userUuid,
             String projectId,
             String? tag,
@@ -648,7 +671,7 @@ class _$BeneficiaryRegistrationSaveHouseDetailsEventImpl
             HouseholdModel householdModel, AddressModel addressModel)?
         updateIndividualDetails,
     TResult? Function(String userUuid, String projectId, BoundaryModel boundary,
-            String? tag, bool navigateToSummary)?
+            String selectedBoundaryCode, String? tag, bool navigateToSummary)?
         create,
     TResult? Function(String userUuid, String projectId, BoundaryModel boundary,
             String? tag, bool navigateToSummary)?
@@ -674,6 +697,7 @@ class _$BeneficiaryRegistrationSaveHouseDetailsEventImpl
             HouseholdModel householdModel,
             IndividualModel individualModel,
             AddressModel addressModel,
+            String selectedBoundaryCode,
             String userUuid,
             String projectId,
             String? tag,
@@ -686,7 +710,7 @@ class _$BeneficiaryRegistrationSaveHouseDetailsEventImpl
             HouseholdModel householdModel, AddressModel addressModel)?
         updateIndividualDetails,
     TResult Function(String userUuid, String projectId, BoundaryModel boundary,
-            String? tag, bool navigateToSummary)?
+            String selectedBoundaryCode, String? tag, bool navigateToSummary)?
         create,
     TResult Function(String userUuid, String projectId, BoundaryModel boundary,
             String? tag, bool navigateToSummary)?
@@ -903,6 +927,7 @@ class _$BeneficiaryRegistrationSaveHouseholdDetailsEventImpl
             HouseholdModel householdModel,
             IndividualModel individualModel,
             AddressModel addressModel,
+            String selectedBoundaryCode,
             String userUuid,
             String projectId,
             String? tag,
@@ -914,8 +939,13 @@ class _$BeneficiaryRegistrationSaveHouseholdDetailsEventImpl
     required TResult Function(IndividualModel model, String? tag,
             HouseholdModel householdModel, AddressModel addressModel)
         updateIndividualDetails,
-    required TResult Function(String userUuid, String projectId,
-            BoundaryModel boundary, String? tag, bool navigateToSummary)
+    required TResult Function(
+            String userUuid,
+            String projectId,
+            BoundaryModel boundary,
+            String selectedBoundaryCode,
+            String? tag,
+            bool navigateToSummary)
         create,
     required TResult Function(String userUuid, String projectId,
             BoundaryModel boundary, String? tag, bool navigateToSummary)
@@ -941,6 +971,7 @@ class _$BeneficiaryRegistrationSaveHouseholdDetailsEventImpl
             HouseholdModel householdModel,
             IndividualModel individualModel,
             AddressModel addressModel,
+            String selectedBoundaryCode,
             String userUuid,
             String projectId,
             String? tag,
@@ -953,7 +984,7 @@ class _$BeneficiaryRegistrationSaveHouseholdDetailsEventImpl
             HouseholdModel householdModel, AddressModel addressModel)?
         updateIndividualDetails,
     TResult? Function(String userUuid, String projectId, BoundaryModel boundary,
-            String? tag, bool navigateToSummary)?
+            String selectedBoundaryCode, String? tag, bool navigateToSummary)?
         create,
     TResult? Function(String userUuid, String projectId, BoundaryModel boundary,
             String? tag, bool navigateToSummary)?
@@ -979,6 +1010,7 @@ class _$BeneficiaryRegistrationSaveHouseholdDetailsEventImpl
             HouseholdModel householdModel,
             IndividualModel individualModel,
             AddressModel addressModel,
+            String selectedBoundaryCode,
             String userUuid,
             String projectId,
             String? tag,
@@ -991,7 +1023,7 @@ class _$BeneficiaryRegistrationSaveHouseholdDetailsEventImpl
             HouseholdModel householdModel, AddressModel addressModel)?
         updateIndividualDetails,
     TResult Function(String userUuid, String projectId, BoundaryModel boundary,
-            String? tag, bool navigateToSummary)?
+            String selectedBoundaryCode, String? tag, bool navigateToSummary)?
         create,
     TResult Function(String userUuid, String projectId, BoundaryModel boundary,
             String? tag, bool navigateToSummary)?
@@ -1223,6 +1255,7 @@ class _$BeneficiaryRegistrationCreateHouseholdEventImpl
             HouseholdModel householdModel,
             IndividualModel individualModel,
             AddressModel addressModel,
+            String selectedBoundaryCode,
             String userUuid,
             String projectId,
             String? tag,
@@ -1234,8 +1267,13 @@ class _$BeneficiaryRegistrationCreateHouseholdEventImpl
     required TResult Function(IndividualModel model, String? tag,
             HouseholdModel householdModel, AddressModel addressModel)
         updateIndividualDetails,
-    required TResult Function(String userUuid, String projectId,
-            BoundaryModel boundary, String? tag, bool navigateToSummary)
+    required TResult Function(
+            String userUuid,
+            String projectId,
+            BoundaryModel boundary,
+            String selectedBoundaryCode,
+            String? tag,
+            bool navigateToSummary)
         create,
     required TResult Function(String userUuid, String projectId,
             BoundaryModel boundary, String? tag, bool navigateToSummary)
@@ -1261,6 +1299,7 @@ class _$BeneficiaryRegistrationCreateHouseholdEventImpl
             HouseholdModel householdModel,
             IndividualModel individualModel,
             AddressModel addressModel,
+            String selectedBoundaryCode,
             String userUuid,
             String projectId,
             String? tag,
@@ -1273,7 +1312,7 @@ class _$BeneficiaryRegistrationCreateHouseholdEventImpl
             HouseholdModel householdModel, AddressModel addressModel)?
         updateIndividualDetails,
     TResult? Function(String userUuid, String projectId, BoundaryModel boundary,
-            String? tag, bool navigateToSummary)?
+            String selectedBoundaryCode, String? tag, bool navigateToSummary)?
         create,
     TResult? Function(String userUuid, String projectId, BoundaryModel boundary,
             String? tag, bool navigateToSummary)?
@@ -1299,6 +1338,7 @@ class _$BeneficiaryRegistrationCreateHouseholdEventImpl
             HouseholdModel householdModel,
             IndividualModel individualModel,
             AddressModel addressModel,
+            String selectedBoundaryCode,
             String userUuid,
             String projectId,
             String? tag,
@@ -1311,7 +1351,7 @@ class _$BeneficiaryRegistrationCreateHouseholdEventImpl
             HouseholdModel householdModel, AddressModel addressModel)?
         updateIndividualDetails,
     TResult Function(String userUuid, String projectId, BoundaryModel boundary,
-            String? tag, bool navigateToSummary)?
+            String selectedBoundaryCode, String? tag, bool navigateToSummary)?
         create,
     TResult Function(String userUuid, String projectId, BoundaryModel boundary,
             String? tag, bool navigateToSummary)?
@@ -1533,6 +1573,7 @@ class _$BeneficiaryRegistrationSaveIndividualDetailsEventImpl
             HouseholdModel householdModel,
             IndividualModel individualModel,
             AddressModel addressModel,
+            String selectedBoundaryCode,
             String userUuid,
             String projectId,
             String? tag,
@@ -1544,8 +1585,13 @@ class _$BeneficiaryRegistrationSaveIndividualDetailsEventImpl
     required TResult Function(IndividualModel model, String? tag,
             HouseholdModel householdModel, AddressModel addressModel)
         updateIndividualDetails,
-    required TResult Function(String userUuid, String projectId,
-            BoundaryModel boundary, String? tag, bool navigateToSummary)
+    required TResult Function(
+            String userUuid,
+            String projectId,
+            BoundaryModel boundary,
+            String selectedBoundaryCode,
+            String? tag,
+            bool navigateToSummary)
         create,
     required TResult Function(String userUuid, String projectId,
             BoundaryModel boundary, String? tag, bool navigateToSummary)
@@ -1571,6 +1617,7 @@ class _$BeneficiaryRegistrationSaveIndividualDetailsEventImpl
             HouseholdModel householdModel,
             IndividualModel individualModel,
             AddressModel addressModel,
+            String selectedBoundaryCode,
             String userUuid,
             String projectId,
             String? tag,
@@ -1583,7 +1630,7 @@ class _$BeneficiaryRegistrationSaveIndividualDetailsEventImpl
             HouseholdModel householdModel, AddressModel addressModel)?
         updateIndividualDetails,
     TResult? Function(String userUuid, String projectId, BoundaryModel boundary,
-            String? tag, bool navigateToSummary)?
+            String selectedBoundaryCode, String? tag, bool navigateToSummary)?
         create,
     TResult? Function(String userUuid, String projectId, BoundaryModel boundary,
             String? tag, bool navigateToSummary)?
@@ -1609,6 +1656,7 @@ class _$BeneficiaryRegistrationSaveIndividualDetailsEventImpl
             HouseholdModel householdModel,
             IndividualModel individualModel,
             AddressModel addressModel,
+            String selectedBoundaryCode,
             String userUuid,
             String projectId,
             String? tag,
@@ -1621,7 +1669,7 @@ class _$BeneficiaryRegistrationSaveIndividualDetailsEventImpl
             HouseholdModel householdModel, AddressModel addressModel)?
         updateIndividualDetails,
     TResult Function(String userUuid, String projectId, BoundaryModel boundary,
-            String? tag, bool navigateToSummary)?
+            String selectedBoundaryCode, String? tag, bool navigateToSummary)?
         create,
     TResult Function(String userUuid, String projectId, BoundaryModel boundary,
             String? tag, bool navigateToSummary)?
@@ -1749,6 +1797,7 @@ abstract class _$$BeneficiaryRegistrationAddMemberEventImplCopyWith<$Res> {
       {HouseholdModel householdModel,
       IndividualModel individualModel,
       AddressModel addressModel,
+      String selectedBoundaryCode,
       String userUuid,
       String projectId,
       String? tag,
@@ -1771,6 +1820,7 @@ class __$$BeneficiaryRegistrationAddMemberEventImplCopyWithImpl<$Res>
     Object? householdModel = null,
     Object? individualModel = null,
     Object? addressModel = null,
+    Object? selectedBoundaryCode = null,
     Object? userUuid = null,
     Object? projectId = null,
     Object? tag = freezed,
@@ -1789,6 +1839,10 @@ class __$$BeneficiaryRegistrationAddMemberEventImplCopyWithImpl<$Res>
           ? _value.addressModel
           : addressModel // ignore: cast_nullable_to_non_nullable
               as AddressModel,
+      selectedBoundaryCode: null == selectedBoundaryCode
+          ? _value.selectedBoundaryCode
+          : selectedBoundaryCode // ignore: cast_nullable_to_non_nullable
+              as String,
       userUuid: null == userUuid
           ? _value.userUuid
           : userUuid // ignore: cast_nullable_to_non_nullable
@@ -1817,6 +1871,7 @@ class _$BeneficiaryRegistrationAddMemberEventImpl
       {required this.householdModel,
       required this.individualModel,
       required this.addressModel,
+      required this.selectedBoundaryCode,
       required this.userUuid,
       required this.projectId,
       this.tag,
@@ -1829,6 +1884,8 @@ class _$BeneficiaryRegistrationAddMemberEventImpl
   @override
   final AddressModel addressModel;
   @override
+  final String selectedBoundaryCode;
+  @override
   final String userUuid;
   @override
   final String projectId;
@@ -1839,7 +1896,7 @@ class _$BeneficiaryRegistrationAddMemberEventImpl
 
   @override
   String toString() {
-    return 'BeneficiaryRegistrationEvent.addMember(householdModel: $householdModel, individualModel: $individualModel, addressModel: $addressModel, userUuid: $userUuid, projectId: $projectId, tag: $tag, beneficiaryType: $beneficiaryType)';
+    return 'BeneficiaryRegistrationEvent.addMember(householdModel: $householdModel, individualModel: $individualModel, addressModel: $addressModel, selectedBoundaryCode: $selectedBoundaryCode, userUuid: $userUuid, projectId: $projectId, tag: $tag, beneficiaryType: $beneficiaryType)';
   }
 
   @override
@@ -1853,6 +1910,8 @@ class _$BeneficiaryRegistrationAddMemberEventImpl
                 other.individualModel == individualModel) &&
             (identical(other.addressModel, addressModel) ||
                 other.addressModel == addressModel) &&
+            (identical(other.selectedBoundaryCode, selectedBoundaryCode) ||
+                other.selectedBoundaryCode == selectedBoundaryCode) &&
             (identical(other.userUuid, userUuid) ||
                 other.userUuid == userUuid) &&
             (identical(other.projectId, projectId) ||
@@ -1863,8 +1922,16 @@ class _$BeneficiaryRegistrationAddMemberEventImpl
   }
 
   @override
-  int get hashCode => Object.hash(runtimeType, householdModel, individualModel,
-      addressModel, userUuid, projectId, tag, beneficiaryType);
+  int get hashCode => Object.hash(
+      runtimeType,
+      householdModel,
+      individualModel,
+      addressModel,
+      selectedBoundaryCode,
+      userUuid,
+      projectId,
+      tag,
+      beneficiaryType);
 
   @JsonKey(ignore: true)
   @override
@@ -1891,6 +1958,7 @@ class _$BeneficiaryRegistrationAddMemberEventImpl
             HouseholdModel householdModel,
             IndividualModel individualModel,
             AddressModel addressModel,
+            String selectedBoundaryCode,
             String userUuid,
             String projectId,
             String? tag,
@@ -1902,16 +1970,21 @@ class _$BeneficiaryRegistrationAddMemberEventImpl
     required TResult Function(IndividualModel model, String? tag,
             HouseholdModel householdModel, AddressModel addressModel)
         updateIndividualDetails,
-    required TResult Function(String userUuid, String projectId,
-            BoundaryModel boundary, String? tag, bool navigateToSummary)
+    required TResult Function(
+            String userUuid,
+            String projectId,
+            BoundaryModel boundary,
+            String selectedBoundaryCode,
+            String? tag,
+            bool navigateToSummary)
         create,
     required TResult Function(String userUuid, String projectId,
             BoundaryModel boundary, String? tag, bool navigateToSummary)
         summary,
     required TResult Function(String tag) validate,
   }) {
-    return addMember(householdModel, individualModel, addressModel, userUuid,
-        projectId, tag, beneficiaryType);
+    return addMember(householdModel, individualModel, addressModel,
+        selectedBoundaryCode, userUuid, projectId, tag, beneficiaryType);
   }
 
   @override
@@ -1930,6 +2003,7 @@ class _$BeneficiaryRegistrationAddMemberEventImpl
             HouseholdModel householdModel,
             IndividualModel individualModel,
             AddressModel addressModel,
+            String selectedBoundaryCode,
             String userUuid,
             String projectId,
             String? tag,
@@ -1942,7 +2016,7 @@ class _$BeneficiaryRegistrationAddMemberEventImpl
             HouseholdModel householdModel, AddressModel addressModel)?
         updateIndividualDetails,
     TResult? Function(String userUuid, String projectId, BoundaryModel boundary,
-            String? tag, bool navigateToSummary)?
+            String selectedBoundaryCode, String? tag, bool navigateToSummary)?
         create,
     TResult? Function(String userUuid, String projectId, BoundaryModel boundary,
             String? tag, bool navigateToSummary)?
@@ -1950,7 +2024,7 @@ class _$BeneficiaryRegistrationAddMemberEventImpl
     TResult? Function(String tag)? validate,
   }) {
     return addMember?.call(householdModel, individualModel, addressModel,
-        userUuid, projectId, tag, beneficiaryType);
+        selectedBoundaryCode, userUuid, projectId, tag, beneficiaryType);
   }
 
   @override
@@ -1969,6 +2043,7 @@ class _$BeneficiaryRegistrationAddMemberEventImpl
             HouseholdModel householdModel,
             IndividualModel individualModel,
             AddressModel addressModel,
+            String selectedBoundaryCode,
             String userUuid,
             String projectId,
             String? tag,
@@ -1981,7 +2056,7 @@ class _$BeneficiaryRegistrationAddMemberEventImpl
             HouseholdModel householdModel, AddressModel addressModel)?
         updateIndividualDetails,
     TResult Function(String userUuid, String projectId, BoundaryModel boundary,
-            String? tag, bool navigateToSummary)?
+            String selectedBoundaryCode, String? tag, bool navigateToSummary)?
         create,
     TResult Function(String userUuid, String projectId, BoundaryModel boundary,
             String? tag, bool navigateToSummary)?
@@ -1990,8 +2065,8 @@ class _$BeneficiaryRegistrationAddMemberEventImpl
     required TResult orElse(),
   }) {
     if (addMember != null) {
-      return addMember(householdModel, individualModel, addressModel, userUuid,
-          projectId, tag, beneficiaryType);
+      return addMember(householdModel, individualModel, addressModel,
+          selectedBoundaryCode, userUuid, projectId, tag, beneficiaryType);
     }
     return orElse();
   }
@@ -2090,6 +2165,7 @@ abstract class BeneficiaryRegistrationAddMemberEvent
           {required final HouseholdModel householdModel,
           required final IndividualModel individualModel,
           required final AddressModel addressModel,
+          required final String selectedBoundaryCode,
           required final String userUuid,
           required final String projectId,
           final String? tag,
@@ -2099,6 +2175,7 @@ abstract class BeneficiaryRegistrationAddMemberEvent
   HouseholdModel get householdModel;
   IndividualModel get individualModel;
   AddressModel get addressModel;
+  String get selectedBoundaryCode;
   String get userUuid;
   String get projectId;
   String? get tag;
@@ -2223,6 +2300,7 @@ class _$BeneficiaryRegistrationUpdateHouseholdDetailsEventImpl
             HouseholdModel householdModel,
             IndividualModel individualModel,
             AddressModel addressModel,
+            String selectedBoundaryCode,
             String userUuid,
             String projectId,
             String? tag,
@@ -2234,8 +2312,13 @@ class _$BeneficiaryRegistrationUpdateHouseholdDetailsEventImpl
     required TResult Function(IndividualModel model, String? tag,
             HouseholdModel householdModel, AddressModel addressModel)
         updateIndividualDetails,
-    required TResult Function(String userUuid, String projectId,
-            BoundaryModel boundary, String? tag, bool navigateToSummary)
+    required TResult Function(
+            String userUuid,
+            String projectId,
+            BoundaryModel boundary,
+            String selectedBoundaryCode,
+            String? tag,
+            bool navigateToSummary)
         create,
     required TResult Function(String userUuid, String projectId,
             BoundaryModel boundary, String? tag, bool navigateToSummary)
@@ -2261,6 +2344,7 @@ class _$BeneficiaryRegistrationUpdateHouseholdDetailsEventImpl
             HouseholdModel householdModel,
             IndividualModel individualModel,
             AddressModel addressModel,
+            String selectedBoundaryCode,
             String userUuid,
             String projectId,
             String? tag,
@@ -2273,7 +2357,7 @@ class _$BeneficiaryRegistrationUpdateHouseholdDetailsEventImpl
             HouseholdModel householdModel, AddressModel addressModel)?
         updateIndividualDetails,
     TResult? Function(String userUuid, String projectId, BoundaryModel boundary,
-            String? tag, bool navigateToSummary)?
+            String selectedBoundaryCode, String? tag, bool navigateToSummary)?
         create,
     TResult? Function(String userUuid, String projectId, BoundaryModel boundary,
             String? tag, bool navigateToSummary)?
@@ -2299,6 +2383,7 @@ class _$BeneficiaryRegistrationUpdateHouseholdDetailsEventImpl
             HouseholdModel householdModel,
             IndividualModel individualModel,
             AddressModel addressModel,
+            String selectedBoundaryCode,
             String userUuid,
             String projectId,
             String? tag,
@@ -2311,7 +2396,7 @@ class _$BeneficiaryRegistrationUpdateHouseholdDetailsEventImpl
             HouseholdModel householdModel, AddressModel addressModel)?
         updateIndividualDetails,
     TResult Function(String userUuid, String projectId, BoundaryModel boundary,
-            String? tag, bool navigateToSummary)?
+            String selectedBoundaryCode, String? tag, bool navigateToSummary)?
         create,
     TResult Function(String userUuid, String projectId, BoundaryModel boundary,
             String? tag, bool navigateToSummary)?
@@ -2560,6 +2645,7 @@ class _$BeneficiaryRegistrationUpdateIndividualDetailsEventImpl
             HouseholdModel householdModel,
             IndividualModel individualModel,
             AddressModel addressModel,
+            String selectedBoundaryCode,
             String userUuid,
             String projectId,
             String? tag,
@@ -2571,8 +2657,13 @@ class _$BeneficiaryRegistrationUpdateIndividualDetailsEventImpl
     required TResult Function(IndividualModel model, String? tag,
             HouseholdModel householdModel, AddressModel addressModel)
         updateIndividualDetails,
-    required TResult Function(String userUuid, String projectId,
-            BoundaryModel boundary, String? tag, bool navigateToSummary)
+    required TResult Function(
+            String userUuid,
+            String projectId,
+            BoundaryModel boundary,
+            String selectedBoundaryCode,
+            String? tag,
+            bool navigateToSummary)
         create,
     required TResult Function(String userUuid, String projectId,
             BoundaryModel boundary, String? tag, bool navigateToSummary)
@@ -2598,6 +2689,7 @@ class _$BeneficiaryRegistrationUpdateIndividualDetailsEventImpl
             HouseholdModel householdModel,
             IndividualModel individualModel,
             AddressModel addressModel,
+            String selectedBoundaryCode,
             String userUuid,
             String projectId,
             String? tag,
@@ -2610,7 +2702,7 @@ class _$BeneficiaryRegistrationUpdateIndividualDetailsEventImpl
             HouseholdModel householdModel, AddressModel addressModel)?
         updateIndividualDetails,
     TResult? Function(String userUuid, String projectId, BoundaryModel boundary,
-            String? tag, bool navigateToSummary)?
+            String selectedBoundaryCode, String? tag, bool navigateToSummary)?
         create,
     TResult? Function(String userUuid, String projectId, BoundaryModel boundary,
             String? tag, bool navigateToSummary)?
@@ -2637,6 +2729,7 @@ class _$BeneficiaryRegistrationUpdateIndividualDetailsEventImpl
             HouseholdModel householdModel,
             IndividualModel individualModel,
             AddressModel addressModel,
+            String selectedBoundaryCode,
             String userUuid,
             String projectId,
             String? tag,
@@ -2649,7 +2742,7 @@ class _$BeneficiaryRegistrationUpdateIndividualDetailsEventImpl
             HouseholdModel householdModel, AddressModel addressModel)?
         updateIndividualDetails,
     TResult Function(String userUuid, String projectId, BoundaryModel boundary,
-            String? tag, bool navigateToSummary)?
+            String selectedBoundaryCode, String? tag, bool navigateToSummary)?
         create,
     TResult Function(String userUuid, String projectId, BoundaryModel boundary,
             String? tag, bool navigateToSummary)?
@@ -2781,6 +2874,7 @@ abstract class _$$BeneficiaryRegistrationCreateEventImplCopyWith<$Res> {
       {String userUuid,
       String projectId,
       BoundaryModel boundary,
+      String selectedBoundaryCode,
       String? tag,
       bool navigateToSummary});
 }
@@ -2801,6 +2895,7 @@ class __$$BeneficiaryRegistrationCreateEventImplCopyWithImpl<$Res>
     Object? userUuid = null,
     Object? projectId = null,
     Object? boundary = null,
+    Object? selectedBoundaryCode = null,
     Object? tag = freezed,
     Object? navigateToSummary = null,
   }) {
@@ -2817,6 +2912,10 @@ class __$$BeneficiaryRegistrationCreateEventImplCopyWithImpl<$Res>
           ? _value.boundary
           : boundary // ignore: cast_nullable_to_non_nullable
               as BoundaryModel,
+      selectedBoundaryCode: null == selectedBoundaryCode
+          ? _value.selectedBoundaryCode
+          : selectedBoundaryCode // ignore: cast_nullable_to_non_nullable
+              as String,
       tag: freezed == tag
           ? _value.tag
           : tag // ignore: cast_nullable_to_non_nullable
@@ -2837,6 +2936,7 @@ class _$BeneficiaryRegistrationCreateEventImpl
       {required this.userUuid,
       required this.projectId,
       required this.boundary,
+      required this.selectedBoundaryCode,
       this.tag,
       this.navigateToSummary = true});
 
@@ -2847,6 +2947,8 @@ class _$BeneficiaryRegistrationCreateEventImpl
   @override
   final BoundaryModel boundary;
   @override
+  final String selectedBoundaryCode;
+  @override
   final String? tag;
   @override
   @JsonKey()
@@ -2854,7 +2956,7 @@ class _$BeneficiaryRegistrationCreateEventImpl
 
   @override
   String toString() {
-    return 'BeneficiaryRegistrationEvent.create(userUuid: $userUuid, projectId: $projectId, boundary: $boundary, tag: $tag, navigateToSummary: $navigateToSummary)';
+    return 'BeneficiaryRegistrationEvent.create(userUuid: $userUuid, projectId: $projectId, boundary: $boundary, selectedBoundaryCode: $selectedBoundaryCode, tag: $tag, navigateToSummary: $navigateToSummary)';
   }
 
   @override
@@ -2868,14 +2970,16 @@ class _$BeneficiaryRegistrationCreateEventImpl
                 other.projectId == projectId) &&
             (identical(other.boundary, boundary) ||
                 other.boundary == boundary) &&
+            (identical(other.selectedBoundaryCode, selectedBoundaryCode) ||
+                other.selectedBoundaryCode == selectedBoundaryCode) &&
             (identical(other.tag, tag) || other.tag == tag) &&
             (identical(other.navigateToSummary, navigateToSummary) ||
                 other.navigateToSummary == navigateToSummary));
   }
 
   @override
-  int get hashCode => Object.hash(
-      runtimeType, userUuid, projectId, boundary, tag, navigateToSummary);
+  int get hashCode => Object.hash(runtimeType, userUuid, projectId, boundary,
+      selectedBoundaryCode, tag, navigateToSummary);
 
   @JsonKey(ignore: true)
   @override
@@ -2902,6 +3006,7 @@ class _$BeneficiaryRegistrationCreateEventImpl
             HouseholdModel householdModel,
             IndividualModel individualModel,
             AddressModel addressModel,
+            String selectedBoundaryCode,
             String userUuid,
             String projectId,
             String? tag,
@@ -2913,15 +3018,21 @@ class _$BeneficiaryRegistrationCreateEventImpl
     required TResult Function(IndividualModel model, String? tag,
             HouseholdModel householdModel, AddressModel addressModel)
         updateIndividualDetails,
-    required TResult Function(String userUuid, String projectId,
-            BoundaryModel boundary, String? tag, bool navigateToSummary)
+    required TResult Function(
+            String userUuid,
+            String projectId,
+            BoundaryModel boundary,
+            String selectedBoundaryCode,
+            String? tag,
+            bool navigateToSummary)
         create,
     required TResult Function(String userUuid, String projectId,
             BoundaryModel boundary, String? tag, bool navigateToSummary)
         summary,
     required TResult Function(String tag) validate,
   }) {
-    return create(userUuid, projectId, boundary, tag, navigateToSummary);
+    return create(userUuid, projectId, boundary, selectedBoundaryCode, tag,
+        navigateToSummary);
   }
 
   @override
@@ -2940,6 +3051,7 @@ class _$BeneficiaryRegistrationCreateEventImpl
             HouseholdModel householdModel,
             IndividualModel individualModel,
             AddressModel addressModel,
+            String selectedBoundaryCode,
             String userUuid,
             String projectId,
             String? tag,
@@ -2952,14 +3064,15 @@ class _$BeneficiaryRegistrationCreateEventImpl
             HouseholdModel householdModel, AddressModel addressModel)?
         updateIndividualDetails,
     TResult? Function(String userUuid, String projectId, BoundaryModel boundary,
-            String? tag, bool navigateToSummary)?
+            String selectedBoundaryCode, String? tag, bool navigateToSummary)?
         create,
     TResult? Function(String userUuid, String projectId, BoundaryModel boundary,
             String? tag, bool navigateToSummary)?
         summary,
     TResult? Function(String tag)? validate,
   }) {
-    return create?.call(userUuid, projectId, boundary, tag, navigateToSummary);
+    return create?.call(userUuid, projectId, boundary, selectedBoundaryCode,
+        tag, navigateToSummary);
   }
 
   @override
@@ -2978,6 +3091,7 @@ class _$BeneficiaryRegistrationCreateEventImpl
             HouseholdModel householdModel,
             IndividualModel individualModel,
             AddressModel addressModel,
+            String selectedBoundaryCode,
             String userUuid,
             String projectId,
             String? tag,
@@ -2990,7 +3104,7 @@ class _$BeneficiaryRegistrationCreateEventImpl
             HouseholdModel householdModel, AddressModel addressModel)?
         updateIndividualDetails,
     TResult Function(String userUuid, String projectId, BoundaryModel boundary,
-            String? tag, bool navigateToSummary)?
+            String selectedBoundaryCode, String? tag, bool navigateToSummary)?
         create,
     TResult Function(String userUuid, String projectId, BoundaryModel boundary,
             String? tag, bool navigateToSummary)?
@@ -2999,7 +3113,8 @@ class _$BeneficiaryRegistrationCreateEventImpl
     required TResult orElse(),
   }) {
     if (create != null) {
-      return create(userUuid, projectId, boundary, tag, navigateToSummary);
+      return create(userUuid, projectId, boundary, selectedBoundaryCode, tag,
+          navigateToSummary);
     }
     return orElse();
   }
@@ -3098,12 +3213,14 @@ abstract class BeneficiaryRegistrationCreateEvent
       {required final String userUuid,
       required final String projectId,
       required final BoundaryModel boundary,
+      required final String selectedBoundaryCode,
       final String? tag,
       final bool navigateToSummary}) = _$BeneficiaryRegistrationCreateEventImpl;
 
   String get userUuid;
   String get projectId;
   BoundaryModel get boundary;
+  String get selectedBoundaryCode;
   String? get tag;
   bool get navigateToSummary;
   @JsonKey(ignore: true)
@@ -3244,6 +3361,7 @@ class _$BeneficiaryRegistrationSummaryEventImpl
             HouseholdModel householdModel,
             IndividualModel individualModel,
             AddressModel addressModel,
+            String selectedBoundaryCode,
             String userUuid,
             String projectId,
             String? tag,
@@ -3255,8 +3373,13 @@ class _$BeneficiaryRegistrationSummaryEventImpl
     required TResult Function(IndividualModel model, String? tag,
             HouseholdModel householdModel, AddressModel addressModel)
         updateIndividualDetails,
-    required TResult Function(String userUuid, String projectId,
-            BoundaryModel boundary, String? tag, bool navigateToSummary)
+    required TResult Function(
+            String userUuid,
+            String projectId,
+            BoundaryModel boundary,
+            String selectedBoundaryCode,
+            String? tag,
+            bool navigateToSummary)
         create,
     required TResult Function(String userUuid, String projectId,
             BoundaryModel boundary, String? tag, bool navigateToSummary)
@@ -3282,6 +3405,7 @@ class _$BeneficiaryRegistrationSummaryEventImpl
             HouseholdModel householdModel,
             IndividualModel individualModel,
             AddressModel addressModel,
+            String selectedBoundaryCode,
             String userUuid,
             String projectId,
             String? tag,
@@ -3294,7 +3418,7 @@ class _$BeneficiaryRegistrationSummaryEventImpl
             HouseholdModel householdModel, AddressModel addressModel)?
         updateIndividualDetails,
     TResult? Function(String userUuid, String projectId, BoundaryModel boundary,
-            String? tag, bool navigateToSummary)?
+            String selectedBoundaryCode, String? tag, bool navigateToSummary)?
         create,
     TResult? Function(String userUuid, String projectId, BoundaryModel boundary,
             String? tag, bool navigateToSummary)?
@@ -3320,6 +3444,7 @@ class _$BeneficiaryRegistrationSummaryEventImpl
             HouseholdModel householdModel,
             IndividualModel individualModel,
             AddressModel addressModel,
+            String selectedBoundaryCode,
             String userUuid,
             String projectId,
             String? tag,
@@ -3332,7 +3457,7 @@ class _$BeneficiaryRegistrationSummaryEventImpl
             HouseholdModel householdModel, AddressModel addressModel)?
         updateIndividualDetails,
     TResult Function(String userUuid, String projectId, BoundaryModel boundary,
-            String? tag, bool navigateToSummary)?
+            String selectedBoundaryCode, String? tag, bool navigateToSummary)?
         create,
     TResult Function(String userUuid, String projectId, BoundaryModel boundary,
             String? tag, bool navigateToSummary)?
@@ -3539,6 +3664,7 @@ class _$BeneficiaryRegistrationTagEventImpl
             HouseholdModel householdModel,
             IndividualModel individualModel,
             AddressModel addressModel,
+            String selectedBoundaryCode,
             String userUuid,
             String projectId,
             String? tag,
@@ -3550,8 +3676,13 @@ class _$BeneficiaryRegistrationTagEventImpl
     required TResult Function(IndividualModel model, String? tag,
             HouseholdModel householdModel, AddressModel addressModel)
         updateIndividualDetails,
-    required TResult Function(String userUuid, String projectId,
-            BoundaryModel boundary, String? tag, bool navigateToSummary)
+    required TResult Function(
+            String userUuid,
+            String projectId,
+            BoundaryModel boundary,
+            String selectedBoundaryCode,
+            String? tag,
+            bool navigateToSummary)
         create,
     required TResult Function(String userUuid, String projectId,
             BoundaryModel boundary, String? tag, bool navigateToSummary)
@@ -3577,6 +3708,7 @@ class _$BeneficiaryRegistrationTagEventImpl
             HouseholdModel householdModel,
             IndividualModel individualModel,
             AddressModel addressModel,
+            String selectedBoundaryCode,
             String userUuid,
             String projectId,
             String? tag,
@@ -3589,7 +3721,7 @@ class _$BeneficiaryRegistrationTagEventImpl
             HouseholdModel householdModel, AddressModel addressModel)?
         updateIndividualDetails,
     TResult? Function(String userUuid, String projectId, BoundaryModel boundary,
-            String? tag, bool navigateToSummary)?
+            String selectedBoundaryCode, String? tag, bool navigateToSummary)?
         create,
     TResult? Function(String userUuid, String projectId, BoundaryModel boundary,
             String? tag, bool navigateToSummary)?
@@ -3615,6 +3747,7 @@ class _$BeneficiaryRegistrationTagEventImpl
             HouseholdModel householdModel,
             IndividualModel individualModel,
             AddressModel addressModel,
+            String selectedBoundaryCode,
             String userUuid,
             String projectId,
             String? tag,
@@ -3627,7 +3760,7 @@ class _$BeneficiaryRegistrationTagEventImpl
             HouseholdModel householdModel, AddressModel addressModel)?
         updateIndividualDetails,
     TResult Function(String userUuid, String projectId, BoundaryModel boundary,
-            String? tag, bool navigateToSummary)?
+            String selectedBoundaryCode, String? tag, bool navigateToSummary)?
         create,
     TResult Function(String userUuid, String projectId, BoundaryModel boundary,
             String? tag, bool navigateToSummary)?

@@ -827,6 +827,9 @@ class CustomDeliverInterventionPageState
         ((form.control(_resourceDeliveredKey) as FormArray).value
             as List<ProductVariantModel?>);
     // Update the task with information from the form and other context
+    final boundaryState = context.read<BoundaryBloc>().state;
+    final selectedBoundary = boundaryState.selectedBoundaryMap.entries
+        .lastWhereOrNull((element) => element.value != null);
     task = task.copyWith(
       projectId: RegistrationDeliverySingleton().projectId,
       resources: productvariantList
@@ -905,6 +908,11 @@ class CustomDeliverInterventionPageState
                 ? EligibilityAssessmentStatus.smcDone.name
                 : EligibilityAssessmentStatus.vasDone.name,
           ),
+          if (context.isDistributor)
+            AdditionalField(
+              'boundaryCode',
+              selectedBoundary!.value!.code.toString(),
+            ),
           ...local_utils.getIndividualAdditionalFields(
             selectedIndividual,
           ),

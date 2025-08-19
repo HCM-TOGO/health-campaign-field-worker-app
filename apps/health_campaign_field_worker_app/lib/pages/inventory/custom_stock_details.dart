@@ -1,4 +1,5 @@
 import 'package:auto_route/auto_route.dart';
+import 'package:collection/collection.dart';
 import 'package:digit_components/widgets/atoms/digit_toaster.dart';
 import 'package:digit_data_model/data_model.dart';
 import 'package:digit_scanner/blocs/scanner.dart';
@@ -587,6 +588,12 @@ class CustomStockDetailsPageState
                                           senderType = primaryType;
                                           break;
                                       }
+                                      final boundaryState =
+                                          context.read<BoundaryBloc>().state;
+                                      final selectedBoundary = boundaryState
+                                          .selectedBoundaryMap.entries
+                                          .lastWhereOrNull((element) =>
+                                              element.value != null);
 
                                       final stockModel = StockModel(
                                         clientReferenceId: IdGen.i.identifier,
@@ -692,6 +699,13 @@ class CustomStockDetailsPageState
                                                       .barCodes.isNotEmpty)
                                                     addBarCodesToFields(
                                                         scannerState.barCodes),
+                                                  if (isDistributor)
+                                                    AdditionalField(
+                                                      'boundaryCode',
+                                                      selectedBoundary!
+                                                          .value!.code
+                                                          .toString(),
+                                                    ),
                                                 ],
                                               )
                                             : null,

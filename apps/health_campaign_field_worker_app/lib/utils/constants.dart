@@ -28,6 +28,7 @@ import '../data/local_store/no_sql/schema/project_types.dart';
 import '../data/local_store/no_sql/schema/row_versions.dart';
 import '../data/local_store/no_sql/schema/service_registry.dart';
 import '../data/repositories/local/inventory_management/custom_stock.dart';
+import '../data/repositories/local/registration_delivery/custom_household_member.dart';
 import '../data/repositories/remote/downsync.dart';
 import '../data/sync_registry.dart';
 import '../data/sync_service_mapper.dart';
@@ -169,7 +170,7 @@ class Constants {
         sql,
         StockReconciliationOpLogManager(isar),
       ),
-      HouseholdMemberLocalRepository(sql, HouseholdMemberOpLogManager(isar)),
+      CustomHouseholdMemberLocalRepository(sql, HouseholdMemberOpLogManager(isar)),
       HouseholdLocalRepository(sql, HouseholdOpLogManager(isar)),
       ProjectBeneficiaryLocalRepository(
         sql,

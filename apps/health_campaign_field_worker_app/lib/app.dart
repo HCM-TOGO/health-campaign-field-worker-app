@@ -29,6 +29,7 @@ import 'blocs/search/search_households_smc.dart';
 import 'data/local_store/app_shared_preferences.dart';
 import 'data/network_manager.dart';
 import 'data/remote_client.dart';
+import 'data/repositories/local/registration_delivery/custom_household_member.dart';
 import 'data/repositories/local/registration_delivery/custom_individual_global_repository.dart';
 import 'data/repositories/local/search/individual_global_search_smc.dart';
 import 'data/repositories/remote/bandwidth_check.dart';
@@ -269,12 +270,12 @@ class MainApplicationState extends State<MainApplication>
 
                     return MultiBlocProvider(
                       providers: [
-
-                          BlocProvider(
+                        BlocProvider(
                           create: (context) => SummaryReportBloc(
                             householdMemberRepository: context.repository<
-                                HouseholdMemberModel,
-                                HouseholdMemberSearchModel>(),
+                                    HouseholdMemberModel,
+                                    HouseholdMemberSearchModel>()
+                                as CustomHouseholdMemberLocalRepository,
                             taskDataRepository: context
                                 .repository<TaskModel, TaskSearchModel>(),
                             productVariantDataRepository: context.repository<

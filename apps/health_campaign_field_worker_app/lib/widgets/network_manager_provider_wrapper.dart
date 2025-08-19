@@ -28,6 +28,7 @@ import '../data/local_store/downsync/downsync.dart';
 import '../data/network_manager.dart';
 import '../data/repositories/custom_task.dart';
 import '../data/repositories/local/inventory_management/custom_stock.dart';
+import '../data/repositories/local/registration_delivery/custom_household_member.dart';
 import '../data/repositories/local/registration_delivery/custom_registration_delivery.dart';
 import '../data/repositories/oplog.dart';
 import '../data/repositories/remote/auth.dart';
@@ -197,7 +198,7 @@ class NetworkManagerProviderWrapper extends StatelessWidget {
       ),
       RepositoryProvider<
           LocalRepository<HouseholdMemberModel, HouseholdMemberSearchModel>>(
-        create: (_) => HouseholdMemberLocalRepository(
+        create: (_) => CustomHouseholdMemberLocalRepository(
           sql,
           HouseholdMemberOpLogManager(isar),
         ),

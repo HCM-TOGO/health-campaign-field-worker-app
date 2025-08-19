@@ -18,19 +18,22 @@ final _privateConstructorUsedError = UnsupportedError(
 mixin _$SummaryReportEvent {
   @optionalTypeArgs
   TResult when<TResult extends Object?>({
-    required TResult Function(String userId) loadSummaryData,
+    required TResult Function(String userId, String selectedBoundaryCode)
+        loadSummaryData,
     required TResult Function() loading,
   }) =>
       throw _privateConstructorUsedError;
   @optionalTypeArgs
   TResult? whenOrNull<TResult extends Object?>({
-    TResult? Function(String userId)? loadSummaryData,
+    TResult? Function(String userId, String selectedBoundaryCode)?
+        loadSummaryData,
     TResult? Function()? loading,
   }) =>
       throw _privateConstructorUsedError;
   @optionalTypeArgs
   TResult maybeWhen<TResult extends Object?>({
-    TResult Function(String userId)? loadSummaryData,
+    TResult Function(String userId, String selectedBoundaryCode)?
+        loadSummaryData,
     TResult Function()? loading,
     required TResult orElse(),
   }) =>
@@ -81,7 +84,7 @@ abstract class _$$SummaryReportLoadDataEventImplCopyWith<$Res> {
           $Res Function(_$SummaryReportLoadDataEventImpl) then) =
       __$$SummaryReportLoadDataEventImplCopyWithImpl<$Res>;
   @useResult
-  $Res call({String userId});
+  $Res call({String userId, String selectedBoundaryCode});
 }
 
 /// @nodoc
@@ -98,11 +101,16 @@ class __$$SummaryReportLoadDataEventImplCopyWithImpl<$Res>
   @override
   $Res call({
     Object? userId = null,
+    Object? selectedBoundaryCode = null,
   }) {
     return _then(_$SummaryReportLoadDataEventImpl(
       userId: null == userId
           ? _value.userId
           : userId // ignore: cast_nullable_to_non_nullable
+              as String,
+      selectedBoundaryCode: null == selectedBoundaryCode
+          ? _value.selectedBoundaryCode
+          : selectedBoundaryCode // ignore: cast_nullable_to_non_nullable
               as String,
     ));
   }
@@ -111,14 +119,17 @@ class __$$SummaryReportLoadDataEventImplCopyWithImpl<$Res>
 /// @nodoc
 
 class _$SummaryReportLoadDataEventImpl implements SummaryReportLoadDataEvent {
-  const _$SummaryReportLoadDataEventImpl({required this.userId});
+  const _$SummaryReportLoadDataEventImpl(
+      {required this.userId, required this.selectedBoundaryCode});
 
   @override
   final String userId;
+  @override
+  final String selectedBoundaryCode;
 
   @override
   String toString() {
-    return 'SummaryReportEvent.loadSummaryData(userId: $userId)';
+    return 'SummaryReportEvent.loadSummaryData(userId: $userId, selectedBoundaryCode: $selectedBoundaryCode)';
   }
 
   @override
@@ -126,11 +137,13 @@ class _$SummaryReportLoadDataEventImpl implements SummaryReportLoadDataEvent {
     return identical(this, other) ||
         (other.runtimeType == runtimeType &&
             other is _$SummaryReportLoadDataEventImpl &&
-            (identical(other.userId, userId) || other.userId == userId));
+            (identical(other.userId, userId) || other.userId == userId) &&
+            (identical(other.selectedBoundaryCode, selectedBoundaryCode) ||
+                other.selectedBoundaryCode == selectedBoundaryCode));
   }
 
   @override
-  int get hashCode => Object.hash(runtimeType, userId);
+  int get hashCode => Object.hash(runtimeType, userId, selectedBoundaryCode);
 
   @JsonKey(ignore: true)
   @override
@@ -142,30 +155,33 @@ class _$SummaryReportLoadDataEventImpl implements SummaryReportLoadDataEvent {
   @override
   @optionalTypeArgs
   TResult when<TResult extends Object?>({
-    required TResult Function(String userId) loadSummaryData,
+    required TResult Function(String userId, String selectedBoundaryCode)
+        loadSummaryData,
     required TResult Function() loading,
   }) {
-    return loadSummaryData(userId);
+    return loadSummaryData(userId, selectedBoundaryCode);
   }
 
   @override
   @optionalTypeArgs
   TResult? whenOrNull<TResult extends Object?>({
-    TResult? Function(String userId)? loadSummaryData,
+    TResult? Function(String userId, String selectedBoundaryCode)?
+        loadSummaryData,
     TResult? Function()? loading,
   }) {
-    return loadSummaryData?.call(userId);
+    return loadSummaryData?.call(userId, selectedBoundaryCode);
   }
 
   @override
   @optionalTypeArgs
   TResult maybeWhen<TResult extends Object?>({
-    TResult Function(String userId)? loadSummaryData,
+    TResult Function(String userId, String selectedBoundaryCode)?
+        loadSummaryData,
     TResult Function()? loading,
     required TResult orElse(),
   }) {
     if (loadSummaryData != null) {
-      return loadSummaryData(userId);
+      return loadSummaryData(userId, selectedBoundaryCode);
     }
     return orElse();
   }
@@ -203,10 +219,13 @@ class _$SummaryReportLoadDataEventImpl implements SummaryReportLoadDataEvent {
 }
 
 abstract class SummaryReportLoadDataEvent implements SummaryReportEvent {
-  const factory SummaryReportLoadDataEvent({required final String userId}) =
+  const factory SummaryReportLoadDataEvent(
+          {required final String userId,
+          required final String selectedBoundaryCode}) =
       _$SummaryReportLoadDataEventImpl;
 
   String get userId;
+  String get selectedBoundaryCode;
   @JsonKey(ignore: true)
   _$$SummaryReportLoadDataEventImplCopyWith<_$SummaryReportLoadDataEventImpl>
       get copyWith => throw _privateConstructorUsedError;
@@ -254,7 +273,8 @@ class _$SummaryReportLoadingEventImpl implements SummaryReportLoadingEvent {
   @override
   @optionalTypeArgs
   TResult when<TResult extends Object?>({
-    required TResult Function(String userId) loadSummaryData,
+    required TResult Function(String userId, String selectedBoundaryCode)
+        loadSummaryData,
     required TResult Function() loading,
   }) {
     return loading();
@@ -263,7 +283,8 @@ class _$SummaryReportLoadingEventImpl implements SummaryReportLoadingEvent {
   @override
   @optionalTypeArgs
   TResult? whenOrNull<TResult extends Object?>({
-    TResult? Function(String userId)? loadSummaryData,
+    TResult? Function(String userId, String selectedBoundaryCode)?
+        loadSummaryData,
     TResult? Function()? loading,
   }) {
     return loading?.call();
@@ -272,7 +293,8 @@ class _$SummaryReportLoadingEventImpl implements SummaryReportLoadingEvent {
   @override
   @optionalTypeArgs
   TResult maybeWhen<TResult extends Object?>({
-    TResult Function(String userId)? loadSummaryData,
+    TResult Function(String userId, String selectedBoundaryCode)?
+        loadSummaryData,
     TResult Function()? loading,
     required TResult orElse(),
   }) {
