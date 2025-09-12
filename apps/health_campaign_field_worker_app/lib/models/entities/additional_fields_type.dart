@@ -5,6 +5,8 @@ part 'additional_fields_type.mapper.dart';
 
 @MappableEnum(caseStyle: CaseStyle.upperCase)
 enum AdditionalFieldsType {
+  @MappableValue("taskStatus")
+  taskStatus,
   @MappableValue("hasImmunizationCard")
   hasImmunizationCard,
   @MappableValue("immunizationCardLost")
