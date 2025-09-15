@@ -25,6 +25,16 @@ class StatusMapper extends EnumMapper<Status> {
   @override
   Status decode(dynamic value) {
     switch (value) {
+      case "BENEFICIARY_ABSENT":
+        return Status.beneficiaryAbsent;
+      case "BENEFICIARY_DECEASED":
+        return Status.beneficiaryDeceased;
+      case "BENEFICIARY_ON_ANTIMALARIAL":
+        return Status.beneficiaryOnAntimalarial;
+      case "BENEFICIARY_ON_COTRIMOXAZOLE":
+        return Status.beneficiaryOnCotrimoxazole;
+      case "BENEFICIARY_HAS_ALLERGY":
+        return Status.beneficiaryHasAllergy;
       case "DELIVERED":
         return Status.delivered;
       case "NOT_ADMINISTERED":
@@ -61,6 +71,16 @@ class StatusMapper extends EnumMapper<Status> {
   @override
   dynamic encode(Status self) {
     switch (self) {
+      case Status.beneficiaryAbsent:
+        return "BENEFICIARY_ABSENT";
+      case Status.beneficiaryDeceased:
+        return "BENEFICIARY_DECEASED";
+      case Status.beneficiaryOnAntimalarial:
+        return "BENEFICIARY_ON_ANTIMALARIAL";
+      case Status.beneficiaryOnCotrimoxazole:
+        return "BENEFICIARY_ON_COTRIMOXAZOLE";
+      case Status.beneficiaryHasAllergy:
+        return "BENEFICIARY_HAS_ALLERGY";
       case Status.delivered:
         return "DELIVERED";
       case Status.notAdministered:

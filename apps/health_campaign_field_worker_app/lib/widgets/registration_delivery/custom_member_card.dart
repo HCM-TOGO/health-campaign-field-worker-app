@@ -89,6 +89,27 @@ class CustomMemberCard extends StatelessWidget {
     required this.variant,
   });
 
+  bool _checkIfBeneficiaryDeceased(BuildContext context) {
+    List<TaskModel>? tasks = this.tasks;
+    if (tasks == null || tasks.isEmpty) {
+      return false;
+    }
+
+    final lastTask = tasks!.last;
+    final isNotAdministered =
+        lastTask.status == Status.notAdministered.toValue();
+    final isDeceasedField = lastTask.additionalFields?.fields.firstWhereOrNull(
+          (e) =>
+              e.key ==
+                  additional_fields_local.AdditionalFieldsType.taskStatus
+                      .toValue() &&
+              e.value == status_local.Status.beneficiaryDeceased.toValue(),
+        ) !=
+        null;
+
+    return isNotAdministered && isDeceasedField;
+  }
+
   bool _checkIfFutureTaskPresent(BuildContext context) {
     List<TaskModel>? tasks = this.tasks;
     if (tasks == null || tasks.isEmpty) {
@@ -177,8 +198,15 @@ class CustomMemberCard extends StatelessWidget {
     bool isBeneficiaryReferredSMC = checkBeneficiaryReferredSMC(smcTasks);
     bool isBeneficiaryInEligibleSMC =
         checkBeneficiaryInEligibleSMC(smcTasks, context.selectedCycle);
+    bool isBeneficiaryDeceased = _checkIfBeneficiaryDeceased(context);
     List<TaskModel>? currentTasks = _getCurrentCycleData(context);
     bool hasBeneficiaryRefused = checkBeneficiaryRefusedSMC(currentTasks);
+    bool isBeneficiaryAbsent = checkBeneficiaryAbsent(currentTasks);
+    bool isBeneficiaryOnAntimalarial =
+        checkBeneficiaryOnAntimalarial(currentTasks);
+    bool isBeneficiaryOnCotrimoxazole =
+        checkBeneficiaryOnCotrimoxazole(currentTasks);
+    bool hasBeneficiaryAllergy = checkBeneficiaryHasAllergy(currentTasks);
 
     final theme = Theme.of(context);
     if (isHead) {
@@ -194,13 +222,31 @@ class CustomMemberCard extends StatelessWidget {
         ),
       );
     }
+
     if (isFutureTaskPresent) {
       return Container();
+    }
+    if (isBeneficiaryDeceased) {
+      return Align(
+        alignment: Alignment.centerLeft,
+        child: DigitIconButton(
+          icon: Icons.info_rounded,
+          iconSize: 20,
+          iconText: localizations
+              .translate(i18_local.householdOverView.beneficiaryDeceasedLabel),
+          iconTextColor: theme.colorScheme.error,
+          iconColor: theme.colorScheme.error,
+        ),
+      );
     }
     if ((isSMCDelivered ||
             isBeneficiaryReferredSMC ||
             isBeneficiaryInEligibleSMC) &&
-        !hasBeneficiaryRefused) {
+        !hasBeneficiaryRefused &&
+        !isBeneficiaryAbsent &&
+        !isBeneficiaryOnAntimalarial &&
+        !isBeneficiaryOnCotrimoxazole &&
+        !hasBeneficiaryAllergy) {
       return Column(
         children: [
           if (isSMCDelivered ||
@@ -315,7 +361,12 @@ class CustomMemberCard extends StatelessWidget {
             ),
         ],
       );
-    } else if (isBeneficiaryRefused || hasBeneficiaryRefused) {
+    } else if (isBeneficiaryRefused ||
+        hasBeneficiaryRefused ||
+        isBeneficiaryAbsent ||
+        isBeneficiaryOnAntimalarial ||
+        isBeneficiaryOnCotrimoxazole ||
+        hasBeneficiaryAllergy) {
       return Column(
         children: [
           Align(
@@ -323,8 +374,19 @@ class CustomMemberCard extends StatelessWidget {
             child: DigitIconButton(
               icon: Icons.info_rounded,
               iconSize: 20,
-              iconText: localizations.translate(i18_local
-                  .householdOverView.householdOverViewBeneficiaryRefusedLabel),
+              iconText: localizations.translate(isBeneficiaryAbsent
+                  ? i18_local.householdOverView.beneficiaryAbsentLabel
+                  : isBeneficiaryOnAntimalarial
+                      ? i18_local.householdOverView
+                          .beneficiaryOnAntimalarialTreatmentLabel
+                      : isBeneficiaryOnCotrimoxazole
+                          ? i18_local.householdOverView
+                              .beneficiaryOnCotrimoxazoleTreatmentLabel
+                          : hasBeneficiaryAllergy
+                              ? i18_local
+                                  .householdOverView.beneficiaryHasAllergyLabel
+                              : i18_local.householdOverView
+                                  .householdOverViewBeneficiaryRefusedLabel),
               iconTextColor: theme.colorScheme.error,
               iconColor: theme.colorScheme.error,
             ),
@@ -360,6 +422,7 @@ class CustomMemberCard extends StatelessWidget {
     final theme = Theme.of(context);
     final textTheme = theme.digitTextTheme(context);
     bool isFutureTaskPresent = _checkIfFutureTaskPresent(context);
+    bool isBeneficiaryDeceased = _checkIfBeneficiaryDeceased(context);
     List<TaskModel>? smcTasks = _getSMCStatusData(context);
     List<TaskModel>? zeroDoseTasks = _getZeroDoseStatusData(context);
     final doseStatus = checkStatus(smcTasks, context.selectedCycle);
@@ -369,6 +432,13 @@ class CustomMemberCard extends StatelessWidget {
         checkBeneficiaryInEligibleSMC(smcTasks, context.selectedCycle);
     List<TaskModel>? currentTasks = _getCurrentCycleData(context);
     bool hasBeneficiaryRefused = checkBeneficiaryRefusedSMC(currentTasks);
+    bool isBeneficiaryAbsent = checkBeneficiaryAbsent(currentTasks);
+    bool isBeneficiaryOnAntimalarial =
+        checkBeneficiaryOnAntimalarial(currentTasks);
+    bool isBeneficiaryOnCotrimoxazole =
+        checkBeneficiaryOnCotrimoxazole(currentTasks);
+    bool hasBeneficiaryAllergy = checkBeneficiaryHasAllergy(currentTasks);
+
     final age = individual.dateOfBirth != null
         ? digits.DigitDateUtils.calculateAge(
             DateFormat(Constants.defaultDateFormat)
@@ -380,6 +450,9 @@ class CustomMemberCard extends StatelessWidget {
         ? true
         : redosePending(smcTasks, context.selectedCycle);
 
+    if (isBeneficiaryDeceased) {
+      return const Offstage();
+    }
     if (isFutureTaskPresent) {
       return const Offstage();
     }
@@ -389,6 +462,10 @@ class CustomMemberCard extends StatelessWidget {
         !isBeneficiaryReferredSMC &&
         !isBeneficiaryInEligibleSMC &&
         !hasBeneficiaryRefused &&
+        !isBeneficiaryAbsent &&
+        !isBeneficiaryOnAntimalarial &&
+        !isBeneficiaryOnCotrimoxazole &&
+        !hasBeneficiaryAllergy &&
         ageInMonths < 3 &&
         (zeroDoseTasks == null || zeroDoseTasks.isEmpty == true)) {
       return Column(
@@ -546,7 +623,11 @@ class CustomMemberCard extends StatelessWidget {
           if (smcAssessmentPendingStatus &&
               !isBeneficiaryReferredSMC &&
               !isBeneficiaryInEligibleSMC &&
-              !hasBeneficiaryRefused)
+              !hasBeneficiaryRefused &&
+              !isBeneficiaryAbsent &&
+              !isBeneficiaryOnAntimalarial &&
+              !isBeneficiaryOnCotrimoxazole &&
+              !hasBeneficiaryAllergy)
             DigitButton(
               label: localizations.translate(
                 i18.memberCard.unableToDeliverLabel,
@@ -657,6 +738,460 @@ class CustomMemberCard extends StatelessWidget {
                                     EligibilityAssessmentType.smc,
                                 enableRouteToZeroDose: true,
                                 task: refusalTask,
+                              ),
+                            ),
+                          );
+                        },
+                      ),
+                      DigitButton(
+                        label: localizations.translate(
+                          i18_local.beneficiaryDetails.beneficiaryAbsentLabel,
+                        ),
+                        type: DigitButtonType.secondary,
+                        size: DigitButtonSize.large,
+                        onPressed: () {
+                          Navigator.of(context, rootNavigator: true).pop();
+                          final clientReferenceId = IdGen.i.identifier;
+                          TaskModel absentTask = TaskModel(
+                            projectBeneficiaryClientReferenceId:
+                                projectBeneficiaryClientReferenceId,
+                            clientReferenceId: clientReferenceId,
+                            tenantId: RegistrationDeliverySingleton().tenantId,
+                            rowVersion: 1,
+                            auditDetails: AuditDetails(
+                              createdBy: RegistrationDeliverySingleton()
+                                  .loggedInUserUuid!,
+                              createdTime: context.millisecondsSinceEpoch(),
+                            ),
+                            projectId:
+                                RegistrationDeliverySingleton().projectId,
+                            status: Status.notAdministered.toValue(),
+                            clientAuditDetails: ClientAuditDetails(
+                              createdBy: RegistrationDeliverySingleton()
+                                  .loggedInUserUuid!,
+                              createdTime: context.millisecondsSinceEpoch(),
+                              lastModifiedBy: RegistrationDeliverySingleton()
+                                  .loggedInUserUuid,
+                              lastModifiedTime:
+                                  context.millisecondsSinceEpoch(),
+                            ),
+                            additionalFields: TaskAdditionalFields(
+                              version: 1,
+                              fields: [
+                                AdditionalField(
+                                  AdditionalFieldsType.cycleIndex.toValue(),
+                                  "0${context.selectedCycle?.id}",
+                                ),
+                                AdditionalField(
+                                  'taskStatus',
+                                  status_local.Status.beneficiaryAbsent
+                                      .toValue(),
+                                ),
+                                ...getIndividualAdditionalFields(individual)
+                              ],
+                            ),
+                            address: individual!.address?.first.copyWith(
+                              relatedClientReferenceId: clientReferenceId,
+                              id: null,
+                            ),
+                          );
+
+                          // TODO: Currently it's been shifted to the zero dose flow
+
+                          // context.read<DeliverInterventionBloc>().add(
+                          //       DeliverInterventionSubmitEvent(
+                          //         task: refusalTask,
+                          //         isEditing: false,
+                          //         boundaryModel:
+                          //             RegistrationDeliverySingleton().boundary!,
+                          //       ),
+                          //     );
+
+                          final reloadState =
+                              context.read<HouseholdOverviewBloc>();
+                          Future.delayed(
+                            const Duration(milliseconds: 500),
+                            () {
+                              reloadState.add(
+                                HouseholdOverviewReloadEvent(
+                                  projectId: RegistrationDeliverySingleton()
+                                      .projectId!,
+                                  projectBeneficiaryType:
+                                      RegistrationDeliverySingleton()
+                                          .beneficiaryType!,
+                                ),
+                              );
+                            },
+                          ).then(
+                            (value) => context.router.push(
+                              CustomSplashAcknowledgementRoute(
+                                eligibilityAssessmentType:
+                                    EligibilityAssessmentType.smc,
+                                enableRouteToZeroDose: true,
+                                task: absentTask,
+                              ),
+                            ),
+                          );
+                        },
+                      ),
+                      DigitButton(
+                        label: localizations.translate(
+                          i18_local.beneficiaryDetails.beneficiaryDeceasedLabel,
+                        ),
+                        type: DigitButtonType.secondary,
+                        size: DigitButtonSize.large,
+                        onPressed: () {
+                          Navigator.of(context, rootNavigator: true).pop();
+                          final clientReferenceId = IdGen.i.identifier;
+                          TaskModel task = TaskModel(
+                            projectBeneficiaryClientReferenceId:
+                                projectBeneficiaryClientReferenceId,
+                            clientReferenceId: clientReferenceId,
+                            tenantId: RegistrationDeliverySingleton().tenantId,
+                            rowVersion: 1,
+                            auditDetails: AuditDetails(
+                              createdBy: RegistrationDeliverySingleton()
+                                  .loggedInUserUuid!,
+                              createdTime: context.millisecondsSinceEpoch(),
+                            ),
+                            projectId:
+                                RegistrationDeliverySingleton().projectId,
+                            status: Status.notAdministered.toValue(),
+                            clientAuditDetails: ClientAuditDetails(
+                              createdBy: RegistrationDeliverySingleton()
+                                  .loggedInUserUuid!,
+                              createdTime: context.millisecondsSinceEpoch(),
+                              lastModifiedBy: RegistrationDeliverySingleton()
+                                  .loggedInUserUuid,
+                              lastModifiedTime:
+                                  context.millisecondsSinceEpoch(),
+                            ),
+                            additionalFields: TaskAdditionalFields(
+                              version: 1,
+                              fields: [
+                                AdditionalField(
+                                  AdditionalFieldsType.cycleIndex.toValue(),
+                                  "0${context.selectedCycle?.id}",
+                                ),
+                                AdditionalField(
+                                  'taskStatus',
+                                  status_local.Status.beneficiaryDeceased
+                                      .toValue(),
+                                ),
+                                ...getIndividualAdditionalFields(individual)
+                              ],
+                            ),
+                            address: individual!.address?.first.copyWith(
+                              relatedClientReferenceId: clientReferenceId,
+                              id: null,
+                            ),
+                          );
+
+                          context.read<DeliverInterventionBloc>().add(
+                                DeliverInterventionSubmitEvent(
+                                  task: task,
+                                  isEditing: false,
+                                  boundaryModel:
+                                      RegistrationDeliverySingleton().boundary!,
+                                ),
+                              );
+
+                          final reloadState =
+                              context.read<HouseholdOverviewBloc>();
+                          Future.delayed(
+                            const Duration(milliseconds: 500),
+                            () {
+                              reloadState.add(
+                                HouseholdOverviewReloadEvent(
+                                  projectId: RegistrationDeliverySingleton()
+                                      .projectId!,
+                                  projectBeneficiaryType:
+                                      RegistrationDeliverySingleton()
+                                          .beneficiaryType!,
+                                ),
+                              );
+                            },
+                          ).then(
+                            (value) => context.router.push(
+                              CustomHouseholdAcknowledgementRoute(
+                                  enableViewHousehold: true,
+                                  eligibilityAssessmentType:
+                                      EligibilityAssessmentType.smc),
+                            ),
+                          );
+                        },
+                      ),
+                      DigitButton(
+                        label: localizations.translate(
+                          i18_local.beneficiaryDetails
+                              .beneficiaryOnAntimalarialTreatmentLabel,
+                        ),
+                        type: DigitButtonType.secondary,
+                        size: DigitButtonSize.large,
+                        onPressed: () {
+                          Navigator.of(context, rootNavigator: true).pop();
+                          final clientReferenceId = IdGen.i.identifier;
+                          TaskModel task = TaskModel(
+                            projectBeneficiaryClientReferenceId:
+                                projectBeneficiaryClientReferenceId,
+                            clientReferenceId: clientReferenceId,
+                            tenantId: RegistrationDeliverySingleton().tenantId,
+                            rowVersion: 1,
+                            auditDetails: AuditDetails(
+                              createdBy: RegistrationDeliverySingleton()
+                                  .loggedInUserUuid!,
+                              createdTime: context.millisecondsSinceEpoch(),
+                            ),
+                            projectId:
+                                RegistrationDeliverySingleton().projectId,
+                            status: Status.notAdministered.toValue(),
+                            clientAuditDetails: ClientAuditDetails(
+                              createdBy: RegistrationDeliverySingleton()
+                                  .loggedInUserUuid!,
+                              createdTime: context.millisecondsSinceEpoch(),
+                              lastModifiedBy: RegistrationDeliverySingleton()
+                                  .loggedInUserUuid,
+                              lastModifiedTime:
+                                  context.millisecondsSinceEpoch(),
+                            ),
+                            additionalFields: TaskAdditionalFields(
+                              version: 1,
+                              fields: [
+                                AdditionalField(
+                                  AdditionalFieldsType.cycleIndex.toValue(),
+                                  "0${context.selectedCycle?.id}",
+                                ),
+                                AdditionalField(
+                                  'taskStatus',
+                                  status_local.Status.beneficiaryOnAntimalarial
+                                      .toValue(),
+                                ),
+                                ...getIndividualAdditionalFields(individual)
+                              ],
+                            ),
+                            address: individual!.address?.first.copyWith(
+                              relatedClientReferenceId: clientReferenceId,
+                              id: null,
+                            ),
+                          );
+
+                          // TODO: Currently it's been shifted to the zero dose flow
+
+                          // context.read<DeliverInterventionBloc>().add(
+                          //       DeliverInterventionSubmitEvent(
+                          //         task: refusalTask,
+                          //         isEditing: false,
+                          //         boundaryModel:
+                          //             RegistrationDeliverySingleton().boundary!,
+                          //       ),
+                          //     );
+
+                          final reloadState =
+                              context.read<HouseholdOverviewBloc>();
+                          Future.delayed(
+                            const Duration(milliseconds: 500),
+                            () {
+                              reloadState.add(
+                                HouseholdOverviewReloadEvent(
+                                  projectId: RegistrationDeliverySingleton()
+                                      .projectId!,
+                                  projectBeneficiaryType:
+                                      RegistrationDeliverySingleton()
+                                          .beneficiaryType!,
+                                ),
+                              );
+                            },
+                          ).then(
+                            (value) => context.router.push(
+                              CustomSplashAcknowledgementRoute(
+                                eligibilityAssessmentType:
+                                    EligibilityAssessmentType.smc,
+                                enableRouteToZeroDose: true,
+                                task: task,
+                              ),
+                            ),
+                          );
+                        },
+                      ),
+                      DigitButton(
+                        label: localizations.translate(
+                          i18_local.beneficiaryDetails
+                              .beneficiaryOnCotrimoxazoleTreatmentLabel,
+                        ),
+                        type: DigitButtonType.secondary,
+                        size: DigitButtonSize.large,
+                        onPressed: () {
+                          Navigator.of(context, rootNavigator: true).pop();
+                          final clientReferenceId = IdGen.i.identifier;
+                          TaskModel task = TaskModel(
+                            projectBeneficiaryClientReferenceId:
+                                projectBeneficiaryClientReferenceId,
+                            clientReferenceId: clientReferenceId,
+                            tenantId: RegistrationDeliverySingleton().tenantId,
+                            rowVersion: 1,
+                            auditDetails: AuditDetails(
+                              createdBy: RegistrationDeliverySingleton()
+                                  .loggedInUserUuid!,
+                              createdTime: context.millisecondsSinceEpoch(),
+                            ),
+                            projectId:
+                                RegistrationDeliverySingleton().projectId,
+                            status: Status.notAdministered.toValue(),
+                            clientAuditDetails: ClientAuditDetails(
+                              createdBy: RegistrationDeliverySingleton()
+                                  .loggedInUserUuid!,
+                              createdTime: context.millisecondsSinceEpoch(),
+                              lastModifiedBy: RegistrationDeliverySingleton()
+                                  .loggedInUserUuid,
+                              lastModifiedTime:
+                                  context.millisecondsSinceEpoch(),
+                            ),
+                            additionalFields: TaskAdditionalFields(
+                              version: 1,
+                              fields: [
+                                AdditionalField(
+                                  AdditionalFieldsType.cycleIndex.toValue(),
+                                  "0${context.selectedCycle?.id}",
+                                ),
+                                AdditionalField(
+                                  'taskStatus',
+                                  status_local.Status.beneficiaryOnCotrimoxazole
+                                      .toValue(),
+                                ),
+                                ...getIndividualAdditionalFields(individual)
+                              ],
+                            ),
+                            address: individual!.address?.first.copyWith(
+                              relatedClientReferenceId: clientReferenceId,
+                              id: null,
+                            ),
+                          );
+
+                          // TODO: Currently it's been shifted to the zero dose flow
+
+                          // context.read<DeliverInterventionBloc>().add(
+                          //       DeliverInterventionSubmitEvent(
+                          //         task: refusalTask,
+                          //         isEditing: false,
+                          //         boundaryModel:
+                          //             RegistrationDeliverySingleton().boundary!,
+                          //       ),
+                          //     );
+
+                          final reloadState =
+                              context.read<HouseholdOverviewBloc>();
+                          Future.delayed(
+                            const Duration(milliseconds: 500),
+                            () {
+                              reloadState.add(
+                                HouseholdOverviewReloadEvent(
+                                  projectId: RegistrationDeliverySingleton()
+                                      .projectId!,
+                                  projectBeneficiaryType:
+                                      RegistrationDeliverySingleton()
+                                          .beneficiaryType!,
+                                ),
+                              );
+                            },
+                          ).then(
+                            (value) => context.router.push(
+                              CustomSplashAcknowledgementRoute(
+                                eligibilityAssessmentType:
+                                    EligibilityAssessmentType.smc,
+                                enableRouteToZeroDose: true,
+                                task: task,
+                              ),
+                            ),
+                          );
+                        },
+                      ),
+                      DigitButton(
+                        label: localizations.translate(
+                          i18_local
+                              .beneficiaryDetails.beneficiaryHasAllergyLabel,
+                        ),
+                        type: DigitButtonType.secondary,
+                        size: DigitButtonSize.large,
+                        onPressed: () {
+                          Navigator.of(context, rootNavigator: true).pop();
+                          final clientReferenceId = IdGen.i.identifier;
+                          TaskModel task = TaskModel(
+                            projectBeneficiaryClientReferenceId:
+                                projectBeneficiaryClientReferenceId,
+                            clientReferenceId: clientReferenceId,
+                            tenantId: RegistrationDeliverySingleton().tenantId,
+                            rowVersion: 1,
+                            auditDetails: AuditDetails(
+                              createdBy: RegistrationDeliverySingleton()
+                                  .loggedInUserUuid!,
+                              createdTime: context.millisecondsSinceEpoch(),
+                            ),
+                            projectId:
+                                RegistrationDeliverySingleton().projectId,
+                            status: Status.notAdministered.toValue(),
+                            clientAuditDetails: ClientAuditDetails(
+                              createdBy: RegistrationDeliverySingleton()
+                                  .loggedInUserUuid!,
+                              createdTime: context.millisecondsSinceEpoch(),
+                              lastModifiedBy: RegistrationDeliverySingleton()
+                                  .loggedInUserUuid,
+                              lastModifiedTime:
+                                  context.millisecondsSinceEpoch(),
+                            ),
+                            additionalFields: TaskAdditionalFields(
+                              version: 1,
+                              fields: [
+                                AdditionalField(
+                                  AdditionalFieldsType.cycleIndex.toValue(),
+                                  "0${context.selectedCycle?.id}",
+                                ),
+                                AdditionalField(
+                                  'taskStatus',
+                                  status_local.Status.beneficiaryHasAllergy
+                                      .toValue(),
+                                ),
+                                ...getIndividualAdditionalFields(individual)
+                              ],
+                            ),
+                            address: individual!.address?.first.copyWith(
+                              relatedClientReferenceId: clientReferenceId,
+                              id: null,
+                            ),
+                          );
+
+                          // TODO: Currently it's been shifted to the zero dose flow
+
+                          // context.read<DeliverInterventionBloc>().add(
+                          //       DeliverInterventionSubmitEvent(
+                          //         task: refusalTask,
+                          //         isEditing: false,
+                          //         boundaryModel:
+                          //             RegistrationDeliverySingleton().boundary!,
+                          //       ),
+                          //     );
+
+                          final reloadState =
+                              context.read<HouseholdOverviewBloc>();
+                          Future.delayed(
+                            const Duration(milliseconds: 500),
+                            () {
+                              reloadState.add(
+                                HouseholdOverviewReloadEvent(
+                                  projectId: RegistrationDeliverySingleton()
+                                      .projectId!,
+                                  projectBeneficiaryType:
+                                      RegistrationDeliverySingleton()
+                                          .beneficiaryType!,
+                                ),
+                              );
+                            },
+                          ).then(
+                            (value) => context.router.push(
+                              CustomSplashAcknowledgementRoute(
+                                eligibilityAssessmentType:
+                                    EligibilityAssessmentType.smc,
+                                enableRouteToZeroDose: true,
+                                task: task,
                               ),
                             ),
                           );
@@ -940,33 +1475,33 @@ class CustomMemberCard extends StatelessWidget {
               //         // !isNotEligibleVAS &&
               //         !isBeneficiaryIneligible &&
               //         !isBeneficiaryReferred)
-              //     ? 
-                  Positioned(
-                      child: Align(
-                        alignment: Alignment.topRight,
-                        child: DigitIconButton(
-                          onPressed: () => DigitActionDialog.show(
-                            context,
-                            widget: ActionCard(
-                              items: [
-                                ActionCardModel(
-                                  icon: Icons.edit,
-                                  label: localizations.translate(
-                                    i18.memberCard.editIndividualDetails,
-                                  ),
-                                  action: editMemberAction,
-                                ),
-                              ],
+              //     ?
+              Positioned(
+                child: Align(
+                  alignment: Alignment.topRight,
+                  child: DigitIconButton(
+                    onPressed: () => DigitActionDialog.show(
+                      context,
+                      widget: ActionCard(
+                        items: [
+                          ActionCardModel(
+                            icon: Icons.edit,
+                            label: localizations.translate(
+                              i18.memberCard.editIndividualDetails,
                             ),
+                            action: editMemberAction,
                           ),
-                          iconText: localizations.translate(
-                            i18.memberCard.editDetails,
-                          ),
-                          icon: Icons.edit,
-                        ),
+                        ],
                       ),
-                    )
-                  // : const Offstage(),
+                    ),
+                    iconText: localizations.translate(
+                      i18.memberCard.editDetails,
+                    ),
+                    icon: Icons.edit,
+                  ),
+                ),
+              )
+              // : const Offstage(),
             ],
           ),
           SizedBox(

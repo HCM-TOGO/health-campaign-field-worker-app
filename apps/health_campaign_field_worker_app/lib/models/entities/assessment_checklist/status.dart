@@ -5,6 +5,16 @@ part 'status.mapper.dart';
 
 @MappableEnum(caseStyle: CaseStyle.upperCase)
 enum Status {
+  @MappableValue("BENEFICIARY_ABSENT")
+  beneficiaryAbsent,
+  @MappableValue("BENEFICIARY_DECEASED")
+  beneficiaryDeceased,
+  @MappableValue("BENEFICIARY_ON_ANTIMALARIAL")
+  beneficiaryOnAntimalarial,
+  @MappableValue("BENEFICIARY_ON_COTRIMOXAZOLE")
+  beneficiaryOnCotrimoxazole,
+  @MappableValue("BENEFICIARY_HAS_ALLERGY")
+  beneficiaryHasAllergy,
   @MappableValue("DELIVERED")
   delivered,
   @MappableValue("NOT_ADMINISTERED")
