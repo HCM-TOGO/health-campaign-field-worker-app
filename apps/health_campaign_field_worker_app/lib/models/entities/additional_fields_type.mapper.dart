@@ -25,6 +25,14 @@ class AdditionalFieldsTypeMapper extends EnumMapper<AdditionalFieldsType> {
   @override
   AdditionalFieldsType decode(dynamic value) {
     switch (value) {
+      case "taskStatus":
+        return AdditionalFieldsType.taskStatus;
+      case "hasImmunizationCard":
+        return AdditionalFieldsType.hasImmunizationCard;
+      case "immunizationCardLost":
+        return AdditionalFieldsType.immunizationCardLost;
+      case "receivedPenta1":
+        return AdditionalFieldsType.receivedPenta1;
       case "zeroDoseStatus":
         return AdditionalFieldsType.zeroDoseStatus;
       case "selectedVaccines":
@@ -81,6 +89,14 @@ class AdditionalFieldsTypeMapper extends EnumMapper<AdditionalFieldsType> {
   @override
   dynamic encode(AdditionalFieldsType self) {
     switch (self) {
+      case AdditionalFieldsType.taskStatus:
+        return "taskStatus";
+      case AdditionalFieldsType.hasImmunizationCard:
+        return "hasImmunizationCard";
+      case AdditionalFieldsType.immunizationCardLost:
+        return "immunizationCardLost";
+      case AdditionalFieldsType.receivedPenta1:
+        return "receivedPenta1";
       case AdditionalFieldsType.zeroDoseStatus:
         return "zeroDoseStatus";
       case AdditionalFieldsType.selectedVaccines:

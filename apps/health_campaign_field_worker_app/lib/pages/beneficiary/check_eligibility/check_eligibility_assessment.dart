@@ -1123,8 +1123,7 @@ class _EligibilityChecklistViewPage
           responses[q2Key] == yes) {
         if (!isReferral &&
             (responses.containsKey(q3Key) && responses[q3Key]!.isNotEmpty)) {
-          isReferral = (responses[q3Key] == negative ||
-                  responses[q3Key] == test_unavailable)
+          isReferral = responses[q3Key] == test_unavailable
               ? true
               : false;
         }

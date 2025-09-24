@@ -1,4 +1,5 @@
 import 'dart:async';
+
 import 'package:collection/collection.dart';
 import 'package:digit_data_model/data_model.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
@@ -9,13 +10,11 @@ import 'package:registration_delivery/models/entities/task_resource.dart';
 import 'package:registration_delivery/utils/typedefs.dart';
 import 'package:registration_delivery/utils/utils.dart';
 
-import '../../models/entities/assessment_checklist/status.dart';
-import '../../utils/app_enums.dart';
-import '../../utils/constants.dart';
-import '../../utils/date_utils.dart';
-
 import '../../../models/entities/additional_fields_type.dart'
     as additional_fields_local;
+import '../../models/entities/assessment_checklist/status.dart';
+import '../../utils/constants.dart';
+import '../../utils/date_utils.dart';
 
 part 'custom_summary_report_bloc.freezed.dart';
 
@@ -48,6 +47,7 @@ class SummaryReportBloc extends Bloc<SummaryReportEvent, SummaryReportState> {
     List<ProductVariantModel> productVariantList = [];
     List<TaskResourceModel> spaq1List = [];
     List<TaskResourceModel> spaq2List = [];
+    List<TaskModel> zeroDoseChildrenListData = [];
     List<TaskModel> zeroDoseChildrenList = [];
     final currentCycle =
         RegistrationDeliverySingleton().projectType?.cycles?.firstWhere(
@@ -55,6 +55,8 @@ class SummaryReportBloc extends Bloc<SummaryReportEvent, SummaryReportState> {
                   (e.startDate) < DateTime.now().millisecondsSinceEpoch &&
                   (e.endDate) > DateTime.now().millisecondsSinceEpoch,
             );
+    final currentUserUuId =
+        RegistrationDeliverySingleton().loggedInUserUuid ?? '';
     householdMemberListData = await (householdMemberRepository)
         .search(HouseholdMemberSearchModel(isHeadOfHousehold: false));
     taskListData = await (taskDataRepository).search(TaskSearchModel());
@@ -64,15 +66,23 @@ class SummaryReportBloc extends Bloc<SummaryReportEvent, SummaryReportState> {
         ? householdMemberListData
         : householdMemberListData.where((member) {
             final createdTime = member.auditDetails?.createdTime ?? 0;
+            final createdBy = member.auditDetails?.createdBy;
+            if (createdBy == null) return false;
+            if (createdBy.isEmpty) return false;
             return createdTime >= currentCycle.startDate &&
-                createdTime <= currentCycle.endDate;
+                createdTime <= currentCycle.endDate &&
+                createdBy == currentUserUuId;
           }).toList();
     final taskList = currentCycle == null
         ? taskListData
         : taskListData.where((task) {
             final createdTime = task.auditDetails?.createdTime ?? 0;
+            final createdBy = task.auditDetails?.createdBy;
+            if (createdBy == null) return false;
+            if (createdBy.isEmpty) return false;
             return createdTime >= currentCycle.startDate &&
-                createdTime <= currentCycle.endDate;
+                createdTime <= currentCycle.endDate &&
+                createdBy == currentUserUuId;
           }).toList();
     for (var element in taskList) {
       if (element.status == null) continue;
@@ -90,9 +100,27 @@ class SummaryReportBloc extends Bloc<SummaryReportEvent, SummaryReportState> {
                       .toValue()) !=
               null) &&
           element.status != Status.delivered.toValue()) {
-        zeroDoseChildrenList.add(element);
+        zeroDoseChildrenListData.add(element);
       }
     }
+
+    Map<String, TaskModel> zeroDoseChildrenMap = {};
+    for (var element in zeroDoseChildrenListData) {
+      final projectbeneficiaryClientRefId =
+          element.projectBeneficiaryClientReferenceId;
+      if (projectbeneficiaryClientRefId != null) {
+        if (!zeroDoseChildrenMap.containsKey(projectbeneficiaryClientRefId)) {
+          zeroDoseChildrenMap[projectbeneficiaryClientRefId] = element;
+        } else if (element.auditDetails!.createdTime >
+            zeroDoseChildrenMap[projectbeneficiaryClientRefId]!
+                .auditDetails!
+                .createdTime) {
+          zeroDoseChildrenMap[projectbeneficiaryClientRefId] = element;
+        }
+      }
+    }
+
+    zeroDoseChildrenList = zeroDoseChildrenMap.values.toList();
 
     for (var task in administeredChildrenList) {
       for (var resource in task.resources!) {
@@ -122,11 +150,13 @@ class SummaryReportBloc extends Bloc<SummaryReportEvent, SummaryReportState> {
     Map<String, int> dateVsSpaq1Count = {};
     Map<String, int> dateVsSpaq2Count = {};
     Map<String, Map<String, int>> dateVsEntityVsCountMap = {};
+
     for (var element in householdMemberList) {
       var dateKey = DigitDateUtils.getDateFromTimestamp(
           element.clientAuditDetails!.createdTime);
       if (element.clientAuditDetails!.createdTime >= currentCycle!.startDate &&
-          element.clientAuditDetails!.createdTime <= currentCycle.endDate) {
+          element.clientAuditDetails!.createdTime <= currentCycle.endDate &&
+          element.clientAuditDetails!.createdBy == currentUserUuId) {
         dateVsHouseholdMembersList.putIfAbsent(dateKey, () => []).add(element);
       }
     }
@@ -134,7 +164,8 @@ class SummaryReportBloc extends Bloc<SummaryReportEvent, SummaryReportState> {
       var dateKey = DigitDateUtils.getDateFromTimestamp(
           element.clientAuditDetails!.createdTime);
       if (element.clientAuditDetails!.createdTime >= currentCycle!.startDate &&
-          element.clientAuditDetails!.createdTime <= currentCycle.endDate) {
+          element.clientAuditDetails!.createdTime <= currentCycle.endDate &&
+          element.clientAuditDetails!.createdBy == currentUserUuId) {
         dateVsAdministeredChilderenList
             .putIfAbsent(dateKey, () => [])
             .add(element);
@@ -144,7 +175,8 @@ class SummaryReportBloc extends Bloc<SummaryReportEvent, SummaryReportState> {
       var dateKey = DigitDateUtils.getDateFromTimestamp(
           element.clientAuditDetails!.createdTime);
       if (element.clientAuditDetails!.createdTime >= currentCycle!.startDate &&
-          element.clientAuditDetails!.createdTime <= currentCycle.endDate) {
+          element.clientAuditDetails!.createdTime <= currentCycle.endDate &&
+          element.clientAuditDetails!.createdBy == currentUserUuId) {
         dateVsRefusalCasesList.putIfAbsent(dateKey, () => []).add(element);
       }
     }
@@ -152,7 +184,8 @@ class SummaryReportBloc extends Bloc<SummaryReportEvent, SummaryReportState> {
       var dateKey = DigitDateUtils.getDateFromTimestamp(
           element.clientAuditDetails!.createdTime);
       if (element.clientAuditDetails!.createdTime >= currentCycle!.startDate &&
-          element.clientAuditDetails!.createdTime <= currentCycle.endDate) {
+          element.clientAuditDetails!.createdTime <= currentCycle.endDate &&
+          element.clientAuditDetails!.createdBy == currentUserUuId) {
         dateVsZeroDoseChildrenList.putIfAbsent(dateKey, () => []).add(element);
       }
     }
@@ -160,7 +193,8 @@ class SummaryReportBloc extends Bloc<SummaryReportEvent, SummaryReportState> {
       var dateKey = DigitDateUtils.getDateFromTimestamp(
           element.auditDetails!.createdTime);
       if (element.auditDetails!.createdTime >= currentCycle!.startDate &&
-          element.auditDetails!.createdTime <= currentCycle.endDate) {
+          element.auditDetails!.createdTime <= currentCycle.endDate &&
+          element.auditDetails!.createdBy == currentUserUuId) {
         dateVsSpaq1List.putIfAbsent(dateKey, () => []).add(element);
       }
     }
@@ -168,7 +202,8 @@ class SummaryReportBloc extends Bloc<SummaryReportEvent, SummaryReportState> {
       var dateKey = DigitDateUtils.getDateFromTimestamp(
           element.auditDetails!.createdTime);
       if (element.auditDetails!.createdTime >= currentCycle!.startDate &&
-          element.auditDetails!.createdTime <= currentCycle.endDate) {
+          element.auditDetails!.createdTime <= currentCycle.endDate &&
+          element.auditDetails!.createdBy == currentUserUuId) {
         dateVsSpaq2List.putIfAbsent(dateKey, () => []).add(element);
       }
     }

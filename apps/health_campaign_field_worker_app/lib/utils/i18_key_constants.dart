@@ -160,6 +160,14 @@ class Common {
 class HouseholdOverView {
   const HouseholdOverView();
 
+  String get beneficiaryDeceasedLabel => 'BENEFICIARY_DECEASED_LABEL';
+  String get beneficiaryAbsentLabel => 'BENEFICIARY_ABSENT_LABEL';
+  String get beneficiaryOnAntimalarialTreatmentLabel =>
+      'BENEFICIARY_ON_ANTIMALARIAL_TREATMENT_LABEL';
+  String get beneficiaryOnCotrimoxazoleTreatmentLabel =>
+      'BENEFICIARY_ON_COTRIMOXAZOLE_TREATMENT_LABEL';
+  String get beneficiaryHasAllergyLabel => 'BENEFICIARY_HAS_ALLERGY_LABEL';
+
   String get householdOverViewHouseholderHeadLabel =>
       'HOUSEHOLD_OVER_VIEW_HOUSEHOLDER_HEAD_LABEL';
 
@@ -1597,6 +1605,14 @@ class BeneficiaryDetails {
 
   String get qrScannerTitle => 'QR_SCANNER_TITLE';
   String get qrScannerToggleTorch => 'QR_SCANNER_TOGGLE_TORCH';
+
+  String get beneficiaryAbsentLabel => 'BENEFICIARY_ABSENT_LABEL';
+  String get beneficiaryDeceasedLabel => 'BENEFICIARY_DECEASED_LABEL';
+  String get beneficiaryOnAntimalarialTreatmentLabel =>
+      'BENEFICIARY_ON_ANTIMALARIAL_TREATMENT_LABEL';
+  String get beneficiaryOnCotrimoxazoleTreatmentLabel =>
+      'BENEFICIARY_ON_COTRIMOXAZOLE_TREATMENT_LABEL';
+  String get beneficiaryHasAllergyLabel => 'BENEFICIARY_HAS_ALLERGY_LABEL';
 }
 
 class PrivacyPolicy {

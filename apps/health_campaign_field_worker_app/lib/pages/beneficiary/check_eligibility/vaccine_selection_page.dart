@@ -63,6 +63,9 @@ class VaccineSelectionPage extends LocalizedStatefulWidget {
   final bool? hasSideEffects;
   final SideEffectModel sideEffect;
   final bool isZeroDoseAlreadyDone;
+  final String? hasImmunizationCard;
+  final String? immunizationCardLost;
+  final String? receivedPenta1;
 
   const VaccineSelectionPage({
     super.key,
@@ -76,6 +79,9 @@ class VaccineSelectionPage extends LocalizedStatefulWidget {
     this.hasSideEffects = false,
     required this.sideEffect,
     this.isZeroDoseAlreadyDone = false,
+    this.hasImmunizationCard,
+    this.immunizationCardLost,
+    this.receivedPenta1,
   });
 
   @override
@@ -993,6 +999,27 @@ class _VaccineSelectionPageState extends LocalizedState<VaccineSelectionPage> {
                                                 .toValue(),
                                             ZeroDoseStatus.done.name,
                                           ),
+                                          AdditionalField(
+                                            additional_fields_local
+                                                .AdditionalFieldsType
+                                                .hasImmunizationCard
+                                                .toValue(),
+                                            widget.hasImmunizationCard,
+                                          ),
+                                          AdditionalField(
+                                            additional_fields_local
+                                                .AdditionalFieldsType
+                                                .immunizationCardLost
+                                                .toValue(),
+                                            widget.immunizationCardLost,
+                                          ),
+                                          AdditionalField(
+                                            additional_fields_local
+                                                .AdditionalFieldsType
+                                                .receivedPenta1
+                                                .toValue(),
+                                            widget.receivedPenta1,
+                                          ),
                                           if (selectedCodes.isNotEmpty)
                                             AdditionalField(
                                               additional_fields_local
@@ -1194,17 +1221,40 @@ class _VaccineSelectionPageState extends LocalizedState<VaccineSelectionPage> {
                                               AdditionalField(
                                                 additional_fields_local
                                                     .AdditionalFieldsType
-                                                    .selectedVaccines
+                                                    .hasImmunizationCard
                                                     .toValue(),
-                                                selectedCodes.join('.'),
+                                                widget.hasImmunizationCard,
                                               ),
                                               AdditionalField(
                                                 additional_fields_local
                                                     .AdditionalFieldsType
-                                                    .noSelectedVaccines
+                                                    .immunizationCardLost
                                                     .toValue(),
-                                                noSelectedCodes.join('.'),
+                                                widget.immunizationCardLost,
                                               ),
+                                              AdditionalField(
+                                                additional_fields_local
+                                                    .AdditionalFieldsType
+                                                    .receivedPenta1
+                                                    .toValue(),
+                                                widget.receivedPenta1,
+                                              ),
+                                              if (selectedCodes.isNotEmpty)
+                                                AdditionalField(
+                                                  additional_fields_local
+                                                      .AdditionalFieldsType
+                                                      .selectedVaccines
+                                                      .toValue(),
+                                                  selectedCodes.join('.'),
+                                                ),
+                                              if (noSelectedCodes.isNotEmpty)
+                                                AdditionalField(
+                                                  additional_fields_local
+                                                      .AdditionalFieldsType
+                                                      .noSelectedVaccines
+                                                      .toValue(),
+                                                  noSelectedCodes.join('.'),
+                                                ),
                                               ...getIndividualAdditionalFields(
                                                   widget.individual)
                                             ],

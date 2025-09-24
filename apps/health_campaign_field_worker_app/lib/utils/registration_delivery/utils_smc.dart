@@ -306,6 +306,119 @@ bool checkBeneficiaryRefusedSMC(List<TaskModel>? tasks) {
   return successfulTask != null;
 }
 
+bool checkIfBeneficiaryDeceased(
+  List<TaskModel>? taskData,
+  ProjectTypeModel? projectType,
+) {
+  final currentCycle = projectType?.cycles?.firstWhereOrNull(
+    (e) =>
+        (e.startDate!) < DateTime.now().millisecondsSinceEpoch &&
+        (e.endDate!) > DateTime.now().millisecondsSinceEpoch,
+  );
+
+  if (taskData == null || taskData.isEmpty || currentCycle == null) {
+    return false;
+  }
+
+  final currentCycleIndex = currentCycle?.id;
+
+  return taskData.any((task) {
+    final statusIsNotAdministered =
+        task.status == Status.notAdministered.toValue();
+    final deceasedField = task.additionalFields?.fields.firstWhereOrNull(
+      (f) =>
+          f.key ==
+              additional_fields_local.AdditionalFieldsType.taskStatus
+                  .toValue() &&
+          f.value == status_local.Status.beneficiaryDeceased.toValue(),
+    );
+    final cycleIndex = task.additionalFields!.fields
+        .firstWhereOrNull(
+          (f) =>
+              f.key ==
+              additional_fields_local.AdditionalFieldsType.cycleIndex.toValue(),
+        )
+        ?.value;
+
+    final isPreviousCycle =
+        cycleIndex != null && int.tryParse(cycleIndex)! < currentCycleIndex!;
+
+    return statusIsNotAdministered && deceasedField != null && isPreviousCycle;
+  });
+}
+
+bool checkBeneficiaryAbsent(List<TaskModel>? tasks) {
+  if ((tasks ?? []).isEmpty) {
+    return false;
+  }
+  final lastTask = tasks!.last;
+  final isNotAdministered = lastTask.status == Status.notAdministered.toValue();
+  final hasAbsentField = lastTask.additionalFields?.fields.firstWhereOrNull(
+        (e) =>
+            e.key ==
+                additional_fields_local.AdditionalFieldsType.taskStatus
+                    .toValue() &&
+            e.value == status_local.Status.beneficiaryAbsent.toValue(),
+      ) !=
+      null;
+
+  return isNotAdministered && hasAbsentField;
+}
+
+bool checkBeneficiaryOnAntimalarial(List<TaskModel>? tasks) {
+  if ((tasks ?? []).isEmpty) {
+    return false;
+  }
+  final lastTask = tasks!.last;
+  final isNotAdministered = lastTask.status == Status.notAdministered.toValue();
+  final isOnAntimalarial = lastTask.additionalFields?.fields.firstWhereOrNull(
+        (e) =>
+            e.key ==
+                additional_fields_local.AdditionalFieldsType.taskStatus
+                    .toValue() &&
+            e.value == status_local.Status.beneficiaryOnAntimalarial.toValue(),
+      ) !=
+      null;
+
+  return isNotAdministered && isOnAntimalarial;
+}
+
+bool checkBeneficiaryOnCotrimoxazole(List<TaskModel>? tasks) {
+  if ((tasks ?? []).isEmpty) {
+    return false;
+  }
+  final lastTask = tasks!.last;
+  final isNotAdministered = lastTask.status == Status.notAdministered.toValue();
+  final isOnCotrimoxazole = lastTask.additionalFields?.fields.firstWhereOrNull(
+        (e) =>
+            e.key ==
+                additional_fields_local.AdditionalFieldsType.taskStatus
+                    .toValue() &&
+            e.value == status_local.Status.beneficiaryOnCotrimoxazole.toValue(),
+      ) !=
+      null;
+
+  return isNotAdministered && isOnCotrimoxazole;
+}
+
+bool checkBeneficiaryHasAllergy(List<TaskModel>? tasks) {
+  if ((tasks ?? []).isEmpty) {
+    return false;
+  }
+  final lastTask = tasks!.last;
+  final isNotAdministered = lastTask.status == Status.notAdministered.toValue();
+  final hasAllergyField = lastTask.additionalFields?.fields.firstWhereOrNull(
+        (e) =>
+            e.key ==
+                additional_fields_local.AdditionalFieldsType.taskStatus
+                    .toValue() &&
+            e.value == status_local.Status.beneficiaryHasAllergy.toValue(),
+      ) !=
+      null;
+
+  return isNotAdministered && hasAllergyField;
+}
+
 bool checkEligibilityForAgeAndSideEffectAll(
   DigitDOBAgeConvertor age,
   ProjectTypeModel? projectType,

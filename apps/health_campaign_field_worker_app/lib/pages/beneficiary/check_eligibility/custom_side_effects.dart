@@ -27,11 +27,13 @@ import 'package:registration_delivery/widgets/localized.dart';
 class CustomSideEffectsPage extends LocalizedStatefulWidget {
   final bool isEditing;
   final List<TaskModel> tasks;
+  final IndividualModel? individual;
 
   const CustomSideEffectsPage({
     super.key,
     super.appLocalizations,
     required this.tasks,
+    this.individual,
     this.isEditing = false,
   });
 
@@ -374,13 +376,15 @@ class CustomSideEffectsPageState extends LocalizedState<CustomSideEffectsPage> {
     ).then(
       (value) => context.router.push(
         ZeroDoseCheckRoute(
-            projectBeneficiaryClientReferenceId:
-                widget.tasks.last.projectBeneficiaryClientReferenceId,
-            eligibilityAssessmentType: EligibilityAssessmentType.smc,
-            isAdministration: false,
-            isChecklistAssessmentDone: false,
-            hasSideEffects: true,
-            sideEffect: sideEffect),
+          projectBeneficiaryClientReferenceId:
+              widget.tasks.last.projectBeneficiaryClientReferenceId,
+          eligibilityAssessmentType: EligibilityAssessmentType.smc,
+          isAdministration: false,
+          isChecklistAssessmentDone: false,
+          hasSideEffects: true,
+          sideEffect: sideEffect,
+          individual: widget.individual,
+        ),
       ),
     );
   }

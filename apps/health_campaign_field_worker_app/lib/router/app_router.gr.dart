@@ -535,6 +535,7 @@ abstract class _$AppRouter extends RootStackRouter {
           key: args.key,
           appLocalizations: args.appLocalizations,
           tasks: args.tasks,
+          individual: args.individual,
           isEditing: args.isEditing,
         ),
       );
@@ -824,6 +825,9 @@ abstract class _$AppRouter extends RootStackRouter {
           hasSideEffects: args.hasSideEffects,
           sideEffect: args.sideEffect,
           isZeroDoseAlreadyDone: args.isZeroDoseAlreadyDone,
+          hasImmunizationCard: args.hasImmunizationCard,
+          immunizationCardLost: args.immunizationCardLost,
+          receivedPenta1: args.receivedPenta1,
         ),
       );
     },
@@ -2760,6 +2764,7 @@ class CustomSideEffectsRoute extends PageRouteInfo<CustomSideEffectsRouteArgs> {
     Key? key,
     RegistrationDeliveryLocalization? appLocalizations,
     required List<TaskModel> tasks,
+    IndividualModel? individual,
     bool isEditing = false,
     List<PageRouteInfo>? children,
   }) : super(
@@ -2768,6 +2773,7 @@ class CustomSideEffectsRoute extends PageRouteInfo<CustomSideEffectsRouteArgs> {
             key: key,
             appLocalizations: appLocalizations,
             tasks: tasks,
+            individual: individual,
             isEditing: isEditing,
           ),
           initialChildren: children,
@@ -2784,6 +2790,7 @@ class CustomSideEffectsRouteArgs {
     this.key,
     this.appLocalizations,
     required this.tasks,
+    this.individual,
     this.isEditing = false,
   });
 
@@ -2793,11 +2800,13 @@ class CustomSideEffectsRouteArgs {
 
   final List<TaskModel> tasks;
 
+  final IndividualModel? individual;
+
   final bool isEditing;
 
   @override
   String toString() {
-    return 'CustomSideEffectsRouteArgs{key: $key, appLocalizations: $appLocalizations, tasks: $tasks, isEditing: $isEditing}';
+    return 'CustomSideEffectsRouteArgs{key: $key, appLocalizations: $appLocalizations, tasks: $tasks, individual: $individual, isEditing: $isEditing}';
   }
 }
 
@@ -3786,6 +3795,9 @@ class VaccineSelectionRoute extends PageRouteInfo<VaccineSelectionRouteArgs> {
     bool? hasSideEffects = false,
     required SideEffectModel sideEffect,
     bool isZeroDoseAlreadyDone = false,
+    String? hasImmunizationCard,
+    String? immunizationCardLost,
+    String? receivedPenta1,
     List<PageRouteInfo>? children,
   }) : super(
           VaccineSelectionRoute.name,
@@ -3802,6 +3814,9 @@ class VaccineSelectionRoute extends PageRouteInfo<VaccineSelectionRouteArgs> {
             hasSideEffects: hasSideEffects,
             sideEffect: sideEffect,
             isZeroDoseAlreadyDone: isZeroDoseAlreadyDone,
+            hasImmunizationCard: hasImmunizationCard,
+            immunizationCardLost: immunizationCardLost,
+            receivedPenta1: receivedPenta1,
           ),
           initialChildren: children,
         );
@@ -3825,6 +3840,9 @@ class VaccineSelectionRouteArgs {
     this.hasSideEffects = false,
     required this.sideEffect,
     this.isZeroDoseAlreadyDone = false,
+    this.hasImmunizationCard,
+    this.immunizationCardLost,
+    this.receivedPenta1,
   });
 
   final Key? key;
@@ -3849,9 +3867,15 @@ class VaccineSelectionRouteArgs {
 
   final bool isZeroDoseAlreadyDone;
 
+  final String? hasImmunizationCard;
+
+  final String? immunizationCardLost;
+
+  final String? receivedPenta1;
+
   @override
   String toString() {
-    return 'VaccineSelectionRouteArgs{key: $key, appLocalizations: $appLocalizations, isAdministration: $isAdministration, eligibilityAssessmentType: $eligibilityAssessmentType, isChecklistAssessmentDone: $isChecklistAssessmentDone, projectBeneficiaryClientReferenceId: $projectBeneficiaryClientReferenceId, individual: $individual, task: $task, hasSideEffects: $hasSideEffects, sideEffect: $sideEffect, isZeroDoseAlreadyDone: $isZeroDoseAlreadyDone}';
+    return 'VaccineSelectionRouteArgs{key: $key, appLocalizations: $appLocalizations, isAdministration: $isAdministration, eligibilityAssessmentType: $eligibilityAssessmentType, isChecklistAssessmentDone: $isChecklistAssessmentDone, projectBeneficiaryClientReferenceId: $projectBeneficiaryClientReferenceId, individual: $individual, task: $task, hasSideEffects: $hasSideEffects, sideEffect: $sideEffect, isZeroDoseAlreadyDone: $isZeroDoseAlreadyDone, hasImmunizationCard: $hasImmunizationCard, immunizationCardLost: $immunizationCardLost, receivedPenta1: $receivedPenta1}';
   }
 }
 

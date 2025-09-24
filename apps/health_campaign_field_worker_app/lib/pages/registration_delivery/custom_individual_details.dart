@@ -70,6 +70,7 @@ class CustomIndividualDetailsPageState
   static const _mobileNumberKey = 'mobileNumber';
   static const _idTypeKey = 'idType';
   static const _idNumberKey = 'idNumber';
+  static const _previousBeneficiaryIdKey = 'previousBeneficiaryId';
   bool isDuplicateTag = false;
   static const maxLength = 200;
   final clickedStatus = ValueNotifier<bool>(false);
@@ -963,6 +964,49 @@ class CustomIndividualDetailsPageState
                               );
                             },
                           ),
+                        if (!widget.isHeadOfHousehold && isRelocated)
+                          Row(
+                            mainAxisAlignment: MainAxisAlignment.center,
+                            children: [
+                              Text(
+                                localizations.translate(
+                                  i18.individualDetails.separatorLabelText,
+                                ),
+                                style: theme.textTheme.bodyLarge,
+                              ),
+                            ],
+                          ),
+                        if (!widget.isHeadOfHousehold && isRelocated)
+                          ReactiveWrapperField(
+                            formControlName: _previousBeneficiaryIdKey,
+                            validationMessages: {
+                              'onlyAlphabetsAndDigitsas': (object) =>
+                                  localizations.translate(
+                                    i18_local.individualDetails
+                                        .onlyAlphabetsNumbersSpacesValidationMessage,
+                                  ),
+                            },
+                            builder: (field) => LabeledField(
+                              label: localizations.translate(
+                                i18_local.beneficiaryDetails.beneficiaryId,
+                              ),
+                              child: DigitTextFormInput(
+                                inputFormatters: [
+                                  FilteringTextInputFormatter.allow(
+                                      RegExp(r'[a-zA-Z0-9]')),
+                                ],
+                                initialValue: form
+                                    .control(_previousBeneficiaryIdKey)
+                                    .value,
+                                onChange: (value) {
+                                  form
+                                      .control(_previousBeneficiaryIdKey)
+                                      .value = value;
+                                },
+                                errorMessage: field.errorText,
+                              ),
+                            ),
+                          ),
                         individualDetailsShowcaseData.mobile.buildWith(
                           child: Offstage(
                             offstage: !widget.isHeadOfHousehold,
@@ -1122,10 +1166,18 @@ class CustomIndividualDetailsPageState
                 identifierType: IdentifierTypes.uniqueBeneficiaryID.toValue(),
               ),
             ],
-      // additionalFields: IndividualAdditionalFields(version: 1, fields: [
-      //   AdditionalField(form.control(_idTypeKey).value ?? '',
-      //       form.control(_idNumberKey).value ?? '')
-      // ])
+      additionalFields: IndividualAdditionalFields(
+        version: 1,
+        fields: [
+          if (form.control(_previousBeneficiaryIdKey).value != null &&
+              // ignore: avoid_dynamic_calls
+              form.control(_previousBeneficiaryIdKey).value!.isNotEmpty)
+            AdditionalField(
+              'previousBeneficiaryId',
+              form.control(_previousBeneficiaryIdKey).value!,
+            ),
+        ],
+      ),
     );
 
     return individual;
@@ -1195,6 +1247,16 @@ class CustomIndividualDetailsPageState
             local_utils.CustomValidator.startsWith7or9(validator)),
         // Validators.required,
       ]),
+      _previousBeneficiaryIdKey: FormControl<String>(
+        value: individual?.additionalFields?.fields
+            .firstWhereOrNull((f) => f.key == 'previousBeneficiaryId')
+            ?.value,
+        validators: [
+          Validators.delegate((validator) =>
+              local_utils.CustomValidator.onlyAlphabetsAndDigitsNoSpaces(
+                  validator)),
+        ],
+      ),
     });
   }
 

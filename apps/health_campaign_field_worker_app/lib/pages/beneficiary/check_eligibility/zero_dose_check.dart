@@ -98,6 +98,9 @@ class ZeroDoseCheckPageState extends LocalizedState<ZeroDoseCheckPage> {
   Map<String?, String> responses = {};
   final String yes = "YES";
   final String no = "NO";
+  String hasImmunizationCard = 'NOT_SELECTED';
+  String immunizationCardLost = 'NOT_SELECTED';
+  String receivedPenta1 = 'NOT_SELECTED';
 
   // List of controllers for form elements
   final List _controllers = [];
@@ -317,6 +320,17 @@ class ZeroDoseCheckPageState extends LocalizedState<ZeroDoseCheckPage> {
                                   responses,
                                 );
 
+                                for (final entry in responses.entries) {
+                                  if (entry.key == 'ZDAQ1') {
+                                    hasImmunizationCard = entry.value;
+                                  } else if (entry.key == 'ZDAQ1.NO.Q2A') {
+                                    immunizationCardLost = entry.value;
+                                  } else if (entry.key ==
+                                      'ZDAQ1.NO.Q2A.YES.Q2AA') {
+                                    receivedPenta1 = entry.value;
+                                  }
+                                }
+
                                 // TODO: Uncomment this block when the vaccine selection page is complete
 
                                 if (showVaccineSelectionPage ||
@@ -436,19 +450,23 @@ class ZeroDoseCheckPageState extends LocalizedState<ZeroDoseCheckPage> {
                                   final isZeroDoseAlreadyDone =
                                       currentCycle!.id > 1;
                                   context.router.push(VaccineSelectionRoute(
-                                      isAdministration: widget.isAdministration,
-                                      eligibilityAssessmentType:
-                                          widget.eligibilityAssessmentType,
-                                      isChecklistAssessmentDone:
-                                          widget.isChecklistAssessmentDone,
-                                      projectBeneficiaryClientReferenceId:
-                                          projectBeneficiaryClientReferenceId,
-                                      individual: widget.individual,
-                                      task: widget.task,
-                                      hasSideEffects: widget.hasSideEffects!,
-                                      sideEffect: widget.sideEffect!,
-                                      isZeroDoseAlreadyDone:
-                                          isZeroDoseAlreadyDone));
+                                    isAdministration: widget.isAdministration,
+                                    eligibilityAssessmentType:
+                                        widget.eligibilityAssessmentType,
+                                    isChecklistAssessmentDone:
+                                        widget.isChecklistAssessmentDone,
+                                    projectBeneficiaryClientReferenceId:
+                                        projectBeneficiaryClientReferenceId,
+                                    individual: widget.individual,
+                                    task: widget.task,
+                                    hasSideEffects: widget.hasSideEffects!,
+                                    sideEffect: widget.sideEffect!,
+                                    isZeroDoseAlreadyDone:
+                                        isZeroDoseAlreadyDone,
+                                    hasImmunizationCard: hasImmunizationCard,
+                                    immunizationCardLost: immunizationCardLost,
+                                    receivedPenta1: receivedPenta1,
+                                  ));
                                 } else {
                                   final shouldSubmit = await DigitDialog.show(
                                     context,
@@ -635,6 +653,27 @@ class ZeroDoseCheckPageState extends LocalizedState<ZeroDoseCheckPage> {
                                                         .name
                                                     : ZeroDoseStatus.done.name,
                                           ),
+                                          AdditionalField(
+                                            additional_fields_local
+                                                .AdditionalFieldsType
+                                                .hasImmunizationCard
+                                                .toValue(),
+                                            hasImmunizationCard,
+                                          ),
+                                          AdditionalField(
+                                            additional_fields_local
+                                                .AdditionalFieldsType
+                                                .immunizationCardLost
+                                                .toValue(),
+                                            immunizationCardLost,
+                                          ),
+                                          AdditionalField(
+                                            additional_fields_local
+                                                .AdditionalFieldsType
+                                                .receivedPenta1
+                                                .toValue(),
+                                            receivedPenta1,
+                                          ),
                                         ];
 
                                         final updatedTask = oldTask.copyWith(
@@ -802,18 +841,10 @@ class ZeroDoseCheckPageState extends LocalizedState<ZeroDoseCheckPage> {
                                                       //       .beneficiaryInEligible
                                                       //       .toValue(),
                                                       // ),
-                                                      if (widget
-                                                              .hasSideEffects ??
-                                                          false == false) ...[
-                                                        AdditionalField(
-                                                          'ineligibleReasons',
-                                                          ineligibilityReasons
-                                                              .join(","),
-                                                        ),
-                                                        AdditionalField(
-                                                            'ageBelow3Months',
-                                                            true.toString()),
-                                                      ] else ...[
+                                                      if (widget.hasSideEffects !=
+                                                              null &&
+                                                          widget.hasSideEffects ==
+                                                              true) ...[
                                                         AdditionalField(
                                                             'ineligibleReasons',
                                                             ["SIDE_EFFECTS"]
@@ -823,6 +854,15 @@ class ZeroDoseCheckPageState extends LocalizedState<ZeroDoseCheckPage> {
                                                                 .AdditionalFieldsType
                                                                 .hasSideEffects
                                                                 .toValue(),
+                                                            true.toString()),
+                                                      ] else ...[
+                                                        AdditionalField(
+                                                          'ineligibleReasons',
+                                                          ineligibilityReasons
+                                                              .join(","),
+                                                        ),
+                                                        AdditionalField(
+                                                            'ageBelow3Months',
                                                             true.toString()),
                                                       ],
                                                       AdditionalField(
@@ -847,6 +887,27 @@ class ZeroDoseCheckPageState extends LocalizedState<ZeroDoseCheckPage> {
                                                                     .name
                                                                 : ZeroDoseStatus
                                                                     .done.name,
+                                                      ),
+                                                      AdditionalField(
+                                                        additional_fields_local
+                                                            .AdditionalFieldsType
+                                                            .hasImmunizationCard
+                                                            .toValue(),
+                                                        hasImmunizationCard,
+                                                      ),
+                                                      AdditionalField(
+                                                        additional_fields_local
+                                                            .AdditionalFieldsType
+                                                            .immunizationCardLost
+                                                            .toValue(),
+                                                        immunizationCardLost,
+                                                      ),
+                                                      AdditionalField(
+                                                        additional_fields_local
+                                                            .AdditionalFieldsType
+                                                            .receivedPenta1
+                                                            .toValue(),
+                                                        receivedPenta1,
                                                       ),
                                                       ...getIndividualAdditionalFields(
                                                           widget.individual)
