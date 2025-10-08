@@ -104,6 +104,10 @@ class _HomePageShowcaseData {
     messageLocalizationKey: i18.home.db,
   );
 
+  final editTasks = ShowcaseItemBuilder(
+    messageLocalizationKey: i18.home.editTasks,
+  );
+
   final dashBoard = ShowcaseItemBuilder(
     messageLocalizationKey: i18.home.dashboard,
   );

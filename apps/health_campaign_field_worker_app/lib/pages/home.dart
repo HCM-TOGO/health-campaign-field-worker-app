@@ -67,6 +67,7 @@ import '../widgets/localized.dart';
 import '../widgets/registration_delivery/custom_beneficiary_progress.dart';
 import '../widgets/showcase/config/showcase_constants.dart';
 import '../widgets/showcase/showcase_button.dart';
+import 'edit/task_list.dart';
 // import 'package:referral_reconciliation/blocs/search_referral_reconciliations.dart';
 // import 'package:referral_reconciliation/router/referral_reconciliation_router.gm.dart';
 // import 'package:referral_reconciliation/pages/search_referral_reconciliations.dart';
@@ -546,7 +547,22 @@ class _HomePageState extends LocalizedState<HomePage> {
             context.router.push(const ClosedHouseholdWrapperRoute());
           },
         ),
-      )
+      ),
+      i18.home.editTasks: homeShowcaseData.editTasks.buildWith(
+        child: HomeItemCard(
+          icon: Icons.edit_note,
+          label: i18.home.editTasks,
+          onPressed: () {
+            Navigator.of(context).push(
+              MaterialPageRoute(
+                builder: (context) => TaskListPage(
+                  db: context.read<LocalSqlDataStore>(),
+                ),
+              ),
+            );
+          },
+        ),
+      ),
     };
 
     final Map<String, GlobalKey> homeItemsShowcaseMap = {
@@ -577,6 +593,7 @@ class _HomePageState extends LocalizedState<HomePage> {
       i18.home.mySurveyForm:
           homeShowcaseData.supervisorMySurveyForm.showcaseKey,
       i18.home.summaryLabel: homeShowcaseData.summaryReport.showcaseKey,
+      i18.home.editTasks: homeShowcaseData.editTasks.showcaseKey,
     };
 
     final homeItemsLabel = <String>[
@@ -596,6 +613,7 @@ class _HomePageState extends LocalizedState<HomePage> {
       i18.home.db,
       i18.home.dashboard,
       i18.home.summaryLabel,
+      i18.home.editTasks,
     ];
 
     final List<String> filteredLabels = homeItemsLabel
@@ -604,7 +622,8 @@ class _HomePageState extends LocalizedState<HomePage> {
                 .map((e) => e.displayName)
                 .toList()
                 .contains(element) ||
-            element == i18.home.db)
+            element == i18.home.db ||
+            element == i18.home.editTasks)
         .toList();
 
     final showcaseKeys = filteredLabels

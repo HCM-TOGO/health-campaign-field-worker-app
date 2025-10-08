@@ -1014,6 +1014,8 @@ class Home {
 
   String get clfLabel => "HOME_COMMUNAL_LIVING_FACILITIES_LABEL";
   String get summaryLabel => 'HOME_SUMMARY_LABEL';
+
+  String get editTasks => 'HOME_EDIT_TASKS_LABEL';
 }
 
 class AcknowledgementSuccess {
