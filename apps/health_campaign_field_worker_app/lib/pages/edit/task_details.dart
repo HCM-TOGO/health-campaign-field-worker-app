@@ -25,8 +25,7 @@ class _TaskDetailPageState extends State<TaskDetailPage> {
   late TextEditingController _versionController;
   late Map<String, TextEditingController> _additionalFieldControllers;
   late Map<String, TextEditingController> _resourceControllers;
-  late Map<String, TextEditingController> _addressControllers;
-  late Map<String, TextEditingController> _auditControllers;
+  late TextEditingController _deleteReasonController;
   late Map<String, TextEditingController> _hiddenIdControllers;
 
   bool _saving = false;
@@ -88,68 +87,8 @@ class _TaskDetailPageState extends State<TaskDetailPage> {
       }
     }
 
-    // Initialize address controllers
-    _addressControllers = {};
-    if (_originalTask.address != null) {
-      final address = _originalTask.address!;
-      _addressControllers['address_id'] = 
-          TextEditingController(text: address.id.toString());
-      _addressControllers['address_relatedClientReferenceId'] = 
-          TextEditingController(text: address.relatedClientReferenceId);
-      _addressControllers['address_tenantId'] = 
-          TextEditingController(text: address.tenantId);
-      _addressControllers['address_doorNo'] = 
-          TextEditingController(text: address.doorNo);
-      _addressControllers['address_latitude'] = 
-          TextEditingController(text: address.latitude.toString());
-      _addressControllers['address_longitude'] = 
-          TextEditingController(text: address.longitude.toString());
-      _addressControllers['address_landmark'] = 
-          TextEditingController(text: address.landmark);
-      _addressControllers['address_locationAccuracy'] = 
-          TextEditingController(text: address.locationAccuracy.toString());
-      _addressControllers['address_addressLine1'] = 
-          TextEditingController(text: address.addressLine1);
-      _addressControllers['address_addressLine2'] = 
-          TextEditingController(text: address.addressLine2);
-      _addressControllers['address_city'] = 
-          TextEditingController(text: address.city);
-      _addressControllers['address_pincode'] = 
-          TextEditingController(text: address.pincode);
-      _addressControllers['address_type'] = 
-          TextEditingController(text: address.type.toString());
-      _addressControllers['address_locality_code'] = 
-          TextEditingController(text: address.locality?.code ?? '');
-      _addressControllers['address_locality_name'] = 
-          TextEditingController(text: address.locality?.name ?? '');
-      _addressControllers['address_rowVersion'] = 
-          TextEditingController(text: address.rowVersion.toString());
-    }
-
-    // Initialize audit controllers
-    _auditControllers = {};
-    if (_originalTask.auditDetails != null) {
-      final audit = _originalTask.auditDetails!;
-      _auditControllers['audit_createdBy'] = 
-          TextEditingController(text: audit.createdBy);
-      _auditControllers['audit_createdTime'] = 
-          TextEditingController(text: audit.createdTime.toString());
-      _auditControllers['audit_lastModifiedBy'] = 
-          TextEditingController(text: audit.lastModifiedBy);
-      _auditControllers['audit_lastModifiedTime'] = 
-          TextEditingController(text: audit.lastModifiedTime.toString());
-    }
-    if (_originalTask.clientAuditDetails != null) {
-      final clientAudit = _originalTask.clientAuditDetails!;
-      _auditControllers['clientAudit_createdBy'] = 
-          TextEditingController(text: clientAudit.createdBy);
-      _auditControllers['clientAudit_createdTime'] = 
-          TextEditingController(text: clientAudit.createdTime.toString());
-      _auditControllers['clientAudit_lastModifiedBy'] = 
-          TextEditingController(text: clientAudit.lastModifiedBy);
-      _auditControllers['clientAudit_lastModifiedTime'] = 
-          TextEditingController(text: clientAudit.lastModifiedTime.toString());
-    }
+    // Initialize delete reason controller
+    _deleteReasonController = TextEditingController();
 
     // Additional field controllers
     _schemaController =
@@ -176,12 +115,7 @@ class _TaskDetailPageState extends State<TaskDetailPage> {
     for (final c in _resourceControllers.values) {
       c.dispose();
     }
-    for (final c in _addressControllers.values) {
-      c.dispose();
-    }
-    for (final c in _auditControllers.values) {
-      c.dispose();
-    }
+    _deleteReasonController.dispose();
     for (final c in _hiddenIdControllers.values) {
       c.dispose();
     }
@@ -241,6 +175,116 @@ class _TaskDetailPageState extends State<TaskDetailPage> {
     }
   }
 
+  Future<void> _showDeleteDialog() async {
+    final result = await showDialog<bool>(
+      context: context,
+      builder: (BuildContext context) {
+        return AlertDialog(
+          title: const Text('Delete Task'),
+          content: Column(
+            mainAxisSize: MainAxisSize.min,
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              const Text('Do you want to delete the administration data?'),
+              const SizedBox(height: 16),
+              TextField(
+                controller: _deleteReasonController,
+                decoration: const InputDecoration(
+                  labelText: 'Reason *',
+                  hintText: 'Please provide a reason for deletion',
+                  border: OutlineInputBorder(),
+                ),
+                maxLines: 3,
+                autofocus: true,
+              ),
+            ],
+          ),
+          actions: [
+            TextButton(
+              onPressed: () => Navigator.of(context).pop(false),
+              child: const Text('Cancel'),
+            ),
+            ElevatedButton(
+              onPressed: () {
+                if (_deleteReasonController.text.trim().isEmpty) {
+                  ScaffoldMessenger.of(context).showSnackBar(
+                    const SnackBar(
+                      content: Text('Please provide a reason for deletion'),
+                      backgroundColor: Colors.red,
+                    ),
+                  );
+                  return;
+                }
+                Navigator.of(context).pop(true);
+              },
+              style: ElevatedButton.styleFrom(
+                backgroundColor: Colors.red,
+                foregroundColor: Colors.white,
+              ),
+              child: const Text('Delete'),
+            ),
+          ],
+        );
+      },
+    );
+
+    if (result == true) {
+      await _deleteTask();
+    }
+  }
+
+  Future<void> _deleteTask() async {
+    setState(() => _saving = true);
+
+    try {
+      final taskDataRepository =
+          context.read<LocalRepository<TaskModel, TaskSearchModel>>()
+              as CustomTaskLocalRepository;
+
+      // Get existing additional fields
+      final existingFields = _additionalFields?.fields ?? [];
+      
+      // Add delete reason to additional fields
+      final deleteReasonField = AdditionalField('deleteReason', _deleteReasonController.text.trim());
+      final updatedFields = [...existingFields, deleteReasonField];
+
+      final newAdditionalFields = TaskAdditionalFields(
+        schema: _additionalFields?.schema ?? 'Task',
+        version: _additionalFields?.version ?? 1,
+        fields: updatedFields,
+      );
+
+      // Create updated task model with delete reason in additional fields
+      final updatedTask = _originalTask.copyWith(
+        additionalFields: newAdditionalFields,
+      );
+
+      // Delete using repository
+      await taskDataRepository.delete(updatedTask);
+
+      if (mounted) {
+        setState(() => _saving = false);
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(
+            content: Text('Task deleted successfully!'),
+            backgroundColor: Colors.green,
+          ),
+        );
+        Navigator.pop(context);
+      }
+    } catch (e) {
+      if (mounted) {
+        setState(() => _saving = false);
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text('Error deleting task: $e'),
+            backgroundColor: Colors.red,
+          ),
+        );
+      }
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
@@ -259,6 +303,11 @@ class _TaskDetailPageState extends State<TaskDetailPage> {
           ),
         ),
         actions: [
+          DigitIconButton(
+            icon: Icons.delete,
+            onPressed: _saving ? null : _showDeleteDialog,
+            iconColor: Colors.red,
+          ),
           DigitIconButton(
             icon: Icons.save,
             onPressed: _saving ? null : _saveChanges,
@@ -286,18 +335,6 @@ class _TaskDetailPageState extends State<TaskDetailPage> {
                   
                   // Task Information Section
                   _buildTaskInformationSection(),
-                  
-                  const SizedBox(height: 16),
-                  
-                  // Address Section
-                  if (_originalTask.address != null)
-                    _buildAddressSection(),
-                  
-                  const SizedBox(height: 16),
-                  
-                  // Audit Details Section
-                  if (_originalTask.auditDetails != null || _originalTask.clientAuditDetails != null)
-                    _buildAuditDetailsSection(),
                   
                   const SizedBox(height: 16),
                   
@@ -599,263 +636,6 @@ class _TaskDetailPageState extends State<TaskDetailPage> {
     );
   }
 
-  Widget _buildAddressSection() {
-    final theme = Theme.of(context);
-    final textTheme = theme.digitTextTheme(context);
-    
-    return DigitCard(
-      child: Padding(
-        padding: const EdgeInsets.all(16),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            Row(
-              children: [
-                Icon(
-                  Icons.location_on,
-                  color: theme.colorScheme.primary,
-                  size: 24,
-                ),
-                const SizedBox(width: 8),
-                Text(
-                  'Address Information',
-                  style: textTheme.headingL.copyWith(
-                    fontWeight: FontWeight.w600,
-                    color: theme.colorScheme.primary,
-                  ),
-                ),
-              ],
-            ),
-            const SizedBox(height: 16),
-            Row(
-              children: [
-                Expanded(
-                  child: CustomDigitTextField(
-                    label: 'Door No',
-                    controller: _addressControllers['address_doorNo'],
-                    readOnly: true,
-                  ),
-                ),
-                const SizedBox(width: 8),
-                Expanded(
-                  child: CustomDigitTextField(
-                    label: 'City',
-                    controller: _addressControllers['address_city'],
-                    readOnly: true,
-                  ),
-                ),
-              ],
-            ),
-            const SizedBox(height: 12),
-            CustomDigitTextField(
-              label: 'Address Line 1',
-              controller: _addressControllers['address_addressLine1'],
-              readOnly: true,
-            ),
-            const SizedBox(height: 12),
-            CustomDigitTextField(
-              label: 'Address Line 2',
-              controller: _addressControllers['address_addressLine2'],
-              readOnly: true,
-            ),
-            const SizedBox(height: 12),
-            Row(
-              children: [
-                Expanded(
-                  child: CustomDigitTextField(
-                    label: 'Landmark',
-                    controller: _addressControllers['address_landmark'],
-                    readOnly: true,
-                  ),
-                ),
-                const SizedBox(width: 8),
-                Expanded(
-                  child: CustomDigitTextField(
-                    label: 'Pincode',
-                    controller: _addressControllers['address_pincode'],
-                    readOnly: true,
-                  ),
-                ),
-              ],
-            ),
-            const SizedBox(height: 12),
-            Row(
-              children: [
-                Expanded(
-                  child: CustomDigitTextField(
-                    label: 'Latitude',
-                    controller: _addressControllers['address_latitude'],
-                    readOnly: true,
-                  ),
-                ),
-                const SizedBox(width: 8),
-                Expanded(
-                  child: CustomDigitTextField(
-                    label: 'Longitude',
-                    controller: _addressControllers['address_longitude'],
-                    readOnly: true,
-                  ),
-                ),
-              ],
-            ),
-            const SizedBox(height: 12),
-            Row(
-              children: [
-                Expanded(
-                  child: CustomDigitTextField(
-                    label: 'Locality Code',
-                    controller: _addressControllers['address_locality_code'],
-                    readOnly: true,
-                  ),
-                ),
-                const SizedBox(width: 8),
-                Expanded(
-                  child: CustomDigitTextField(
-                    label: 'Locality Name',
-                    controller: _addressControllers['address_locality_name'],
-                    readOnly: true,
-                  ),
-                ),
-              ],
-            ),
-          ],
-        ),
-      ),
-    );
-  }
-
-  Widget _buildAuditDetailsSection() {
-    final theme = Theme.of(context);
-    final textTheme = theme.digitTextTheme(context);
-    
-    return DigitCard(
-      child: Padding(
-        padding: const EdgeInsets.all(16),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            Row(
-              children: [
-                Icon(
-                  Icons.history,
-                  color: theme.colorScheme.primary,
-                  size: 24,
-                ),
-                const SizedBox(width: 8),
-                Text(
-                  'Audit Details',
-                  style: textTheme.headingL.copyWith(
-                    fontWeight: FontWeight.w600,
-                    color: theme.colorScheme.primary,
-                  ),
-                ),
-              ],
-            ),
-            const SizedBox(height: 16),
-            if (_originalTask.auditDetails != null) ...[
-              Text(
-                'Server Audit',
-                style: textTheme.headingM.copyWith(
-                  fontWeight: FontWeight.w600,
-                  color: theme.colorScheme.secondary,
-                ),
-              ),
-              const SizedBox(height: 8),
-              Row(
-                children: [
-                  Expanded(
-                    child: CustomDigitTextField(
-                      label: 'Created By',
-                      controller: _auditControllers['audit_createdBy'],
-                      readOnly: true,
-                    ),
-                  ),
-                  const SizedBox(width: 8),
-                  Expanded(
-                    child: CustomDigitTextField(
-                      label: 'Created Time',
-                      controller: _auditControllers['audit_createdTime'],
-                      readOnly: true,
-                    ),
-                  ),
-                ],
-              ),
-              const SizedBox(height: 12),
-              Row(
-                children: [
-                  Expanded(
-                    child: CustomDigitTextField(
-                      label: 'Last Modified By',
-                      controller: _auditControllers['audit_lastModifiedBy'],
-                      readOnly: true,
-                    ),
-                  ),
-                  const SizedBox(width: 8),
-                  Expanded(
-                    child: CustomDigitTextField(
-                      label: 'Last Modified Time',
-                      controller: _auditControllers['audit_lastModifiedTime'],
-                      readOnly: true,
-                    ),
-                  ),
-                ],
-              ),
-              const SizedBox(height: 16),
-            ],
-            if (_originalTask.clientAuditDetails != null) ...[
-              Text(
-                'Client Audit',
-                style: textTheme.headingM.copyWith(
-                  fontWeight: FontWeight.w600,
-                  color: theme.colorScheme.secondary,
-                ),
-              ),
-              const SizedBox(height: 8),
-              Row(
-                children: [
-                  Expanded(
-                    child: CustomDigitTextField(
-                      label: 'Created By',
-                      controller: _auditControllers['clientAudit_createdBy'],
-                      readOnly: true,
-                    ),
-                  ),
-                  const SizedBox(width: 8),
-                  Expanded(
-                    child: CustomDigitTextField(
-                      label: 'Created Time',
-                      controller: _auditControllers['clientAudit_createdTime'],
-                      readOnly: true,
-                    ),
-                  ),
-                ],
-              ),
-              const SizedBox(height: 12),
-              Row(
-                children: [
-                  Expanded(
-                    child: CustomDigitTextField(
-                      label: 'Last Modified By',
-                      controller: _auditControllers['clientAudit_lastModifiedBy'],
-                      readOnly: true,
-                    ),
-                  ),
-                  const SizedBox(width: 8),
-                  Expanded(
-                    child: CustomDigitTextField(
-                      label: 'Last Modified Time',
-                      controller: _auditControllers['clientAudit_lastModifiedTime'],
-                      readOnly: true,
-                    ),
-                  ),
-                ],
-              ),
-            ],
-          ],
-        ),
-      ),
-    );
-  }
 
   Widget _buildHiddenIdFields() {
     final theme = Theme.of(context);
