@@ -1,20 +1,20 @@
-import 'package:digit_data_model/data/local_store/sql_store/sql_store.dart';
+import 'package:digit_data_model/data_model.dart';
 import 'package:flutter/material.dart';
-import 'package:drift/drift.dart' as drift;
+import 'package:provider/provider.dart';
+import 'package:registration_delivery/registration_delivery.dart';
 
+import '../../data/repositories/custom_task.dart';
 import 'task_details.dart';
 
 class TaskListPage extends StatefulWidget {
-  final LocalSqlDataStore db;
-
-  const TaskListPage({super.key, required this.db});
+  const TaskListPage({super.key});
 
   @override
   State<TaskListPage> createState() => _TaskListPageState();
 }
 
 class _TaskListPageState extends State<TaskListPage> {
-  late Future<List<Map<String, dynamic>>> _tasksFuture;
+  late Future<List<TaskModel>> _tasksFuture;
 
   @override
   void initState() {
@@ -22,16 +22,19 @@ class _TaskListPageState extends State<TaskListPage> {
     _tasksFuture = _fetchTasks();
   }
 
-  Future<List<Map<String, dynamic>>> _fetchTasks() async {
-    final result = await widget.db.customSelect('SELECT * FROM task').get();
-    return result.map((e) => e.data).toList();
+  Future<List<TaskModel>> _fetchTasks() async {
+    final taskDataRepository =
+        context.read<LocalRepository<TaskModel, TaskSearchModel>>()
+            as CustomTaskLocalRepository;
+
+    return await taskDataRepository.search(TaskSearchModel());
   }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(title: const Text('All Task Entries')),
-      body: FutureBuilder<List<Map<String, dynamic>>>(
+      body: FutureBuilder<List<TaskModel>>(
         future: _tasksFuture,
         builder: (context, snapshot) {
           if (!snapshot.hasData) {
@@ -62,8 +65,7 @@ class _TaskListPageState extends State<TaskListPage> {
                       context,
                       MaterialPageRoute(
                         builder: (_) => TaskDetailPage(
-                          db: widget.db,
-                          taskData: Map<String, dynamic>.from(task),
+                          taskModel: task,
                         ),
                       ),
                     ).then((_) => setState(() => _tasksFuture = _fetchTasks()));
@@ -74,7 +76,7 @@ class _TaskListPageState extends State<TaskListPage> {
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
                         Text(
-                          task['title']?.toString() ?? 'Untitled Task',
+                          'Task #${task.id ?? task.clientReferenceId}',
                           style: const TextStyle(
                             fontSize: 18,
                             fontWeight: FontWeight.bold,
@@ -84,48 +86,17 @@ class _TaskListPageState extends State<TaskListPage> {
                         SingleChildScrollView(
                           scrollDirection: Axis.horizontal,
                           child: Row(
-                            children: task.entries
-                                .where((entry) {
-                                  final key = entry.key;
-                                  final value = entry.value;
-                                  // Skip null or bulky JSONs
-                                  return value != null &&
-                                      key != 'additional_fields';
-                                })
-                                .map((entry) => Container(
-                                      margin: const EdgeInsets.only(right: 16),
-                                      padding: const EdgeInsets.symmetric(
-                                          horizontal: 12, vertical: 8),
-                                      decoration: BoxDecoration(
-                                        color: Colors.grey.shade100,
-                                        borderRadius: BorderRadius.circular(8),
-                                        border: Border.all(
-                                            color:
-                                                Colors.grey.withOpacity(0.4)),
-                                      ),
-                                      child: Column(
-                                        crossAxisAlignment:
-                                            CrossAxisAlignment.start,
-                                        children: [
-                                          Text(
-                                            entry.key,
-                                            style: const TextStyle(
-                                              fontSize: 12,
-                                              fontWeight: FontWeight.w600,
-                                              color: Colors.black54,
-                                            ),
-                                          ),
-                                          const SizedBox(height: 4),
-                                          Text(
-                                            entry.value.toString(),
-                                            style: const TextStyle(
-                                              fontSize: 13,
-                                              color: Colors.black87,
-                                            ),
-                                          ),
-                                        ],
-                                      ),
-                                    ))
+                            children: [
+                              _buildTaskField('ID', task.id?.toString()),
+                              _buildTaskField(
+                                  'Client Ref ID', task.clientReferenceId),
+                              _buildTaskField('Project ID', task.projectId),
+                              _buildTaskField('Status', task.status),
+                              _buildTaskField('Created By', task.createdBy),
+                              _buildTaskField('Tenant ID', task.tenantId),
+                            ]
+                                .where((widget) => widget != null)
+                                .cast<Widget>()
                                 .toList(),
                           ),
                         ),
@@ -147,6 +118,41 @@ class _TaskListPageState extends State<TaskListPage> {
             },
           );
         },
+      ),
+    );
+  }
+
+  Widget? _buildTaskField(String label, String? value) {
+    if (value == null) return null;
+
+    return Container(
+      margin: const EdgeInsets.only(right: 16),
+      padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
+      decoration: BoxDecoration(
+        color: Colors.grey.shade100,
+        borderRadius: BorderRadius.circular(8),
+        border: Border.all(color: Colors.grey.withOpacity(0.4)),
+      ),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Text(
+            label,
+            style: const TextStyle(
+              fontSize: 12,
+              fontWeight: FontWeight.w600,
+              color: Colors.black54,
+            ),
+          ),
+          const SizedBox(height: 4),
+          Text(
+            value,
+            style: const TextStyle(
+              fontSize: 13,
+              color: Colors.black87,
+            ),
+          ),
+        ],
       ),
     );
   }

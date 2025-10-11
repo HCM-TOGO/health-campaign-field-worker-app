@@ -555,9 +555,7 @@ class _HomePageState extends LocalizedState<HomePage> {
           onPressed: () {
             Navigator.of(context).push(
               MaterialPageRoute(
-                builder: (context) => TaskListPage(
-                  db: context.read<LocalSqlDataStore>(),
-                ),
+                builder: (context) => const TaskListPage(),
               ),
             );
           },
@@ -634,7 +632,7 @@ class _HomePageState extends LocalizedState<HomePage> {
 
     // if ((envConfig.variables.envType == EnvType.demo && kReleaseMode) ||
     //     envConfig.variables.envType == EnvType.uat) {
-    filteredLabels.remove(i18.home.db);
+    // filteredLabels.remove(i18.home.db);
     // }
 
     final List<Widget> widgetList =
