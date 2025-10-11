@@ -115,6 +115,9 @@ class Constants {
   static const String spaq1 = "SPAQ 1";
   static const String spaq2 = "SPAQ 2";
 
+  static const String spaq1VariantId = "PVAR-2025-05-28-000001";
+  static const String spaq2VariantId = "PVAR-2025-05-28-000002";
+
   static const String spaq1Name = "SPAQ1_NAME";
   static const String spaq2Name = "SPAQ2_NAME";
 

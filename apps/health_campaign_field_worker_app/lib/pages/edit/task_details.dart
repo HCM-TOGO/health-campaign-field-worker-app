@@ -1,14 +1,21 @@
 import 'package:digit_data_model/data_model.dart';
 import 'package:digit_components/digit_components.dart';
+import 'package:digit_ui_components/models/DropdownModels.dart';
 import 'package:digit_ui_components/theme/digit_extended_theme.dart';
 import 'package:flutter/material.dart';
-import 'package:provider/provider.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:registration_delivery/registration_delivery.dart';
+import 'package:digit_ui_components/widgets/atoms/digit_dropdown_input.dart'
+    as digit_ui;
+import 'package:registration_delivery/widgets/localized.dart';
 
 import '../../data/repositories/custom_task.dart';
+import '../../models/entities/status.dart';
+import '../../utils/constants.dart';
 import '../../widgets/digit_ui_component/custom_digit_input_field.dart';
+import '../../../utils/utils.dart' as local_utils;
 
-class TaskDetailPage extends StatefulWidget {
+class TaskDetailPage extends LocalizedStatefulWidget {
   final TaskModel taskModel;
 
   const TaskDetailPage({super.key, required this.taskModel});
@@ -17,7 +24,7 @@ class TaskDetailPage extends StatefulWidget {
   State<TaskDetailPage> createState() => _TaskDetailPageState();
 }
 
-class _TaskDetailPageState extends State<TaskDetailPage> {
+class _TaskDetailPageState extends LocalizedState<TaskDetailPage> {
   late Map<String, TextEditingController> _controllers;
   late TaskModel _originalTask;
   late TaskAdditionalFields? _additionalFields;
@@ -63,26 +70,27 @@ class _TaskDetailPageState extends State<TaskDetailPage> {
 
     // Initialize resource controllers
     _resourceControllers = {};
-    if (_originalTask.resources != null && _originalTask.resources!.isNotEmpty) {
+    if (_originalTask.resources != null &&
+        _originalTask.resources!.isNotEmpty) {
       for (int i = 0; i < _originalTask.resources!.length; i++) {
         final resource = _originalTask.resources![i];
-        _resourceControllers['resource_${i}_id'] = 
+        _resourceControllers['resource_${i}_id'] =
             TextEditingController(text: resource.id.toString());
-        _resourceControllers['resource_${i}_clientReferenceId'] = 
+        _resourceControllers['resource_${i}_clientReferenceId'] =
             TextEditingController(text: resource.clientReferenceId);
-        _resourceControllers['resource_${i}_taskclientReferenceId'] = 
+        _resourceControllers['resource_${i}_taskclientReferenceId'] =
             TextEditingController(text: resource.taskclientReferenceId);
-        _resourceControllers['resource_${i}_productVariantId'] = 
+        _resourceControllers['resource_${i}_productVariantId'] =
             TextEditingController(text: resource.productVariantId.toString());
-        _resourceControllers['resource_${i}_taskId'] = 
+        _resourceControllers['resource_${i}_taskId'] =
             TextEditingController(text: resource.taskId.toString());
-        _resourceControllers['resource_${i}_deliveryComment'] = 
+        _resourceControllers['resource_${i}_deliveryComment'] =
             TextEditingController(text: resource.deliveryComment);
-        _resourceControllers['resource_${i}_quantity'] = 
+        _resourceControllers['resource_${i}_quantity'] =
             TextEditingController(text: resource.quantity.toString());
-        _resourceControllers['resource_${i}_isDelivered'] = 
+        _resourceControllers['resource_${i}_isDelivered'] =
             TextEditingController(text: resource.isDelivered.toString());
-        _resourceControllers['resource_${i}_rowVersion'] = 
+        _resourceControllers['resource_${i}_rowVersion'] =
             TextEditingController(text: resource.rowVersion.toString());
       }
     }
@@ -124,6 +132,39 @@ class _TaskDetailPageState extends State<TaskDetailPage> {
     super.dispose();
   }
 
+  Future<void> _showSaveDialog() async {
+    final result = await showDialog<bool>(
+      context: context,
+      builder: (BuildContext context) {
+        return AlertDialog(
+          title: const Text('Save Changes'),
+          content: const Text(
+            'Are you sure you want to update this task?',
+            style: TextStyle(fontSize: 16),
+          ),
+          actions: [
+            TextButton(
+              onPressed: () => Navigator.of(context).pop(false),
+              child: const Text('Go Back'),
+            ),
+            ElevatedButton(
+              onPressed: () => Navigator.of(context).pop(true),
+              style: ElevatedButton.styleFrom(
+                backgroundColor: Colors.green,
+                foregroundColor: Colors.white,
+              ),
+              child: const Text('Save'),
+            ),
+          ],
+        );
+      },
+    );
+
+    if (result == true) {
+      await _saveChanges();
+    }
+  }
+
   Future<void> _saveChanges() async {
     setState(() => _saving = true);
 
@@ -147,12 +188,86 @@ class _TaskDetailPageState extends State<TaskDetailPage> {
         fields: updatedFields,
       );
 
+      // Build updated TaskResource list from controllers
+      final updatedResources = <TaskResourceModel>[];
+      final totalResources = _originalTask.resources?.length ?? 0;
+
+      for (int i = 0; i < totalResources; i++) {
+        final resource = _originalTask.resources![i];
+
+        updatedResources.add(
+          resource.copyWith(
+            productVariantId:
+                _resourceControllers['resource_${i}_productVariantId']?.text ??
+                    resource.productVariantId ??
+                    '',
+            deliveryComment:
+                _resourceControllers['resource_${i}_deliveryComment']?.text ??
+                    resource.deliveryComment,
+            // isDelivered: _resourceControllers['resource_${i}_isDelivered']
+            //         ?.text
+            //         .toLowerCase() ==
+            //     'true',
+            clientAuditDetails: resource.clientAuditDetails?.copyWith(
+                  lastModifiedBy:
+                      RegistrationDeliverySingleton().loggedInUserUuid,
+                  lastModifiedTime: DateTime.now().millisecondsSinceEpoch,
+                ) ??
+                ClientAuditDetails(
+                  createdBy: RegistrationDeliverySingleton().loggedInUserUuid!,
+                  createdTime: DateTime.now().millisecondsSinceEpoch,
+                  lastModifiedBy:
+                      RegistrationDeliverySingleton().loggedInUserUuid!,
+                  lastModifiedTime: DateTime.now().millisecondsSinceEpoch,
+                ),
+            auditDetails: resource.auditDetails?.copyWith(
+                  lastModifiedBy:
+                      RegistrationDeliverySingleton().loggedInUserUuid,
+                  lastModifiedTime: DateTime.now().millisecondsSinceEpoch,
+                ) ??
+                AuditDetails(
+                  createdBy: RegistrationDeliverySingleton().loggedInUserUuid!,
+                  createdTime: DateTime.now().millisecondsSinceEpoch,
+                  lastModifiedBy:
+                      RegistrationDeliverySingleton().loggedInUserUuid!,
+                  lastModifiedTime: DateTime.now().millisecondsSinceEpoch,
+                ),
+          ),
+        );
+      }
+
+      final updatedClientAuditDetails = _originalTask.clientAuditDetails
+              ?.copyWith(
+            lastModifiedBy: RegistrationDeliverySingleton().loggedInUserUuid,
+            lastModifiedTime: DateTime.now().millisecondsSinceEpoch,
+          ) ??
+          ClientAuditDetails(
+            lastModifiedBy: RegistrationDeliverySingleton().loggedInUserUuid,
+            lastModifiedTime: DateTime.now().millisecondsSinceEpoch,
+            createdBy: _originalTask.clientAuditDetails?.createdBy ?? '',
+            createdTime: _originalTask.clientAuditDetails?.createdTime ?? 0,
+          );
+
+      final updatedAuditDetails = _originalTask.auditDetails?.copyWith(
+            lastModifiedBy: RegistrationDeliverySingleton().loggedInUserUuid,
+            lastModifiedTime: DateTime.now().millisecondsSinceEpoch,
+          ) ??
+          AuditDetails(
+            createdBy: _originalTask.auditDetails?.createdBy ?? '',
+            createdTime: _originalTask.auditDetails?.createdTime ?? 0,
+            lastModifiedBy: RegistrationDeliverySingleton().loggedInUserUuid,
+            lastModifiedTime: DateTime.now().millisecondsSinceEpoch,
+          );
+
       // Create updated task model
       final updatedTask = _originalTask.copyWith(
         status: _controllers['status']?.text.isNotEmpty == true
             ? _controllers['status']!.text
             : _originalTask.status,
         additionalFields: newAdditionalFields,
+        resources: updatedResources,
+        clientAuditDetails: updatedClientAuditDetails,
+        auditDetails: updatedAuditDetails,
       );
 
       // Save using repository
@@ -161,7 +276,10 @@ class _TaskDetailPageState extends State<TaskDetailPage> {
       if (mounted) {
         setState(() => _saving = false);
         ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(content: Text('Changes saved successfully!')),
+          const SnackBar(
+            content: Text('Changes saved successfully!'),
+            backgroundColor: Colors.green,
+          ),
         );
         Navigator.pop(context);
       }
@@ -169,7 +287,10 @@ class _TaskDetailPageState extends State<TaskDetailPage> {
       if (mounted) {
         setState(() => _saving = false);
         ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text('Error saving changes: $e')),
+          SnackBar(
+            content: Text('Error saving changes: $e'),
+            backgroundColor: Colors.red,
+          ),
         );
       }
     }
@@ -243,9 +364,10 @@ class _TaskDetailPageState extends State<TaskDetailPage> {
 
       // Get existing additional fields
       final existingFields = _additionalFields?.fields ?? [];
-      
+
       // Add delete reason to additional fields
-      final deleteReasonField = AdditionalField('deleteReason', _deleteReasonController.text.trim());
+      final deleteReasonField =
+          AdditionalField('deleteReason', _deleteReasonController.text.trim());
       final updatedFields = [...existingFields, deleteReasonField];
 
       final newAdditionalFields = TaskAdditionalFields(
@@ -254,9 +376,18 @@ class _TaskDetailPageState extends State<TaskDetailPage> {
         fields: updatedFields,
       );
 
+      // final updatedResources = <TaskResourceModel>[];
+      // final totalResources = _originalTask.resources?.length ?? 0;
+
+      // for (int i = 0; i < totalResources; i++) {
+      //   final resource = _originalTask.resources![i];
+      //   updatedResources.add(resource.copyWith(isDeleted: true));
+      // }
+
       // Create updated task model with delete reason in additional fields
       final updatedTask = _originalTask.copyWith(
         additionalFields: newAdditionalFields,
+        // resources: updatedResources,
       );
 
       // Delete using repository
@@ -289,14 +420,14 @@ class _TaskDetailPageState extends State<TaskDetailPage> {
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
     final textTheme = theme.digitTextTheme(context);
-    
+
     return Scaffold(
       backgroundColor: theme.colorScheme.surface,
       appBar: AppBar(
         backgroundColor: theme.colorScheme.primary,
         foregroundColor: theme.colorScheme.onPrimary,
         title: Text(
-          'Task Details #${_originalTask.id ?? _originalTask.clientReferenceId}',
+          'Task #${_originalTask.id ?? _originalTask.clientReferenceId}',
           style: textTheme.headingL.copyWith(
             color: theme.colorScheme.onPrimary,
             fontWeight: FontWeight.w600,
@@ -310,37 +441,38 @@ class _TaskDetailPageState extends State<TaskDetailPage> {
           ),
           DigitIconButton(
             icon: Icons.save,
-            onPressed: _saving ? null : _saveChanges,
+            onPressed: _saving ? null : _showSaveDialog,
           ),
         ],
       ),
       body: _saving
           ? const Center(child: CircularProgressIndicator())
           : SingleChildScrollView(
-              padding: const EdgeInsets.all(16),
+              padding: const EdgeInsets.all(4),
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   // Resources Section (Priority)
-                  if (_originalTask.resources != null && _originalTask.resources!.isNotEmpty)
+                  if (_originalTask.resources != null &&
+                      _originalTask.resources!.isNotEmpty)
                     _buildResourcesSection(),
-                  
+
                   const SizedBox(height: 16),
-                  
+
                   // Additional Details Section
                   if (_additionalFields != null)
                     _buildAdditionalDetailsSection(),
-                  
+
                   const SizedBox(height: 16),
-                  
+
                   // Task Information Section
                   _buildTaskInformationSection(),
-                  
+
                   const SizedBox(height: 16),
-                  
+
                   // Hidden ID Fields (for data population)
                   _buildHiddenIdFields(),
-                  
+
                   const SizedBox(height: 32),
                 ],
               ),
@@ -351,10 +483,10 @@ class _TaskDetailPageState extends State<TaskDetailPage> {
   Widget _buildResourcesSection() {
     final theme = Theme.of(context);
     final textTheme = theme.digitTextTheme(context);
-    
+
     return DigitCard(
       child: Padding(
-        padding: const EdgeInsets.all(16),
+        padding: const EdgeInsets.all(8),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
@@ -388,7 +520,22 @@ class _TaskDetailPageState extends State<TaskDetailPage> {
   Widget _buildResourceCard(int index) {
     final theme = Theme.of(context);
     final textTheme = theme.digitTextTheme(context);
-    
+
+    ProjectTypeModel? projectTypeModel = RegistrationDeliverySingleton()
+        .selectedProject
+        ?.additionalDetails
+        ?.projectType;
+
+    // Get all DeliveryProductVariants from project type
+    List<DeliveryProductVariant>? productVariants = projectTypeModel?.resources
+        ?.map(
+            (r) => DeliveryProductVariant(productVariantId: r.productVariantId))
+        .toList();
+
+    // Get the currently selected variant value from the controller
+    String? selectedVariantId =
+        _resourceControllers['resource_${index}_productVariantId']?.text ?? '';
+
     return Container(
       margin: const EdgeInsets.only(bottom: 12),
       padding: const EdgeInsets.all(12),
@@ -402,6 +549,7 @@ class _TaskDetailPageState extends State<TaskDetailPage> {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
+          // Resource Header
           Text(
             'Resource ${index + 1}',
             style: textTheme.headingM.copyWith(
@@ -410,51 +558,88 @@ class _TaskDetailPageState extends State<TaskDetailPage> {
             ),
           ),
           const SizedBox(height: 8),
+
+          // Product Variant Dropdown
+          if (productVariants != null && productVariants.isNotEmpty)
+            LabeledField(
+              label: 'Product Variant ID *',
+              labelStyle: TextStyle(
+                color: theme.colorScheme.onSurfaceVariant,
+                fontSize: 16,
+              ),
+              child: digit_ui.DigitDropdown(
+                isDisabled: false,
+                readOnly: false,
+                selectedOption: DropdownItem(
+                  code: selectedVariantId,
+                  name: getFormattedSku(getSku(selectedVariantId) ?? ''),
+                ),
+                items: productVariants
+                    .map(
+                      (variant) => DropdownItem(
+                        code: variant.productVariantId,
+                        name: getFormattedSku(
+                            getSku(variant.productVariantId) ?? ''),
+                      ),
+                    )
+                    .toList(),
+                onSelect: (selected) {
+                  if (selected != null) {
+                    selectedVariantId = selected.code;
+                    _resourceControllers['resource_${index}_productVariantId']
+                        ?.text = selected.code;
+                  }
+                },
+              ),
+            )
+          else
+            Text(
+              'No Product Variants available',
+              style: textTheme.bodyS.copyWith(
+                color: theme.colorScheme.onSurfaceVariant,
+              ),
+            ),
+
+          const SizedBox(height: 8),
+
+          // Task ID
+          CustomDigitTextField(
+            label: 'Task ID',
+            controller: _resourceControllers['resource_${index}_taskId'],
+            readOnly: true,
+          ),
+          const SizedBox(height: 8),
+
+          // Quantity + Is Delivered
           Row(
             children: [
-              Expanded(
-                child: CustomDigitTextField(
-                  label: 'Product Variant ID',
-                  controller: _resourceControllers['resource_${index}_productVariantId'],
-                  readOnly: true,
-                ),
-              ),
-              const SizedBox(width: 8),
               Expanded(
                 child: CustomDigitTextField(
                   label: 'Quantity',
-                  controller: _resourceControllers['resource_${index}_quantity'],
-                  readOnly: true,
-                ),
-              ),
-            ],
-          ),
-          const SizedBox(height: 8),
-          Row(
-            children: [
-              Expanded(
-                child: CustomDigitTextField(
-                  label: 'Is Delivered',
-                  controller: _resourceControllers['resource_${index}_isDelivered'],
+                  controller:
+                      _resourceControllers['resource_${index}_quantity'],
                   readOnly: true,
                 ),
               ),
               const SizedBox(width: 8),
               Expanded(
                 child: CustomDigitTextField(
-                  label: 'Task ID',
-                  controller: _resourceControllers['resource_${index}_taskId'],
+                  label: 'Is Delivered',
+                  controller:
+                      _resourceControllers['resource_${index}_isDelivered'],
                   readOnly: true,
                 ),
               ),
             ],
           ),
           const SizedBox(height: 8),
+
+          // Delivery Comment
           CustomDigitTextField(
             label: 'Delivery Comment',
-            controller: _resourceControllers['resource_${index}_deliveryComment'],
+            controller:
+                _resourceControllers['resource_${index}_deliveryComment'],
             readOnly: true,
-            maxLines: 2,
           ),
         ],
       ),
@@ -464,7 +649,7 @@ class _TaskDetailPageState extends State<TaskDetailPage> {
   Widget _buildAdditionalDetailsSection() {
     final theme = Theme.of(context);
     final textTheme = theme.digitTextTheme(context);
-    
+
     return DigitCard(
       child: Padding(
         padding: const EdgeInsets.all(16),
@@ -520,7 +705,15 @@ class _TaskDetailPageState extends State<TaskDetailPage> {
   Widget _buildTaskInformationSection() {
     final theme = Theme.of(context);
     final textTheme = theme.digitTextTheme(context);
-    
+
+    // Generate dropdown items dynamically from Status enum
+    final statusOptions = Status.values
+        .map((s) => DropdownItem(code: s.toValue(), name: s.toValue()))
+        .toList();
+
+    // Get current status value from controller
+    final selectedStatus = _controllers['status']?.text ?? '';
+
     return DigitCard(
       child: Padding(
         padding: const EdgeInsets.all(16),
@@ -545,24 +738,34 @@ class _TaskDetailPageState extends State<TaskDetailPage> {
               ],
             ),
             const SizedBox(height: 16),
-            Row(
-              children: [
-                Expanded(
-                  child: CustomDigitTextField(
-                    label: 'Project ID',
-                    controller: _controllers['projectId'],
-                    readOnly: true,
-                  ),
+            CustomDigitTextField(
+              label: 'Project ID',
+              controller: _controllers['projectId'],
+              readOnly: true,
+            ),
+            const SizedBox(height: 8),
+            LabeledField(
+              label: 'Status *',
+              labelStyle: TextStyle(
+                color: theme.colorScheme.onSurfaceVariant,
+                fontSize: 16,
+              ),
+              child: digit_ui.DigitDropdown(
+                isDisabled: false,
+                readOnly: false,
+                selectedOption: DropdownItem(
+                  code: selectedStatus,
+                  name: selectedStatus.isNotEmpty
+                      ? selectedStatus
+                      : 'Select Status',
                 ),
-                const SizedBox(width: 8),
-                Expanded(
-                  child: CustomDigitTextField(
-                    label: 'Status',
-                    controller: _controllers['status'],
-                    readOnly: false,
-                  ),
-                ),
-              ],
+                items: statusOptions,
+                onSelect: (selected) {
+                  if (selected != null) {
+                    _controllers['status']?.text = selected.code;
+                  }
+                },
+              ),
             ),
             const SizedBox(height: 12),
             Row(
@@ -636,11 +839,10 @@ class _TaskDetailPageState extends State<TaskDetailPage> {
     );
   }
 
-
   Widget _buildHiddenIdFields() {
     final theme = Theme.of(context);
     final textTheme = theme.digitTextTheme(context);
-    
+
     return DigitCard(
       child: Padding(
         padding: const EdgeInsets.all(16),
@@ -651,7 +853,7 @@ class _TaskDetailPageState extends State<TaskDetailPage> {
               children: [
                 Icon(
                   Icons.visibility_off,
-                  color: theme.colorScheme.outline,
+                  color: theme.colorScheme.error,
                   size: 24,
                 ),
                 const SizedBox(width: 8),
@@ -659,7 +861,7 @@ class _TaskDetailPageState extends State<TaskDetailPage> {
                   'System Fields (Hidden)',
                   style: textTheme.headingL.copyWith(
                     fontWeight: FontWeight.w600,
-                    color: theme.colorScheme.outline,
+                    color: theme.colorScheme.error,
                   ),
                 ),
               ],
@@ -668,6 +870,7 @@ class _TaskDetailPageState extends State<TaskDetailPage> {
             Row(
               children: [
                 Expanded(
+                  flex: 2,
                   child: CustomDigitTextField(
                     label: 'ID',
                     controller: _hiddenIdControllers['id'],
@@ -676,6 +879,7 @@ class _TaskDetailPageState extends State<TaskDetailPage> {
                 ),
                 const SizedBox(width: 8),
                 Expanded(
+                  flex: 3,
                   child: CustomDigitTextField(
                     label: 'Client Reference ID',
                     controller: _hiddenIdControllers['clientReferenceId'],
@@ -695,5 +899,25 @@ class _TaskDetailPageState extends State<TaskDetailPage> {
         .split('_')
         .map((word) => word[0].toUpperCase() + word.substring(1))
         .join(' ');
+  }
+
+  String? getSku(String variantId) {
+    if (variantId == Constants.spaq1VariantId) {
+      return Constants.spaq1;
+    } else if (variantId == Constants.spaq2VariantId) {
+      return Constants.spaq2;
+    }
+    return null; // Fallback to null if no match
+  }
+
+  String getFormattedSku(String sku) {
+    if (sku == 'Red VAS') {
+      return 'VAS - Red Capsule';
+    } else if (sku == 'Blue VAS') {
+      return 'VAS - Blue Capsule';
+    } else if (sku == Constants.spaq1 || sku == Constants.spaq2) {
+      return localizations.translate(local_utils.getSpaqName(sku));
+    }
+    return sku; // Fallback to original if no match
   }
 }
