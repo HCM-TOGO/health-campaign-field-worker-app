@@ -8,8 +8,10 @@ import 'package:registration_delivery/registration_delivery.dart';
 import 'package:digit_ui_components/widgets/atoms/digit_dropdown_input.dart'
     as digit_ui;
 import 'package:registration_delivery/widgets/localized.dart';
+import 'package:digit_ui_components/utils/date_utils.dart';
 
 import '../../data/repositories/custom_task.dart';
+import '../../models/entities/identifier_types.dart';
 import '../../models/entities/status.dart';
 import '../../utils/constants.dart';
 import '../../widgets/digit_ui_component/custom_digit_input_field.dart';
@@ -17,8 +19,10 @@ import '../../../utils/utils.dart' as local_utils;
 
 class TaskDetailPage extends LocalizedStatefulWidget {
   final TaskModel taskModel;
+  final IndividualModel? individualModel;
 
-  const TaskDetailPage({super.key, required this.taskModel});
+  const TaskDetailPage(
+      {super.key, required this.taskModel, this.individualModel});
 
   @override
   State<TaskDetailPage> createState() => _TaskDetailPageState();
@@ -27,6 +31,7 @@ class TaskDetailPage extends LocalizedStatefulWidget {
 class _TaskDetailPageState extends LocalizedState<TaskDetailPage> {
   late Map<String, TextEditingController> _controllers;
   late TaskModel _originalTask;
+  late IndividualModel? _individual;
   late TaskAdditionalFields? _additionalFields;
   late TextEditingController _schemaController;
   late TextEditingController _versionController;
@@ -41,6 +46,7 @@ class _TaskDetailPageState extends LocalizedState<TaskDetailPage> {
   void initState() {
     super.initState();
     _originalTask = widget.taskModel;
+    _individual = widget.individualModel;
     _additionalFields = widget.taskModel.additionalFields;
 
     // Initialize controllers for basic task fields
@@ -452,23 +458,28 @@ class _TaskDetailPageState extends LocalizedState<TaskDetailPage> {
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
+                  // Beneficiary Details Section
+                  if (_individual != null) ...[
+                    _buildIndividualDetailsSection(),
+                  ],
+
                   // Resources Section (Priority)
                   if (_originalTask.resources != null &&
-                      _originalTask.resources!.isNotEmpty)
+                      _originalTask.resources!.isNotEmpty) ...[
                     _buildResourcesSection(),
-
-                  const SizedBox(height: 16),
-
-                  // Additional Details Section
-                  if (_additionalFields != null)
-                    _buildAdditionalDetailsSection(),
-
-                  const SizedBox(height: 16),
+                    const SizedBox(height: 16),
+                  ],
 
                   // Task Information Section
                   _buildTaskInformationSection(),
 
                   const SizedBox(height: 16),
+
+                  // Additional Details Section
+                  if (_additionalFields != null) ...[
+                    _buildAdditionalDetailsSection(),
+                    const SizedBox(height: 16),
+                  ],
 
                   // Hidden ID Fields (for data population)
                   _buildHiddenIdFields(),
@@ -477,6 +488,104 @@ class _TaskDetailPageState extends LocalizedState<TaskDetailPage> {
                 ],
               ),
             ),
+    );
+  }
+
+  Widget _buildIndividualDetailsSection() {
+    final theme = Theme.of(context);
+    final textTheme = theme.digitTextTheme(context);
+
+    final individual = _individual;
+    if (individual == null) return const SizedBox.shrink();
+
+    // Compute details
+    final name =
+        "${individual.name?.givenName ?? ''} ${individual.name?.familyName ?? ''}"
+            .trim();
+    final gender = individual.gender?.name ?? 'N/A';
+    final age = individual.dateOfBirth != null
+        ? DigitDateUtils.calculateAge(
+            DigitDateUtils.getFormattedDateToDateTime(
+                  individual.dateOfBirth!,
+                ) ??
+                DateTime.now(),
+          )
+        : null;
+    final beneficiaryId = individual.identifiers != null &&
+            individual.identifiers!.isNotEmpty &&
+            individual.identifiers?.first.identifierType ==
+                IdentifierTypes.uniqueBeneficiaryID.toValue()
+        ? individual.identifiers?.first.identifierId ?? 'N/A'
+        : 'N/A';
+
+    return DigitCard(
+      child: Padding(
+        padding: const EdgeInsets.all(16),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            // Header
+            Row(
+              children: [
+                Icon(
+                  Icons.person,
+                  color: theme.colorScheme.primary,
+                  size: 24,
+                ),
+                const SizedBox(width: 8),
+                Text(
+                  'Beneficiary Details',
+                  style: textTheme.headingL.copyWith(
+                    fontWeight: FontWeight.w600,
+                    color: theme.colorScheme.primary,
+                  ),
+                ),
+              ],
+            ),
+            const SizedBox(height: 16),
+
+            // Display info
+            _buildIndividualInfoRow('Name', name.isNotEmpty ? name : 'N/A'),
+            if (age != null)
+              _buildIndividualInfoRow(
+                  'Age', '${age.years} years and ${age.months} months'),
+            _buildIndividualInfoRow('Gender', gender),
+            _buildIndividualInfoRow('Beneficiary ID', beneficiaryId),
+          ],
+        ),
+      ),
+    );
+  }
+
+  // A helper builder for label-value pairs
+  Widget _buildIndividualInfoRow(String label, String value) {
+    final theme = Theme.of(context);
+    final textTheme = theme.digitTextTheme(context);
+
+    return Padding(
+      padding: const EdgeInsets.symmetric(vertical: 4),
+      child: Row(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          SizedBox(
+            width: 160,
+            child: Text(
+              '$label:',
+              style: textTheme.headingS.copyWith(
+                fontWeight: FontWeight.w500,
+              ),
+            ),
+          ),
+          Expanded(
+            child: Text(
+              value,
+              style: textTheme.headingS.copyWith(
+                fontWeight: FontWeight.w500,
+              ),
+            ),
+          ),
+        ],
+      ),
     );
   }
 
@@ -692,7 +801,7 @@ class _TaskDetailPageState extends LocalizedState<TaskDetailPage> {
                 child: CustomDigitTextField(
                   label: _formatFieldLabel(entry.key),
                   controller: entry.value,
-                  readOnly: false,
+                  readOnly: true,
                 ),
               );
             }),

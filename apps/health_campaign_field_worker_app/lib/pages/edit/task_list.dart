@@ -4,6 +4,7 @@ import 'package:provider/provider.dart';
 import 'package:registration_delivery/registration_delivery.dart';
 
 import '../../data/repositories/custom_task.dart';
+import '../../models/entities/identifier_types.dart';
 import 'task_details.dart';
 
 class TaskListPage extends StatefulWidget {
@@ -15,19 +16,81 @@ class TaskListPage extends StatefulWidget {
 
 class _TaskListPageState extends State<TaskListPage> {
   late Future<List<TaskModel>> _tasksFuture;
+  final Map<String, IndividualModel?> _individualsByTask =
+      {}; // Store related individuals
 
   @override
   void initState() {
     super.initState();
-    _tasksFuture = _fetchTasks();
+    _tasksFuture = _fetchTasksWithIndividual();
   }
 
-  Future<List<TaskModel>> _fetchTasks() async {
+  Future<List<TaskModel>> _fetchTasksWithIndividual() async {
     final taskDataRepository =
         context.read<LocalRepository<TaskModel, TaskSearchModel>>()
             as CustomTaskLocalRepository;
 
-    return await taskDataRepository.search(TaskSearchModel());
+    List<TaskModel> tasks = await taskDataRepository.search(TaskSearchModel(
+      createdBy: RegistrationDeliverySingleton().loggedInUserUuid,
+    ));
+
+    tasks = tasks
+        .where((task) =>
+            task.isDeleted != true &&
+            task.clientAuditDetails?.createdBy ==
+                RegistrationDeliverySingleton().loggedInUserUuid)
+        .toList();
+
+    // For each task, fetch the related Individual (if exists)
+    for (final task in tasks) {
+      final individual = await _fetchIndividualForTask(task);
+      _individualsByTask[task.id ?? task.projectBeneficiaryClientReferenceId!] =
+          individual;
+    }
+
+    return tasks;
+  }
+
+  Future<IndividualModel?> _fetchIndividualForTask(TaskModel task) async {
+    if (task.projectBeneficiaryClientReferenceId == null ||
+        task.projectBeneficiaryClientReferenceId!.isEmpty) {
+      return null;
+    }
+
+    final projectBeneficiaryRepository = context.read<
+        LocalRepository<ProjectBeneficiaryModel,
+            ProjectBeneficiarySearchModel>>();
+
+    final individualRepository =
+        context.read<LocalRepository<IndividualModel, IndividualSearchModel>>();
+
+    try {
+      final beneficiaries = await projectBeneficiaryRepository.search(
+        ProjectBeneficiarySearchModel(
+          isDeleted: false,
+          clientReferenceId: [task.projectBeneficiaryClientReferenceId!],
+        ),
+      );
+
+      if (beneficiaries.isNotEmpty) {
+        final beneficiary = beneficiaries.first;
+        if (beneficiary.beneficiaryClientReferenceId != null) {
+          final individuals = await individualRepository.search(
+            IndividualSearchModel(
+              clientReferenceId: [beneficiary.beneficiaryClientReferenceId!],
+              isDeleted: false,
+            ),
+          );
+          if (individuals.isNotEmpty) {
+            return individuals.first;
+          }
+        }
+      }
+    } catch (e) {
+      // Handle errors if necessary
+      debugPrint('Error fetching individual: $e');
+    }
+    return null;
   }
 
   @override
@@ -52,6 +115,8 @@ class _TaskListPageState extends State<TaskListPage> {
             itemBuilder: (context, index) {
               final task = tasks[index];
 
+              IndividualModel? individual = _individualsByTask[
+                  task.id ?? task.projectBeneficiaryClientReferenceId!];
               return Card(
                 margin: const EdgeInsets.symmetric(vertical: 8),
                 elevation: 2,
@@ -66,9 +131,12 @@ class _TaskListPageState extends State<TaskListPage> {
                       MaterialPageRoute(
                         builder: (_) => TaskDetailPage(
                           taskModel: task,
+                          individualModel: _individualsByTask[task.id ??
+                              task.projectBeneficiaryClientReferenceId!],
                         ),
                       ),
-                    ).then((_) => setState(() => _tasksFuture = _fetchTasks()));
+                    ).then((_) => setState(
+                        () => _tasksFuture = _fetchTasksWithIndividual()));
                   },
                   child: Padding(
                     padding: const EdgeInsets.all(16),
@@ -82,6 +150,36 @@ class _TaskListPageState extends State<TaskListPage> {
                             fontWeight: FontWeight.bold,
                           ),
                         ),
+                        if (individual != null) ...{
+                          if (individual.name?.givenName != null ||
+                              individual.name?.familyName != null) ...[
+                            const SizedBox(height: 4),
+                            Text(
+                              'Name: ${individual.name?.givenName ?? ''} ${individual.name?.familyName ?? ''}'
+                                  .trim(),
+                              style: const TextStyle(
+                                fontSize: 16,
+                                fontWeight: FontWeight.bold,
+                                color: Colors.black54,
+                              ),
+                            ),
+                          ],
+                          if (individual.identifiers != null &&
+                              individual.identifiers!.isNotEmpty &&
+                              individual.identifiers?.first.identifierType ==
+                                  IdentifierTypes.uniqueBeneficiaryID
+                                      .toValue()) ...[
+                            const SizedBox(height: 4),
+                            Text(
+                              'Beneficiary ID: ${_individualsByTask[task.id ?? task.projectBeneficiaryClientReferenceId!]?.identifiers?.first.identifierId}',
+                              style: const TextStyle(
+                                fontSize: 16,
+                                fontWeight: FontWeight.bold,
+                                color: Colors.black54,
+                              ),
+                            ),
+                          ],
+                        },
                         const SizedBox(height: 12),
                         SingleChildScrollView(
                           scrollDirection: Axis.horizontal,
