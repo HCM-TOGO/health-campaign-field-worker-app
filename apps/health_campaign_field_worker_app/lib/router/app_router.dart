@@ -19,6 +19,9 @@ import 'package:inventory_management/blocs/app_localization.dart';
 import 'package:inventory_management/router/inventory_router.dart';
 import 'package:inventory_management/router/inventory_router.gm.dart';
 import 'package:inventory_management/blocs/record_stock.dart' as _i15;
+import '../pages/edit/individual_task_list.dart';
+import '../pages/edit/task_list.dart';
+import '../pages/edit/task_details.dart';
 import '../pages/registration_delivery/custom_complaints_inbox_search.dart';
 
 import '../blocs/inventory_management/custom_inventory_report.dart';
@@ -51,6 +54,7 @@ import '../pages/registration_delivery/custom_beneficiary_registration_wrapper.d
 import '../pages/registration_delivery/custom_household_details.dart';
 import '../pages/registration_delivery/custom_household_location.dart';
 import '../pages/registration_delivery/custom_household_overview.dart';
+import '../pages/edit/individual_task_list.dart';
 import '../pages/registration_delivery/custom_individual_details.dart';
 import '../pages/registration_delivery/custom_registration_delivery_wrapper.dart';
 import '../pages/registration_delivery/custom_search_beneficiary.dart';
@@ -214,6 +218,16 @@ class AppRouter extends _$AppRouter {
                   page: ClosedHouseholdAcknowledgementRoute.page,
                   path: 'closed-household-acknowledgement'),
             ]),
+
+        // Edit Task Route
+        AutoRoute(
+          page: TaskListRoute.page,
+          path: 'task-list',
+        ),
+        AutoRoute(
+          page: TaskDetailRoute.page,
+          path: 'task-details',
+        ),
 
         // Attendance Route
         AutoRoute(
@@ -416,6 +430,14 @@ class AppRouter extends _$AppRouter {
                     page: CustomHouseholdOverviewRoute.page,
                     path: 'custom-overview',
                     initial: true,
+                  ),
+                  AutoRoute(
+                    page: IndividualTaskListRoute.page,
+                    path: 'individual-task-list',
+                  ),
+                  AutoRoute(
+                    page: TaskDetailRoute.page,
+                    path: 'task-details',
                   ),
                   // AutoRoute(
                   //   page: BeneficiaryDetailsRoute.page,

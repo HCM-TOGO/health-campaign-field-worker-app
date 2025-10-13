@@ -553,11 +553,7 @@ class _HomePageState extends LocalizedState<HomePage> {
           icon: Icons.edit_note,
           label: i18.home.editTasks,
           onPressed: () {
-            Navigator.of(context).push(
-              MaterialPageRoute(
-                builder: (context) => const TaskListPage(),
-              ),
-            );
+            context.router.push(const TaskListRoute());
           },
         ),
       ),

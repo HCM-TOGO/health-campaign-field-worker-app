@@ -719,6 +719,17 @@ abstract class _$AppRouter extends RootStackRouter {
         ),
       );
     },
+    IndividualTaskListRoute.name: (routeData) {
+      final args = routeData.argsAs<IndividualTaskListRouteArgs>();
+      return AutoRoutePage<dynamic>(
+        routeData: routeData,
+        child: IndividualTaskListPage(
+          key: args.key,
+          individual: args.individual,
+          tasks: args.tasks,
+        ),
+      );
+    },
     LanguageSelectionRoute.name: (routeData) {
       return AutoRoutePage<dynamic>(
         routeData: routeData,
@@ -789,6 +800,23 @@ abstract class _$AppRouter extends RootStackRouter {
           isEditing: args.isEditing,
           tasks: args.tasks,
         ),
+      );
+    },
+    TaskDetailRoute.name: (routeData) {
+      final args = routeData.argsAs<TaskDetailRouteArgs>();
+      return AutoRoutePage<dynamic>(
+        routeData: routeData,
+        child: TaskDetailPage(
+          key: args.key,
+          taskModel: args.taskModel,
+          individualModel: args.individualModel,
+        ),
+      );
+    },
+    TaskListRoute.name: (routeData) {
+      return AutoRoutePage<dynamic>(
+        routeData: routeData,
+        child: const TaskListPage(),
       );
     },
     UnauthenticatedRouteWrapper.name: (routeData) {
@@ -3477,6 +3505,50 @@ class HomeRouteArgs {
 }
 
 /// generated route for
+/// [IndividualTaskListPage]
+class IndividualTaskListRoute
+    extends PageRouteInfo<IndividualTaskListRouteArgs> {
+  IndividualTaskListRoute({
+    Key? key,
+    required IndividualModel individual,
+    required List<TaskModel> tasks,
+    List<PageRouteInfo>? children,
+  }) : super(
+          IndividualTaskListRoute.name,
+          args: IndividualTaskListRouteArgs(
+            key: key,
+            individual: individual,
+            tasks: tasks,
+          ),
+          initialChildren: children,
+        );
+
+  static const String name = 'IndividualTaskListRoute';
+
+  static const PageInfo<IndividualTaskListRouteArgs> page =
+      PageInfo<IndividualTaskListRouteArgs>(name);
+}
+
+class IndividualTaskListRouteArgs {
+  const IndividualTaskListRouteArgs({
+    this.key,
+    required this.individual,
+    required this.tasks,
+  });
+
+  final Key? key;
+
+  final IndividualModel individual;
+
+  final List<TaskModel> tasks;
+
+  @override
+  String toString() {
+    return 'IndividualTaskListRouteArgs{key: $key, individual: $individual, tasks: $tasks}';
+  }
+}
+
+/// generated route for
 /// [LanguageSelectionPage]
 class LanguageSelectionRoute extends PageRouteInfo<void> {
   const LanguageSelectionRoute({List<PageRouteInfo>? children})
@@ -3726,6 +3798,63 @@ class RecordRedoseRouteArgs {
   String toString() {
     return 'RecordRedoseRouteArgs{key: $key, appLocalizations: $appLocalizations, isEditing: $isEditing, tasks: $tasks}';
   }
+}
+
+/// generated route for
+/// [TaskDetailPage]
+class TaskDetailRoute extends PageRouteInfo<TaskDetailRouteArgs> {
+  TaskDetailRoute({
+    Key? key,
+    required TaskModel taskModel,
+    IndividualModel? individualModel,
+    List<PageRouteInfo>? children,
+  }) : super(
+          TaskDetailRoute.name,
+          args: TaskDetailRouteArgs(
+            key: key,
+            taskModel: taskModel,
+            individualModel: individualModel,
+          ),
+          initialChildren: children,
+        );
+
+  static const String name = 'TaskDetailRoute';
+
+  static const PageInfo<TaskDetailRouteArgs> page =
+      PageInfo<TaskDetailRouteArgs>(name);
+}
+
+class TaskDetailRouteArgs {
+  const TaskDetailRouteArgs({
+    this.key,
+    required this.taskModel,
+    this.individualModel,
+  });
+
+  final Key? key;
+
+  final TaskModel taskModel;
+
+  final IndividualModel? individualModel;
+
+  @override
+  String toString() {
+    return 'TaskDetailRouteArgs{key: $key, taskModel: $taskModel, individualModel: $individualModel}';
+  }
+}
+
+/// generated route for
+/// [TaskListPage]
+class TaskListRoute extends PageRouteInfo<void> {
+  const TaskListRoute({List<PageRouteInfo>? children})
+      : super(
+          TaskListRoute.name,
+          initialChildren: children,
+        );
+
+  static const String name = 'TaskListRoute';
+
+  static const PageInfo<void> page = PageInfo<void>(name);
 }
 
 /// generated route for
