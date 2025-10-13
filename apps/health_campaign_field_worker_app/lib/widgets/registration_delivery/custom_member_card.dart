@@ -1491,6 +1491,48 @@ class CustomMemberCard extends StatelessWidget {
                             ),
                             action: editMemberAction,
                           ),
+                          ActionCardModel(
+                            icon: Icons.edit_sharp,
+                            label: localizations.translate(
+                              i18_local.householdOverView.editTaskDetails,
+                            ),
+                            action: () {
+                              Navigator.of(context, rootNavigator: true).pop();
+                              if (tasks != null && tasks!.isNotEmpty) {
+                                context.router.push(
+                                  IndividualTaskListRoute(
+                                    individual: individual,
+                                    tasks: tasks!,
+                                  ),
+                                );
+                              } else {
+                                DigitDialog.show(
+                                  context,
+                                  options: DigitDialogOptions(
+                                    titleText: localizations.translate(
+                                      i18_local.householdOverView
+                                          .noTasksAvailableTitle,
+                                    ),
+                                    contentText: localizations.translate(
+                                      i18_local.householdOverView
+                                          .noTasksAvailableContent,
+                                    ),
+                                    primaryAction: DigitDialogActions(
+                                      label: localizations.translate(
+                                        i18.common.coreCommonOk,
+                                      ),
+                                      action: (ctx) {
+                                        Navigator.of(
+                                          ctx,
+                                          rootNavigator: true,
+                                        ).pop();
+                                      },
+                                    ),
+                                  ),
+                                );
+                              }
+                            },
+                          ),
                         ],
                       ),
                     ),
