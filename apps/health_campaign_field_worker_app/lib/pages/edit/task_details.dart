@@ -1,3 +1,4 @@
+import 'package:auto_route/auto_route.dart';
 import 'package:digit_data_model/data_model.dart';
 import 'package:digit_components/digit_components.dart';
 import 'package:digit_ui_components/models/DropdownModels.dart';
@@ -7,16 +8,18 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:registration_delivery/registration_delivery.dart';
 import 'package:digit_ui_components/widgets/atoms/digit_dropdown_input.dart'
     as digit_ui;
-import 'package:registration_delivery/widgets/localized.dart';
 import 'package:digit_ui_components/utils/date_utils.dart';
+import '../../../models/entities/assessment_checklist/status.dart';
 
+import '../../utils/i18_key_constants.dart' as i18;
 import '../../data/repositories/custom_task.dart';
 import '../../models/entities/identifier_types.dart';
-import '../../models/entities/status.dart';
 import '../../utils/constants.dart';
 import '../../widgets/digit_ui_component/custom_digit_input_field.dart';
 import '../../../utils/utils.dart' as local_utils;
+import '../../widgets/localized.dart';
 
+@RoutePage()
 class TaskDetailPage extends LocalizedStatefulWidget {
   final TaskModel taskModel;
   final IndividualModel? individualModel;
@@ -38,9 +41,20 @@ class _TaskDetailPageState extends LocalizedState<TaskDetailPage> {
   late Map<String, TextEditingController> _additionalFieldControllers;
   late Map<String, TextEditingController> _resourceControllers;
   late TextEditingController _deleteReasonController;
+  late TextEditingController _updateReasonController;
   late Map<String, TextEditingController> _hiddenIdControllers;
 
   bool _saving = false;
+
+  List<String> allowedStatuses = [
+    Status.delivered.toValue(),
+    Status.administeredSuccess.toValue(),
+    Status.notAdministered.toValue(),
+    Status.beneficiaryReferred.toValue(),
+    Status.beneficiaryRefused.toValue(),
+    Status.beneficiaryInEligible.toValue(),
+    Status.administeredFailed.toValue(),
+  ];
 
   @override
   void initState() {
@@ -104,6 +118,9 @@ class _TaskDetailPageState extends LocalizedState<TaskDetailPage> {
     // Initialize delete reason controller
     _deleteReasonController = TextEditingController();
 
+    // Initialize update reason controller
+    _updateReasonController = TextEditingController();
+
     // Additional field controllers
     _schemaController =
         TextEditingController(text: _additionalFields?.schema ?? '');
@@ -130,6 +147,7 @@ class _TaskDetailPageState extends LocalizedState<TaskDetailPage> {
       c.dispose();
     }
     _deleteReasonController.dispose();
+    _updateReasonController.dispose();
     for (final c in _hiddenIdControllers.values) {
       c.dispose();
     }
@@ -143,23 +161,81 @@ class _TaskDetailPageState extends LocalizedState<TaskDetailPage> {
       context: context,
       builder: (BuildContext context) {
         return AlertDialog(
-          title: const Text('Save Changes'),
-          content: const Text(
-            'Are you sure you want to update this task?',
-            style: TextStyle(fontSize: 16),
+          title: Text(localizations.translate(i18.editTasks.updateDialogTitle)),
+          content: Column(
+            mainAxisSize: MainAxisSize.min,
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Text(
+                localizations.translate(i18.editTasks.updateDialogMessage),
+                style: const TextStyle(fontSize: 16),
+              ),
+              const SizedBox(height: 16),
+              TextField(
+                controller: _updateReasonController,
+                decoration: InputDecoration(
+                  labelText: localizations.translate(i18.editTasks.reasonLabel),
+                  hintText:
+                      localizations.translate(i18.editTasks.updateReasonHint),
+                  border: const OutlineInputBorder(),
+                ),
+                maxLines: 3,
+                maxLength: 200, // visually enforce limit too
+                autofocus: true,
+              ),
+            ],
           ),
           actions: [
             TextButton(
               onPressed: () => Navigator.of(context).pop(false),
-              child: const Text('Go Back'),
+              child: Text(localizations.translate(i18.common.coreCommonCancel)),
             ),
             ElevatedButton(
-              onPressed: () => Navigator.of(context).pop(true),
+              onPressed: () {
+                final reason = _updateReasonController.text.trim();
+                if (reason.isEmpty) {
+                  ScaffoldMessenger.of(context).showSnackBar(
+                    SnackBar(
+                      content: Text(
+                        localizations
+                            .translate(i18.editTasks.updateReasonRequiredError),
+                      ),
+                      backgroundColor: Colors.red,
+                    ),
+                  );
+                  return;
+                }
+                if (reason.length < 3) {
+                  ScaffoldMessenger.of(context).showSnackBar(
+                    SnackBar(
+                      content: Text(
+                        localizations
+                            .translate(i18.editTasks.reasonMinLengthError),
+                      ),
+                      backgroundColor: Colors.red,
+                    ),
+                  );
+                  return;
+                }
+                if (reason.length > 200) {
+                  ScaffoldMessenger.of(context).showSnackBar(
+                    SnackBar(
+                      content: Text(
+                        localizations
+                            .translate(i18.editTasks.reasonMaxLengthError),
+                      ),
+                      backgroundColor: Colors.red,
+                    ),
+                  );
+                  return;
+                }
+                Navigator.of(context).pop(true);
+              },
               style: ElevatedButton.styleFrom(
                 backgroundColor: Colors.green,
                 foregroundColor: Colors.white,
               ),
-              child: const Text('Save'),
+              child: Text(localizations.translate(i18.common.coreCommonSave)),
             ),
           ],
         );
@@ -179,11 +255,43 @@ class _TaskDetailPageState extends LocalizedState<TaskDetailPage> {
           context.read<LocalRepository<TaskModel, TaskSearchModel>>()
               as CustomTaskLocalRepository;
 
-      // Update additional fields
+      // Get existing fields
+      final existingFields = _additionalFields?.fields ?? [];
+
+      // Handle editCount logic
+      final editCountField = existingFields.firstWhere(
+        (f) => f.key == 'editCount',
+        orElse: () => const AdditionalField('editCount', '0'),
+      );
+      final currentEditCount = int.tryParse(editCountField.value ?? '0') ?? 0;
+      final newEditCount = currentEditCount + 1;
+
+      // Handle updateReason logic
+      final updateReasonField = existingFields.firstWhere(
+        (f) => f.key == 'updateReason',
+        orElse: () => const AdditionalField('updateReason', ''),
+      );
+      // ignore: avoid_dynamic_calls
+      final oldReason = updateReasonField.value?.trim() ?? '';
+      final newReason = _updateReasonController.text.trim();
+      // ignore: avoid_dynamic_calls
+      final combinedReason = oldReason.isNotEmpty
+          ? '$oldReason | Edit #$newEditCount: $newReason'
+          : 'Edit #$newEditCount: $newReason';
+
+      // Prepare updated fields
       final updatedFields = _additionalFieldControllers.entries
           .map((e) => AdditionalField(e.key, e.value.text))
           .toList();
 
+      // Replace or add editCount and updateReason
+      final List<AdditionalField> finalUpdatedFields = [
+        ...updatedFields,
+        AdditionalField('editCount', newEditCount.toString()),
+        AdditionalField('updateReason', combinedReason),
+      ];
+
+      // Build new TaskAdditionalFields
       final newAdditionalFields = TaskAdditionalFields(
         schema: _schemaController.text.isNotEmpty
             ? _schemaController.text
@@ -191,7 +299,7 @@ class _TaskDetailPageState extends LocalizedState<TaskDetailPage> {
         version: int.tryParse(_versionController.text) ??
             _additionalFields?.version ??
             1,
-        fields: updatedFields,
+        fields: finalUpdatedFields,
       );
 
       // Build updated TaskResource list from controllers
@@ -282,8 +390,10 @@ class _TaskDetailPageState extends LocalizedState<TaskDetailPage> {
       if (mounted) {
         setState(() => _saving = false);
         ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(
-            content: Text('Changes saved successfully!'),
+          SnackBar(
+            content: Text(
+              localizations.translate(i18.editTasks.updateSuccessMessage),
+            ),
             backgroundColor: Colors.green,
           ),
         );
@@ -294,10 +404,13 @@ class _TaskDetailPageState extends LocalizedState<TaskDetailPage> {
         setState(() => _saving = false);
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
-            content: Text('Error saving changes: $e'),
+            content: Text(
+              localizations.translate(i18.editTasks.updateErrorMessage),
+            ),
             backgroundColor: Colors.red,
           ),
         );
+        debugPrint('Error saving changes: $e');
       }
     }
   }
@@ -307,21 +420,23 @@ class _TaskDetailPageState extends LocalizedState<TaskDetailPage> {
       context: context,
       builder: (BuildContext context) {
         return AlertDialog(
-          title: const Text('Delete Task'),
+          title: Text(localizations.translate(i18.editTasks.deleteDialogTitle)),
           content: Column(
             mainAxisSize: MainAxisSize.min,
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              const Text('Do you want to delete the administration data?'),
+              Text(localizations.translate(i18.editTasks.deleteDialogMessage)),
               const SizedBox(height: 16),
               TextField(
                 controller: _deleteReasonController,
-                decoration: const InputDecoration(
-                  labelText: 'Reason *',
-                  hintText: 'Please provide a reason for deletion',
-                  border: OutlineInputBorder(),
+                decoration: InputDecoration(
+                  labelText: localizations.translate(i18.editTasks.reasonLabel),
+                  hintText:
+                      localizations.translate(i18.editTasks.deleteReasonHint),
+                  border: const OutlineInputBorder(),
                 ),
                 maxLines: 3,
+                maxLength: 200,
                 autofocus: true,
               ),
             ],
@@ -329,14 +444,36 @@ class _TaskDetailPageState extends LocalizedState<TaskDetailPage> {
           actions: [
             TextButton(
               onPressed: () => Navigator.of(context).pop(false),
-              child: const Text('Cancel'),
+              child: Text(localizations.translate(i18.common.coreCommonCancel)),
             ),
             ElevatedButton(
               onPressed: () {
-                if (_deleteReasonController.text.trim().isEmpty) {
+                final reason = _deleteReasonController.text.trim();
+                if (reason.isEmpty) {
                   ScaffoldMessenger.of(context).showSnackBar(
-                    const SnackBar(
-                      content: Text('Please provide a reason for deletion'),
+                    SnackBar(
+                      content: Text(localizations
+                          .translate(i18.editTasks.deleteReasonRequiredError)),
+                      backgroundColor: Colors.red,
+                    ),
+                  );
+                  return;
+                }
+                if (reason.length < 3) {
+                  ScaffoldMessenger.of(context).showSnackBar(
+                    SnackBar(
+                      content: Text(localizations
+                          .translate(i18.editTasks.reasonMinLengthError)),
+                      backgroundColor: Colors.red,
+                    ),
+                  );
+                  return;
+                }
+                if (reason.length > 200) {
+                  ScaffoldMessenger.of(context).showSnackBar(
+                    SnackBar(
+                      content: Text(localizations
+                          .translate(i18.editTasks.reasonMaxLengthError)),
                       backgroundColor: Colors.red,
                     ),
                   );
@@ -348,7 +485,7 @@ class _TaskDetailPageState extends LocalizedState<TaskDetailPage> {
                 backgroundColor: Colors.red,
                 foregroundColor: Colors.white,
               ),
-              child: const Text('Delete'),
+              child: Text(localizations.translate(i18.common.coreCommonDelete)),
             ),
           ],
         );
@@ -402,8 +539,10 @@ class _TaskDetailPageState extends LocalizedState<TaskDetailPage> {
       if (mounted) {
         setState(() => _saving = false);
         ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(
-            content: Text('Task deleted successfully!'),
+          SnackBar(
+            content: Text(
+              localizations.translate(i18.editTasks.deleteSuccessMessage),
+            ),
             backgroundColor: Colors.green,
           ),
         );
@@ -414,10 +553,13 @@ class _TaskDetailPageState extends LocalizedState<TaskDetailPage> {
         setState(() => _saving = false);
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
-            content: Text('Error deleting task: $e'),
+            content: Text(
+              localizations.translate(i18.editTasks.deleteErrorMessage),
+            ),
             backgroundColor: Colors.red,
           ),
         );
+        debugPrint('Error deleting task: $e');
       }
     }
   }
@@ -433,7 +575,7 @@ class _TaskDetailPageState extends LocalizedState<TaskDetailPage> {
         backgroundColor: theme.colorScheme.primary,
         foregroundColor: theme.colorScheme.onPrimary,
         title: Text(
-          'Task #${_originalTask.id ?? _originalTask.clientReferenceId}',
+          '${localizations.translate(i18.editTasks.taskLabel)} #${_originalTask.id ?? _originalTask.clientReferenceId}',
           style: textTheme.headingL.copyWith(
             color: theme.colorScheme.onPrimary,
             fontWeight: FontWeight.w600,
@@ -534,7 +676,8 @@ class _TaskDetailPageState extends LocalizedState<TaskDetailPage> {
                 ),
                 const SizedBox(width: 8),
                 Text(
-                  'Beneficiary Details',
+                  localizations
+                      .translate(i18.editTasks.beneficiaryDetailsSectionTitle),
                   style: textTheme.headingL.copyWith(
                     fontWeight: FontWeight.w600,
                     color: theme.colorScheme.primary,
@@ -545,12 +688,14 @@ class _TaskDetailPageState extends LocalizedState<TaskDetailPage> {
             const SizedBox(height: 16),
 
             // Display info
-            _buildIndividualInfoRow('Name', name.isNotEmpty ? name : 'N/A'),
+            _buildIndividualInfoRow(
+                i18.editTasks.nameLabel, name.isNotEmpty ? name : 'N/A'),
             if (age != null)
-              _buildIndividualInfoRow(
-                  'Age', '${age.years} years and ${age.months} months'),
-            _buildIndividualInfoRow('Gender', gender),
-            _buildIndividualInfoRow('Beneficiary ID', beneficiaryId),
+              _buildIndividualInfoRow(i18.editTasks.ageLabel,
+                  '${age.years} years and ${age.months} months'),
+            _buildIndividualInfoRow(i18.editTasks.genderLabel, gender),
+            _buildIndividualInfoRow(
+                i18.editTasks.beneficiaryIdLabel, beneficiaryId),
           ],
         ),
       ),
@@ -570,7 +715,7 @@ class _TaskDetailPageState extends LocalizedState<TaskDetailPage> {
           SizedBox(
             width: 160,
             child: Text(
-              '$label:',
+              '${localizations.translate(label)}:',
               style: textTheme.headingS.copyWith(
                 fontWeight: FontWeight.w500,
               ),
@@ -608,7 +753,7 @@ class _TaskDetailPageState extends LocalizedState<TaskDetailPage> {
                 ),
                 const SizedBox(width: 8),
                 Text(
-                  'Resources',
+                  localizations.translate(i18.editTasks.resourcesSectionTitle),
                   style: textTheme.headingL.copyWith(
                     fontWeight: FontWeight.w600,
                     color: theme.colorScheme.primary,
@@ -660,7 +805,7 @@ class _TaskDetailPageState extends LocalizedState<TaskDetailPage> {
         children: [
           // Resource Header
           Text(
-            'Resource ${index + 1}',
+            '${localizations.translate(i18.editTasks.resourceLabel)} ${index + 1}',
             style: textTheme.headingM.copyWith(
               fontWeight: FontWeight.w600,
               color: theme.colorScheme.primary,
@@ -671,7 +816,8 @@ class _TaskDetailPageState extends LocalizedState<TaskDetailPage> {
           // Product Variant Dropdown
           if (productVariants != null && productVariants.isNotEmpty)
             LabeledField(
-              label: 'Product Variant ID *',
+              label:
+                  localizations.translate(i18.editTasks.productVariantIdLabel),
               labelStyle: TextStyle(
                 color: theme.colorScheme.onSurfaceVariant,
                 fontSize: 16,
@@ -703,7 +849,7 @@ class _TaskDetailPageState extends LocalizedState<TaskDetailPage> {
             )
           else
             Text(
-              'No Product Variants available',
+              localizations.translate(i18.editTasks.noProductVariantsFound),
               style: textTheme.bodyS.copyWith(
                 color: theme.colorScheme.onSurfaceVariant,
               ),
@@ -713,7 +859,7 @@ class _TaskDetailPageState extends LocalizedState<TaskDetailPage> {
 
           // Task ID
           CustomDigitTextField(
-            label: 'Task ID',
+            label: localizations.translate(i18.editTasks.taskIdLabel),
             controller: _resourceControllers['resource_${index}_taskId'],
             readOnly: true,
           ),
@@ -724,7 +870,7 @@ class _TaskDetailPageState extends LocalizedState<TaskDetailPage> {
             children: [
               Expanded(
                 child: CustomDigitTextField(
-                  label: 'Quantity',
+                  label: localizations.translate(i18.editTasks.quantityLabel),
                   controller:
                       _resourceControllers['resource_${index}_quantity'],
                   readOnly: true,
@@ -733,7 +879,8 @@ class _TaskDetailPageState extends LocalizedState<TaskDetailPage> {
               const SizedBox(width: 8),
               Expanded(
                 child: CustomDigitTextField(
-                  label: 'Is Delivered',
+                  label:
+                      localizations.translate(i18.editTasks.isDeliveredLabel),
                   controller:
                       _resourceControllers['resource_${index}_isDelivered'],
                   readOnly: true,
@@ -745,7 +892,7 @@ class _TaskDetailPageState extends LocalizedState<TaskDetailPage> {
 
           // Delivery Comment
           CustomDigitTextField(
-            label: 'Delivery Comment',
+            label: localizations.translate(i18.editTasks.deliveryCommentLabel),
             controller:
                 _resourceControllers['resource_${index}_deliveryComment'],
             readOnly: true,
@@ -774,7 +921,8 @@ class _TaskDetailPageState extends LocalizedState<TaskDetailPage> {
                 ),
                 const SizedBox(width: 8),
                 Text(
-                  'Additional Details',
+                  localizations
+                      .translate(i18.editTasks.additionalDetailsSectionTitle),
                   style: textTheme.headingL.copyWith(
                     fontWeight: FontWeight.w600,
                     color: theme.colorScheme.primary,
@@ -784,13 +932,13 @@ class _TaskDetailPageState extends LocalizedState<TaskDetailPage> {
             ),
             const SizedBox(height: 16),
             CustomDigitTextField(
-              label: 'Schema',
+              label: localizations.translate(i18.editTasks.schemaLabel),
               controller: _schemaController,
               readOnly: true,
             ),
             const SizedBox(height: 12),
             CustomDigitTextField(
-              label: 'Version',
+              label: localizations.translate(i18.editTasks.versionLabel),
               controller: _versionController,
               readOnly: true,
             ),
@@ -817,6 +965,7 @@ class _TaskDetailPageState extends LocalizedState<TaskDetailPage> {
 
     // Generate dropdown items dynamically from Status enum
     final statusOptions = Status.values
+        .where((s) => allowedStatuses.contains(s.toValue()))
         .map((s) => DropdownItem(code: s.toValue(), name: s.toValue()))
         .toList();
 
@@ -838,7 +987,7 @@ class _TaskDetailPageState extends LocalizedState<TaskDetailPage> {
                 ),
                 const SizedBox(width: 8),
                 Text(
-                  'Task Information',
+                  localizations.translate(i18.editTasks.taskInfoSectionTitle),
                   style: textTheme.headingL.copyWith(
                     fontWeight: FontWeight.w600,
                     color: theme.colorScheme.primary,
@@ -848,13 +997,13 @@ class _TaskDetailPageState extends LocalizedState<TaskDetailPage> {
             ),
             const SizedBox(height: 16),
             CustomDigitTextField(
-              label: 'Project ID',
+              label: localizations.translate(i18.editTasks.projectIdLabel),
               controller: _controllers['projectId'],
               readOnly: true,
             ),
             const SizedBox(height: 8),
             LabeledField(
-              label: 'Status *',
+              label: localizations.translate(i18.editTasks.statusLabel),
               labelStyle: TextStyle(
                 color: theme.colorScheme.onSurfaceVariant,
                 fontSize: 16,
@@ -866,7 +1015,8 @@ class _TaskDetailPageState extends LocalizedState<TaskDetailPage> {
                   code: selectedStatus,
                   name: selectedStatus.isNotEmpty
                       ? selectedStatus
-                      : 'Select Status',
+                      : localizations
+                          .translate(i18.editTasks.selectStatusLabel),
                 ),
                 items: statusOptions,
                 onSelect: (selected) {
@@ -881,7 +1031,8 @@ class _TaskDetailPageState extends LocalizedState<TaskDetailPage> {
               children: [
                 Expanded(
                   child: CustomDigitTextField(
-                    label: 'Created By',
+                    label:
+                        localizations.translate(i18.editTasks.createdByLabel),
                     controller: _controllers['createdBy'],
                     readOnly: true,
                   ),
@@ -889,7 +1040,7 @@ class _TaskDetailPageState extends LocalizedState<TaskDetailPage> {
                 const SizedBox(width: 8),
                 Expanded(
                   child: CustomDigitTextField(
-                    label: 'Tenant ID',
+                    label: localizations.translate(i18.editTasks.tenantIdLabel),
                     controller: _controllers['tenantId'],
                     readOnly: true,
                   ),
@@ -901,7 +1052,8 @@ class _TaskDetailPageState extends LocalizedState<TaskDetailPage> {
               children: [
                 Expanded(
                   child: CustomDigitTextField(
-                    label: 'Project Beneficiary ID',
+                    label: localizations
+                        .translate(i18.editTasks.projectBeneficiaryIdLabel),
                     controller: _controllers['projectBeneficiaryId'],
                     readOnly: true,
                   ),
@@ -909,7 +1061,8 @@ class _TaskDetailPageState extends LocalizedState<TaskDetailPage> {
                 const SizedBox(width: 8),
                 Expanded(
                   child: CustomDigitTextField(
-                    label: 'Row Version',
+                    label:
+                        localizations.translate(i18.editTasks.rowVersionLabel),
                     controller: _controllers['rowVersion'],
                     readOnly: true,
                   ),
@@ -918,7 +1071,8 @@ class _TaskDetailPageState extends LocalizedState<TaskDetailPage> {
             ),
             const SizedBox(height: 12),
             CustomDigitTextField(
-              label: 'Project Beneficiary Client Reference ID',
+              label: localizations
+                  .translate(i18.editTasks.projectBeneficiaryCLientRefIdLabel),
               controller: _controllers['projectBeneficiaryClientReferenceId'],
               readOnly: true,
             ),
@@ -927,7 +1081,8 @@ class _TaskDetailPageState extends LocalizedState<TaskDetailPage> {
               children: [
                 Expanded(
                   child: CustomDigitTextField(
-                    label: 'Is Deleted',
+                    label:
+                        localizations.translate(i18.editTasks.isDeletedLabel),
                     controller: _controllers['isDeleted'],
                     readOnly: true,
                   ),
@@ -935,7 +1090,8 @@ class _TaskDetailPageState extends LocalizedState<TaskDetailPage> {
                 const SizedBox(width: 8),
                 Expanded(
                   child: CustomDigitTextField(
-                    label: 'Created Date',
+                    label:
+                        localizations.translate(i18.editTasks.createdDateLabel),
                     controller: _controllers['createdDate'],
                     readOnly: true,
                   ),
@@ -967,7 +1123,8 @@ class _TaskDetailPageState extends LocalizedState<TaskDetailPage> {
                 ),
                 const SizedBox(width: 8),
                 Text(
-                  'System Fields (Hidden)',
+                  localizations
+                      .translate(i18.editTasks.systemFieldsSectionTitle),
                   style: textTheme.headingL.copyWith(
                     fontWeight: FontWeight.w600,
                     color: theme.colorScheme.error,
@@ -981,7 +1138,7 @@ class _TaskDetailPageState extends LocalizedState<TaskDetailPage> {
                 Expanded(
                   flex: 2,
                   child: CustomDigitTextField(
-                    label: 'ID',
+                    label: localizations.translate(i18.editTasks.idLabel),
                     controller: _hiddenIdControllers['id'],
                     readOnly: true,
                   ),
@@ -990,7 +1147,8 @@ class _TaskDetailPageState extends LocalizedState<TaskDetailPage> {
                 Expanded(
                   flex: 3,
                   child: CustomDigitTextField(
-                    label: 'Client Reference ID',
+                    label:
+                        localizations.translate(i18.editTasks.clientRefIdLabel),
                     controller: _hiddenIdControllers['clientReferenceId'],
                     readOnly: true,
                   ),

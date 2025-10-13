@@ -3,18 +3,21 @@ import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:registration_delivery/registration_delivery.dart';
 
+import '../../utils/i18_key_constants.dart' as i18;
 import '../../data/repositories/custom_task.dart';
 import '../../models/entities/identifier_types.dart';
-import 'task_details.dart';
+import '../../router/app_router.dart';
+import '../../widgets/localized.dart';
 
-class TaskListPage extends StatefulWidget {
+@RoutePage()
+class TaskListPage extends LocalizedStatefulWidget {
   const TaskListPage({super.key});
 
   @override
   State<TaskListPage> createState() => _TaskListPageState();
 }
 
-class _TaskListPageState extends State<TaskListPage> {
+class _TaskListPageState extends LocalizedState<TaskListPage> {
   late Future<List<TaskModel>> _tasksFuture;
   final Map<String, IndividualModel?> _individualsByTask =
       {}; // Store related individuals
@@ -96,7 +99,13 @@ class _TaskListPageState extends State<TaskListPage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(title: const Text('All Task Entries')),
+      appBar: AppBar(
+        title: Text(
+          localizations.translate(
+            i18.editTasks.editTasksTitle,
+          ),
+        ),
+      ),
       body: FutureBuilder<List<TaskModel>>(
         future: _tasksFuture,
         builder: (context, snapshot) {
@@ -106,7 +115,13 @@ class _TaskListPageState extends State<TaskListPage> {
 
           final tasks = snapshot.data!;
           if (tasks.isEmpty) {
-            return const Center(child: Text('No tasks found'));
+            return Center(
+              child: Text(
+                localizations.translate(
+                  i18.editTasks.noTasksFound,
+                ),
+              ),
+            );
           }
 
           return ListView.builder(
@@ -126,17 +141,16 @@ class _TaskListPageState extends State<TaskListPage> {
                 child: InkWell(
                   borderRadius: BorderRadius.circular(12),
                   onTap: () {
-                    Navigator.push(
-                      context,
-                      MaterialPageRoute(
-                        builder: (_) => TaskDetailPage(
-                          taskModel: task,
-                          individualModel: _individualsByTask[task.id ??
-                              task.projectBeneficiaryClientReferenceId!],
-                        ),
-                      ),
-                    ).then((_) => setState(
-                        () => _tasksFuture = _fetchTasksWithIndividual()));
+                    context.router
+                        .push(
+                          TaskDetailRoute(
+                            taskModel: task,
+                            individualModel: _individualsByTask[task.id ??
+                                task.projectBeneficiaryClientReferenceId!],
+                          ),
+                        )
+                        .then((_) => setState(
+                            () => _tasksFuture = _fetchTasksWithIndividual()));
                   },
                   child: Padding(
                     padding: const EdgeInsets.all(16),
@@ -144,7 +158,7 @@ class _TaskListPageState extends State<TaskListPage> {
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
                         Text(
-                          'Task #${task.id ?? task.clientReferenceId}',
+                          '${localizations.translate(i18.editTasks.taskLabel)} #${task.id ?? task.clientReferenceId}',
                           style: const TextStyle(
                             fontSize: 18,
                             fontWeight: FontWeight.bold,
@@ -155,7 +169,7 @@ class _TaskListPageState extends State<TaskListPage> {
                               individual.name?.familyName != null) ...[
                             const SizedBox(height: 4),
                             Text(
-                              'Name: ${individual.name?.givenName ?? ''} ${individual.name?.familyName ?? ''}'
+                              '${localizations.translate(i18.editTasks.nameLabel)}: ${individual.name?.givenName ?? ''} ${individual.name?.familyName ?? ''}'
                                   .trim(),
                               style: const TextStyle(
                                 fontSize: 16,
@@ -171,7 +185,7 @@ class _TaskListPageState extends State<TaskListPage> {
                                       .toValue()) ...[
                             const SizedBox(height: 4),
                             Text(
-                              'Beneficiary ID: ${_individualsByTask[task.id ?? task.projectBeneficiaryClientReferenceId!]?.identifiers?.first.identifierId}',
+                              '${localizations.translate(i18.editTasks.beneficiaryIdLabel)}: ${_individualsByTask[task.id ?? task.projectBeneficiaryClientReferenceId!]?.identifiers?.first.identifierId}',
                               style: const TextStyle(
                                 fontSize: 16,
                                 fontWeight: FontWeight.bold,
@@ -185,13 +199,18 @@ class _TaskListPageState extends State<TaskListPage> {
                           scrollDirection: Axis.horizontal,
                           child: Row(
                             children: [
-                              _buildTaskField('ID', task.id?.toString()),
                               _buildTaskField(
-                                  'Client Ref ID', task.clientReferenceId),
-                              _buildTaskField('Project ID', task.projectId),
-                              _buildTaskField('Status', task.status),
-                              _buildTaskField('Created By', task.createdBy),
-                              _buildTaskField('Tenant ID', task.tenantId),
+                                  i18.editTasks.idLabel, task.id?.toString()),
+                              _buildTaskField(i18.editTasks.clientRefIdLabel,
+                                  task.clientReferenceId),
+                              _buildTaskField(
+                                  i18.editTasks.projectIdLabel, task.projectId),
+                              _buildTaskField(
+                                  i18.editTasks.statusLabel, task.status),
+                              _buildTaskField(
+                                  i18.editTasks.createdByLabel, task.createdBy),
+                              _buildTaskField(
+                                  i18.editTasks.tenantIdLabel, task.tenantId),
                             ]
                                 .where((widget) => widget != null)
                                 .cast<Widget>()
@@ -201,7 +220,8 @@ class _TaskListPageState extends State<TaskListPage> {
                         Padding(
                           padding: const EdgeInsets.only(top: 8),
                           child: Text(
-                            'Tap to View/Edit',
+                            localizations
+                                .translate(i18.editTasks.tapToViewOrEdit),
                             style: TextStyle(
                               color: Theme.of(context).colorScheme.primary,
                               fontStyle: FontStyle.italic,
@@ -235,7 +255,7 @@ class _TaskListPageState extends State<TaskListPage> {
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           Text(
-            label,
+            localizations.translate(label),
             style: const TextStyle(
               fontSize: 12,
               fontWeight: FontWeight.w600,
