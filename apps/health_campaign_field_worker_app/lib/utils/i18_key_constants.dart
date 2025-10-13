@@ -44,6 +44,7 @@ const deliverIntervention = DeliverIntervention();
 const checklist = Checklist();
 const referBeneficiary = ReferBeneficiary();
 const householdDetails = HouseholdDetails();
+const editTasks = EditTasks();
 
 class Common {
   const Common();
@@ -121,6 +122,8 @@ class Common {
 
   String get coreCommonNo => 'CORE_COMMON_NO';
   String get coreCommonGoback => 'CORE_COMMON_GO_BACK';
+
+  String get coreCommonDelete => 'CORE_COMMON_DELETE';
 
   String get coreCommonRequiredItems => 'CORE_COMMON_REQUIRED_ITEMS';
 
@@ -206,6 +209,124 @@ class HouseholdOverView {
       'HOUSEHOLD_OVER_VIEW_INCOMPLETEMENT_VACCINE_LABEL';
   String get householdOverViewZeroDoseDeliveredIconLabel =>
       'HOUSEHOLD_OVER_VIEW_ZERO_DOSE_DELIVERED_ICON_LABEL';
+
+  String get editTaskDetails => 'MEMBER_CARD_EDIT_TASK_DETAILS';
+
+  String get noTasksAvailableTitle => 'MEMBER_CARD_NO_TASKS_AVAILABLE_TITLE';
+
+  String get noTasksAvailableContent =>
+      'MEMBER_CARD_NO_TASKS_AVAILABLE_CONTENT';
+}
+
+class EditTasks {
+  const EditTasks();
+
+  String get editTasksTitle => 'EDIT_TASKS_TITLE';
+
+  String get noTasksFound => 'NO_TASKS_FOUND';
+
+  String get taskLabel => 'TASK_LABEL';
+
+  String get nameLabel => 'NAME_LABEL';
+
+  String get beneficiaryIdLabel => 'BENEFICIARY_ID_LABEL';
+
+  String get idLabel => 'ID_LABEL';
+
+  String get clientRefIdLabel => 'CLIENT_REF_ID_LABEL';
+
+  String get projectIdLabel => 'PROJECT_ID_LABEL';
+
+  String get statusLabel => 'STATUS_LABEL';
+
+  String get createdByLabel => 'CREATED_BY_LABEL';
+
+  String get tenantIdLabel => 'TENANT_ID_LABEL';
+
+  String get tapToViewOrEdit => 'TAP_TO_VIEW_OR_EDIT';
+
+  String get tasksForLabel => 'TASKS_FOR_LABEL';
+
+  String get individualTasksTitle => 'INDIVIDUAL_TASKS_TITLE';
+
+  String get noTasksFoundForIndividual => 'NO_TASKS_FOUND_FOR_INDIVIDUAL';
+
+  String get updateDialogTitle => 'UPDATE_DIALOG_TITLE';
+
+  String get updateDialogMessage => 'UPDATE_DIALOG_MESSAGE';
+
+  String get reasonLabel => 'REASON_LABEL';
+
+  String get updateReasonHint => 'UPDATE_REASON_HINT';
+
+  String get updateReasonRequiredError => 'REASON_REQUIRED_ERROR';
+
+  String get reasonMinLengthError => 'REASON_MIN_LENGTH_ERROR';
+
+  String get reasonMaxLengthError => 'REASON_MAX_LENGTH_ERROR';
+
+  String get updateSuccessMessage => 'UPDATE_SUCCESS_MESSAGE';
+
+  String get updateErrorMessage => 'UPDATE_ERROR_MESSAGE';
+
+  String get deleteDialogTitle => 'DELETE_DIALOG_TITLE';
+
+  String get deleteDialogMessage => 'DELETE_DIALOG_MESSAGE';
+
+  String get deleteReasonHint => 'DELETE_REASON_HINT';
+
+  String get deleteReasonRequiredError => 'DELETE_REASON_REQUIRED_ERROR';
+
+  String get deleteSuccessMessage => 'DELETE_SUCCESS_MESSAGE';
+
+  String get deleteErrorMessage => 'DELETE_ERROR_MESSAGE';
+
+  String get beneficiaryDetailsSectionTitle =>
+      'BENEFICIARY_DETAILS_SECTION_TITLE';
+
+  String get ageLabel => 'AGE_LABEL';
+
+  String get genderLabel => 'GENDER_LABEL';
+
+  String get resourcesSectionTitle => 'RESOURCES_SECTION_TITLE';
+
+  String get resourceLabel => 'RESOURCE_LABEL';
+
+  String get productVariantIdLabel => 'PRODUCT_VARIANT_ID_LABEL';
+
+  String get noProductVariantsFound => 'NO_PRODUCT_VARIANTS_FOUND';
+
+  String get taskIdLabel => 'TASK_ID_LABEL';
+
+  String get quantityLabel => 'QUANTITY_LABEL';
+
+  String get isDeliveredLabel => 'IS_DELIVERED_LABEL';
+
+  String get deliveryCommentLabel => 'DELIVERY_COMMENT_LABEL';
+
+  String get additionalDetailsSectionTitle =>
+      'ADDITIONAL_DETAILS_SECTION_TITLE';
+
+  String get schemaLabel => 'SCHEMA_LABEL';
+
+  String get versionLabel => 'VERSION_LABEL';
+
+  String get taskInfoSectionTitle => 'TASK_INFO_SECTION_TITLE';
+
+  String get selectStatusLabel => 'SELECT_STATUS_LABEL';
+
+  String get projectBeneficiaryIdLabel => 'PROJECT_BENEFICIARY_ID_LABEL';
+
+  String get rowVersionLabel => 'ROW_VERSION_LABEL';
+
+  String get projectBeneficiaryCLientRefIdLabel =>
+      'PROJECT_BENEFICIARY_CLIENT_REF_ID_LABEL';
+
+  String get isDeletedLabel => 'IS_DELETED_LABEL';
+
+  String get createdDateLabel => 'CREATED_DATE_LABEL';
+
+  String get systemFieldsSectionTitle => 'SYSTEM_FIELDS_SECTION_TITLE';
 }
 
 class DeliverIntervention {
