@@ -1,4 +1,5 @@
 import 'package:auto_route/auto_route.dart';
+import 'package:collection/collection.dart';
 import 'package:digit_data_model/data_model.dart';
 import 'package:digit_components/digit_components.dart';
 import 'package:digit_ui_components/models/DropdownModels.dart';
@@ -11,6 +12,7 @@ import 'package:digit_ui_components/widgets/atoms/digit_dropdown_input.dart'
 import 'package:digit_ui_components/utils/date_utils.dart';
 import '../../../models/entities/assessment_checklist/status.dart';
 
+import '../../models/entities/additional_fields_type.dart';
 import '../../utils/i18_key_constants.dart' as i18;
 import '../../data/repositories/custom_task.dart';
 import '../../models/entities/identifier_types.dart';
@@ -129,9 +131,13 @@ class _TaskDetailPageState extends LocalizedState<TaskDetailPage> {
 
     final fieldsList = _additionalFields?.fields ?? [];
 
+    // Exclude cycleIndex, doseIndex, and dateOfAdministration from editable additional fields
     _additionalFieldControllers = {
       for (final field in fieldsList)
-        field.key: TextEditingController(text: field.value?.toString() ?? '')
+        if (field.key != AdditionalFieldsType.cycleIndex.toValue() &&
+            field.key != AdditionalFieldsType.doseIndex.toValue() &&
+            field.key != AdditionalFieldsType.dateOfAdministration.toValue())
+          field.key: TextEditingController(text: field.value?.toString() ?? '')
     };
   }
 
@@ -660,6 +666,32 @@ class _TaskDetailPageState extends LocalizedState<TaskDetailPage> {
         ? individual.identifiers?.first.identifierId ?? 'N/A'
         : 'N/A';
 
+    // Extract from additional fields
+    final cycleIndex = _additionalFields?.fields
+        .firstWhereOrNull(
+            (f) => f.key == AdditionalFieldsType.cycleIndex.toValue())
+        ?.value
+        ?.toString();
+    final doseIndex = _additionalFields?.fields
+        .firstWhereOrNull(
+            (f) => f.key == AdditionalFieldsType.doseIndex.toValue())
+        ?.value
+        ?.toString();
+    final administrationEpoch = _additionalFields?.fields
+        .firstWhereOrNull(
+            (f) => f.key == AdditionalFieldsType.dateOfAdministration.toValue())
+        ?.value;
+    String? administrationDateStr;
+    if (administrationEpoch is int) {
+      administrationDateStr =
+          local_utils.formatDateFromMillis(administrationEpoch);
+    } else if (administrationEpoch is String) {
+      final parsed = int.tryParse(administrationEpoch);
+      if (parsed != null) {
+        administrationDateStr = local_utils.formatDateFromMillis(parsed);
+      }
+    }
+
     return DigitCard(
       child: Padding(
         padding: const EdgeInsets.all(16),
@@ -696,6 +728,21 @@ class _TaskDetailPageState extends LocalizedState<TaskDetailPage> {
             _buildIndividualInfoRow(i18.editTasks.genderLabel, gender),
             _buildIndividualInfoRow(
                 i18.editTasks.beneficiaryIdLabel, beneficiaryId),
+            if (cycleIndex != null)
+              _buildIndividualInfoRow(
+                i18.beneficiaryDetails.recordCycle,
+                cycleIndex,
+              ),
+            if (doseIndex != null)
+              _buildIndividualInfoRow(
+                i18.deliverIntervention.dose,
+                doseIndex,
+              ),
+            if (administrationDateStr != null)
+              _buildIndividualInfoRow(
+                i18.householdDetails.dateOfAdministrationLabel,
+                administrationDateStr,
+              ),
           ],
         ),
       ),

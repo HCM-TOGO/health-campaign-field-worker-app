@@ -158,7 +158,27 @@ class _TaskListPageState extends LocalizedState<TaskListPage> {
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
                         Text(
-                          '${localizations.translate(i18.editTasks.taskLabel)} #${task.id ?? task.clientReferenceId}',
+                          (() {
+                            final fields = task.additionalFields?.fields ?? const [];
+                            String? cycleIndex;
+                            String? doseIndex;
+                            for (final f in fields) {
+                              if (f.key == 'cycleIndex' && (f.value?.toString().isNotEmpty ?? false)) {
+                                cycleIndex = f.value.toString();
+                              }
+                              if (f.key == 'doseIndex' && (f.value?.toString().isNotEmpty ?? false)) {
+                                doseIndex = f.value.toString();
+                              }
+                            }
+                            String suffix;
+                            if (cycleIndex != null || doseIndex != null) {
+                              final sep = (cycleIndex != null && doseIndex != null) ? ' -- ' : '';
+                              suffix = '${cycleIndex ?? ''}$sep${doseIndex ?? ''}';
+                            } else {
+                              suffix = task.clientReferenceId;
+                            }
+                            return '${localizations.translate(i18.editTasks.taskLabel)} #$suffix';
+                          })(),
                           style: const TextStyle(
                             fontSize: 18,
                             fontWeight: FontWeight.bold,
