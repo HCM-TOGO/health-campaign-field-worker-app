@@ -5,6 +5,7 @@ import 'package:digit_components/digit_components.dart';
 import 'package:digit_ui_components/models/DropdownModels.dart';
 import 'package:digit_ui_components/theme/digit_extended_theme.dart';
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:registration_delivery/registration_delivery.dart';
 import 'package:digit_ui_components/widgets/atoms/digit_dropdown_input.dart'
@@ -13,6 +14,7 @@ import 'package:digit_ui_components/utils/date_utils.dart';
 import '../../../models/entities/assessment_checklist/status.dart';
 
 import '../../models/entities/additional_fields_type.dart';
+import '../../utils/environment_config.dart';
 import '../../utils/i18_key_constants.dart' as i18;
 import '../../data/repositories/custom_task.dart';
 import '../../models/entities/identifier_types.dart';
@@ -47,16 +49,24 @@ class _TaskDetailPageState extends LocalizedState<TaskDetailPage> {
   late Map<String, TextEditingController> _hiddenIdControllers;
 
   bool _saving = false;
+  late bool showResources;
 
   List<String> allowedStatuses = [
     Status.delivered.toValue(),
     Status.administeredSuccess.toValue(),
-    Status.notAdministered.toValue(),
     Status.beneficiaryReferred.toValue(),
     Status.beneficiaryRefused.toValue(),
     Status.beneficiaryInEligible.toValue(),
-    Status.administeredFailed.toValue(),
+    Status.notAdministered.toValue(),
   ];
+
+  ProjectTypeModel? projectTypeModel = RegistrationDeliverySingleton()
+      .selectedProject
+      ?.additionalDetails
+      ?.projectType;
+
+  // Get all DeliveryProductVariants from project type
+  List<DeliveryProductVariant>? productVariants;
 
   @override
   void initState() {
@@ -64,6 +74,15 @@ class _TaskDetailPageState extends LocalizedState<TaskDetailPage> {
     _originalTask = widget.taskModel;
     _individual = widget.individualModel;
     _additionalFields = widget.taskModel.additionalFields;
+
+    productVariants = projectTypeModel?.resources
+        ?.map(
+            (r) => DeliveryProductVariant(productVariantId: r.productVariantId))
+        .toList();
+
+    showResources = _originalTask.resources != null &&
+        (_originalTask.status == Status.administeredSuccess.toValue() ||
+            _originalTask.status == Status.delivered.toValue());
 
     // Initialize controllers for basic task fields
     _controllers = {
@@ -115,6 +134,9 @@ class _TaskDetailPageState extends LocalizedState<TaskDetailPage> {
         _resourceControllers['resource_${i}_rowVersion'] =
             TextEditingController(text: resource.rowVersion.toString());
       }
+    } else {
+      _resourceControllers['resource_${0}_productVariantId'] =
+          TextEditingController(text: '');
     }
 
     // Initialize delete reason controller
@@ -163,6 +185,37 @@ class _TaskDetailPageState extends LocalizedState<TaskDetailPage> {
   }
 
   Future<void> _showSaveDialog() async {
+    if (_controllers['status']?.text == null ||
+        _controllers['status']?.text.trim() == '') {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text(
+            localizations.translate(i18.editTasks.statusRequiredError),
+          ),
+          backgroundColor: Colors.red,
+        ),
+      );
+      return;
+    }
+
+    if (showResources &&
+        (_resourceControllers['resource_${0}_productVariantId']?.text == null ||
+            _resourceControllers['resource_${0}_productVariantId']
+                    ?.text
+                    .trim() ==
+                '')) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text(
+            localizations
+                .translate(i18.editTasks.productVariantIdRequiredError),
+          ),
+          backgroundColor: Colors.red,
+        ),
+      );
+      return;
+    }
+
     final result = await showDialog<bool>(
       context: context,
       builder: (BuildContext context) {
@@ -311,49 +364,86 @@ class _TaskDetailPageState extends LocalizedState<TaskDetailPage> {
       // Build updated TaskResource list from controllers
       final updatedResources = <TaskResourceModel>[];
       final totalResources = _originalTask.resources?.length ?? 0;
-
-      for (int i = 0; i < totalResources; i++) {
-        final resource = _originalTask.resources![i];
-
-        updatedResources.add(
-          resource.copyWith(
-            productVariantId:
-                _resourceControllers['resource_${i}_productVariantId']?.text ??
-                    resource.productVariantId ??
-                    '',
-            deliveryComment:
-                _resourceControllers['resource_${i}_deliveryComment']?.text ??
-                    resource.deliveryComment,
-            // isDelivered: _resourceControllers['resource_${i}_isDelivered']
-            //         ?.text
-            //         .toLowerCase() ==
-            //     'true',
-            clientAuditDetails: resource.clientAuditDetails?.copyWith(
-                  lastModifiedBy:
-                      RegistrationDeliverySingleton().loggedInUserUuid,
-                  lastModifiedTime: DateTime.now().millisecondsSinceEpoch,
-                ) ??
-                ClientAuditDetails(
-                  createdBy: RegistrationDeliverySingleton().loggedInUserUuid!,
-                  createdTime: DateTime.now().millisecondsSinceEpoch,
-                  lastModifiedBy:
-                      RegistrationDeliverySingleton().loggedInUserUuid!,
-                  lastModifiedTime: DateTime.now().millisecondsSinceEpoch,
-                ),
-            auditDetails: resource.auditDetails?.copyWith(
-                  lastModifiedBy:
-                      RegistrationDeliverySingleton().loggedInUserUuid,
-                  lastModifiedTime: DateTime.now().millisecondsSinceEpoch,
-                ) ??
-                AuditDetails(
-                  createdBy: RegistrationDeliverySingleton().loggedInUserUuid!,
-                  createdTime: DateTime.now().millisecondsSinceEpoch,
-                  lastModifiedBy:
-                      RegistrationDeliverySingleton().loggedInUserUuid!,
-                  lastModifiedTime: DateTime.now().millisecondsSinceEpoch,
-                ),
-          ),
-        );
+      if (showResources) {
+        if (totalResources == 0) {
+          int qty = productVariants
+                  ?.where((element) =>
+                      element.productVariantId ==
+                      _resourceControllers['resource_${0}_productVariantId']
+                          ?.text)
+                  .firstOrNull
+                  ?.quantity ??
+              1;
+          updatedResources.add(
+            TaskResourceModel(
+              taskclientReferenceId:
+                  _originalTask?.clientReferenceId ?? IdGen.i.identifier,
+              clientReferenceId: IdGen.i.identifier,
+              productVariantId:
+                  _resourceControllers['resource_${0}_productVariantId']?.text,
+              isDelivered: true,
+              taskId: _originalTask.id,
+              tenantId: envConfig.variables.tenantId,
+              rowVersion: _originalTask.rowVersion ?? 1,
+              quantity: qty.toString(),
+              clientAuditDetails: ClientAuditDetails(
+                createdBy: context.loggedInUserUuid,
+                createdTime: context.millisecondsSinceEpoch(),
+              ),
+              auditDetails: AuditDetails(
+                createdBy: context.loggedInUserUuid,
+                createdTime: context.millisecondsSinceEpoch(),
+              ),
+            ),
+          );
+        } else {
+          for (int i = 0; i < totalResources; i++) {
+            final resource = _originalTask.resources![i];
+            updatedResources.add(
+              resource.copyWith(
+                productVariantId:
+                    _resourceControllers['resource_${i}_productVariantId']
+                            ?.text ??
+                        resource.productVariantId ??
+                        '',
+                deliveryComment:
+                    _resourceControllers['resource_${i}_deliveryComment']
+                            ?.text ??
+                        resource.deliveryComment,
+                // isDelivered: _resourceControllers['resource_${i}_isDelivered']
+                //         ?.text
+                //         .toLowerCase() ==
+                //     'true',
+                clientAuditDetails: resource.clientAuditDetails?.copyWith(
+                      lastModifiedBy:
+                          RegistrationDeliverySingleton().loggedInUserUuid,
+                      lastModifiedTime: DateTime.now().millisecondsSinceEpoch,
+                    ) ??
+                    ClientAuditDetails(
+                      createdBy:
+                          RegistrationDeliverySingleton().loggedInUserUuid!,
+                      createdTime: DateTime.now().millisecondsSinceEpoch,
+                      lastModifiedBy:
+                          RegistrationDeliverySingleton().loggedInUserUuid!,
+                      lastModifiedTime: DateTime.now().millisecondsSinceEpoch,
+                    ),
+                auditDetails: resource.auditDetails?.copyWith(
+                      lastModifiedBy:
+                          RegistrationDeliverySingleton().loggedInUserUuid,
+                      lastModifiedTime: DateTime.now().millisecondsSinceEpoch,
+                    ) ??
+                    AuditDetails(
+                      createdBy:
+                          RegistrationDeliverySingleton().loggedInUserUuid!,
+                      createdTime: DateTime.now().millisecondsSinceEpoch,
+                      lastModifiedBy:
+                          RegistrationDeliverySingleton().loggedInUserUuid!,
+                      lastModifiedTime: DateTime.now().millisecondsSinceEpoch,
+                    ),
+              ),
+            );
+          }
+        }
       }
 
       final updatedClientAuditDetails = _originalTask.clientAuditDetails
@@ -392,6 +482,14 @@ class _TaskDetailPageState extends LocalizedState<TaskDetailPage> {
 
       // Save using repository
       await taskDataRepository.update(updatedTask);
+
+      // context.read<DeliverInterventionBloc>().add(
+      //       DeliverInterventionSubmitEvent(
+      //         task: updatedTask,
+      //         isEditing: true,
+      //         boundaryModel: RegistrationDeliverySingleton().boundary!,
+      //       ),
+      //     );
 
       if (mounted) {
         setState(() => _saving = false);
@@ -525,22 +623,30 @@ class _TaskDetailPageState extends LocalizedState<TaskDetailPage> {
         fields: updatedFields,
       );
 
-      // final updatedResources = <TaskResourceModel>[];
-      // final totalResources = _originalTask.resources?.length ?? 0;
+      final updatedResources = <TaskResourceModel>[];
+      final totalResources = _originalTask.resources?.length ?? 0;
 
-      // for (int i = 0; i < totalResources; i++) {
-      //   final resource = _originalTask.resources![i];
-      //   updatedResources.add(resource.copyWith(isDeleted: true));
-      // }
+      for (int i = 0; i < totalResources; i++) {
+        final resource = _originalTask.resources![i];
+        updatedResources.add(resource.copyWith(isDeleted: true));
+      }
 
       // Create updated task model with delete reason in additional fields
       final updatedTask = _originalTask.copyWith(
         additionalFields: newAdditionalFields,
-        // resources: updatedResources,
+        resources: updatedResources,
       );
 
       // Delete using repository
       await taskDataRepository.delete(updatedTask);
+
+      // context.read<DeliverInterventionBloc>().add(
+      //       DeliverInterventionSubmitEvent(
+      //         task: updatedTask,
+      //         isEditing: true,
+      //         boundaryModel: RegistrationDeliverySingleton().boundary!,
+      //       ),
+      //     );
 
       if (mounted) {
         setState(() => _saving = false);
@@ -612,8 +718,7 @@ class _TaskDetailPageState extends LocalizedState<TaskDetailPage> {
                   ],
 
                   // Resources Section (Priority)
-                  if (_originalTask.resources != null &&
-                      _originalTask.resources!.isNotEmpty) ...[
+                  if (showResources) ...[
                     _buildResourcesSection(),
                     const SizedBox(height: 16),
                   ],
@@ -724,7 +829,7 @@ class _TaskDetailPageState extends LocalizedState<TaskDetailPage> {
                 i18.editTasks.nameLabel, name.isNotEmpty ? name : 'N/A'),
             if (age != null)
               _buildIndividualInfoRow(i18.editTasks.ageLabel,
-                  '${age.years} years and ${age.months} months'),
+                  '${age.years} ${i18.editTasks.yearsLabel} ${i18.editTasks.andLabel} ${age.months} ${i18.editTasks.monthsLabel}'),
             _buildIndividualInfoRow(i18.editTasks.genderLabel, gender),
             _buildIndividualInfoRow(
                 i18.editTasks.beneficiaryIdLabel, beneficiaryId),
@@ -809,9 +914,14 @@ class _TaskDetailPageState extends LocalizedState<TaskDetailPage> {
               ],
             ),
             const SizedBox(height: 16),
-            ...List.generate(_originalTask.resources!.length, (index) {
-              return _buildResourceCard(index);
-            }),
+            if (_originalTask.resources != null &&
+                _originalTask.resources!.isNotEmpty) ...[
+              ...List.generate(_originalTask.resources!.length, (index) {
+                return _buildResourceCard(index);
+              }),
+            ] else if (showResources) ...[
+              _buildResourceCard(0)
+            ],
           ],
         ),
       ),
@@ -821,17 +931,6 @@ class _TaskDetailPageState extends LocalizedState<TaskDetailPage> {
   Widget _buildResourceCard(int index) {
     final theme = Theme.of(context);
     final textTheme = theme.digitTextTheme(context);
-
-    ProjectTypeModel? projectTypeModel = RegistrationDeliverySingleton()
-        .selectedProject
-        ?.additionalDetails
-        ?.projectType;
-
-    // Get all DeliveryProductVariants from project type
-    List<DeliveryProductVariant>? productVariants = projectTypeModel?.resources
-        ?.map(
-            (r) => DeliveryProductVariant(productVariantId: r.productVariantId))
-        .toList();
 
     // Get the currently selected variant value from the controller
     String? selectedVariantId =
@@ -861,7 +960,7 @@ class _TaskDetailPageState extends LocalizedState<TaskDetailPage> {
           const SizedBox(height: 8),
 
           // Product Variant Dropdown
-          if (productVariants != null && productVariants.isNotEmpty)
+          if (productVariants != null && productVariants!.isNotEmpty)
             LabeledField(
               label:
                   localizations.translate(i18.editTasks.productVariantIdLabel),
@@ -876,7 +975,7 @@ class _TaskDetailPageState extends LocalizedState<TaskDetailPage> {
                   code: selectedVariantId,
                   name: getFormattedSku(getSku(selectedVariantId) ?? ''),
                 ),
-                items: productVariants
+                items: productVariants!
                     .map(
                       (variant) => DropdownItem(
                         code: variant.productVariantId,
@@ -1069,6 +1168,16 @@ class _TaskDetailPageState extends LocalizedState<TaskDetailPage> {
                 onSelect: (selected) {
                   if (selected != null) {
                     _controllers['status']?.text = selected.code;
+                    if (selected.code == Status.administeredSuccess.toValue() ||
+                        selected.code == Status.delivered.toValue()) {
+                      setState(() {
+                        showResources = true;
+                      });
+                    } else {
+                      setState(() {
+                        showResources = false;
+                      });
+                    }
                   }
                 },
               ),
