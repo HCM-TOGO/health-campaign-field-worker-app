@@ -286,6 +286,12 @@ class EditTasks {
 
   String get ageLabel => 'AGE_LABEL';
 
+  String get yearsLabel => 'YEARS_LABEL';
+
+  String get andLabel => 'AND_LABEL';
+
+  String get monthsLabel => 'MONTHS_LABEL';
+
   String get genderLabel => 'GENDER_LABEL';
 
   String get resourcesSectionTitle => 'RESOURCES_SECTION_TITLE';
@@ -327,6 +333,15 @@ class EditTasks {
   String get createdDateLabel => 'CREATED_DATE_LABEL';
 
   String get systemFieldsSectionTitle => 'SYSTEM_FIELDS_SECTION_TITLE';
+
+  String get statusRequiredError => 'STATUS_REQUIRED_ERROR';
+
+  String get productVariantIdRequiredError =>
+      'PRODUCT_VARIANT_ID_REQUIRED_ERROR';
+
+  String get enableSearchLabel => 'ENABLE_SEARCH_LABEL';
+
+  String get searchByBeneficiaryIdLabel => 'SEARCH_BY_BENEFICIARY_ID_LABEL';
 }
 
 class DeliverIntervention {

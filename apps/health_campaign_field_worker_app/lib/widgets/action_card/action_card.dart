@@ -8,20 +8,21 @@ class ActionCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final theme = Theme.of(context);
-
     return Column(
       mainAxisSize: MainAxisSize.min,
       children: items
           .map(
             (e) => Padding(
               padding: const EdgeInsets.all(spacer2 / 2),
-              child: DigitButton(
-                type: DigitButtonType.secondary,
-                size: DigitButtonSize.large,
-                prefixIcon: e.icon,
-                label: e.label,
-                onPressed: e.action ?? () {},
+              child: SizedBox(
+                width: double.infinity, // makes it full width
+                child: DigitButton(
+                  type: DigitButtonType.secondary,
+                  size: DigitButtonSize.large,
+                  prefixIcon: e.icon,
+                  label: e.label,
+                  onPressed: e.action ?? () {},
+                ),
               ),
             ),
           )
