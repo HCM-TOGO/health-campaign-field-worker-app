@@ -28,7 +28,11 @@ class _IndividualTaskListPageState
   @override
   void initState() {
     super.initState();
-    _tasks = widget.tasks;
+    _tasks = _filterTasks();
+  }
+
+  List<TaskModel> _filterTasks() {
+    return widget.tasks.where((task) => task.isDeleted != true).toList();
   }
 
   @override
@@ -72,7 +76,7 @@ class _IndividualTaskListPageState
                               individualModel: individual,
                             ),
                           )
-                          .then((_) => setState(() {}));
+                          .then((_) => setState(() => _tasks = _filterTasks()));
                       // await Navigator.push(
                       //   context,
                       //   MaterialPageRoute(
@@ -90,7 +94,34 @@ class _IndividualTaskListPageState
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
                           Text(
-                            '${localizations.translate(i18.editTasks.taskLabel)} #${task.id ?? task.clientReferenceId}',
+                            (() {
+                              final fields =
+                                  task.additionalFields?.fields ?? const [];
+                              String? cycleIndex;
+                              String? doseIndex;
+                              for (final f in fields) {
+                                if (f.key == 'cycleIndex' &&
+                                    (f.value?.toString().isNotEmpty ?? false)) {
+                                  cycleIndex = f.value.toString();
+                                }
+                                if (f.key == 'doseIndex' &&
+                                    (f.value?.toString().isNotEmpty ?? false)) {
+                                  doseIndex = f.value.toString();
+                                }
+                              }
+                              String suffix;
+                              if (cycleIndex != null || doseIndex != null) {
+                                final sep =
+                                    (cycleIndex != null && doseIndex != null)
+                                        ? ' -- '
+                                        : '';
+                                suffix =
+                                    '${cycleIndex ?? ''}$sep${doseIndex ?? ''}';
+                              } else {
+                                suffix = task.clientReferenceId;
+                              }
+                              return '${localizations.translate(i18.editTasks.taskLabel)} #$suffix';
+                            })(),
                             style: const TextStyle(
                               fontSize: 18,
                               fontWeight: FontWeight.bold,
