@@ -15,12 +15,18 @@ import 'package:registration_delivery/models/entities/status.dart';
 import 'package:registration_delivery/models/entities/task.dart';
 import 'package:registration_delivery/utils/constants.dart';
 import 'package:registration_delivery/utils/i18_key_constants.dart' as i18;
+import '../../models/entities/additional_fields_type.dart';
+import '../../utils/app_enums.dart';
+import '../../utils/extensions/extensions.dart';
 import '../../utils/i18_key_constants.dart' as i18_local;
 import 'package:registration_delivery/utils/utils.dart';
 import 'package:registration_delivery/widgets/beneficiary/beneficiary_card.dart';
 import 'package:registration_delivery/widgets/localized.dart';
-
+import '../../models/entities/additional_fields_type.dart'
+    as additional_fields_local;
 import '../../utils/registration_delivery/utils_smc.dart' as util_local;
+import '../../utils/registration_delivery/utils_smc.dart'
+    show checkBeneficiaryReferredSMC;
 
 class CustomViewBeneficiaryCard extends LocalizedStatefulWidget {
   final HouseholdMemberWrapper householdMember;
@@ -61,6 +67,33 @@ class CustomViewBeneficiaryCardState
   bool get isCardExpanded => _isCardExpanded;
 
   set isCardExpanded(bool value) => setState(() => _isCardExpanded = value);
+
+  List<TaskModel>? _getCurrentCycleData(List<TaskModel>? tasks) {
+    return tasks
+        ?.where((e) =>
+            e.additionalFields?.fields
+                .where((field) =>
+                    field.key == AdditionalFieldsType.cycleIndex.toValue() &&
+                    int.tryParse(field.value) == context.selectedCycle?.id)
+                .isNotEmpty ??
+            false)
+        .toList();
+  }
+
+  List<TaskModel>? _getSMCStatusData(List<TaskModel>? tasks) {
+    List<TaskModel>? currentTasks = _getCurrentCycleData(tasks);
+    return currentTasks
+        ?.where((e) =>
+            e.additionalFields?.fields.firstWhereOrNull(
+              (element) =>
+                  element.key ==
+                      additional_fields_local.AdditionalFieldsType.deliveryType
+                          .toValue() &&
+                  element.value == EligibilityAssessmentStatus.smcDone.name,
+            ) !=
+            null)
+        .toList();
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -169,11 +202,14 @@ class CustomViewBeneficiaryCardState
           (taskData ?? []).isNotEmpty ? taskData?.last : null,
           sideEffects,
         );
+        List<TaskModel>? smcTasks = _getSMCStatusData(taskData);
         final isBeneficiaryRefused = checkIfBeneficiaryRefused(taskData);
         final isBeneficiaryReferred = checkIfBeneficiaryReferred(
           referralData,
           currentCycle,
         );
+        final isBeneficiaryReferralTaskPresent =
+            checkBeneficiaryReferredSMC(smcTasks);
 
         final isIneligibleForSMC =
             util_local.checkBeneficiaryInEligibleSMC(taskData, currentCycle);
@@ -210,7 +246,8 @@ class CustomViewBeneficiaryCardState
                   isBeneficiaryReferred,
                   isStatusReset,
                   isVASDelivered,
-                  isSMCDelivered),
+                  isSMCDelivered,
+                  isBeneficiaryReferralTaskPresent),
               taskData,
             ),
             cellKey: 'delivery',
@@ -416,11 +453,11 @@ class CustomViewBeneficiaryCardState
     } else if (statusKeys.isIneligibleForSMC || statusKeys.isIneligibleForVAS) {
       return localizations.translate(
           i18.householdOverView.householdOverViewNotEligibleIconLabel);
-    } else if (statusKeys.isBeneficiaryReferred) {
-      return localizations.translate(Status.beneficiaryReferred.toValue());
     } else if (taskData != null) {
       if (taskData.isEmpty) {
         return localizations.translate(Status.notVisited.toValue());
+      } else if (statusKeys.isBeneficiaryReferralTaskPresent) {
+        return localizations.translate(Status.beneficiaryReferred.toValue());
       } else if (statusKeys.isVASDelivered && statusKeys.isSMCDelivered) {
         return localizations.translate(
             i18_local.householdOverView.householdOverViewVASDeliveredIconLabel);
@@ -437,6 +474,8 @@ class CustomViewBeneficiaryCardState
       } else {
         return localizations.translate(Status.visited.toValue());
       }
+    } else if (statusKeys.isBeneficiaryReferred) {
+      return localizations.translate(Status.beneficiaryReferred.toValue());
     } else {
       return localizations.translate(Status.notVisited.toValue());
     }
@@ -486,14 +525,17 @@ class CustomStatusKeys {
   bool isStatusReset;
   bool isVASDelivered;
   bool isSMCDelivered;
+  bool isBeneficiaryReferralTaskPresent;
   CustomStatusKeys(
-      this.isHeadOfHousehold,
-      this.isNotEligible,
-      this.isIneligibleForSMC,
-      this.isIneligibleForVAS,
-      this.isBeneficiaryRefused,
-      this.isBeneficiaryReferred,
-      this.isStatusReset,
-      this.isVASDelivered,
-      this.isSMCDelivered);
+    this.isHeadOfHousehold,
+    this.isNotEligible,
+    this.isIneligibleForSMC,
+    this.isIneligibleForVAS,
+    this.isBeneficiaryRefused,
+    this.isBeneficiaryReferred,
+    this.isStatusReset,
+    this.isVASDelivered,
+    this.isSMCDelivered,
+    this.isBeneficiaryReferralTaskPresent,
+  );
 }
