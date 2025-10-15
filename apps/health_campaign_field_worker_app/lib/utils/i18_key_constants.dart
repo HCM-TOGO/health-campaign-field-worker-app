@@ -1751,6 +1751,17 @@ class BeneficiaryDetails {
   String get beneficiaryOnCotrimoxazoleTreatmentLabel =>
       'BENEFICIARY_ON_COTRIMOXAZOLE_TREATMENT_LABEL';
   String get beneficiaryHasAllergyLabel => 'BENEFICIARY_HAS_ALLERGY_LABEL';
+
+  String get deleteIndividualLabelText => 'DELETE_INDIVIDUAL_LABEL_TEXT';
+  String get deleteIndividualHintText => 'DELETE_INDIVIDUAL_HINT_TEXT';
+  String get deleteIndividualRequiredErrorMsg =>
+      'DELETE_INDIVIDUAL_REQUIRED_ERROR_MESSAGE';
+  String get deleteIndividualMinLengthErrorMsg =>
+      'DELETE_INDIVIDUAL_MIN_LENGTH_ERROR_MESSAGE';
+  String get deleteIndividualMaxLengthErrorMsg =>
+      'DELETE_INDIVIDUAL_MAX_LENGTH_ERROR_MESSAGE';
+  String get deleteIndividualSuccessMsg => 'DELETE_INDIVIDUAL_SUCCESS_MESSAGE';
+  String get deleteIndividualFailedMsg => 'DELETE_INDIVIDUAL_FAILED_MESSAGE';
 }
 
 class PrivacyPolicy {

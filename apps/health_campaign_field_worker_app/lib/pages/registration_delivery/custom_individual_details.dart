@@ -145,7 +145,8 @@ class CustomIndividualDetailsPageState
     ));
   }
 
-  Future<void> _deleteIndividualAndRelated(BuildContext context, String reason) async {
+  Future<void> _deleteIndividualAndRelated(
+      BuildContext context, String reason) async {
     final state = context.read<CustomBeneficiaryRegistrationBloc>().state;
     final individual = state.mapOrNull<IndividualModel>(
       editIndividual: (v) => v.individualModel,
@@ -159,7 +160,8 @@ class CustomIndividualDetailsPageState
     final individualRepo = ContextUtilityExtensions(context)
         .repository<IndividualModel, IndividualSearchModel>(context);
     final projectBeneficiaryRepo = ContextUtilityExtensions(context)
-        .repository<ProjectBeneficiaryModel, ProjectBeneficiarySearchModel>(context);
+        .repository<ProjectBeneficiaryModel, ProjectBeneficiarySearchModel>(
+            context);
     final householdMemberRepo = ContextUtilityExtensions(context)
         .repository<HouseholdMemberModel, HouseholdMemberSearchModel>(context);
     final taskRepo = ContextUtilityExtensions(context)
@@ -175,9 +177,11 @@ class CustomIndividualDetailsPageState
     // delete individual
     final existing = (await individualRepo.search(IndividualSearchModel(
       clientReferenceId: [individual.clientReferenceId],
-    ))).firstOrNull;
+    )))
+        .firstOrNull;
     await individualRepo.delete(individual.copyWith(
-      additionalFields: IndividualAdditionalFields(version: 1, fields: updatedAdditional),
+      additionalFields:
+          IndividualAdditionalFields(version: 1, fields: updatedAdditional),
       id: existing?.id,
       rowVersion: existing?.rowVersion ?? 1,
       nonRecoverableError: existing?.nonRecoverableError ?? false,
@@ -191,7 +195,8 @@ class CustomIndividualDetailsPageState
     );
 
     for (final pb in projectBeneficiaries) {
-      await projectBeneficiaryRepo.delete(pb.copyWith(rowVersion: pb.rowVersion));
+      await projectBeneficiaryRepo
+          .delete(pb.copyWith(rowVersion: pb.rowVersion));
     }
 
     // delete household member mapping
@@ -612,7 +617,8 @@ class CustomIndividualDetailsPageState
                         );
                       },
                     ),
-                    BlocBuilder<CustomBeneficiaryRegistrationBloc, BeneficiaryRegistrationState>(
+                    BlocBuilder<CustomBeneficiaryRegistrationBloc,
+                        BeneficiaryRegistrationState>(
                       builder: (context, state) {
                         final bool showDelete = state.maybeMap(
                               editIndividual: (_) => true,
@@ -625,7 +631,8 @@ class CustomIndividualDetailsPageState
                         return Padding(
                           padding: const EdgeInsets.only(top: spacer2),
                           child: DigitButton(
-                            label: 'Delete',
+                            label: localizations.translate(
+                                i18.memberCard.deleteIndividualActionText),
                             type: DigitButtonType.secondary,
                             size: DigitButtonSize.large,
                             mainAxisSize: MainAxisSize.max,
@@ -634,18 +641,26 @@ class CustomIndividualDetailsPageState
                                 context: context,
                                 builder: (BuildContext ctx) {
                                   return AlertDialog(
-                                    title: Text(localizations.translate(i18.deliverIntervention.dialogTitle)),
+                                    title: Text(localizations.translate(
+                                        i18.deliverIntervention.dialogTitle)),
                                     content: Column(
                                       mainAxisSize: MainAxisSize.min,
-                                      crossAxisAlignment: CrossAxisAlignment.start,
+                                      crossAxisAlignment:
+                                          CrossAxisAlignment.start,
                                       children: [
-                                        Text(localizations.translate(i18.deliverIntervention.dialogContent)),
+                                        Text(localizations.translate(i18
+                                            .deliverIntervention
+                                            .dialogContent)),
                                         const SizedBox(height: 16),
                                         TextField(
                                           controller: _deleteReasonController,
                                           decoration: InputDecoration(
-                                            labelText: 'Reason for deletion',
-                                            hintText: 'Enter reason (required)',
+                                            labelText: localizations.translate(
+                                                i18_local.beneficiaryDetails
+                                                    .deleteIndividualLabelText),
+                                            hintText: localizations.translate(
+                                                i18_local.beneficiaryDetails
+                                                    .deleteIndividualHintText),
                                             border: const OutlineInputBorder(),
                                           ),
                                           maxLines: 3,
@@ -656,34 +671,50 @@ class CustomIndividualDetailsPageState
                                     ),
                                     actions: [
                                       TextButton(
-                                        onPressed: () => Navigator.of(ctx).pop(false),
-                                        child: Text(localizations.translate(i18.common.coreCommonCancel)),
+                                        onPressed: () =>
+                                            Navigator.of(ctx).pop(false),
+                                        child: Text(localizations.translate(
+                                            i18.common.coreCommonCancel)),
                                       ),
                                       ElevatedButton(
                                         onPressed: () {
-                                          final reason = _deleteReasonController.text.trim();
+                                          final reason = _deleteReasonController
+                                              .text
+                                              .trim();
                                           if (reason.isEmpty) {
-                                            ScaffoldMessenger.of(ctx).showSnackBar(
+                                            ScaffoldMessenger.of(ctx)
+                                                .showSnackBar(
                                               SnackBar(
-                                                content: const Text('Reason is required'),
+                                                content: Text(localizations
+                                                    .translate(i18_local
+                                                        .beneficiaryDetails
+                                                        .deleteIndividualRequiredErrorMsg)),
                                                 backgroundColor: Colors.red,
                                               ),
                                             );
                                             return;
                                           }
                                           if (reason.length < 3) {
-                                            ScaffoldMessenger.of(ctx).showSnackBar(
+                                            ScaffoldMessenger.of(ctx)
+                                                .showSnackBar(
                                               SnackBar(
-                                                content: const Text('Reason must be at least 3 characters'),
+                                                content: Text(localizations
+                                                    .translate(i18_local
+                                                        .beneficiaryDetails
+                                                        .deleteIndividualMinLengthErrorMsg)),
                                                 backgroundColor: Colors.red,
                                               ),
                                             );
                                             return;
                                           }
                                           if (reason.length > 200) {
-                                            ScaffoldMessenger.of(ctx).showSnackBar(
+                                            ScaffoldMessenger.of(ctx)
+                                                .showSnackBar(
                                               SnackBar(
-                                                content: const Text('Reason must be at most 200 characters'),
+                                                content: Text(localizations
+                                                    .translate(i18_local
+                                                        .beneficiaryDetails
+                                                        .deleteIndividualMaxLengthErrorMsg)),
                                                 backgroundColor: Colors.red,
                                               ),
                                             );
@@ -695,7 +726,8 @@ class CustomIndividualDetailsPageState
                                           backgroundColor: Colors.red,
                                           foregroundColor: Colors.white,
                                         ),
-                                        child: const Text('Delete'),
+                                        child: Text(localizations.translate(
+                                            i18_local.common.coreCommonDelete)),
                                       ),
                                     ],
                                   );
@@ -705,13 +737,17 @@ class CustomIndividualDetailsPageState
                               if (result != true) return;
 
                               try {
-                                final reason = _deleteReasonController.text.trim();
-                                await _deleteIndividualAndRelated(context, reason);
+                                final reason =
+                                    _deleteReasonController.text.trim();
+                                await _deleteIndividualAndRelated(
+                                    context, reason);
                                 if (context.mounted) {
                                   await DigitToast.show(
                                     context,
                                     options: DigitToastOptions(
-                                      'Deleted successfully',
+                                      localizations.translate(i18_local
+                                          .beneficiaryDetails
+                                          .deleteIndividualSuccessMsg),
                                       true,
                                       Theme.of(context),
                                     ),
@@ -724,7 +760,9 @@ class CustomIndividualDetailsPageState
                                   await DigitToast.show(
                                     context,
                                     options: DigitToastOptions(
-                                      'Failed to delete',
+                                      localizations.translate(i18_local
+                                          .beneficiaryDetails
+                                          .deleteIndividualFailedMsg),
                                       true,
                                       Theme.of(context),
                                     ),
