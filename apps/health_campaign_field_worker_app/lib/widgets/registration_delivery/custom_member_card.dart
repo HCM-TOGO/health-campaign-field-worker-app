@@ -124,6 +124,16 @@ class CustomMemberCard extends StatelessWidget {
         null;
   }
 
+  bool _checkIfAdministrationDone(List<TaskModel>? tasks) {
+    if (tasks == null || tasks.isEmpty) {
+      return false;
+    }
+
+    return tasks.firstWhereOrNull(
+            (e) => e.status == Status.administeredSuccess.toValue()) !=
+        null;
+  }
+
   List<TaskModel>? _getCurrentCycleData(BuildContext context) {
     List<TaskModel>? tasks = this
         .tasks
@@ -207,6 +217,7 @@ class CustomMemberCard extends StatelessWidget {
     bool isBeneficiaryOnCotrimoxazole =
         checkBeneficiaryOnCotrimoxazole(currentTasks);
     bool hasBeneficiaryAllergy = checkBeneficiaryHasAllergy(currentTasks);
+    bool isAdministrationDone = _checkIfAdministrationDone(smcTasks);
 
     final theme = Theme.of(context);
     if (isHead) {
@@ -239,7 +250,7 @@ class CustomMemberCard extends StatelessWidget {
         ),
       );
     }
-    if ((isSMCDelivered ||
+    if (((isSMCDelivered && isAdministrationDone) ||
             isBeneficiaryReferredSMC ||
             isBeneficiaryInEligibleSMC) &&
         !hasBeneficiaryRefused &&
