@@ -14,6 +14,7 @@ import 'package:digit_ui_components/utils/date_utils.dart';
 import '../../../models/entities/assessment_checklist/status.dart';
 
 import '../../models/entities/additional_fields_type.dart';
+import '../../utils/app_enums.dart';
 import '../../utils/environment_config.dart';
 import '../../utils/i18_key_constants.dart' as i18;
 import '../../data/repositories/custom_task.dart';
@@ -21,6 +22,8 @@ import '../../models/entities/identifier_types.dart';
 import '../../utils/constants.dart';
 import '../../widgets/digit_ui_component/custom_digit_input_field.dart';
 import '../../../utils/utils.dart' as local_utils;
+import '../../../models/entities/additional_fields_type.dart'
+    as additional_fields_local;
 import '../../widgets/localized.dart';
 
 @RoutePage()
@@ -74,6 +77,10 @@ class _TaskDetailPageState extends LocalizedState<TaskDetailPage> {
     _originalTask = widget.taskModel;
     _individual = widget.individualModel;
     _additionalFields = widget.taskModel.additionalFields;
+
+    if (_originalTask.status != Status.delivered.toValue()) {
+      allowedStatuses.remove(Status.delivered.toValue());
+    }
 
     productVariants = projectTypeModel?.resources
         ?.map(
@@ -156,10 +163,11 @@ class _TaskDetailPageState extends LocalizedState<TaskDetailPage> {
     // Exclude cycleIndex, doseIndex, and dateOfAdministration from editable additional fields
     _additionalFieldControllers = {
       for (final field in fieldsList)
-        if (field.key != AdditionalFieldsType.cycleIndex.toValue() &&
-            field.key != AdditionalFieldsType.doseIndex.toValue() &&
-            field.key != AdditionalFieldsType.dateOfAdministration.toValue())
-          field.key: TextEditingController(text: field.value?.toString() ?? '')
+        // not needed as all additional fields are non-editable only
+        // if (field.key != AdditionalFieldsType.cycleIndex.toValue() &&
+        //     field.key != AdditionalFieldsType.doseIndex.toValue() &&
+        //     field.key != AdditionalFieldsType.dateOfAdministration.toValue())
+        field.key: TextEditingController(text: field.value?.toString() ?? '')
     };
   }
 
@@ -314,182 +322,27 @@ class _TaskDetailPageState extends LocalizedState<TaskDetailPage> {
           context.read<LocalRepository<TaskModel, TaskSearchModel>>()
               as CustomTaskLocalRepository;
 
-      // Get existing fields
-      final existingFields = _additionalFields?.fields ?? [];
+      if (_originalTask.status == Status.administeredSuccess.toValue() ||
+          _originalTask.status == Status.delivered.toValue()) {
+        List<TaskModel> allAdministrationTasks =
+            await _getAllCurrentCycleAdministrationTasks(taskDataRepository);
 
-      // Handle editCount logic
-      final editCountField = existingFields.firstWhere(
-        (f) => f.key == 'editCount',
-        orElse: () => const AdditionalField('editCount', '0'),
-      );
-      final currentEditCount = int.tryParse(editCountField.value ?? '0') ?? 0;
-      final newEditCount = currentEditCount + 1;
-
-      // Handle updateReason logic
-      final updateReasonField = existingFields.firstWhere(
-        (f) => f.key == 'updateReason',
-        orElse: () => const AdditionalField('updateReason', ''),
-      );
-      // ignore: avoid_dynamic_calls
-      final oldReason = updateReasonField.value?.trim() ?? '';
-      final newReason = _updateReasonController.text.trim();
-      // ignore: avoid_dynamic_calls
-      final combinedReason = oldReason.isNotEmpty
-          ? '$oldReason | Edit #$newEditCount: $newReason'
-          : 'Edit #$newEditCount: $newReason';
-
-      // Prepare updated fields
-      final updatedFields = _additionalFieldControllers.entries
-          .map((e) => AdditionalField(e.key, e.value.text))
-          .toList();
-
-      // Replace or add editCount and updateReason
-      final List<AdditionalField> finalUpdatedFields = [
-        ...updatedFields,
-        AdditionalField('editCount', newEditCount.toString()),
-        AdditionalField('updateReason', combinedReason),
-      ];
-
-      // Build new TaskAdditionalFields
-      final newAdditionalFields = TaskAdditionalFields(
-        schema: _schemaController.text.isNotEmpty
-            ? _schemaController.text
-            : _additionalFields?.schema ?? '',
-        version: int.tryParse(_versionController.text) ??
-            _additionalFields?.version ??
-            1,
-        fields: finalUpdatedFields,
-      );
-
-      // Build updated TaskResource list from controllers
-      final updatedResources = <TaskResourceModel>[];
-      final totalResources = _originalTask.resources?.length ?? 0;
-      if (showResources) {
-        if (totalResources == 0) {
-          int qty = productVariants
-                  ?.where((element) =>
-                      element.productVariantId ==
-                      _resourceControllers['resource_${0}_productVariantId']
-                          ?.text)
-                  .firstOrNull
-                  ?.quantity ??
-              1;
-          updatedResources.add(
-            TaskResourceModel(
-              taskclientReferenceId:
-                  _originalTask?.clientReferenceId ?? IdGen.i.identifier,
-              clientReferenceId: IdGen.i.identifier,
-              productVariantId:
-                  _resourceControllers['resource_${0}_productVariantId']?.text,
-              isDelivered: true,
-              taskId: _originalTask.id,
-              tenantId: envConfig.variables.tenantId,
-              rowVersion: _originalTask.rowVersion ?? 1,
-              quantity: qty.toString(),
-              clientAuditDetails: ClientAuditDetails(
-                createdBy: context.loggedInUserUuid,
-                createdTime: context.millisecondsSinceEpoch(),
-              ),
-              auditDetails: AuditDetails(
-                createdBy: context.loggedInUserUuid,
-                createdTime: context.millisecondsSinceEpoch(),
-              ),
-            ),
-          );
-        } else {
-          for (int i = 0; i < totalResources; i++) {
-            final resource = _originalTask.resources![i];
-            updatedResources.add(
-              resource.copyWith(
-                productVariantId:
-                    _resourceControllers['resource_${i}_productVariantId']
-                            ?.text ??
-                        resource.productVariantId ??
-                        '',
-                deliveryComment:
-                    _resourceControllers['resource_${i}_deliveryComment']
-                            ?.text ??
-                        resource.deliveryComment,
-                // isDelivered: _resourceControllers['resource_${i}_isDelivered']
-                //         ?.text
-                //         .toLowerCase() ==
-                //     'true',
-                clientAuditDetails: resource.clientAuditDetails?.copyWith(
-                      lastModifiedBy:
-                          RegistrationDeliverySingleton().loggedInUserUuid,
-                      lastModifiedTime: DateTime.now().millisecondsSinceEpoch,
-                    ) ??
-                    ClientAuditDetails(
-                      createdBy:
-                          RegistrationDeliverySingleton().loggedInUserUuid!,
-                      createdTime: DateTime.now().millisecondsSinceEpoch,
-                      lastModifiedBy:
-                          RegistrationDeliverySingleton().loggedInUserUuid!,
-                      lastModifiedTime: DateTime.now().millisecondsSinceEpoch,
-                    ),
-                auditDetails: resource.auditDetails?.copyWith(
-                      lastModifiedBy:
-                          RegistrationDeliverySingleton().loggedInUserUuid,
-                      lastModifiedTime: DateTime.now().millisecondsSinceEpoch,
-                    ) ??
-                    AuditDetails(
-                      createdBy:
-                          RegistrationDeliverySingleton().loggedInUserUuid!,
-                      createdTime: DateTime.now().millisecondsSinceEpoch,
-                      lastModifiedBy:
-                          RegistrationDeliverySingleton().loggedInUserUuid!,
-                      lastModifiedTime: DateTime.now().millisecondsSinceEpoch,
-                    ),
-              ),
-            );
-          }
+        bool changeStatus = false;
+        if (_originalTask.status != _controllers['status']?.text) {
+          changeStatus = true;
         }
+
+        for (var task in allAdministrationTasks) {
+          TaskModel updatedTask =
+              _getUpdatedTask(task, changeStatus: changeStatus);
+          // Save using repository
+          await taskDataRepository.update(updatedTask);
+        }
+      } else {
+        TaskModel updatedTask = _getUpdatedTask(_originalTask);
+        // Save using repository
+        await taskDataRepository.update(updatedTask);
       }
-
-      final updatedClientAuditDetails = _originalTask.clientAuditDetails
-              ?.copyWith(
-            lastModifiedBy: RegistrationDeliverySingleton().loggedInUserUuid,
-            lastModifiedTime: DateTime.now().millisecondsSinceEpoch,
-          ) ??
-          ClientAuditDetails(
-            lastModifiedBy: RegistrationDeliverySingleton().loggedInUserUuid,
-            lastModifiedTime: DateTime.now().millisecondsSinceEpoch,
-            createdBy: _originalTask.clientAuditDetails?.createdBy ?? '',
-            createdTime: _originalTask.clientAuditDetails?.createdTime ?? 0,
-          );
-
-      final updatedAuditDetails = _originalTask.auditDetails?.copyWith(
-            lastModifiedBy: RegistrationDeliverySingleton().loggedInUserUuid,
-            lastModifiedTime: DateTime.now().millisecondsSinceEpoch,
-          ) ??
-          AuditDetails(
-            createdBy: _originalTask.auditDetails?.createdBy ?? '',
-            createdTime: _originalTask.auditDetails?.createdTime ?? 0,
-            lastModifiedBy: RegistrationDeliverySingleton().loggedInUserUuid,
-            lastModifiedTime: DateTime.now().millisecondsSinceEpoch,
-          );
-
-      // Create updated task model
-      final updatedTask = _originalTask.copyWith(
-        status: _controllers['status']?.text.isNotEmpty == true
-            ? _controllers['status']!.text
-            : _originalTask.status,
-        additionalFields: newAdditionalFields,
-        resources: updatedResources,
-        clientAuditDetails: updatedClientAuditDetails,
-        auditDetails: updatedAuditDetails,
-      );
-
-      // Save using repository
-      await taskDataRepository.update(updatedTask);
-
-      // context.read<DeliverInterventionBloc>().add(
-      //       DeliverInterventionSubmitEvent(
-      //         task: updatedTask,
-      //         isEditing: true,
-      //         boundaryModel: RegistrationDeliverySingleton().boundary!,
-      //       ),
-      //     );
 
       if (mounted) {
         setState(() => _saving = false);
@@ -517,6 +370,206 @@ class _TaskDetailPageState extends LocalizedState<TaskDetailPage> {
         debugPrint('Error saving changes: $e');
       }
     }
+  }
+
+  TaskModel _getUpdatedTask(TaskModel task, {bool changeStatus = true}) {
+    // Get existing fields
+    final existingFields = task.additionalFields?.fields ?? [];
+
+    // Handle editCount logic
+    final editCountField = existingFields.firstWhere(
+      (f) => f.key == 'editCount',
+      orElse: () => const AdditionalField('editCount', '0'),
+    );
+    final currentEditCount = int.tryParse(editCountField.value ?? '0') ?? 0;
+    final newEditCount = currentEditCount + 1;
+
+    // Handle updateReason logic
+    final updateReasonField = existingFields.firstWhere(
+      (f) => f.key == 'updateReason',
+      orElse: () => const AdditionalField('updateReason', ''),
+    );
+    // ignore: avoid_dynamic_calls
+    final oldReason = updateReasonField.value?.trim() ?? '';
+    final newReason = _updateReasonController.text.trim();
+    // ignore: avoid_dynamic_calls
+    final combinedReason = oldReason.isNotEmpty
+        ? '$oldReason | Edit #$newEditCount: $newReason'
+        : 'Edit #$newEditCount: $newReason';
+
+    // Prepare updated fields
+    List<AdditionalField> updatedFields =
+        existingFields.map((e) => AdditionalField(e.key, e.value)).toList();
+
+    if (_controllers['status']?.text == Status.beneficiaryRefused.toValue() ||
+        _controllers['status']?.text == Status.notAdministered.toValue()) {
+      // Exclude deliveryType when status is beneficiaryRefused or notAdministered
+      updatedFields = updatedFields
+          .where((field) =>
+              field.key !=
+              additional_fields_local.AdditionalFieldsType.deliveryType
+                  .toValue())
+          .toList();
+    } else {
+      // Include deliveryType if it's not already present
+      final hasDeliveryType = updatedFields.any((field) =>
+          field.key ==
+          additional_fields_local.AdditionalFieldsType.deliveryType.toValue());
+
+      if (!hasDeliveryType) {
+        updatedFields = [
+          ...updatedFields,
+          AdditionalField(
+            additional_fields_local.AdditionalFieldsType.deliveryType.toValue(),
+            EligibilityAssessmentStatus.smcDone.name,
+          ),
+        ];
+      }
+    }
+
+    // Remove any existing editCount and updateReason before adding updated ones
+    updatedFields = updatedFields
+        .where((f) => f.key != 'editCount' && f.key != 'updateReason')
+        .toList();
+
+    // Now safely append updated editCount and updateReason
+    final List<AdditionalField> finalUpdatedFields = [
+      ...updatedFields,
+      AdditionalField('editCount', newEditCount.toString()),
+      AdditionalField('updateReason', combinedReason),
+    ];
+
+    // Build new TaskAdditionalFields
+    final newAdditionalFields = TaskAdditionalFields(
+      schema: _schemaController.text.isNotEmpty
+          ? _schemaController.text
+          : task.additionalFields?.schema ?? '',
+      version: int.tryParse(_versionController.text) ??
+          task.additionalFields?.version ??
+          1,
+      fields: finalUpdatedFields,
+    );
+
+    // Build updated TaskResource list from controllers
+    final updatedResources = <TaskResourceModel>[];
+    final totalResources = task.resources?.length ?? 0;
+    if (showResources) {
+      if (totalResources == 0) {
+        int qty = productVariants
+                ?.where((element) =>
+                    element.productVariantId ==
+                    _resourceControllers['resource_${0}_productVariantId']
+                        ?.text)
+                .firstOrNull
+                ?.quantity ??
+            1;
+        updatedResources.add(
+          TaskResourceModel(
+            taskclientReferenceId:
+                _originalTask?.clientReferenceId ?? IdGen.i.identifier,
+            clientReferenceId: IdGen.i.identifier,
+            productVariantId:
+                _resourceControllers['resource_${0}_productVariantId']?.text,
+            isDelivered: true,
+            taskId: _originalTask.id,
+            tenantId: envConfig.variables.tenantId,
+            rowVersion: _originalTask.rowVersion ?? 1,
+            quantity: qty.toString(),
+            clientAuditDetails: ClientAuditDetails(
+              createdBy: context.loggedInUserUuid,
+              createdTime: context.millisecondsSinceEpoch(),
+            ),
+            auditDetails: AuditDetails(
+              createdBy: context.loggedInUserUuid,
+              createdTime: context.millisecondsSinceEpoch(),
+            ),
+          ),
+        );
+      } else {
+        for (int i = 0; i < totalResources; i++) {
+          final resource = task.resources![i];
+          updatedResources.add(
+            resource.copyWith(
+              productVariantId:
+                  _resourceControllers['resource_${i}_productVariantId']
+                          ?.text ??
+                      resource.productVariantId ??
+                      '',
+              deliveryComment:
+                  _resourceControllers['resource_${i}_deliveryComment']?.text ??
+                      resource.deliveryComment,
+              // isDelivered: _resourceControllers['resource_${i}_isDelivered']
+              //         ?.text
+              //         .toLowerCase() ==
+              //     'true',
+              clientAuditDetails: resource.clientAuditDetails?.copyWith(
+                    lastModifiedBy:
+                        RegistrationDeliverySingleton().loggedInUserUuid,
+                    lastModifiedTime: DateTime.now().millisecondsSinceEpoch,
+                  ) ??
+                  ClientAuditDetails(
+                    createdBy:
+                        RegistrationDeliverySingleton().loggedInUserUuid!,
+                    createdTime: DateTime.now().millisecondsSinceEpoch,
+                    lastModifiedBy:
+                        RegistrationDeliverySingleton().loggedInUserUuid!,
+                    lastModifiedTime: DateTime.now().millisecondsSinceEpoch,
+                  ),
+              auditDetails: resource.auditDetails?.copyWith(
+                    lastModifiedBy:
+                        RegistrationDeliverySingleton().loggedInUserUuid,
+                    lastModifiedTime: DateTime.now().millisecondsSinceEpoch,
+                  ) ??
+                  AuditDetails(
+                    createdBy:
+                        RegistrationDeliverySingleton().loggedInUserUuid!,
+                    createdTime: DateTime.now().millisecondsSinceEpoch,
+                    lastModifiedBy:
+                        RegistrationDeliverySingleton().loggedInUserUuid!,
+                    lastModifiedTime: DateTime.now().millisecondsSinceEpoch,
+                  ),
+            ),
+          );
+        }
+      }
+    }
+
+    final updatedClientAuditDetails = task.clientAuditDetails?.copyWith(
+          lastModifiedBy: RegistrationDeliverySingleton().loggedInUserUuid,
+          lastModifiedTime: DateTime.now().millisecondsSinceEpoch,
+        ) ??
+        ClientAuditDetails(
+          lastModifiedBy: RegistrationDeliverySingleton().loggedInUserUuid,
+          lastModifiedTime: DateTime.now().millisecondsSinceEpoch,
+          createdBy: task.clientAuditDetails?.createdBy ?? '',
+          createdTime: task.clientAuditDetails?.createdTime ?? 0,
+        );
+
+    final updatedAuditDetails = task.auditDetails?.copyWith(
+          lastModifiedBy: RegistrationDeliverySingleton().loggedInUserUuid,
+          lastModifiedTime: DateTime.now().millisecondsSinceEpoch,
+        ) ??
+        AuditDetails(
+          createdBy: task.auditDetails?.createdBy ?? '',
+          createdTime: task.auditDetails?.createdTime ?? 0,
+          lastModifiedBy: RegistrationDeliverySingleton().loggedInUserUuid,
+          lastModifiedTime: DateTime.now().millisecondsSinceEpoch,
+        );
+
+    // Create updated task model
+    final updatedTask = task.copyWith(
+      status: changeStatus
+          ? (_controllers['status']?.text.isNotEmpty == true
+              ? _controllers['status']!.text
+              : task.status)
+          : task.status,
+      additionalFields: newAdditionalFields,
+      resources: updatedResources,
+      clientAuditDetails: updatedClientAuditDetails,
+      auditDetails: updatedAuditDetails,
+    );
+
+    return updatedTask;
   }
 
   Future<void> _showDeleteDialog() async {
@@ -609,44 +662,21 @@ class _TaskDetailPageState extends LocalizedState<TaskDetailPage> {
           context.read<LocalRepository<TaskModel, TaskSearchModel>>()
               as CustomTaskLocalRepository;
 
-      // Get existing additional fields
-      final existingFields = _additionalFields?.fields ?? [];
+      if (_originalTask.status == Status.administeredSuccess.toValue() ||
+          _originalTask.status == Status.delivered.toValue()) {
+        List<TaskModel> allAdministrationTasks =
+            await _getAllCurrentCycleAdministrationTasks(taskDataRepository);
 
-      // Add delete reason to additional fields
-      final deleteReasonField =
-          AdditionalField('deleteReason', _deleteReasonController.text.trim());
-      final updatedFields = [...existingFields, deleteReasonField];
-
-      final newAdditionalFields = TaskAdditionalFields(
-        schema: _additionalFields?.schema ?? 'Task',
-        version: _additionalFields?.version ?? 1,
-        fields: updatedFields,
-      );
-
-      final updatedResources = <TaskResourceModel>[];
-      final totalResources = _originalTask.resources?.length ?? 0;
-
-      for (int i = 0; i < totalResources; i++) {
-        final resource = _originalTask.resources![i];
-        updatedResources.add(resource.copyWith(isDeleted: true));
+        for (var task in allAdministrationTasks) {
+          TaskModel updatedTask = _getUpdatedTaskForDelete(task);
+          // Delete using repository
+          await taskDataRepository.delete(updatedTask);
+        }
+      } else {
+        TaskModel updatedTask = _getUpdatedTaskForDelete(_originalTask);
+        // Delete using repository
+        await taskDataRepository.delete(updatedTask);
       }
-
-      // Create updated task model with delete reason in additional fields
-      final updatedTask = _originalTask.copyWith(
-        additionalFields: newAdditionalFields,
-        resources: updatedResources,
-      );
-
-      // Delete using repository
-      await taskDataRepository.delete(updatedTask);
-
-      // context.read<DeliverInterventionBloc>().add(
-      //       DeliverInterventionSubmitEvent(
-      //         task: updatedTask,
-      //         isEditing: true,
-      //         boundaryModel: RegistrationDeliverySingleton().boundary!,
-      //       ),
-      //     );
 
       if (mounted) {
         setState(() => _saving = false);
@@ -674,6 +704,77 @@ class _TaskDetailPageState extends LocalizedState<TaskDetailPage> {
         debugPrint('Error deleting task: $e');
       }
     }
+  }
+
+  TaskModel _getUpdatedTaskForDelete(TaskModel task) {
+    // Get existing additional fields
+    final existingFields = task.additionalFields?.fields ?? [];
+
+    // Add delete reason to additional fields
+    final deleteReasonField =
+        AdditionalField('deleteReason', _deleteReasonController.text.trim());
+    final updatedFields = [...existingFields, deleteReasonField];
+
+    final newAdditionalFields = TaskAdditionalFields(
+      schema: task.additionalFields?.schema ?? 'Task',
+      version: task.additionalFields?.version ?? 1,
+      fields: updatedFields,
+    );
+
+    final updatedResources = <TaskResourceModel>[];
+    final totalResources = task.resources?.length ?? 0;
+
+    for (int i = 0; i < totalResources; i++) {
+      final resource = task.resources![i];
+      updatedResources.add(resource.copyWith(isDeleted: true));
+    }
+
+    // Create updated task model with delete reason in additional fields
+    final updatedTask = task.copyWith(
+      additionalFields: newAdditionalFields,
+      resources: updatedResources,
+    );
+
+    return updatedTask;
+  }
+
+  Future<List<TaskModel>> _getAllCurrentCycleAdministrationTasks(
+      CustomTaskLocalRepository taskDataRepository) async {
+    List<TaskModel> allAdministrationTasks =
+        await taskDataRepository.search(TaskSearchModel(
+      createdBy: RegistrationDeliverySingleton().loggedInUserUuid,
+      isDeleted: false,
+      projectBeneficiaryClientReferenceId:
+          _originalTask.projectBeneficiaryClientReferenceId != null
+              ? [_originalTask.projectBeneficiaryClientReferenceId!]
+              : [],
+    ));
+
+    String currentTaskCycle = _originalTask.additionalFields?.fields
+        .where(
+            (field) => field.key == AdditionalFieldsType.cycleIndex.toValue())
+        .firstOrNull
+        ?.value;
+
+    allAdministrationTasks = allAdministrationTasks
+        .where((task) =>
+            task.isDeleted != true &&
+            task.clientAuditDetails?.createdBy ==
+                RegistrationDeliverySingleton().loggedInUserUuid &&
+            task.projectBeneficiaryClientReferenceId ==
+                _originalTask.projectBeneficiaryClientReferenceId &&
+            (task.status == Status.administeredSuccess.toValue() ||
+                task.status == Status.delivered.toValue()) &&
+            (task.additionalFields?.fields
+                    .where((field) =>
+                        field.key ==
+                            AdditionalFieldsType.cycleIndex.toValue() &&
+                        field.value == currentTaskCycle)
+                    .isNotEmpty ??
+                false))
+        .toList();
+
+    return allAdministrationTasks;
   }
 
   @override

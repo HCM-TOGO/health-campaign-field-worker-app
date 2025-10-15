@@ -1,7 +1,9 @@
+import 'package:collection/collection.dart';
 import 'package:digit_data_model/data_model.dart';
 import 'package:flutter/material.dart';
 import 'package:registration_delivery/registration_delivery.dart';
 
+import '../../models/entities/additional_fields_type.dart';
 import '../../utils/i18_key_constants.dart' as i18;
 import '../../router/app_router.dart';
 import '../../widgets/localized.dart';
@@ -32,7 +34,20 @@ class _IndividualTaskListPageState
   }
 
   List<TaskModel> _filterTasks() {
-    return widget.tasks.where((task) => task.isDeleted != true).toList();
+    return widget.tasks.where((task) {
+      if (task.isDeleted == true) return false;
+      if (task.clientAuditDetails?.createdBy !=
+          RegistrationDeliverySingleton().loggedInUserUuid) {
+        return false;
+      }
+
+      final doseIndexField = task.additionalFields?.fields.firstWhereOrNull(
+        (field) => field.key == AdditionalFieldsType.doseIndex.toValue(),
+      );
+
+      // Include if doseIndex not present OR value equals 01
+      return doseIndexField == null || doseIndexField.value == "01";
+    }).toList();
   }
 
   @override

@@ -1,3 +1,4 @@
+import 'package:collection/collection.dart';
 import 'package:digit_data_model/data_model.dart';
 import 'package:digit_ui_components/widgets/atoms/digit_search_bar.dart';
 import 'package:digit_ui_components/widgets/atoms/switch.dart';
@@ -5,6 +6,7 @@ import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:registration_delivery/registration_delivery.dart';
 
+import '../../models/entities/additional_fields_type.dart';
 import '../../utils/i18_key_constants.dart' as i18;
 import '../../data/repositories/custom_task.dart';
 import '../../models/entities/identifier_types.dart';
@@ -45,12 +47,20 @@ class _TaskListPageState extends LocalizedState<TaskListPage> {
       createdBy: RegistrationDeliverySingleton().loggedInUserUuid,
     ));
 
-    tasks = tasks
-        .where((task) =>
-            task.isDeleted != true &&
-            task.clientAuditDetails?.createdBy ==
-                RegistrationDeliverySingleton().loggedInUserUuid)
-        .toList();
+    tasks = tasks.where((task) {
+      if (task.isDeleted == true) return false;
+      if (task.clientAuditDetails?.createdBy !=
+          RegistrationDeliverySingleton().loggedInUserUuid) {
+        return false;
+      }
+
+      final doseIndexField = task.additionalFields?.fields.firstWhereOrNull(
+        (field) => field.key == AdditionalFieldsType.doseIndex.toValue(),
+      );
+
+      // Include if doseIndex not present OR value equals 01
+      return doseIndexField == null || doseIndexField.value == "01";
+    }).toList();
 
     for (final task in tasks) {
       final individual = await _fetchIndividualForTask(task);
