@@ -93,16 +93,9 @@ class _TaskDetailPageState extends LocalizedState<TaskDetailPage> {
 
     // Initialize controllers for basic task fields
     _controllers = {
-      'projectId': TextEditingController(text: _originalTask.projectId ?? ''),
+      // 'projectId': TextEditingController(text: _originalTask.projectId ?? ''),
       'status': TextEditingController(text: _originalTask.status ?? ''),
       'createdBy': TextEditingController(text: _originalTask.createdBy ?? ''),
-      'tenantId': TextEditingController(text: _originalTask.tenantId ?? ''),
-      'projectBeneficiaryId': TextEditingController(
-          text: _originalTask.projectBeneficiaryId?.toString() ?? ''),
-      'projectBeneficiaryClientReferenceId': TextEditingController(
-          text: _originalTask.projectBeneficiaryClientReferenceId ?? ''),
-      'rowVersion': TextEditingController(
-          text: _originalTask.rowVersion?.toString() ?? ''),
       'isDeleted': TextEditingController(
           text: _originalTask.isDeleted?.toString() ?? ''),
       'createdDate': TextEditingController(
@@ -112,8 +105,6 @@ class _TaskDetailPageState extends LocalizedState<TaskDetailPage> {
     // Initialize hidden ID controllers
     _hiddenIdControllers = {
       'id': TextEditingController(text: _originalTask.id?.toString() ?? ''),
-      'clientReferenceId':
-          TextEditingController(text: _originalTask.clientReferenceId),
     };
 
     // Initialize resource controllers
@@ -124,10 +115,6 @@ class _TaskDetailPageState extends LocalizedState<TaskDetailPage> {
         final resource = _originalTask.resources![i];
         _resourceControllers['resource_${i}_id'] =
             TextEditingController(text: resource.id.toString());
-        _resourceControllers['resource_${i}_clientReferenceId'] =
-            TextEditingController(text: resource.clientReferenceId);
-        _resourceControllers['resource_${i}_taskclientReferenceId'] =
-            TextEditingController(text: resource.taskclientReferenceId);
         _resourceControllers['resource_${i}_productVariantId'] =
             TextEditingController(text: resource.productVariantId.toString());
         _resourceControllers['resource_${i}_taskId'] =
@@ -138,8 +125,6 @@ class _TaskDetailPageState extends LocalizedState<TaskDetailPage> {
             TextEditingController(text: resource.quantity.toString());
         _resourceControllers['resource_${i}_isDelivered'] =
             TextEditingController(text: resource.isDelivered.toString());
-        _resourceControllers['resource_${i}_rowVersion'] =
-            TextEditingController(text: resource.rowVersion.toString());
       }
     } else {
       _resourceControllers['resource_${0}_productVariantId'] =
@@ -788,7 +773,34 @@ class _TaskDetailPageState extends LocalizedState<TaskDetailPage> {
         backgroundColor: theme.colorScheme.primary,
         foregroundColor: theme.colorScheme.onPrimary,
         title: Text(
-          '${localizations.translate(i18.editTasks.taskLabel)} #${_originalTask.id ?? _originalTask.clientReferenceId}',
+          (() {
+            final fields = _originalTask.additionalFields?.fields ?? const [];
+            String? cycleIndex;
+            String? doseIndex;
+            for (final f in fields) {
+              if (f.key == 'cycleIndex' &&
+                  (f.value?.toString().isNotEmpty ?? false)) {
+                cycleIndex = f.value.toString();
+              }
+              if (f.key == 'doseIndex' &&
+                  (f.value?.toString().isNotEmpty ?? false)) {
+                doseIndex = f.value.toString();
+              }
+            }
+            String suffix;
+            if (cycleIndex != null || doseIndex != null) {
+              final sep =
+                  (cycleIndex != null && doseIndex != null) ? ' -- ' : '';
+              suffix = (cycleIndex != null && doseIndex != null)
+                  ? '${localizations.translate(i18.beneficiaryDetails.beneficiaryCycle)} $cycleIndex $sep ${localizations.translate(i18.deliverIntervention.dose)} $doseIndex'
+                  : ((cycleIndex != null)
+                      ? '${localizations.translate(i18.beneficiaryDetails.beneficiaryCycle)} $cycleIndex'
+                      : '${localizations.translate(i18.deliverIntervention.dose)} ${doseIndex ?? ''}');
+            } else {
+              suffix = _originalTask.id ?? _originalTask.clientReferenceId;
+            }
+            return '${localizations.translate(i18.editTasks.taskLabel)} #$suffix';
+          })(),
           style: textTheme.headingL.copyWith(
             color: theme.colorScheme.onPrimary,
             fontWeight: FontWeight.w600,
@@ -1245,12 +1257,6 @@ class _TaskDetailPageState extends LocalizedState<TaskDetailPage> {
                 ),
               ],
             ),
-            const SizedBox(height: 16),
-            CustomDigitTextField(
-              label: localizations.translate(i18.editTasks.projectIdLabel),
-              controller: _controllers['projectId'],
-              readOnly: true,
-            ),
             const SizedBox(height: 8),
             LabeledField(
               label: localizations.translate(i18.editTasks.statusLabel),
@@ -1297,44 +1303,7 @@ class _TaskDetailPageState extends LocalizedState<TaskDetailPage> {
                     readOnly: true,
                   ),
                 ),
-                const SizedBox(width: 8),
-                Expanded(
-                  child: CustomDigitTextField(
-                    label: localizations.translate(i18.editTasks.tenantIdLabel),
-                    controller: _controllers['tenantId'],
-                    readOnly: true,
-                  ),
-                ),
               ],
-            ),
-            const SizedBox(height: 12),
-            Row(
-              children: [
-                Expanded(
-                  child: CustomDigitTextField(
-                    label: localizations
-                        .translate(i18.editTasks.projectBeneficiaryIdLabel),
-                    controller: _controllers['projectBeneficiaryId'],
-                    readOnly: true,
-                  ),
-                ),
-                const SizedBox(width: 8),
-                Expanded(
-                  child: CustomDigitTextField(
-                    label:
-                        localizations.translate(i18.editTasks.rowVersionLabel),
-                    controller: _controllers['rowVersion'],
-                    readOnly: true,
-                  ),
-                ),
-              ],
-            ),
-            const SizedBox(height: 12),
-            CustomDigitTextField(
-              label: localizations
-                  .translate(i18.editTasks.projectBeneficiaryCLientRefIdLabel),
-              controller: _controllers['projectBeneficiaryClientReferenceId'],
-              readOnly: true,
             ),
             const SizedBox(height: 12),
             Row(
@@ -1400,16 +1369,6 @@ class _TaskDetailPageState extends LocalizedState<TaskDetailPage> {
                   child: CustomDigitTextField(
                     label: localizations.translate(i18.editTasks.idLabel),
                     controller: _hiddenIdControllers['id'],
-                    readOnly: true,
-                  ),
-                ),
-                const SizedBox(width: 8),
-                Expanded(
-                  flex: 3,
-                  child: CustomDigitTextField(
-                    label:
-                        localizations.translate(i18.editTasks.clientRefIdLabel),
-                    controller: _hiddenIdControllers['clientReferenceId'],
                     readOnly: true,
                   ),
                 ),

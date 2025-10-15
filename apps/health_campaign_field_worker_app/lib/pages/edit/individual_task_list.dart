@@ -130,8 +130,12 @@ class _IndividualTaskListPageState
                                     (cycleIndex != null && doseIndex != null)
                                         ? ' -- '
                                         : '';
-                                suffix =
-                                    '${cycleIndex ?? ''}$sep${doseIndex ?? ''}';
+                                suffix = (cycleIndex != null &&
+                                        doseIndex != null)
+                                    ? '${localizations.translate(i18.beneficiaryDetails.beneficiaryCycle)} $cycleIndex $sep ${localizations.translate(i18.deliverIntervention.dose)} $doseIndex'
+                                    : ((cycleIndex != null)
+                                        ? '${localizations.translate(i18.beneficiaryDetails.beneficiaryCycle)} $cycleIndex'
+                                        : '${localizations.translate(i18.deliverIntervention.dose)} ${doseIndex ?? ''}');
                               } else {
                                 suffix = task.clientReferenceId;
                               }
@@ -174,16 +178,10 @@ class _IndividualTaskListPageState
                               children: [
                                 _buildTaskField(
                                     i18.editTasks.idLabel, task.id?.toString()),
-                                _buildTaskField(i18.editTasks.clientRefIdLabel,
-                                    task.clientReferenceId),
-                                _buildTaskField(i18.editTasks.projectIdLabel,
-                                    task.projectId ?? ''),
                                 _buildTaskField(i18.editTasks.statusLabel,
                                     task.status ?? 'N/A'),
                                 _buildTaskField(i18.editTasks.createdByLabel,
                                     task.createdBy ?? ''),
-                                _buildTaskField(i18.editTasks.tenantIdLabel,
-                                    task.tenantId ?? ''),
                               ]
                                   .where((widget) => widget != null)
                                   .cast<Widget>()
