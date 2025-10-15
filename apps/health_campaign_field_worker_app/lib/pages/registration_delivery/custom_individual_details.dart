@@ -46,6 +46,9 @@ import '../../router/app_router.dart';
 import '../../utils/utils.dart' as local_utils;
 import '../../utils/registration_delivery/registration_delivery_utils.dart';
 import 'custom_beneficiary_acknowledgement.dart';
+import 'package:registration_delivery/models/entities/project_beneficiary.dart';
+import 'package:registration_delivery/models/entities/task.dart';
+import 'package:registration_delivery/models/entities/household_member.dart';
 
 @RoutePage()
 class CustomIndividualDetailsPage extends LocalizedStatefulWidget {
@@ -92,6 +95,7 @@ class CustomIndividualDetailsPageState
   Set<String>? beneficiaryId;
 
   late final CustomSearchHouseholdsBloc customSearchHouseholdsBloc;
+  final TextEditingController _deleteReasonController = TextEditingController();
 
   @override
   void initState() {
@@ -139,6 +143,78 @@ class CustomIndividualDetailsPageState
       name: name,
       individualModel: individual,
     ));
+  }
+
+  Future<void> _deleteIndividualAndRelated(BuildContext context, String reason) async {
+    final state = context.read<CustomBeneficiaryRegistrationBloc>().state;
+    final individual = state.mapOrNull<IndividualModel>(
+      editIndividual: (v) => v.individualModel,
+    );
+    final household = state.mapOrNull<HouseholdModel>(
+      editIndividual: (v) => v.householdModel,
+    );
+
+    if (individual == null || household == null) return;
+
+    final individualRepo = ContextUtilityExtensions(context)
+        .repository<IndividualModel, IndividualSearchModel>(context);
+    final projectBeneficiaryRepo = ContextUtilityExtensions(context)
+        .repository<ProjectBeneficiaryModel, ProjectBeneficiarySearchModel>(context);
+    final householdMemberRepo = ContextUtilityExtensions(context)
+        .repository<HouseholdMemberModel, HouseholdMemberSearchModel>(context);
+    final taskRepo = ContextUtilityExtensions(context)
+        .repository<TaskModel, TaskSearchModel>(context);
+
+    // merge delete reason into individual's additional fields before delete
+    final existingAdditional = individual.additionalFields?.fields ?? [];
+    final updatedAdditional = [
+      ...existingAdditional,
+      AdditionalField('deleteReason', reason),
+    ];
+
+    // delete individual
+    final existing = (await individualRepo.search(IndividualSearchModel(
+      clientReferenceId: [individual.clientReferenceId],
+    ))).firstOrNull;
+    await individualRepo.delete(individual.copyWith(
+      additionalFields: IndividualAdditionalFields(version: 1, fields: updatedAdditional),
+      id: existing?.id,
+      rowVersion: existing?.rowVersion ?? 1,
+      nonRecoverableError: existing?.nonRecoverableError ?? false,
+    ));
+
+    // find project beneficiaries for this individual and delete them
+    final projectBeneficiaries = await projectBeneficiaryRepo.search(
+      ProjectBeneficiarySearchModel(
+        beneficiaryClientReferenceId: [individual.clientReferenceId],
+      ),
+    );
+
+    for (final pb in projectBeneficiaries) {
+      await projectBeneficiaryRepo.delete(pb.copyWith(rowVersion: pb.rowVersion));
+    }
+
+    // delete household member mapping
+    final members = await householdMemberRepo.search(
+      HouseholdMemberSearchModel(
+        householdClientReferenceId: [household.clientReferenceId],
+        individualClientReferenceId: [individual.clientReferenceId],
+      ),
+    );
+    for (final m in members) {
+      await householdMemberRepo.delete(m.copyWith(rowVersion: m.rowVersion));
+    }
+
+    // fetch tasks linked to the individual's project beneficiaries and delete
+    if (projectBeneficiaries.isNotEmpty) {
+      final tasks = await taskRepo.search(TaskSearchModel(
+        projectBeneficiaryClientReferenceId:
+            projectBeneficiaries.map((e) => e.clientReferenceId).toList(),
+      ));
+      for (final t in tasks) {
+        await taskRepo.delete(t.copyWith(rowVersion: t.rowVersion));
+      }
+    }
   }
 
   @override
@@ -533,6 +609,130 @@ class CustomIndividualDetailsPageState
                               );
                             }
                           },
+                        );
+                      },
+                    ),
+                    BlocBuilder<CustomBeneficiaryRegistrationBloc, BeneficiaryRegistrationState>(
+                      builder: (context, state) {
+                        final bool showDelete = state.maybeMap(
+                              editIndividual: (_) => true,
+                              orElse: () => false,
+                            ) &&
+                            !widget.isHeadOfHousehold;
+
+                        if (!showDelete) return const SizedBox.shrink();
+
+                        return Padding(
+                          padding: const EdgeInsets.only(top: spacer2),
+                          child: DigitButton(
+                            label: 'Delete',
+                            type: DigitButtonType.secondary,
+                            size: DigitButtonSize.large,
+                            mainAxisSize: MainAxisSize.max,
+                            onPressed: () async {
+                              final result = await showDialog<bool>(
+                                context: context,
+                                builder: (BuildContext ctx) {
+                                  return AlertDialog(
+                                    title: Text(localizations.translate(i18.deliverIntervention.dialogTitle)),
+                                    content: Column(
+                                      mainAxisSize: MainAxisSize.min,
+                                      crossAxisAlignment: CrossAxisAlignment.start,
+                                      children: [
+                                        Text(localizations.translate(i18.deliverIntervention.dialogContent)),
+                                        const SizedBox(height: 16),
+                                        TextField(
+                                          controller: _deleteReasonController,
+                                          decoration: InputDecoration(
+                                            labelText: 'Reason for deletion',
+                                            hintText: 'Enter reason (required)',
+                                            border: const OutlineInputBorder(),
+                                          ),
+                                          maxLines: 3,
+                                          maxLength: 200,
+                                          autofocus: true,
+                                        ),
+                                      ],
+                                    ),
+                                    actions: [
+                                      TextButton(
+                                        onPressed: () => Navigator.of(ctx).pop(false),
+                                        child: Text(localizations.translate(i18.common.coreCommonCancel)),
+                                      ),
+                                      ElevatedButton(
+                                        onPressed: () {
+                                          final reason = _deleteReasonController.text.trim();
+                                          if (reason.isEmpty) {
+                                            ScaffoldMessenger.of(ctx).showSnackBar(
+                                              SnackBar(
+                                                content: const Text('Reason is required'),
+                                                backgroundColor: Colors.red,
+                                              ),
+                                            );
+                                            return;
+                                          }
+                                          if (reason.length < 3) {
+                                            ScaffoldMessenger.of(ctx).showSnackBar(
+                                              SnackBar(
+                                                content: const Text('Reason must be at least 3 characters'),
+                                                backgroundColor: Colors.red,
+                                              ),
+                                            );
+                                            return;
+                                          }
+                                          if (reason.length > 200) {
+                                            ScaffoldMessenger.of(ctx).showSnackBar(
+                                              SnackBar(
+                                                content: const Text('Reason must be at most 200 characters'),
+                                                backgroundColor: Colors.red,
+                                              ),
+                                            );
+                                            return;
+                                          }
+                                          Navigator.of(ctx).pop(true);
+                                        },
+                                        style: ElevatedButton.styleFrom(
+                                          backgroundColor: Colors.red,
+                                          foregroundColor: Colors.white,
+                                        ),
+                                        child: const Text('Delete'),
+                                      ),
+                                    ],
+                                  );
+                                },
+                              );
+
+                              if (result != true) return;
+
+                              try {
+                                final reason = _deleteReasonController.text.trim();
+                                await _deleteIndividualAndRelated(context, reason);
+                                if (context.mounted) {
+                                  await DigitToast.show(
+                                    context,
+                                    options: DigitToastOptions(
+                                      'Deleted successfully',
+                                      true,
+                                      Theme.of(context),
+                                    ),
+                                  );
+                                  _deleteReasonController.clear();
+                                  context.router.maybePop();
+                                }
+                              } catch (e) {
+                                if (context.mounted) {
+                                  await DigitToast.show(
+                                    context,
+                                    options: DigitToastOptions(
+                                      'Failed to delete',
+                                      true,
+                                      Theme.of(context),
+                                    ),
+                                  );
+                                }
+                              }
+                            },
+                          ),
                         );
                       },
                     ),
