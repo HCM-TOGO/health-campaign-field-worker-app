@@ -929,8 +929,11 @@ class _TaskDetailPageState extends LocalizedState<TaskDetailPage> {
             _buildIndividualInfoRow(
                 i18.editTasks.nameLabel, name.isNotEmpty ? name : 'N/A'),
             if (age != null)
-              _buildIndividualInfoRow(i18.editTasks.ageLabel,
-                  '${age.years} ${i18.editTasks.yearsLabel} ${i18.editTasks.andLabel} ${age.months} ${i18.editTasks.monthsLabel}'),
+              _buildIndividualInfoRow(
+                i18.editTasks.ageLabel,
+                '${age.years} ${localizations.translate(i18.editTasks.yearsLabel)} ${localizations.translate(i18.editTasks.andLabel)} ${age.months} ${localizations.translate(i18.editTasks.monthsLabel)}',
+              ),
+
             _buildIndividualInfoRow(i18.editTasks.genderLabel, gender),
             _buildIndividualInfoRow(
                 i18.editTasks.beneficiaryIdLabel, beneficiaryId),
