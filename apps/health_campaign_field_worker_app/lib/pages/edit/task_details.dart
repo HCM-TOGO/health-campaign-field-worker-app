@@ -1388,9 +1388,11 @@ class _TaskDetailPageState extends LocalizedState<TaskDetailPage> {
   }
 
   String? getSku(String variantId) {
-    if (variantId == Constants.spaq1VariantId) {
+    if (variantId == Constants.spaq1VariantId ||
+        variantId == Constants.spaq1VariantIdProd) {
       return Constants.spaq1;
-    } else if (variantId == Constants.spaq2VariantId) {
+    } else if (variantId == Constants.spaq2VariantId ||
+        variantId == Constants.spaq2VariantIdProd) {
       return Constants.spaq2;
     }
     return null; // Fallback to null if no match
