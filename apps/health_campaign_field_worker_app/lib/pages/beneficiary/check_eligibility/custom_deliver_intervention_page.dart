@@ -118,7 +118,7 @@ class CustomDeliverInterventionPageState
                   ? true
                   : false,
               boundaryModel: RegistrationDeliverySingleton().boundary!,
-              navigateToSummary: true,
+              navigateToSummary: false,
               householdMemberWrapper: householdMember),
         );
 
