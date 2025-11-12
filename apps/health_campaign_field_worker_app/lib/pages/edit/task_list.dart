@@ -1,3 +1,5 @@
+import 'dart:async';
+
 import 'package:collection/collection.dart';
 import 'package:digit_data_model/data_model.dart';
 import 'package:digit_ui_components/widgets/atoms/digit_search_bar.dart';
@@ -6,11 +8,11 @@ import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:registration_delivery/registration_delivery.dart';
 
-import '../../models/entities/additional_fields_type.dart';
-import '../../utils/i18_key_constants.dart' as i18;
 import '../../data/repositories/custom_task.dart';
+import '../../models/entities/additional_fields_type.dart';
 import '../../models/entities/identifier_types.dart';
 import '../../router/app_router.dart';
+import '../../utils/i18_key_constants.dart' as i18;
 import '../../utils/upper_case.dart';
 import '../../widgets/localized.dart';
 import '../../widgets/showcase/showcase_wrappers.dart';
@@ -36,6 +38,7 @@ class _TaskListPageState extends LocalizedState<TaskListPage> {
   void initState() {
     super.initState();
     _tasksFuture = _fetchTasksWithIndividual();
+    _subscribeToTaskChanges();
   }
 
   Future<List<TaskModel>> _fetchTasksWithIndividual() async {
@@ -71,6 +74,58 @@ class _TaskListPageState extends LocalizedState<TaskListPage> {
     _allTasks = tasks;
     _filteredTasks = tasks;
     return tasks;
+  }
+
+  void _subscribeToTaskChanges() {
+    final taskDataRepository =
+        context.read<LocalRepository<TaskModel, TaskSearchModel>>()
+            as CustomTaskLocalRepository;
+
+    taskDataRepository.listenToChanges(
+      query: TaskSearchModel(
+        createdBy: RegistrationDeliverySingleton().loggedInUserUuid,
+      ),
+      listener: (data) {
+        _onTasksChanged(data);
+      },
+    );
+  }
+
+  Future<void> _onTasksChanged(List<TaskModel> data) async {
+    List<TaskModel> tasks = data.where((task) {
+      if (task.isDeleted == true) return false;
+      if (task.clientAuditDetails?.createdBy !=
+          RegistrationDeliverySingleton().loggedInUserUuid) {
+        return false;
+      }
+
+      final doseIndexField = task.additionalFields?.fields.firstWhereOrNull(
+        (field) => field.key == AdditionalFieldsType.doseIndex.toValue(),
+      );
+
+      return doseIndexField == null || doseIndexField.value == "01";
+    }).toList();
+
+    final Map<String, IndividualModel?> newIndividualsByTask = {};
+    await Future.wait(tasks.map((task) async {
+      final ind = await _fetchIndividualForTask(task);
+      newIndividualsByTask[
+          task.id ?? task.projectBeneficiaryClientReferenceId!] = ind;
+    }));
+
+    if (!mounted) return;
+    setState(() {
+      _individualsByTask
+        ..clear()
+        ..addAll(newIndividualsByTask);
+      _allTasks = tasks;
+      // Re-apply current search filter
+      if (_isSearchEnabled && _searchQuery.isNotEmpty) {
+        _filterTasksByBeneficiaryId(_searchQuery);
+      } else {
+        _filteredTasks = tasks;
+      }
+    });
   }
 
   Future<IndividualModel?> _fetchIndividualForTask(TaskModel task) async {
@@ -220,7 +275,7 @@ class _TaskListPageState extends LocalizedState<TaskListPage> {
                       if (_isSearchEnabled && _searchQuery.isNotEmpty) {
                         return Center(
                           child: Text(
-                            'No matching tasks found for "$_searchQuery"',
+                            '${localizations.translate(i18.editTasks.noMatchFound)} "$_searchQuery"',
                             style: const TextStyle(
                               fontSize: 16,
                               color: Colors.black54,

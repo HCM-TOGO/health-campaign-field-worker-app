@@ -342,6 +342,8 @@ class EditTasks {
   String get enableSearchLabel => 'ENABLE_SEARCH_LABEL';
 
   String get searchByBeneficiaryIdLabel => 'SEARCH_BY_BENEFICIARY_ID_LABEL';
+
+  String get noMatchFound => 'NO_MATCH_FOUND';
 }
 
 class DeliverIntervention {

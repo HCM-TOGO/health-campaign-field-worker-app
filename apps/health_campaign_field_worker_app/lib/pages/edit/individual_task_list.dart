@@ -1,11 +1,13 @@
 import 'package:collection/collection.dart';
 import 'package:digit_data_model/data_model.dart';
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
 import 'package:registration_delivery/registration_delivery.dart';
 
+import '../../data/repositories/custom_task.dart';
 import '../../models/entities/additional_fields_type.dart';
-import '../../utils/i18_key_constants.dart' as i18;
 import '../../router/app_router.dart';
+import '../../utils/i18_key_constants.dart' as i18;
 import '../../widgets/localized.dart';
 
 @RoutePage()
@@ -31,6 +33,7 @@ class _IndividualTaskListPageState
   void initState() {
     super.initState();
     _tasks = _filterTasks();
+    _subscribeToTaskChanges();
   }
 
   List<TaskModel> _filterTasks() {
@@ -48,6 +51,44 @@ class _IndividualTaskListPageState
       // Include if doseIndex not present OR value equals 01
       return doseIndexField == null || doseIndexField.value == "01";
     }).toList();
+  }
+
+  void _subscribeToTaskChanges() {
+    final taskDataRepository =
+        context.read<LocalRepository<TaskModel, TaskSearchModel>>()
+            as CustomTaskLocalRepository;
+
+    final allowedBeneficiaryRefs = widget.tasks
+        .map((t) => t.projectBeneficiaryClientReferenceId)
+        .whereNotNull()
+        .toSet();
+
+    taskDataRepository.listenToChanges(
+      query: TaskSearchModel(
+        createdBy: RegistrationDeliverySingleton().loggedInUserUuid,
+      ),
+      listener: (data) {
+        final filtered = data.where((task) {
+          if (task.isDeleted == true) return false;
+          if (task.clientAuditDetails?.createdBy !=
+              RegistrationDeliverySingleton().loggedInUserUuid) {
+            return false;
+          }
+          if (task.projectBeneficiaryClientReferenceId == null) return false;
+          if (!allowedBeneficiaryRefs
+              .contains(task.projectBeneficiaryClientReferenceId)) {
+            return false;
+          }
+          final doseIndexField = task.additionalFields?.fields.firstWhereOrNull(
+            (field) => field.key == AdditionalFieldsType.doseIndex.toValue(),
+          );
+          return doseIndexField == null || doseIndexField.value == "01";
+        }).toList();
+
+        if (!mounted) return;
+        setState(() => _tasks = filtered);
+      },
+    );
   }
 
   @override
@@ -92,16 +133,6 @@ class _IndividualTaskListPageState
                             ),
                           )
                           .then((_) => setState(() => _tasks = _filterTasks()));
-                      // await Navigator.push(
-                      //   context,
-                      //   MaterialPageRoute(
-                      //     builder: (_) => TaskDetailPage(
-                      //       taskModel: task,
-                      //       individualModel: individual,
-                      //     ),
-                      //   ),
-                      // );
-                      // setState(() {}); // Refresh UI after returning
                     },
                     child: Padding(
                       padding: const EdgeInsets.all(16),

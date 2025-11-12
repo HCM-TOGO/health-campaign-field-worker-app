@@ -1,29 +1,29 @@
 import 'package:auto_route/auto_route.dart';
 import 'package:collection/collection.dart';
-import 'package:digit_data_model/data_model.dart';
 import 'package:digit_components/digit_components.dart';
+import 'package:digit_data_model/data_model.dart';
 import 'package:digit_ui_components/models/DropdownModels.dart';
 import 'package:digit_ui_components/theme/digit_extended_theme.dart';
-import 'package:flutter/material.dart';
-import 'package:provider/provider.dart';
-import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:registration_delivery/registration_delivery.dart';
+import 'package:digit_ui_components/utils/date_utils.dart';
 import 'package:digit_ui_components/widgets/atoms/digit_dropdown_input.dart'
     as digit_ui;
-import 'package:digit_ui_components/utils/date_utils.dart';
-import '../../../models/entities/assessment_checklist/status.dart';
+import 'package:flutter/material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:provider/provider.dart';
+import 'package:registration_delivery/registration_delivery.dart';
 
-import '../../models/entities/additional_fields_type.dart';
-import '../../utils/app_enums.dart';
-import '../../utils/environment_config.dart';
-import '../../utils/i18_key_constants.dart' as i18;
-import '../../data/repositories/custom_task.dart';
-import '../../models/entities/identifier_types.dart';
-import '../../utils/constants.dart';
-import '../../widgets/digit_ui_component/custom_digit_input_field.dart';
-import '../../../utils/utils.dart' as local_utils;
 import '../../../models/entities/additional_fields_type.dart'
     as additional_fields_local;
+import '../../../models/entities/assessment_checklist/status.dart';
+import '../../../utils/utils.dart' as local_utils;
+import '../../data/repositories/custom_task.dart';
+import '../../models/entities/additional_fields_type.dart';
+import '../../models/entities/identifier_types.dart';
+import '../../utils/app_enums.dart';
+import '../../utils/constants.dart';
+import '../../utils/environment_config.dart';
+import '../../utils/i18_key_constants.dart' as i18;
+import '../../widgets/digit_ui_component/custom_digit_input_field.dart';
 import '../../widgets/localized.dart';
 
 @RoutePage()
@@ -93,7 +93,6 @@ class _TaskDetailPageState extends LocalizedState<TaskDetailPage> {
 
     // Initialize controllers for basic task fields
     _controllers = {
-      // 'projectId': TextEditingController(text: _originalTask.projectId ?? ''),
       'status': TextEditingController(text: _originalTask.status ?? ''),
       'createdBy': TextEditingController(text: _originalTask.createdBy ?? ''),
       'isDeleted': TextEditingController(
@@ -148,10 +147,6 @@ class _TaskDetailPageState extends LocalizedState<TaskDetailPage> {
     // Exclude cycleIndex, doseIndex, and dateOfAdministration from editable additional fields
     _additionalFieldControllers = {
       for (final field in fieldsList)
-        // not needed as all additional fields are non-editable only
-        // if (field.key != AdditionalFieldsType.cycleIndex.toValue() &&
-        //     field.key != AdditionalFieldsType.doseIndex.toValue() &&
-        //     field.key != AdditionalFieldsType.dateOfAdministration.toValue())
         field.key: TextEditingController(text: field.value?.toString() ?? '')
     };
   }
@@ -483,10 +478,6 @@ class _TaskDetailPageState extends LocalizedState<TaskDetailPage> {
               deliveryComment:
                   _resourceControllers['resource_${i}_deliveryComment']?.text ??
                       resource.deliveryComment,
-              // isDelivered: _resourceControllers['resource_${i}_isDelivered']
-              //         ?.text
-              //         .toLowerCase() ==
-              //     'true',
               clientAuditDetails: resource.clientAuditDetails?.copyWith(
                     lastModifiedBy:
                         RegistrationDeliverySingleton().loggedInUserUuid,

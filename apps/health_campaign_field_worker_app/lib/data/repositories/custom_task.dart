@@ -56,6 +56,20 @@ class CustomTaskLocalRepository extends TaskLocalRepository {
                 projectBeneficiaryClientReferenceId:
                     task.projectBeneficiaryClientReferenceId,
                 createdDate: task.createdDate,
+                additionalFields: task.additionalFields == null
+                    ? null
+                    : TaskAdditionalFieldsMapper.fromJson(
+                        task.additionalFields!,
+                      ),
+                clientAuditDetails: (task.clientCreatedBy != null &&
+                        task.clientCreatedTime != null)
+                    ? ClientAuditDetails(
+                        createdBy: task.clientCreatedBy!,
+                        createdTime: task.clientCreatedTime!,
+                        lastModifiedBy: task.clientModifiedBy,
+                        lastModifiedTime: task.clientModifiedTime,
+                      )
+                    : null,
                 status: task.status,
               );
             })
