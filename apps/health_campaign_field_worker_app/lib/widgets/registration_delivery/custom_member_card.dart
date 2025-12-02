@@ -1497,12 +1497,29 @@ class CustomMemberCard extends StatelessWidget {
                             action: () {
                               Navigator.of(context, rootNavigator: true).pop();
                               if (tasks != null && tasks!.isNotEmpty) {
-                                context.router.push(
+                                final bloc =
+                                    context.read<HouseholdOverviewBloc>();
+                                final projectId =
+                                    RegistrationDeliverySingleton().projectId!;
+                                final beneficiaryType =
+                                    RegistrationDeliverySingleton()
+                                        .beneficiaryType!;
+
+                                context.router
+                                    .push(
                                   IndividualTaskListRoute(
                                     individual: individual,
                                     tasks: tasks!,
                                   ),
-                                );
+                                )
+                                    .then((_) {
+                                  bloc.add(
+                                    HouseholdOverviewReloadEvent(
+                                      projectId: projectId,
+                                      projectBeneficiaryType: beneficiaryType,
+                                    ),
+                                  );
+                                });
                               } else {
                                 DigitDialog.show(
                                   context,
