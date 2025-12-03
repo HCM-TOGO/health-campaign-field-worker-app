@@ -649,9 +649,15 @@ class _TaskDetailPageState extends LocalizedState<TaskDetailPage> {
           await taskDataRepository.delete(updatedTask);
         }
       } else {
-        TaskModel updatedTask = _getUpdatedTaskForDelete(_originalTask);
-        // Delete using repository
-        await taskDataRepository.delete(updatedTask);
+        List<TaskModel> allTasksToDelete =
+            await _getAllCurrentCycleRelatedTasks(
+                taskDataRepository, _originalTask.status);
+
+        for (var task in allTasksToDelete) {
+          TaskModel updatedTask = _getUpdatedTaskForDelete(task);
+          // Delete using repository
+          await taskDataRepository.delete(updatedTask);
+        }
       }
 
       if (mounted) {
@@ -751,6 +757,46 @@ class _TaskDetailPageState extends LocalizedState<TaskDetailPage> {
         .toList();
 
     return allAdministrationTasks;
+  }
+
+  Future<List<TaskModel>> _getAllCurrentCycleRelatedTasks(
+      CustomTaskLocalRepository taskDataRepository, String? status) async {
+    List<TaskModel> allTasks = await taskDataRepository.search(TaskSearchModel(
+      createdBy: RegistrationDeliverySingleton().loggedInUserUuid,
+      isDeleted: false,
+      projectBeneficiaryClientReferenceId:
+          _originalTask.projectBeneficiaryClientReferenceId != null
+              ? [_originalTask.projectBeneficiaryClientReferenceId!]
+              : [],
+    ));
+
+    String currentTaskCycle = _originalTask.additionalFields?.fields
+        .where(
+            (field) => field.key == AdditionalFieldsType.cycleIndex.toValue())
+        .firstOrNull
+        ?.value;
+
+    allTasks = allTasks
+        .where((task) =>
+            task.isDeleted != true &&
+            task.clientAuditDetails?.createdBy ==
+                RegistrationDeliverySingleton().loggedInUserUuid &&
+            task.projectBeneficiaryClientReferenceId ==
+                _originalTask.projectBeneficiaryClientReferenceId &&
+            (task.additionalFields?.fields
+                    .where((field) =>
+                        field.key ==
+                            AdditionalFieldsType.cycleIndex.toValue() &&
+                        field.value == currentTaskCycle)
+                    .isNotEmpty ??
+                false))
+        .toList();
+
+    if (status != null) {
+      allTasks = allTasks.where((task) => task.status == status).toList();
+    }
+
+    return allTasks;
   }
 
   @override
