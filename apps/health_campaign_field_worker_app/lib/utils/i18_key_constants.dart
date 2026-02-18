@@ -96,6 +96,8 @@ class Common {
 
   String get coreCommonHelp => 'CORE_COMMON_HELP';
 
+  String get coreCommonTenant => 'CORE_COMMON_TENANT';
+
   String get coreCommonHome => 'CORE_COMMON_HOME';
 
   String get coreCommonViewDownloadedData => 'CORE_COMMON_VIEW_DOWNLOADED_DATA';
@@ -914,6 +916,9 @@ class Login {
 
   String get unableToLoginText => 'UNABLE_TO_LOGIN';
   String get noInternetError => 'ERR_NOT_CONNECTED_TO_INTERNET';
+
+  String? get microsoftSSOLabel => 'Microsoft Login';
+  String? get orLabel => 'OR';
 }
 
 class SelectSurveyFormShowcase {

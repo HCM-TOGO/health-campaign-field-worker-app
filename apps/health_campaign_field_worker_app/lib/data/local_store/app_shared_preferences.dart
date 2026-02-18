@@ -3,6 +3,7 @@ import 'package:shared_preferences/shared_preferences.dart';
 class AppSharedPreferences {
   static const String isFirstLaunchKey = 'isFirstLaunch';
   static const String userSelectedLocale = 'userSelectedLocale';
+  static const String selectedTenantIdKey = 'selectedTenantId';
 
   SharedPreferences? _sharedPreferences;
 
@@ -29,7 +30,11 @@ class AppSharedPreferences {
 
   bool get isFirstLaunch => sharedPreferences.getBool(isFirstLaunchKey) ?? true;
 
-  String? get getSelectedLocale => sharedPreferences.getString(userSelectedLocale);
+  String? get getSelectedLocale =>
+      sharedPreferences.getString(userSelectedLocale);
+
+  String? get getSelectedTenantId =>
+      sharedPreferences.getString(selectedTenantIdKey);
 
   Future<void> appLaunchedFirstTime() async {
     await sharedPreferences.setBool(
@@ -45,4 +50,14 @@ class AppSharedPreferences {
     );
   }
 
+  Future<void> setSelectedTenantId(String tenantId) async {
+    await sharedPreferences.setString(
+      selectedTenantIdKey,
+      tenantId,
+    );
+  }
+
+  Future<void> clearSelectedTenantId() async {
+    await sharedPreferences.remove(selectedTenantIdKey);
+  }
 }

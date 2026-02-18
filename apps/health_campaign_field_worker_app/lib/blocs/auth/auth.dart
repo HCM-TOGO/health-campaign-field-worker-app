@@ -10,8 +10,10 @@ import '../../data/local_store/secure_store/secure_store.dart';
 import '../../data/repositories/remote/auth.dart';
 import '../../data/repositories/remote/mdms.dart';
 import '../../models/auth/auth_model.dart';
+import '../../data/repositories/remote/sso_auth.dart';
 import '../../models/entities/roles_type.dart';
 import '../../models/role_actions/role_actions_model.dart';
+import '../../services/entra_auth_service.dart';
 import '../../utils/environment_config.dart';
 
 // part 'auth.freezed.dart' need to be added to auto generate the files for freezed model
@@ -23,19 +25,25 @@ typedef AuthEmitter = Emitter<AuthState>;
 class AuthBloc extends Bloc<AuthEvent, AuthState> {
   final LocalSecureStore localSecureStore;
   final AuthRepository authRepository;
+  final SSOAuthRepository? ssoAuthRepository;
   final MdmsRepository mdmsRepository;
   final RemoteRepository<IndividualModel, IndividualSearchModel>
       individualRemoteRepository;
+  final EntraAuthService entraAuthService;
 
   AuthBloc({
     required this.authRepository,
+    this.ssoAuthRepository,
     required this.mdmsRepository,
     required this.individualRemoteRepository,
     LocalSecureStore? localSecureStore,
+    EntraAuthService? entraAuthService,
   })  : localSecureStore = LocalSecureStore.instance,
+        entraAuthService = entraAuthService ?? EntraAuthService(),
         super(const AuthUnauthenticatedState()) {
     on(_onLogin);
     on(_onLogout);
+    on(_onMicrosoftSSOLogin);
     on(_onAutoLogin);
     on(_onAddSpaqCounts);
   }
@@ -147,16 +155,182 @@ class AuthBloc extends Bloc<AuthEvent, AuthState> {
     }
   }
 
+  //_onMicrosoftSSOLogin event handles Microsoft Entra ID SSO login
+  // This flow:
+  // 1. Authenticates user with Microsoft Entra ID
+  // 2. Exchanges Entra tokens for DIGIT JWT tokens via backend
+  // 3. Persists session exactly like regular login
+  FutureOr<void> _onMicrosoftSSOLogin(
+    AuthMicrosoftSSOLoginEvent event,
+    AuthEmitter emit,
+  ) async {
+    emit(const AuthLoadingState());
+
+    try {
+      // Step 1: Authenticate with Microsoft Entra ID
+      final entraResult = await entraAuthService.signInWithMicrosoft();
+
+      if (entraResult == null) {
+        emit(const AuthErrorState('Microsoft sign-in cancelled or failed'));
+        emit(const AuthUnauthenticatedState());
+        return;
+      }
+
+      final idToken = entraResult['idToken'] as String;
+      final accessToken = entraResult['accessToken'] as String;
+
+      // Step 2: Exchange Entra tokens for DIGIT tokens via backend
+      if (ssoAuthRepository == null) {
+        throw Exception(
+          'SSO authentication not configured. Please provide SSOAuthRepository.',
+        );
+      }
+
+      final AuthModel result = await ssoAuthRepository!
+          .exchangeEntraTokensForDigitAuth(
+              idToken: idToken, authToken: accessToken);
+
+      // Step 3: Persist DIGIT session (same as regular login)
+      await localSecureStore.setAuthCredentials(result);
+      await localSecureStore.setBoundaryRefetch(true);
+
+      // Step 4: Fetch role actions
+      final actionsWrapper = await mdmsRepository
+          .searchRoleActions(envConfig.variables.actionMapApiPath, {
+        "roleCodes": result.userRequestModel.roles.map((e) => e.code).toList(),
+        "tenantId": envConfig.variables.tenantId,
+        "actionMaster": "actions-test",
+        "enabled": true,
+      });
+
+      await localSecureStore.setBoundaryRefetch(true);
+      await localSecureStore.setRoleActions(actionsWrapper);
+
+      // Step 5: Handle special roles (same as regular login)
+      if (result.userRequestModel.roles
+          .where((role) =>
+              role.code == RolesType.districtSupervisor.toValue() ||
+              role.code == RolesType.distributor.toValue())
+          .toList()
+          .isNotEmpty) {
+        final loggedInIndividual = await individualRemoteRepository.search(
+          IndividualSearchModel(
+            userUuid: [result.userRequestModel.uuid],
+          ),
+        );
+        await localSecureStore
+            .setSelectedIndividual(loggedInIndividual.firstOrNull?.id);
+      }
+
+      // Step 6: Emit authenticated state
+      emit(
+        AuthAuthenticatedState(
+          accessToken: result.accessToken,
+          refreshToken: result.refreshToken,
+          userModel: result.userRequestModel,
+          actionsWrapper: actionsWrapper,
+          individualId: result.userRequestModel.uuid,
+        ),
+      );
+    } on DioException catch (error) {
+      String errorMessage = 'Microsoft SSO login failed';
+
+      // Handle specific error cases
+      if (error.response != null) {
+        final statusCode = error.response!.statusCode;
+        final responseData = error.response!.data;
+
+        if (statusCode == 401) {
+          errorMessage =
+              'Unauthorized. Please check if your Microsoft account is linked to DIGIT.';
+        } else if (statusCode == 403) {
+          errorMessage =
+              'Access denied. Your account does not have the required permissions.';
+        } else if (statusCode == 400) {
+          errorMessage =
+              'Invalid request. Please ensure your Microsoft account is properly configured.';
+        } else if (responseData is Map) {
+          errorMessage = responseData['message']?.toString() ??
+              responseData['error']?.toString() ??
+              errorMessage;
+        }
+      }
+
+      emit(AuthErrorState(errorMessage));
+      emit(const AuthUnauthenticatedState());
+
+      AppLogger.instance.error(
+        title: 'Microsoft SSO login error',
+        message: error.response?.data.toString() ?? error.toString(),
+      );
+    } catch (error) {
+      String errorMessage = 'Microsoft SSO login failed';
+
+      if (error.toString().contains('cancelled') ||
+          error.toString().contains('canceled')) {
+        errorMessage = 'Sign-in cancelled';
+      } else if (error.toString().contains('network')) {
+        errorMessage =
+            'Network error. Please check your connection and try again.';
+      } else {
+        errorMessage = error.toString();
+      }
+
+      emit(AuthErrorState(errorMessage));
+      emit(const AuthUnauthenticatedState());
+
+      AppLogger.instance.error(
+        title: 'Microsoft SSO login error',
+        message: error.toString(),
+      );
+    }
+  }
+
   //_onLogout event logs out the user and deletes the saved user details from local storage
   FutureOr<void> _onLogout(AuthLogoutEvent event, AuthEmitter emit) async {
     try {
+      // Check if user has Entra tokens (SSO login)
+      final entraIdToken = await entraAuthService.getIdToken();
+      bool entraSignOutSuccess = true;
+
+      if (entraIdToken != null) {
+        // Sign out from Microsoft Entra ID
+        try {
+          entraSignOutSuccess = await entraAuthService.signOut();
+          if (!entraSignOutSuccess) {
+            // If Entra sign-out failed, mark as error
+            AppLogger.instance.error(
+              title: 'AuthBloc',
+              message:
+                  'Entra sign-out failed, clearing Entra tokens but preserving local storage',
+            );
+          }
+        } catch (e) {
+          // If there's an exception, mark as error
+          entraSignOutSuccess = false;
+          AppLogger.instance.error(
+            title: 'AuthBloc',
+            message: 'Entra sign-out error: $e',
+          );
+        }
+      }
+
+      // Only clear DIGIT session data if Entra sign-out was successful or no Entra tokens
+      // If Entra sign-out failed, do not delete localstorage as per requirement
+
       emit(const AuthLoadingState());
       await localSecureStore.deleteAll();
       await localSecureStore.setBoundaryRefetch(true);
+      emit(const AuthUnauthenticatedState());
+
+      // If hasError is true, we skip deleting localstorage
     } catch (error) {
-      rethrow;
+      // On any error during logout, do not delete localstorage
+      AppLogger.instance.error(
+        title: 'AuthBloc',
+        message: 'Error during logout: $error',
+      );
     }
-    emit(const AuthUnauthenticatedState());
   }
 
   FutureOr<void> _onAddSpaqCounts(
@@ -219,6 +393,10 @@ class AuthEvent with _$AuthEvent {
     required int spaq1Count,
     required int spaq2Count,
   }) = AuthAddSpaqCountsEvent;
+
+  const factory AuthEvent.microsoftSSOLogin({
+    required String tenantId,
+  }) = AuthMicrosoftSSOLoginEvent;
 
   const factory AuthEvent.autoLogin({
     required String tenantId,

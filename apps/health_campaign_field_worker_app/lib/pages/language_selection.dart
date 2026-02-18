@@ -38,114 +38,125 @@ class _LanguageSelectionPageState extends State<LanguageSelectionPage> {
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
 
-    return Scaffold(
-      body: Container(
-        color: theme.colorTheme.primary.primary2,
-        child: Column(
-          mainAxisAlignment: MainAxisAlignment.end,
-          children: [
-            BlocBuilder<AppInitializationBloc, AppInitializationState>(
-              builder: (context, state) {
-                if (state is! AppInitialized) return const Offstage();
-                final appConfig = state.appConfiguration;
-                final languages = state.appConfiguration.languages;
-                final localizationModulesList =
-                    state.appConfiguration.backendInterface?.interfaces;
-                if (languages == null) {
-                  return const Offstage();
-                }
+    return PopScope(
+      canPop: false,
+      onPopInvoked: (didPop) async {
+        if (!didPop) {
+          // Clear the selected tenantId to use original .env value
+          await AppSharedPreferences().clearSelectedTenantId();
+          // Navigate to initial screen instead of closing the app
+          context.router.replaceAll([InitialRouteRoute()]);
+        }
+      },
+      child: Scaffold(
+        body: Container(
+          color: theme.colorTheme.primary.primary2,
+          child: Column(
+            mainAxisAlignment: MainAxisAlignment.end,
+            children: [
+              BlocBuilder<AppInitializationBloc, AppInitializationState>(
+                builder: (context, state) {
+                  if (state is! AppInitialized) return const Offstage();
+                  final appConfig = state.appConfiguration;
+                  final languages = state.appConfiguration.languages;
+                  final localizationModulesList =
+                      state.appConfiguration.backendInterface?.interfaces;
+                  if (languages == null) {
+                    return const Offstage();
+                  }
 
-                return BlocConsumer<LocalizationBloc, LocalizationState>(
-                  listener: (context, state) {
-                    if (state.loading && !isDialogVisible) {
-                      isDialogVisible = true;
-                      DigitComponentsUtils.showDialog(
-                        context,
-                        "",
-                        DialogType.inProgress,
-                      );
-                    } else if (!state.loading && isDialogVisible) {
-                      isDialogVisible = false;
-                      DigitComponentsUtils.hideDialog(context);
-                    }
-                    if (!state.loading &&
-                        !isDialogVisible &&
-                        state.retryModule != null) {
-                      DigitSyncDialog.show(
-                        context,
-                        type: DialogType.failed,
-                        label: i18.common.failedToFetch,
-                        primaryAction: DigitDialogActions(
-                          label: AppLocalizations.of(context).translate(
-                            i18.common.coreCommonRetry,
-                          ),
-                          action: (ctx) {
-                            context.read<LocalizationBloc>().add(
-                                LocalizationEvent.onLoadLocalization(
-                                    module: state.retryModule.toString(),
-                                    tenantId: appConfig.tenantId ?? "default",
-                                    locale: AppSharedPreferences()
-                                        .getSelectedLocale
-                                        .toString(),
-                                    path: Constants.localizationApiPath));
-                            Navigator.pop(ctx);
-                          },
-                        ),
-                        secondaryAction: DigitDialogActions(
-                          label: AppLocalizations.of(context).translate(
-                            i18.common.corecommonclose,
-                          ),
-                          action: (ctx) => Navigator.pop(ctx),
-                        ),
-                      );
-                    }
-                  },
-                  builder: (context, localizationState) {
-                    return localizationModulesList != null
-                        ? DigitLanguageCard(
-                            contentPadding:
-                                const EdgeInsets.symmetric(vertical: spacer2),
-                            rowItemWidth:
-                                MediaQuery.of(context).size.width * .272,
-                            digitRowCardItems: languages.map((e) {
-                              var index = languages.indexOf(e);
-
-                              return DigitRowCardModel(
-                                label: e.label,
-                                value: e.value,
-                                isSelected: getSelectedLanguage(
-                                  state,
-                                  index,
-                                ),
-                              );
-                            }).toList(),
-                            onLanguageChange: (value) async {
-                              final info = await PackageInfo.fromPlatform();
-                              Constants().initialize(info.version);
-                              int index = languages.indexWhere(
-                                (ele) =>
-                                    ele.value.toString() ==
-                                    value.value.toString(),
-                              );
-                              triggerLanguageChange(
-                                index,
-                                localizationModulesList,
-                                appConfig.tenantId ?? "default",
-                                value.value.toString(),
-                              );
-                            },
-                            onLanguageSubmit: () => context.router.push(
-                              LoginRoute(),
+                  return BlocConsumer<LocalizationBloc, LocalizationState>(
+                    listener: (context, state) {
+                      if (state.loading && !isDialogVisible) {
+                        isDialogVisible = true;
+                        DigitComponentsUtils.showDialog(
+                          context,
+                          "",
+                          DialogType.inProgress,
+                        );
+                      } else if (!state.loading && isDialogVisible) {
+                        isDialogVisible = false;
+                        DigitComponentsUtils.hideDialog(context);
+                      }
+                      if (!state.loading &&
+                          !isDialogVisible &&
+                          state.retryModule != null) {
+                        DigitSyncDialog.show(
+                          context,
+                          type: DialogType.failed,
+                          label: i18.common.failedToFetch,
+                          primaryAction: DigitDialogActions(
+                            label: AppLocalizations.of(context).translate(
+                              i18.common.coreCommonRetry,
                             ),
-                            languageSubmitLabel: AppLocalizations.of(context)
-                                .translate(i18.common.coreCommonContinue),
-                          )
-                        : const Offstage();
-                  },
-                );
-              },
-            ),
-          ],
+                            action: (ctx) {
+                              context.read<LocalizationBloc>().add(
+                                  LocalizationEvent.onLoadLocalization(
+                                      module: state.retryModule.toString(),
+                                      tenantId: appConfig.tenantId ?? "default",
+                                      locale: AppSharedPreferences()
+                                          .getSelectedLocale
+                                          .toString(),
+                                      path: Constants.localizationApiPath));
+                              Navigator.pop(ctx);
+                            },
+                          ),
+                          secondaryAction: DigitDialogActions(
+                            label: AppLocalizations.of(context).translate(
+                              i18.common.corecommonclose,
+                            ),
+                            action: (ctx) => Navigator.pop(ctx),
+                          ),
+                        );
+                      }
+                    },
+                    builder: (context, localizationState) {
+                      return localizationModulesList != null
+                          ? DigitLanguageCard(
+                              contentPadding:
+                                  const EdgeInsets.symmetric(vertical: spacer2),
+                              rowItemWidth:
+                                  MediaQuery.of(context).size.width * .272,
+                              digitRowCardItems: languages.map((e) {
+                                var index = languages.indexOf(e);
+
+                                return DigitRowCardModel(
+                                  label: e.label,
+                                  value: e.value,
+                                  isSelected: getSelectedLanguage(
+                                    state,
+                                    index,
+                                  ),
+                                );
+                              }).toList(),
+                              onLanguageChange: (value) async {
+                                final info = await PackageInfo.fromPlatform();
+                                Constants().initialize(info.version);
+                                int index = languages.indexWhere(
+                                  (ele) =>
+                                      ele.value.toString() ==
+                                      value.value.toString(),
+                                );
+                                triggerLanguageChange(
+                                  index,
+                                  localizationModulesList,
+                                  appConfig.tenantId ?? "default",
+                                  value.value.toString(),
+                                );
+                              },
+                              onLanguageSubmit: () => context.router.push(
+                                LoginRoute(),
+                              ),
+                              languageSubmitLabel: AppLocalizations.of(context)
+                                  .translate(i18.common.coreCommonContinue),
+                            )
+                          : const Offstage();
+                    },
+                  );
+                },
+              ),
+            ],
+          ),
         ),
       ),
     );

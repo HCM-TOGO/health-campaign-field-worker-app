@@ -13,6 +13,8 @@ import 'package:reactive_forms/reactive_forms.dart';
 import '../blocs/app_initialization/app_initialization.dart';
 import '../blocs/auth/auth.dart';
 import '../data/local_store/no_sql/schema/app_configuration.dart';
+import '../data/remote_client.dart';
+import '../data/repositories/remote/mdms.dart';
 import '../router/app_router.dart';
 import '../utils/environment_config.dart';
 import '../utils/i18_key_constants.dart' as i18;
@@ -36,9 +38,38 @@ class _LoginPageState extends LocalizedState<LoginPage> {
   static const _password = 'password';
   static const _privacyCheck = 'privacyCheck';
 
+  Map<String, dynamic>? _ssoConfig;
+  bool _isLoadingSSO = true;
+
   @override
   void initState() {
     super.initState();
+    _fetchSSOConfiguration();
+  }
+
+  Future<void> _fetchSSOConfiguration() async {
+    try {
+      final mdmsRepository = MdmsRepository(DioClient().dio);
+      final tenantId = envConfig.variables.tenantId;
+
+      final ssoConfig = await mdmsRepository.fetchSSOConfiguration(
+        tenantId: tenantId,
+      );
+
+      if (mounted) {
+        setState(() {
+          _ssoConfig = ssoConfig;
+          _isLoadingSSO = false;
+        });
+      }
+    } catch (e) {
+      if (mounted) {
+        setState(() {
+          _ssoConfig = null;
+          _isLoadingSSO = false;
+        });
+      }
+    }
   }
 
   @override
@@ -186,6 +217,52 @@ class _LoginPageState extends LocalizedState<LoginPage> {
                         size: DigitButtonSize.large,
                         mainAxisSize: MainAxisSize.max,
                       ),
+
+                      // OR separator - Show only when SSO is available
+                      if (!_isLoadingSSO &&
+                          _ssoConfig != null &&
+                          _ssoConfig!['active'] == true)
+                        Padding(
+                          padding:
+                              const EdgeInsets.symmetric(vertical: spacer4),
+                          child: Row(
+                            children: [
+                              Expanded(
+                                child: Divider(
+                                  color: theme.colorTheme.text.secondary,
+                                  thickness: 1,
+                                ),
+                              ),
+                              Padding(
+                                padding: const EdgeInsets.symmetric(
+                                  horizontal: spacer3,
+                                ),
+                                child: Text(
+                                  'OR',
+                                  style: textTheme.bodyL.copyWith(
+                                    color: theme.colorTheme.text.secondary,
+                                    fontWeight: FontWeight.w500,
+                                  ),
+                                ),
+                              ),
+                              Expanded(
+                                child: Divider(
+                                  color: theme.colorTheme.text.secondary,
+                                  thickness: 1,
+                                ),
+                              ),
+                            ],
+                          ),
+                        ),
+
+                      // Microsoft SSO Login Button - Show dynamically based on MDMS config
+                      if (!_isLoadingSSO &&
+                          _ssoConfig != null &&
+                          _ssoConfig!['active'] == true)
+                        _buildSSOButton(),
+
+                      // Forgot Password button - always visible in both SSO and username/password modes
+
                       DigitButton(
                         label: localizations.translate(
                           i18.forgotPassword.actionLabel,
@@ -223,6 +300,83 @@ class _LoginPageState extends LocalizedState<LoginPage> {
                       ),
                     ]);
               },
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+
+  Widget _buildSSOButton() {
+    final logoUrl = _ssoConfig?['logo'] as String?;
+    final theme = Theme.of(context);
+    final textTheme = theme.digitTextTheme(context);
+
+    return Container(
+      margin: const EdgeInsets.only(top: spacer2),
+      width: double.infinity,
+      child: ElevatedButton(
+        onPressed: () {
+          FocusManager.instance.primaryFocus?.unfocus();
+
+          context.read<AuthBloc>().add(
+                AuthMicrosoftSSOLoginEvent(
+                  tenantId: envConfig.variables.tenantId,
+                ),
+              );
+        },
+        style: ElevatedButton.styleFrom(
+          backgroundColor: theme.colorTheme.primary.primary1,
+          foregroundColor: theme.colorTheme.paper.primary,
+          padding: const EdgeInsets.symmetric(
+            horizontal: spacer4,
+            vertical: spacer3,
+          ),
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(spacer1),
+          ),
+          minimumSize: const Size(double.infinity, 48),
+        ),
+        child: Row(
+          mainAxisAlignment: MainAxisAlignment.center,
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            if (logoUrl != null)
+              Image.network(
+                logoUrl,
+                width: 20,
+                height: 20,
+                errorBuilder: (context, error, stackTrace) {
+                  return Icon(
+                    Icons.login,
+                    size: 20,
+                    color: theme.colorTheme.paper.primary,
+                  );
+                },
+                loadingBuilder: (context, child, loadingProgress) {
+                  if (loadingProgress == null) return child;
+                  return SizedBox(
+                    width: 20,
+                    height: 20,
+                    child: CircularProgressIndicator(
+                      strokeWidth: 2,
+                      value: loadingProgress.expectedTotalBytes != null
+                          ? loadingProgress.cumulativeBytesLoaded /
+                              loadingProgress.expectedTotalBytes!
+                          : null,
+                    ),
+                  );
+                },
+              ),
+            if (logoUrl != null) const SizedBox(width: spacer2),
+            Text(
+              localizations.translate(
+                i18.login.microsoftSSOLabel ?? 'LOGIN_MICROSOFT_SSO_LABEL',
+              ),
+              style: textTheme.bodyL.copyWith(
+                color: theme.colorTheme.paper.primary,
+                fontWeight: FontWeight.w600,
+              ),
             ),
           ],
         ),

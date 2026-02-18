@@ -28,6 +28,7 @@ import '../blocs/inventory_management/custom_inventory_report.dart';
 import '../blocs/localization/app_localization.dart';
 import '../pages/acknowledgement.dart';
 import '../pages/authenticated.dart';
+import '../pages/initial_screen.dart';
 import '../pages/beneficiary/check_eligibility/check_eligibility_assessment.dart';
 import '../pages/beneficiary/check_eligibility/custom_dose_administered.dart';
 import '../pages/beneficiary/check_eligibility/custom_splash_acknowledge.dart';
@@ -140,12 +141,16 @@ class AppRouter extends _$AppRouter {
       page: UnauthenticatedRouteWrapper.page,
       path: '/',
       children: [
-        // AutoRoute(
-        //   page: LanguageSelectionRoute.page,
-        //   path: 'language_selection',
-        //   initial: true,
-        // ),
-        AutoRoute(page: LoginRoute.page, path: 'login', initial: true),
+        AutoRoute(
+          page: InitialRouteRoute.page,
+          path: 'initial',
+          initial: true,
+        ),
+        AutoRoute(
+          page: LanguageSelectionRoute.page,
+          path: 'language_selection',
+        ),
+        AutoRoute(page: LoginRoute.page, path: 'login'),
       ],
     ),
     AutoRoute(

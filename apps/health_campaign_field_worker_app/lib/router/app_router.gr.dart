@@ -730,6 +730,17 @@ abstract class _$AppRouter extends RootStackRouter {
         ),
       );
     },
+    InitialRouteRoute.name: (routeData) {
+      final args = routeData.argsAs<InitialRouteRouteArgs>(
+          orElse: () => const InitialRouteRouteArgs());
+      return AutoRoutePage<dynamic>(
+        routeData: routeData,
+        child: InitialScreenPage(
+          key: args.key,
+          appLocalizations: args.appLocalizations,
+        ),
+      );
+    },
     LanguageSelectionRoute.name: (routeData) {
       return AutoRoutePage<dynamic>(
         routeData: routeData,
@@ -3545,6 +3556,44 @@ class IndividualTaskListRouteArgs {
   @override
   String toString() {
     return 'IndividualTaskListRouteArgs{key: $key, individual: $individual, tasks: $tasks}';
+  }
+}
+
+/// generated route for
+/// [InitialScreenPage]
+class InitialRouteRoute extends PageRouteInfo<InitialRouteRouteArgs> {
+  InitialRouteRoute({
+    Key? key,
+    AppLocalizations? appLocalizations,
+    List<PageRouteInfo>? children,
+  }) : super(
+          InitialRouteRoute.name,
+          args: InitialRouteRouteArgs(
+            key: key,
+            appLocalizations: appLocalizations,
+          ),
+          initialChildren: children,
+        );
+
+  static const String name = 'InitialRouteRoute';
+
+  static const PageInfo<InitialRouteRouteArgs> page =
+      PageInfo<InitialRouteRouteArgs>(name);
+}
+
+class InitialRouteRouteArgs {
+  const InitialRouteRouteArgs({
+    this.key,
+    this.appLocalizations,
+  });
+
+  final Key? key;
+
+  final AppLocalizations? appLocalizations;
+
+  @override
+  String toString() {
+    return 'InitialRouteRouteArgs{key: $key, appLocalizations: $appLocalizations}';
   }
 }
 

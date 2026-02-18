@@ -34,6 +34,7 @@ import 'data/repositories/local/search/individual_global_search_smc.dart';
 import 'data/repositories/remote/bandwidth_check.dart';
 import 'data/repositories/remote/localization.dart';
 import 'data/repositories/remote/mdms.dart';
+import 'data/repositories/remote/sso_auth.dart';
 import 'router/app_navigator_observer.dart';
 import 'router/app_router.dart';
 import 'utils/environment_config.dart';
@@ -203,6 +204,14 @@ class MainApplicationState extends State<MainApplication>
               BlocProvider(
                 create: (ctx) => AuthBloc(
                   authRepository: ctx.read(),
+                  ssoAuthRepository:
+                      envConfig.variables.entraClientId.isNotEmpty
+                          ? SSOAuthRepository(
+                              widget.client,
+                              oauthLoginPath:
+                                  envConfig.variables.entraOAuthLoginPath,
+                            )
+                          : null,
                   mdmsRepository: MdmsRepository(widget.client),
                   individualRemoteRepository: ctx.read<
                       RemoteRepository<IndividualModel,
@@ -269,8 +278,7 @@ class MainApplicationState extends State<MainApplication>
 
                     return MultiBlocProvider(
                       providers: [
-
-                          BlocProvider(
+                        BlocProvider(
                           create: (context) => SummaryReportBloc(
                             householdMemberRepository: context.repository<
                                 HouseholdMemberModel,
