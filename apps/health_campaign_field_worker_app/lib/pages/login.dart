@@ -5,12 +5,11 @@ import 'package:digit_ui_components/widgets/atoms/digit_loader.dart';
 import 'package:digit_ui_components/widgets/atoms/pop_up_card.dart';
 import 'package:digit_ui_components/widgets/molecules/digit_card.dart';
 import 'package:digit_ui_components/widgets/molecules/show_pop_up.dart';
-import 'package:digit_ui_components/widgets/privacy_notice/privacy_component.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:flutter_svg/flutter_svg.dart';
 import 'package:reactive_forms/reactive_forms.dart';
 
-import '../blocs/app_initialization/app_initialization.dart';
 import '../blocs/auth/auth.dart';
 import '../data/local_store/no_sql/schema/app_configuration.dart';
 import '../data/remote_client.dart';
@@ -193,29 +192,77 @@ class _LoginPageState extends LocalizedState<LoginPage> {
                       //         i18.privacyPolicy.privacyPolicyValidationText),
                       //   );
                       // }),
-                      DigitButton(
-                        label: localizations.translate(i18.login.actionLabel),
-                        type: DigitButtonType.primary,
-                        onPressed: () {
-                          form.markAllAsTouched();
-                          if (!form.valid) return;
+                      BlocBuilder<AuthBloc, AuthState>(
+                        builder: (context, authState) {
+                          final isLoading = authState is AuthLoadingState;
+                          
+                          return Container(
+                            margin: const EdgeInsets.only(top: spacer2),
+                            width: double.infinity,
+                            child: Stack(
+                              alignment: Alignment.center,
+                              children: [
+                                ElevatedButton(
+                                  onPressed: isLoading
+                                      ? null
+                                      : () {
+                                          form.markAllAsTouched();
+                                          if (!form.valid) return;
 
-                          FocusManager.instance.primaryFocus?.unfocus();
+                                          FocusManager.instance.primaryFocus?.unfocus();
 
-                          context.read<AuthBloc>().add(
-                                AuthLoginEvent(
-                                  userId:
-                                      (form.control(_userId).value as String)
-                                          .trim(),
-                                  password:
-                                      (form.control(_password).value as String)
-                                          .trim(),
-                                  tenantId: envConfig.variables.tenantId,
+                                          context.read<AuthBloc>().add(
+                                                AuthLoginEvent(
+                                                  userId:
+                                                      (form.control(_userId).value as String)
+                                                          .trim(),
+                                                  password:
+                                                      (form.control(_password).value as String)
+                                                          .trim(),
+                                                  tenantId: envConfig.variables.tenantId,
+                                                ),
+                                              );
+                                        },
+                                  style: ElevatedButton.styleFrom(
+                                    backgroundColor: theme.colorTheme.primary.primary1,
+                                    foregroundColor: theme.colorTheme.paper.primary,
+                                    disabledBackgroundColor: theme.colorTheme.primary.primary1.withOpacity(0.6),
+                                    padding: const EdgeInsets.symmetric(
+                                      horizontal: spacer4,
+                                      vertical: spacer3,
+                                    ),
+                                    shape: RoundedRectangleBorder(
+                                      borderRadius: BorderRadius.zero,
+                                    ),
+                                    minimumSize: const Size(double.infinity, 48),
+                                  ),
+                                  child: Text(
+                                    localizations.translate(i18.login.actionLabel),
+                                    style: textTheme.bodyL.copyWith(
+                                      color: theme.colorTheme.paper.primary,
+                                      fontWeight: FontWeight.w600,
+                                    ),
+                                  ),
                                 ),
-                              );
+                                if (isLoading)
+                                  Positioned.fill(
+                                    child: Center(
+                                      child: SizedBox(
+                                        width: 20,
+                                        height: 20,
+                                        child: CircularProgressIndicator(
+                                          strokeWidth: 2,
+                                          valueColor: AlwaysStoppedAnimation<Color>(
+                                            theme.colorTheme.paper.primary,
+                                          ),
+                                        ),
+                                      ),
+                                    ),
+                                  ),
+                              ],
+                            ),
+                          );
                         },
-                        size: DigitButtonSize.large,
-                        mainAxisSize: MainAxisSize.max,
                       ),
 
                       // OR separator - Show only when SSO is available
@@ -308,79 +355,130 @@ class _LoginPageState extends LocalizedState<LoginPage> {
   }
 
   Widget _buildSSOButton() {
+    // Get logo and name from API response
     final logoUrl = _ssoConfig?['logo'] as String?;
+    final ssoName = _ssoConfig?['name'] as String?;
     final theme = Theme.of(context);
     final textTheme = theme.digitTextTheme(context);
 
-    return Container(
-      margin: const EdgeInsets.only(top: spacer2),
-      width: double.infinity,
-      child: ElevatedButton(
-        onPressed: () {
-          FocusManager.instance.primaryFocus?.unfocus();
+    return BlocBuilder<AuthBloc, AuthState>(
+      builder: (context, authState) {
+        final isLoading = authState is AuthLoadingState;
+        
+        // Check if logo URL is SVG
+        final isSvg = logoUrl != null && logoUrl.toLowerCase().endsWith('.svg');
+        
+        return Container(
+          margin: const EdgeInsets.only(top: spacer2),
+          width: double.infinity,
+          child: ElevatedButton(
+            onPressed: isLoading
+                ? null
+                : () {
+                    FocusManager.instance.primaryFocus?.unfocus();
 
-          context.read<AuthBloc>().add(
-                AuthMicrosoftSSOLoginEvent(
-                  tenantId: envConfig.variables.tenantId,
-                ),
-              );
-        },
-        style: ElevatedButton.styleFrom(
-          backgroundColor: theme.colorTheme.primary.primary1,
-          foregroundColor: theme.colorTheme.paper.primary,
-          padding: const EdgeInsets.symmetric(
-            horizontal: spacer4,
-            vertical: spacer3,
-          ),
-          shape: RoundedRectangleBorder(
-            borderRadius: BorderRadius.circular(spacer1),
-          ),
-          minimumSize: const Size(double.infinity, 48),
-        ),
-        child: Row(
-          mainAxisAlignment: MainAxisAlignment.center,
-          mainAxisSize: MainAxisSize.min,
-          children: [
-            if (logoUrl != null)
-              Image.network(
-                logoUrl,
-                width: 20,
-                height: 20,
-                errorBuilder: (context, error, stackTrace) {
-                  return Icon(
-                    Icons.login,
-                    size: 20,
-                    color: theme.colorTheme.paper.primary,
-                  );
-                },
-                loadingBuilder: (context, child, loadingProgress) {
-                  if (loadingProgress == null) return child;
-                  return SizedBox(
+                    context.read<AuthBloc>().add(
+                          AuthMicrosoftSSOLoginEvent(
+                            tenantId: envConfig.variables.tenantId,
+                          ),
+                        );
+                  },
+            style: ElevatedButton.styleFrom(
+              backgroundColor: theme.colorTheme.primary.primary1,
+              foregroundColor: theme.colorTheme.paper.primary,
+              disabledBackgroundColor: theme.colorTheme.primary.primary1.withOpacity(0.6),
+              padding: const EdgeInsets.symmetric(
+                horizontal: spacer4,
+                vertical: spacer3,
+              ),
+              shape: RoundedRectangleBorder(
+                borderRadius: BorderRadius.zero,
+              ),
+              minimumSize: const Size(double.infinity, 48),
+            ),
+            child: Row(
+              mainAxisAlignment: MainAxisAlignment.center,
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                if (isLoading)
+                  SizedBox(
                     width: 20,
                     height: 20,
                     child: CircularProgressIndicator(
                       strokeWidth: 2,
-                      value: loadingProgress.expectedTotalBytes != null
-                          ? loadingProgress.cumulativeBytesLoaded /
-                              loadingProgress.expectedTotalBytes!
-                          : null,
+                      valueColor: AlwaysStoppedAnimation<Color>(
+                        theme.colorTheme.paper.primary,
+                      ),
                     ),
-                  );
-                },
-              ),
-            if (logoUrl != null) const SizedBox(width: spacer2),
-            Text(
-              localizations.translate(
-                i18.login.microsoftSSOLabel ?? 'LOGIN_MICROSOFT_SSO_LABEL',
-              ),
-              style: textTheme.bodyL.copyWith(
-                color: theme.colorTheme.paper.primary,
-                fontWeight: FontWeight.w600,
-              ),
+                  )
+                else if (logoUrl != null)
+                  isSvg
+                      ? SvgPicture.network(
+                          logoUrl,
+                          width: 20,
+                          height: 20,
+                          fit: BoxFit.contain,
+                          placeholderBuilder: (context) => SizedBox(
+                            width: 20,
+                            height: 20,
+                            child: CircularProgressIndicator(
+                              strokeWidth: 2,
+                              valueColor: AlwaysStoppedAnimation<Color>(
+                                theme.colorTheme.paper.primary,
+                              ),
+                            ),
+                          ),
+                          colorFilter: ColorFilter.mode(
+                            theme.colorTheme.paper.primary,
+                            BlendMode.srcIn,
+                          ),
+                        )
+                      : Image.network(
+                          logoUrl,
+                          width: 20,
+                          height: 20,
+                          fit: BoxFit.contain,
+                          errorBuilder: (context, error, stackTrace) {
+                            return Icon(
+                              Icons.login,
+                              size: 20,
+                              color: theme.colorTheme.paper.primary,
+                            );
+                          },
+                          loadingBuilder: (context, child, loadingProgress) {
+                            if (loadingProgress == null) return child;
+                            return SizedBox(
+                              width: 20,
+                              height: 20,
+                              child: CircularProgressIndicator(
+                                strokeWidth: 2,
+                                value: loadingProgress.expectedTotalBytes != null
+                                    ? loadingProgress.cumulativeBytesLoaded /
+                                        loadingProgress.expectedTotalBytes!
+                                    : null,
+                                valueColor: AlwaysStoppedAnimation<Color>(
+                                  theme.colorTheme.paper.primary,
+                                ),
+                              ),
+                            );
+                          },
+                        ),
+                if ((isLoading || logoUrl != null)) const SizedBox(width: spacer2),
+                Text(
+                  ssoName ??
+                      localizations.translate(
+                        i18.login.microsoftSSOLabel ?? 'LOGIN_MICROSOFT_SSO_LABEL',
+                      ),
+                  style: textTheme.bodyL.copyWith(
+                    color: theme.colorTheme.paper.primary,
+                    fontWeight: FontWeight.w600,
+                  ),
+                ),
+              ],
             ),
-          ],
-        ),
-      ),
+          ),
+        );
+      },
     );
   }
 

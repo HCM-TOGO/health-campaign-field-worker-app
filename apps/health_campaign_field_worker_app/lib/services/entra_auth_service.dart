@@ -345,14 +345,12 @@ class EntraAuthService {
         hasError = true;
       }
 
-      if (!hasError) {
-        // Clear all stored Entra tokens (always clear, even on error)
-        await _secureStorage.delete(key: _entraIdTokenKey);
-        await _secureStorage.delete(key: _entraAccessTokenKey);
-        await _secureStorage.delete(key: _entraRefreshTokenKey);
-        await _secureStorage.delete(key: _entraTokenExpiryKey);
-        await _secureStorage.delete(key: _codeVerifierKey);
-      }
+      // Clear all stored Entra tokens (always clear, even on error)
+      await _secureStorage.delete(key: _entraIdTokenKey);
+      await _secureStorage.delete(key: _entraAccessTokenKey);
+      await _secureStorage.delete(key: _entraRefreshTokenKey);
+      await _secureStorage.delete(key: _entraTokenExpiryKey);
+      await _secureStorage.delete(key: _codeVerifierKey);
     } catch (e) {
       hasError = true;
       AppLogger.instance.error(
