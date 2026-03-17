@@ -143,7 +143,12 @@ class EntraAuthService {
           entraConfig.clientId,
           entraConfig.redirectUrl,
           discoveryUrl: entraConfig.discoveryUrl,
-          scopes: ['openid', 'profile', 'offline_access'],
+          scopes: [
+            'openid',
+            'profile',
+            'offline_access',
+            'api://123f3eee-80a4-40cd-a235-f9edb3a25b38/access_as_user'
+          ],
           promptValues: ['select_account'],
         ),
       );

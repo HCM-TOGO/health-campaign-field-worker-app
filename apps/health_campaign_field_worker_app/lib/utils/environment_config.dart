@@ -4,8 +4,6 @@ import 'package:collection/collection.dart';
 import 'package:digit_ui_components/utils/app_logger.dart';
 import 'package:flutter_dotenv/flutter_dotenv.dart';
 
-import '../data/local_store/app_shared_preferences.dart';
-
 EnvironmentConfiguration envConfig = EnvironmentConfiguration.instance;
 
 class EnvironmentConfiguration {
@@ -203,12 +201,7 @@ class Variables {
       : _dotEnv.get(_actionMapUrl.key, fallback: _actionMapUrl.value);
 
   String get tenantId {
-    // First check if user has selected a tenantId from MDMS dropdown
-    final selectedTenantId = AppSharedPreferences().getSelectedTenantId;
-    if (selectedTenantId != null && selectedTenantId.isNotEmpty) {
-      return selectedTenantId;
-    }
-    // Fall back to environment variable
+    // Always use tenantId from .env file
     return useFallbackValues
         ? _tenantId.value
         : _dotEnv.get(_tenantId.key, fallback: _tenantId.value);
@@ -301,7 +294,7 @@ class Variables {
   EntraConfig get entraConfig {
     final tenantId = entraTenantId;
     final discoveryUrl =
-        'https://login.microsoftonline.com/$tenantId/v2.0/.well-known/openid-configuration';
+        'https://login.microsoftonline.com/$tenantId/.well-known/openid-configuration';
 
     return EntraConfig(
       clientId: entraClientId,

@@ -188,7 +188,9 @@ class AuthBloc extends Bloc<AuthEvent, AuthState> {
 
       final AuthModel result = await ssoAuthRepository!
           .exchangeEntraTokensForDigitAuth(
-              idToken: idToken, authToken: accessToken);
+              idToken: idToken,
+              authToken: accessToken,
+              tenantId: event.tenantId);
 
       // Step 3: Persist DIGIT session (same as regular login)
       await localSecureStore.setAuthCredentials(result);

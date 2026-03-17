@@ -195,7 +195,7 @@ class _LoginPageState extends LocalizedState<LoginPage> {
                       BlocBuilder<AuthBloc, AuthState>(
                         builder: (context, authState) {
                           final isLoading = authState is AuthLoadingState;
-                          
+
                           return Container(
                             margin: const EdgeInsets.only(top: spacer2),
                             width: double.infinity,
@@ -209,24 +209,32 @@ class _LoginPageState extends LocalizedState<LoginPage> {
                                           form.markAllAsTouched();
                                           if (!form.valid) return;
 
-                                          FocusManager.instance.primaryFocus?.unfocus();
+                                          FocusManager.instance.primaryFocus
+                                              ?.unfocus();
 
                                           context.read<AuthBloc>().add(
                                                 AuthLoginEvent(
-                                                  userId:
-                                                      (form.control(_userId).value as String)
-                                                          .trim(),
-                                                  password:
-                                                      (form.control(_password).value as String)
-                                                          .trim(),
-                                                  tenantId: envConfig.variables.tenantId,
+                                                  userId: (form
+                                                          .control(_userId)
+                                                          .value as String)
+                                                      .trim(),
+                                                  password: (form
+                                                          .control(_password)
+                                                          .value as String)
+                                                      .trim(),
+                                                  tenantId: envConfig
+                                                      .variables.tenantId,
                                                 ),
                                               );
                                         },
                                   style: ElevatedButton.styleFrom(
-                                    backgroundColor: theme.colorTheme.primary.primary1,
-                                    foregroundColor: theme.colorTheme.paper.primary,
-                                    disabledBackgroundColor: theme.colorTheme.primary.primary1.withOpacity(0.6),
+                                    backgroundColor:
+                                        theme.colorTheme.primary.primary1,
+                                    foregroundColor:
+                                        theme.colorTheme.paper.primary,
+                                    disabledBackgroundColor: theme
+                                        .colorTheme.primary.primary1
+                                        .withOpacity(0.6),
                                     padding: const EdgeInsets.symmetric(
                                       horizontal: spacer4,
                                       vertical: spacer3,
@@ -234,10 +242,12 @@ class _LoginPageState extends LocalizedState<LoginPage> {
                                     shape: RoundedRectangleBorder(
                                       borderRadius: BorderRadius.zero,
                                     ),
-                                    minimumSize: const Size(double.infinity, 48),
+                                    minimumSize:
+                                        const Size(double.infinity, 48),
                                   ),
                                   child: Text(
-                                    localizations.translate(i18.login.actionLabel),
+                                    localizations
+                                        .translate(i18.login.actionLabel),
                                     style: textTheme.bodyL.copyWith(
                                       color: theme.colorTheme.paper.primary,
                                       fontWeight: FontWeight.w600,
@@ -252,7 +262,8 @@ class _LoginPageState extends LocalizedState<LoginPage> {
                                         height: 20,
                                         child: CircularProgressIndicator(
                                           strokeWidth: 2,
-                                          valueColor: AlwaysStoppedAnimation<Color>(
+                                          valueColor:
+                                              AlwaysStoppedAnimation<Color>(
                                             theme.colorTheme.paper.primary,
                                           ),
                                         ),
@@ -356,18 +367,18 @@ class _LoginPageState extends LocalizedState<LoginPage> {
 
   Widget _buildSSOButton() {
     // Get logo and name from API response
-    final logoUrl = _ssoConfig?['logo'] as String?;
-    final ssoName = _ssoConfig?['name'] as String?;
+    final logoUrl = _ssoConfig?['ui']['logo'] as String?;
+    final ssoName = _ssoConfig?['ui']['name'] as String?;
     final theme = Theme.of(context);
     final textTheme = theme.digitTextTheme(context);
 
     return BlocBuilder<AuthBloc, AuthState>(
       builder: (context, authState) {
         final isLoading = authState is AuthLoadingState;
-        
+
         // Check if logo URL is SVG
         final isSvg = logoUrl != null && logoUrl.toLowerCase().endsWith('.svg');
-        
+
         return Container(
           margin: const EdgeInsets.only(top: spacer2),
           width: double.infinity,
@@ -386,7 +397,8 @@ class _LoginPageState extends LocalizedState<LoginPage> {
             style: ElevatedButton.styleFrom(
               backgroundColor: theme.colorTheme.primary.primary1,
               foregroundColor: theme.colorTheme.paper.primary,
-              disabledBackgroundColor: theme.colorTheme.primary.primary1.withOpacity(0.6),
+              disabledBackgroundColor:
+                  theme.colorTheme.primary.primary1.withOpacity(0.6),
               padding: const EdgeInsets.symmetric(
                 horizontal: spacer4,
                 vertical: spacer3,
@@ -452,7 +464,8 @@ class _LoginPageState extends LocalizedState<LoginPage> {
                               height: 20,
                               child: CircularProgressIndicator(
                                 strokeWidth: 2,
-                                value: loadingProgress.expectedTotalBytes != null
+                                value: loadingProgress.expectedTotalBytes !=
+                                        null
                                     ? loadingProgress.cumulativeBytesLoaded /
                                         loadingProgress.expectedTotalBytes!
                                     : null,
@@ -463,11 +476,13 @@ class _LoginPageState extends LocalizedState<LoginPage> {
                             );
                           },
                         ),
-                if ((isLoading || logoUrl != null)) const SizedBox(width: spacer2),
+                if ((isLoading || logoUrl != null))
+                  const SizedBox(width: spacer2),
                 Text(
                   ssoName ??
                       localizations.translate(
-                        i18.login.microsoftSSOLabel ?? 'LOGIN_MICROSOFT_SSO_LABEL',
+                        i18.login.microsoftSSOLabel ??
+                            'LOGIN_MICROSOFT_SSO_LABEL',
                       ),
                   style: textTheme.bodyL.copyWith(
                     color: theme.colorTheme.paper.primary,

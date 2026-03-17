@@ -28,7 +28,7 @@ class InitialScreenPage extends LocalizedStatefulWidget {
 class _InitialScreenPageState extends LocalizedState<InitialScreenPage> {
   bool _isLoading = false;
   bool _hasNavigated = false;
-  List<Map<String, dynamic>> _mdmsData = [];
+  List<String> _tenantIds = [];
   String? _selectedValue;
   String? _errorMessage;
 
@@ -51,38 +51,23 @@ class _InitialScreenPageState extends LocalizedState<InitialScreenPage> {
       final appInitBloc = context.read<AppInitializationBloc>();
       await _waitForAppInitialization(appInitBloc);
 
-      // Fetch MDMS data
-      const schemaCode = 'tenant.apk.tenants';
-      if (schemaCode.isEmpty) {
-        // If no schemaCode configured, skip to language selection
-        if (mounted && !_hasNavigated) {
-          _hasNavigated = true;
-          context.router.replaceAll([const LanguageSelectionRoute()]);
-        }
-        return;
-      }
-
+      // Fetch tenant list using new API
       final mdmsRepository = MdmsRepository(DioClient().dio);
-      final tenantId = envConfig.variables.tenantId;
-
-      final data = await mdmsRepository.searchMDMSBySchema(
-        tenantId: tenantId,
-        schemaCode: schemaCode,
-      );
+      final tenantIds = await mdmsRepository.searchTenants();
 
       if (mounted) {
         setState(() {
           _isLoading = false;
-          _mdmsData = data;
-          if (data.isEmpty) {
-            _errorMessage = 'No data found';
+          _tenantIds = tenantIds;
+          if (tenantIds.isEmpty) {
+            _errorMessage = 'No tenants found';
           }
         });
       }
     } catch (e) {
       AppLogger.instance.error(
         title: 'InitialScreen',
-        message: 'Error fetching MDMS data: $e',
+        message: 'Error fetching tenants: $e',
       );
       if (mounted) {
         setState(() {
@@ -94,7 +79,7 @@ class _InitialScreenPageState extends LocalizedState<InitialScreenPage> {
   }
 
   Future<void> _handleContinue() async {
-    if (_selectedValue == null && _mdmsData.isNotEmpty) {
+    if (_selectedValue == null && _tenantIds.isNotEmpty) {
       // Show error if nothing selected
       return;
     }
@@ -139,7 +124,7 @@ class _InitialScreenPageState extends LocalizedState<InitialScreenPage> {
             ? const Center(
                 child: CircularProgressIndicator(),
               )
-            : _mdmsData.isEmpty && _errorMessage == null
+            : _tenantIds.isEmpty && _errorMessage == null
                 ? const Center(
                     child: CircularProgressIndicator(),
                   )
@@ -160,7 +145,7 @@ class _InitialScreenPageState extends LocalizedState<InitialScreenPage> {
                                 ),
                               ),
                             ),
-                          if (_mdmsData.isNotEmpty) ...[
+                          if (_tenantIds.isNotEmpty) ...[
                             DigitCard(
                               margin: const EdgeInsets.all(spacer2),
                               children: [
@@ -175,11 +160,16 @@ class _InitialScreenPageState extends LocalizedState<InitialScreenPage> {
                                 const SizedBox(height: spacer4),
                                 DigitDropdown<String>(
                                   selectedOption: _selectedValue != null
-                                      ? _getDropdownItem(_selectedValue!)
+                                      ? DropdownItem(
+                                          code: _selectedValue!,
+                                          name: _selectedValue!,
+                                        )
                                       : null,
-                                  items: _mdmsData
-                                      .map((item) =>
-                                          _getDropdownItemFromMap(item))
+                                  items: _tenantIds
+                                      .map((tenantId) => DropdownItem(
+                                            code: tenantId,
+                                            name: tenantId,
+                                          ))
                                       .toList(),
                                   onSelect: (value) {
                                     setState(() {
@@ -243,38 +233,4 @@ class _InitialScreenPageState extends LocalizedState<InitialScreenPage> {
     );
   }
 
-  DropdownItem _getDropdownItem(String code) {
-    final item = _mdmsData.firstWhere(
-      (item) => _getCodeFromMap(item) == code,
-      orElse: () => <String, dynamic>{},
-    );
-    return _getDropdownItemFromMap(item);
-  }
-
-  DropdownItem _getDropdownItemFromMap(Map<String, dynamic> item) {
-    // Use tenantId as both code and display name
-    final tenantId = item['tenantId']?.toString() ??
-        item['code']?.toString() ??
-        item['id']?.toString() ??
-        item['value']?.toString() ??
-        '';
-
-    final tenantName = item['name']?.toString() ??
-        item['tenantId']?.toString() ??
-        item['value']?.toString() ??
-        '';
-
-    return DropdownItem(
-      code: tenantId,
-      name: tenantName, // Show tenantId in the dropdown
-    );
-  }
-
-  String _getCodeFromMap(Map<String, dynamic> item) {
-    return item['tenantId']?.toString() ??
-        item['code']?.toString() ??
-        item['id']?.toString() ??
-        item['value']?.toString() ??
-        '';
-  }
 }

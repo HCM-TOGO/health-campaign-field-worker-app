@@ -144,11 +144,11 @@ class AppRouter extends _$AppRouter {
         AutoRoute(
           page: InitialRouteRoute.page,
           path: 'initial',
-          initial: true,
         ),
         AutoRoute(
           page: LanguageSelectionRoute.page,
           path: 'language_selection',
+          initial: true,
         ),
         AutoRoute(page: LoginRoute.page, path: 'login'),
       ],

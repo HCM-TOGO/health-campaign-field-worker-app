@@ -9,17 +9,22 @@ import 'package:isar/isar.dart';
 import '../../../models/app_config/app_config_model.dart' as app_configuration;
 import '../../../models/mdms/service_registry/pgr_service_defenitions.dart';
 import '../../../models/mdms/service_registry/service_registry_model.dart';
+import '../../../models/request_info/request_info_model.dart';
 import '../../../models/role_actions/role_actions_model.dart';
+import '../../../utils/constants.dart';
 import '../../../utils/environment_config.dart';
 import '../../local_store/no_sql/schema/app_configuration.dart';
 import '../../local_store/no_sql/schema/project_types.dart';
 import '../../local_store/no_sql/schema/row_versions.dart';
 import '../../local_store/no_sql/schema/service_registry.dart';
+import '../../local_store/secure_store/secure_store.dart';
 
 class MdmsRepository {
   final Dio _client;
+  final LocalSecureStore _localSecureStore;
 
-  const MdmsRepository(this._client);
+  MdmsRepository(this._client, {LocalSecureStore? localSecureStore})
+      : _localSecureStore = localSecureStore ?? LocalSecureStore.instance;
 
   Future<ServiceRegistryPrimaryWrapperModel> searchServiceRegistry(
     String apiEndPoint,
@@ -555,6 +560,75 @@ class MdmsRepository {
     }
   }
 
+  /// Search tenants using the new tenant search API
+  /// Returns a list of tenant IDs as strings
+  /// If [tenantId] is not provided, envConfig.variables.tenantId is used.
+  Future<List<String>> searchTenants({String? tenantId}) async {
+    try {
+      final baseUrl = envConfig.variables.mdmsBaseUrl;
+      final apiPath = 'mdms-v2/v2/_search/tenants';
+      final effectiveTenantId = tenantId ?? envConfig.variables.tenantId;
+      final pathWithQuery = '$apiPath?tenantId=$effectiveTenantId';
+      final fullUrl = baseUrl.endsWith('/')
+          ? '$baseUrl$pathWithQuery'
+          : '$baseUrl/$pathWithQuery';
+
+      // Get auth token and user info
+      final authToken = await _localSecureStore.accessToken;
+      final userInfo = await _localSecureStore.userRequestModel;
+
+      // Build RequestInfo
+      final requestInfo = RequestInfoModel(
+        apiId: RequestInfoData.apiId,
+        ver: RequestInfoData.ver,
+        ts: DateTime.now().millisecondsSinceEpoch,
+        action: 'tenants',
+        did: RequestInfoData.did,
+        key: RequestInfoData.key,
+        msgId: 'search with from and to values',
+        authToken: authToken,
+        userInfo: userInfo,
+      );
+
+      final requestBody = {
+        'RequestInfo': requestInfo.toJson(),
+      };
+
+      final response = await _client.post(
+        fullUrl,
+        data: requestBody,
+      );
+
+      final responseData = response.data;
+      if (responseData is! Map<String, dynamic>) {
+        throw Exception('Invalid response format');
+      }
+
+      // Extract tenantIds from response
+      final tenantIds = responseData['tenantIds'];
+      if (tenantIds != null && tenantIds is List) {
+        return tenantIds
+            .whereType<String>()
+            .toList(); // Filter to ensure all items are strings
+      }
+
+      return [];
+    } on DioException catch (e) {
+      AppLogger.instance.error(
+        title: 'MDMS Repository',
+        message: 'Error searching tenants: $e',
+        stackTrace: e.stackTrace,
+      );
+      rethrow;
+    } catch (e) {
+      AppLogger.instance.error(
+        title: 'MDMS Repository',
+        message: 'Unexpected error searching tenants: $e',
+      );
+      rethrow;
+    }
+  }
+
   /// Fetch SSO Configuration from MDMS v1 API
   /// Returns the first active SSO configuration, or null if none found
   Future<Map<String, dynamic>?> fetchSSOConfiguration({
@@ -571,10 +645,10 @@ class MdmsRepository {
           'tenantId': tenantId,
           'moduleDetails': [
             {
-              'moduleName': 'common-masters',
+              'moduleName': 'SSO',
               'masterDetails': [
                 {
-                  'name': 'SSOConfiguration',
+                  'name': 'IdentityProviders',
                   'filter': '[?(@.active == true)]',
                 }
               ]
@@ -598,20 +672,20 @@ class MdmsRepository {
         return null;
       }
 
-      final commonMasters = mdmsRes['common-masters'];
-      if (commonMasters == null || commonMasters is! Map<String, dynamic>) {
+      final ssoModule = mdmsRes['SSO'];
+      if (ssoModule == null || ssoModule is! Map<String, dynamic>) {
         return null;
       }
 
-      final ssoConfigList = commonMasters['SSOConfiguration'];
-      if (ssoConfigList == null ||
-          ssoConfigList is! List ||
-          ssoConfigList.isEmpty) {
+      final identityProviders = ssoModule['IdentityProviders'];
+      if (identityProviders == null ||
+          identityProviders is! List ||
+          identityProviders.isEmpty) {
         return null;
       }
 
       // Return the first active SSO configuration
-      final firstConfig = ssoConfigList.first;
+      final firstConfig = identityProviders.first;
       if (firstConfig is Map<String, dynamic>) {
         return firstConfig;
       }

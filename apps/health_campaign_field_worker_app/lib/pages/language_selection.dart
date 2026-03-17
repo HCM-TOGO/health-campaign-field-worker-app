@@ -42,10 +42,8 @@ class _LanguageSelectionPageState extends State<LanguageSelectionPage> {
       canPop: false,
       onPopInvoked: (didPop) async {
         if (!didPop) {
-          // Clear the selected tenantId to use original .env value
-          await AppSharedPreferences().clearSelectedTenantId();
-          // Navigate to initial screen instead of closing the app
-          context.router.replaceAll([InitialRouteRoute()]);
+          // Exit the app when back is pressed on language selection
+          // (Language selection is now the initial screen)
         }
       },
       child: Scaffold(
