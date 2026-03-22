@@ -629,9 +629,9 @@ class MdmsRepository {
     }
   }
 
-  /// Fetch SSO Configuration from MDMS v1 API
-  /// Returns the first active SSO configuration, or null if none found
-  Future<Map<String, dynamic>?> fetchSSOConfiguration({
+  /// Fetch SSO providers from MDMS v1 API
+  /// Returns all active identity providers, or an empty list if none found
+  Future<List<Map<String, dynamic>>> fetchSSOConfiguration({
     required String tenantId,
   }) async {
     try {
@@ -664,46 +664,40 @@ class MdmsRepository {
 
       final responseData = response.data;
       if (responseData is! Map<String, dynamic>) {
-        return null;
+        return <Map<String, dynamic>>[];
       }
 
       final mdmsRes = responseData['MdmsRes'];
       if (mdmsRes == null || mdmsRes is! Map<String, dynamic>) {
-        return null;
+        return <Map<String, dynamic>>[];
       }
 
       final ssoModule = mdmsRes['SSO'];
       if (ssoModule == null || ssoModule is! Map<String, dynamic>) {
-        return null;
+        return <Map<String, dynamic>>[];
       }
 
       final identityProviders = ssoModule['IdentityProviders'];
       if (identityProviders == null ||
           identityProviders is! List ||
           identityProviders.isEmpty) {
-        return null;
+        return <Map<String, dynamic>>[];
       }
 
-      // Return the first active SSO configuration
-      final firstConfig = identityProviders.first;
-      if (firstConfig is Map<String, dynamic>) {
-        return firstConfig;
-      }
-
-      return null;
+      return identityProviders.whereType<Map<String, dynamic>>().toList();
     } on DioException catch (e) {
       AppLogger.instance.error(
         title: 'MDMS Repository',
         message: 'Error fetching SSO configuration: $e',
         stackTrace: e.stackTrace,
       );
-      return null;
+      return <Map<String, dynamic>>[];
     } catch (e) {
       AppLogger.instance.error(
         title: 'MDMS Repository',
         message: 'Unexpected error fetching SSO configuration: $e',
       );
-      return null;
+      return <Map<String, dynamic>>[];
     }
   }
 }

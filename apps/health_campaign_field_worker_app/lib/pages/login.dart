@@ -37,7 +37,7 @@ class _LoginPageState extends LocalizedState<LoginPage> {
   static const _password = 'password';
   static const _privacyCheck = 'privacyCheck';
 
-  Map<String, dynamic>? _ssoConfig;
+  List<Map<String, dynamic>> _ssoProviders = [];
   bool _isLoadingSSO = true;
 
   @override
@@ -57,14 +57,16 @@ class _LoginPageState extends LocalizedState<LoginPage> {
 
       if (mounted) {
         setState(() {
-          _ssoConfig = ssoConfig;
+          _ssoProviders = ssoConfig.where((provider) {
+            return provider['active'] == true;
+          }).toList();
           _isLoadingSSO = false;
         });
       }
     } catch (e) {
       if (mounted) {
         setState(() {
-          _ssoConfig = null;
+          _ssoProviders = [];
           _isLoadingSSO = false;
         });
       }
@@ -276,10 +278,25 @@ class _LoginPageState extends LocalizedState<LoginPage> {
                         },
                       ),
 
+                      if (_isLoadingSSO)
+                        Padding(
+                          padding: const EdgeInsets.symmetric(vertical: spacer4),
+                          child: Center(
+                            child: SizedBox(
+                              width: 24,
+                              height: 24,
+                              child: CircularProgressIndicator(
+                                strokeWidth: 2.5,
+                                valueColor: AlwaysStoppedAnimation<Color>(
+                                  theme.colorTheme.primary.primary1,
+                                ),
+                              ),
+                            ),
+                          ),
+                        ),
+
                       // OR separator - Show only when SSO is available
-                      if (!_isLoadingSSO &&
-                          _ssoConfig != null &&
-                          _ssoConfig!['active'] == true)
+                      if (!_isLoadingSSO && _ssoProviders.isNotEmpty)
                         Padding(
                           padding:
                               const EdgeInsets.symmetric(vertical: spacer4),
@@ -314,10 +331,8 @@ class _LoginPageState extends LocalizedState<LoginPage> {
                         ),
 
                       // Microsoft SSO Login Button - Show dynamically based on MDMS config
-                      if (!_isLoadingSSO &&
-                          _ssoConfig != null &&
-                          _ssoConfig!['active'] == true)
-                        _buildSSOButton(),
+                      if (!_isLoadingSSO && _ssoProviders.isNotEmpty)
+                        _buildSSOButtons(),
 
                       // Forgot Password button - always visible in both SSO and username/password modes
 
@@ -365,35 +380,173 @@ class _LoginPageState extends LocalizedState<LoginPage> {
     );
   }
 
-  Widget _buildSSOButton() {
-    // Get logo and name from API response
-    final logoUrl = _ssoConfig?['ui']['logo'] as String?;
-    final ssoName = _ssoConfig?['ui']['name'] as String?;
+  Widget _buildSSOButtons() {
+    final theme = Theme.of(context);
+    final showName = _ssoProviders.length == 1;
+    final providerCount = _ssoProviders.length;
+
+    if (providerCount > 3) {
+      return Scrollbar(
+        thumbVisibility: true,
+        child: SingleChildScrollView(
+          scrollDirection: Axis.horizontal,
+          child: Row(
+            children: _ssoProviders
+                .map(
+                  (provider) => Padding(
+                    padding: const EdgeInsets.only(right: spacer2),
+                    child: _buildSingleSSOButton(
+                      provider: provider,
+                      showName: false,
+                      compact: true,
+                    ),
+                  ),
+                )
+                .toList(),
+          ),
+        ),
+      );
+    }
+
+    return Row(
+      mainAxisAlignment: MainAxisAlignment.center,
+      children: _ssoProviders
+          .map(
+            (provider) => Padding(
+              padding: const EdgeInsets.only(right: spacer2),
+              child: _buildSingleSSOButton(
+                provider: provider,
+                showName: showName,
+                compact: !showName,
+              ),
+            ),
+          )
+          .toList(),
+    );
+  }
+
+  Widget _buildSingleSSOButton({
+    required Map<String, dynamic> provider,
+    required bool showName,
+    required bool compact,
+  }) {
+    final logoUrl = provider['ui']?['logo'] as String?;
+    final ssoName = provider['ui']?['name'] as String?;
     final theme = Theme.of(context);
     final textTheme = theme.digitTextTheme(context);
 
     return BlocBuilder<AuthBloc, AuthState>(
       builder: (context, authState) {
         final isLoading = authState is AuthLoadingState;
-
-        // Check if logo URL is SVG
         final isSvg = logoUrl != null && logoUrl.toLowerCase().endsWith('.svg');
+        final iconColor = showName
+            ? theme.colorTheme.paper.primary
+            : theme.colorTheme.primary.primary1;
+        final double iconSize = showName ? 20 : 28;
+
+        Widget iconWidget() {
+          if (isLoading) {
+            return SizedBox(
+              width: iconSize,
+              height: iconSize,
+              child: CircularProgressIndicator(
+                strokeWidth: 2,
+                valueColor: AlwaysStoppedAnimation<Color>(iconColor),
+              ),
+            );
+          }
+
+          if (logoUrl == null) {
+            return Icon(
+              Icons.login,
+              size: iconSize + 2,
+              color: iconColor,
+            );
+          }
+
+          if (isSvg) {
+            return SvgPicture.network(
+              logoUrl,
+              width: iconSize,
+              height: iconSize,
+              fit: BoxFit.contain,
+              placeholderBuilder: (context) => SizedBox(
+                width: iconSize,
+                height: iconSize,
+                child: CircularProgressIndicator(
+                  strokeWidth: 2,
+                  valueColor: AlwaysStoppedAnimation<Color>(iconColor),
+                ),
+              ),
+              colorFilter: ColorFilter.mode(
+                iconColor,
+                BlendMode.srcIn,
+              ),
+            );
+          }
+
+          return Image.network(
+            logoUrl,
+            width: iconSize,
+            height: iconSize,
+            fit: BoxFit.contain,
+            errorBuilder: (context, error, stackTrace) {
+              return Icon(
+                Icons.login,
+                size: iconSize + 2,
+                color: iconColor,
+              );
+            },
+            loadingBuilder: (context, child, loadingProgress) {
+              if (loadingProgress == null) return child;
+              return SizedBox(
+                width: iconSize,
+                height: iconSize,
+                child: CircularProgressIndicator(
+                  strokeWidth: 2,
+                  value: loadingProgress.expectedTotalBytes != null
+                      ? loadingProgress.cumulativeBytesLoaded /
+                          loadingProgress.expectedTotalBytes!
+                      : null,
+                  valueColor: AlwaysStoppedAnimation<Color>(iconColor),
+                ),
+              );
+            },
+          );
+        }
+
+        final onPressed = isLoading
+            ? null
+            : () {
+                FocusManager.instance.primaryFocus?.unfocus();
+                context.read<AuthBloc>().add(
+                      AuthMicrosoftSSOLoginEvent(
+                        tenantId: envConfig.variables.tenantId,
+                      ),
+                    );
+              };
+
+        if (!showName) {
+          return Container(
+            margin: const EdgeInsets.only(top: spacer2),
+            width: compact ? 56 : null,
+            height: 48,
+            child: Material(
+              color: Colors.transparent,
+              child: InkWell(
+                onTap: onPressed,
+                borderRadius: BorderRadius.circular(4),
+                child: Center(child: iconWidget()),
+              ),
+            ),
+          );
+        }
 
         return Container(
           margin: const EdgeInsets.only(top: spacer2),
-          width: double.infinity,
+          width: compact ? 56 : double.infinity,
           child: ElevatedButton(
-            onPressed: isLoading
-                ? null
-                : () {
-                    FocusManager.instance.primaryFocus?.unfocus();
-
-                    context.read<AuthBloc>().add(
-                          AuthMicrosoftSSOLoginEvent(
-                            tenantId: envConfig.variables.tenantId,
-                          ),
-                        );
-                  },
+            onPressed: onPressed,
             style: ElevatedButton.styleFrom(
               backgroundColor: theme.colorTheme.primary.primary1,
               foregroundColor: theme.colorTheme.paper.primary,
@@ -412,83 +565,21 @@ class _LoginPageState extends LocalizedState<LoginPage> {
               mainAxisAlignment: MainAxisAlignment.center,
               mainAxisSize: MainAxisSize.min,
               children: [
-                if (isLoading)
-                  SizedBox(
-                    width: 20,
-                    height: 20,
-                    child: CircularProgressIndicator(
-                      strokeWidth: 2,
-                      valueColor: AlwaysStoppedAnimation<Color>(
-                        theme.colorTheme.paper.primary,
-                      ),
-                    ),
-                  )
-                else if (logoUrl != null)
-                  isSvg
-                      ? SvgPicture.network(
-                          logoUrl,
-                          width: 20,
-                          height: 20,
-                          fit: BoxFit.contain,
-                          placeholderBuilder: (context) => SizedBox(
-                            width: 20,
-                            height: 20,
-                            child: CircularProgressIndicator(
-                              strokeWidth: 2,
-                              valueColor: AlwaysStoppedAnimation<Color>(
-                                theme.colorTheme.paper.primary,
-                              ),
-                            ),
-                          ),
-                          colorFilter: ColorFilter.mode(
-                            theme.colorTheme.paper.primary,
-                            BlendMode.srcIn,
-                          ),
-                        )
-                      : Image.network(
-                          logoUrl,
-                          width: 20,
-                          height: 20,
-                          fit: BoxFit.contain,
-                          errorBuilder: (context, error, stackTrace) {
-                            return Icon(
-                              Icons.login,
-                              size: 20,
-                              color: theme.colorTheme.paper.primary,
-                            );
-                          },
-                          loadingBuilder: (context, child, loadingProgress) {
-                            if (loadingProgress == null) return child;
-                            return SizedBox(
-                              width: 20,
-                              height: 20,
-                              child: CircularProgressIndicator(
-                                strokeWidth: 2,
-                                value: loadingProgress.expectedTotalBytes !=
-                                        null
-                                    ? loadingProgress.cumulativeBytesLoaded /
-                                        loadingProgress.expectedTotalBytes!
-                                    : null,
-                                valueColor: AlwaysStoppedAnimation<Color>(
-                                  theme.colorTheme.paper.primary,
-                                ),
-                              ),
-                            );
-                          },
-                        ),
-                if ((isLoading || logoUrl != null))
+                iconWidget(),
+                if (showName && (isLoading || logoUrl != null))
                   const SizedBox(width: spacer2),
-                Text(
-                  ssoName ??
-                      localizations.translate(
-                        i18.login.microsoftSSOLabel ??
-                            'LOGIN_MICROSOFT_SSO_LABEL',
-                      ),
-                  style: textTheme.bodyL.copyWith(
-                    color: theme.colorTheme.paper.primary,
-                    fontWeight: FontWeight.w600,
+                if (showName)
+                  Text(
+                    ssoName ??
+                        localizations.translate(
+                          i18.login.microsoftSSOLabel ??
+                              'LOGIN_MICROSOFT_SSO_LABEL',
+                        ),
+                    style: textTheme.bodyL.copyWith(
+                      color: theme.colorTheme.paper.primary,
+                      fontWeight: FontWeight.w600,
+                    ),
                   ),
-                ),
               ],
             ),
           ),
