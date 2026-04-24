@@ -14,6 +14,7 @@ import '../../data/repositories/remote/sso_auth.dart';
 import '../../models/entities/roles_type.dart';
 import '../../models/role_actions/role_actions_model.dart';
 import '../../services/entra_auth_service.dart';
+import '../../services/sso_provider_auth.dart';
 import '../../utils/environment_config.dart';
 
 // part 'auth.freezed.dart' need to be added to auto generate the files for freezed model
@@ -30,6 +31,7 @@ class AuthBloc extends Bloc<AuthEvent, AuthState> {
   final RemoteRepository<IndividualModel, IndividualSearchModel>
       individualRemoteRepository;
   final EntraAuthService entraAuthService;
+  final Map<String, SSOProviderAuthService> ssoProviderAuthServices;
 
   AuthBloc({
     required this.authRepository,
@@ -38,12 +40,19 @@ class AuthBloc extends Bloc<AuthEvent, AuthState> {
     required this.individualRemoteRepository,
     LocalSecureStore? localSecureStore,
     EntraAuthService? entraAuthService,
+    Map<String, SSOProviderAuthService>? ssoProviderAuthServices,
   })  : localSecureStore = LocalSecureStore.instance,
         entraAuthService = entraAuthService ?? EntraAuthService(),
+        ssoProviderAuthServices = ssoProviderAuthServices ??
+            {
+              'microsoft': MicrosoftSSOProviderAuthService(
+                entraAuthService ?? EntraAuthService(),
+              ),
+            },
         super(const AuthUnauthenticatedState()) {
     on(_onLogin);
     on(_onLogout);
-    on(_onMicrosoftSSOLogin);
+    on(_onSSOLogin);
     on(_onAutoLogin);
     on(_onAddSpaqCounts);
   }
@@ -155,29 +164,31 @@ class AuthBloc extends Bloc<AuthEvent, AuthState> {
     }
   }
 
-  //_onMicrosoftSSOLogin event handles Microsoft Entra ID SSO login
-  // This flow:
-  // 1. Authenticates user with Microsoft Entra ID
-  // 2. Exchanges Entra tokens for DIGIT JWT tokens via backend
-  // 3. Persists session exactly like regular login
-  FutureOr<void> _onMicrosoftSSOLogin(
-    AuthMicrosoftSSOLoginEvent event,
+  //_onSSOLogin handles provider-based SSO login
+  // For unsupported providers, a user-friendly message is emitted.
+  FutureOr<void> _onSSOLogin(
+    AuthSSOLoginEvent event,
     AuthEmitter emit,
   ) async {
     emit(const AuthLoadingState());
 
     try {
-      // Step 1: Authenticate with Microsoft Entra ID
-      final entraResult = await entraAuthService.signInWithMicrosoft();
-
-      if (entraResult == null) {
-        emit(const AuthErrorState('Microsoft sign-in cancelled or failed'));
+      final providerKey = event.providerKey.toLowerCase();
+      final providerService = ssoProviderAuthServices[providerKey];
+      if (providerService == null) {
+        emit(const AuthErrorState('Provider not supported yet'));
         emit(const AuthUnauthenticatedState());
         return;
       }
 
-      final idToken = entraResult['idToken'] as String;
-      final accessToken = entraResult['accessToken'] as String;
+      // Step 1: Authenticate with selected provider
+      final providerResult = await providerService.signIn();
+      if (providerResult == null) {
+        emit(AuthErrorState(
+            '${event.providerKey} sign-in cancelled or failed'));
+        emit(const AuthUnauthenticatedState());
+        return;
+      }
 
       // Step 2: Exchange Entra tokens for DIGIT tokens via backend
       if (ssoAuthRepository == null) {
@@ -188,8 +199,8 @@ class AuthBloc extends Bloc<AuthEvent, AuthState> {
 
       final AuthModel result = await ssoAuthRepository!
           .exchangeEntraTokensForDigitAuth(
-              idToken: idToken,
-              authToken: accessToken,
+              idToken: providerResult.idToken,
+              authToken: providerResult.accessToken,
               tenantId: event.tenantId);
 
       // Step 3: Persist DIGIT session (same as regular login)
@@ -235,7 +246,7 @@ class AuthBloc extends Bloc<AuthEvent, AuthState> {
         ),
       );
     } on DioException catch (error) {
-      String errorMessage = 'Microsoft SSO login failed';
+      String errorMessage = '${event.providerKey} SSO login failed';
 
       // Handle specific error cases
       if (error.response != null) {
@@ -262,11 +273,11 @@ class AuthBloc extends Bloc<AuthEvent, AuthState> {
       emit(const AuthUnauthenticatedState());
 
       AppLogger.instance.error(
-        title: 'Microsoft SSO login error',
+        title: '${event.providerKey} SSO login error',
         message: error.response?.data.toString() ?? error.toString(),
       );
     } catch (error) {
-      String errorMessage = 'Microsoft SSO login failed';
+      String errorMessage = '${event.providerKey} SSO login failed';
 
       if (error.toString().contains('cancelled') ||
           error.toString().contains('canceled')) {
@@ -282,7 +293,7 @@ class AuthBloc extends Bloc<AuthEvent, AuthState> {
       emit(const AuthUnauthenticatedState());
 
       AppLogger.instance.error(
-        title: 'Microsoft SSO login error',
+        title: '${event.providerKey} SSO login error',
         message: error.toString(),
       );
     }
@@ -396,9 +407,10 @@ class AuthEvent with _$AuthEvent {
     required int spaq2Count,
   }) = AuthAddSpaqCountsEvent;
 
-  const factory AuthEvent.microsoftSSOLogin({
+  const factory AuthEvent.ssoLogin({
+    required String providerKey,
     required String tenantId,
-  }) = AuthMicrosoftSSOLoginEvent;
+  }) = AuthSSOLoginEvent;
 
   const factory AuthEvent.autoLogin({
     required String tenantId,

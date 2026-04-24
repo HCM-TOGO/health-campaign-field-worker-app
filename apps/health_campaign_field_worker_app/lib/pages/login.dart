@@ -385,6 +385,19 @@ class _LoginPageState extends LocalizedState<LoginPage> {
     final showName = _ssoProviders.length == 1;
     final providerCount = _ssoProviders.length;
 
+    // When there is a single SSO provider we show a full-width button with text.
+    // Avoid placing it in a Row without Expanded/Flexible (Row gives unbounded width).
+    if (providerCount == 1 && showName) {
+      return SizedBox(
+        width: double.infinity,
+        child: _buildSingleSSOButton(
+          provider: _ssoProviders.first,
+          showName: true,
+          compact: false,
+        ),
+      );
+    }
+
     if (providerCount > 3) {
       return Scrollbar(
         thumbVisibility: true,
@@ -519,8 +532,10 @@ class _LoginPageState extends LocalizedState<LoginPage> {
             ? null
             : () {
                 FocusManager.instance.primaryFocus?.unfocus();
+                final providerKey = _getProviderKey(provider);
                 context.read<AuthBloc>().add(
-                      AuthMicrosoftSSOLoginEvent(
+                      AuthSSOLoginEvent(
+                        providerKey: providerKey,
                         tenantId: envConfig.variables.tenantId,
                       ),
                     );
@@ -544,7 +559,7 @@ class _LoginPageState extends LocalizedState<LoginPage> {
 
         return Container(
           margin: const EdgeInsets.only(top: spacer2),
-          width: compact ? 56 : double.infinity,
+          width: compact ? 56 : null,
           child: ElevatedButton(
             onPressed: onPressed,
             style: ElevatedButton.styleFrom(
@@ -601,6 +616,23 @@ class _LoginPageState extends LocalizedState<LoginPage> {
           value: false,
         )
       });
+
+  String _getProviderKey(Map<String, dynamic> provider) {
+    final explicitCode = provider['code']?.toString().trim().toLowerCase();
+    if (explicitCode != null && explicitCode.isNotEmpty) {
+      return explicitCode;
+    }
+
+    final name = provider['ui']?['name']?.toString().trim().toLowerCase() ?? '';
+    if (name.contains('microsoft') || name.contains('entra')) {
+      return 'microsoft';
+    }
+    if (name.contains('google')) {
+      return 'google';
+    }
+
+    return name.isNotEmpty ? name : 'unknown';
+  }
 }
 
 // convert to privacy notice model
