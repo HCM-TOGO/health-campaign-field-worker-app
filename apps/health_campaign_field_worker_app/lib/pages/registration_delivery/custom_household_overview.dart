@@ -1,4 +1,3 @@
-import 'package:auto_route/auto_route.dart';
 import 'package:collection/collection.dart';
 import 'package:digit_data_model/data_model.dart';
 import 'package:digit_data_model/models/entities/household_type.dart';
@@ -7,7 +6,6 @@ import 'package:digit_ui_components/theme/digit_extended_theme.dart';
 import 'package:digit_ui_components/theme/digit_theme.dart';
 import 'package:digit_ui_components/theme/spacers.dart';
 import 'package:digit_ui_components/utils/date_utils.dart';
-import 'package:digit_ui_components/widgets/atoms/digit_action_card.dart';
 import 'package:digit_ui_components/widgets/atoms/digit_button.dart';
 import 'package:digit_ui_components/widgets/atoms/digit_chip.dart';
 import 'package:digit_ui_components/widgets/atoms/digit_search_bar.dart';
@@ -17,11 +15,6 @@ import 'package:digit_ui_components/widgets/molecules/show_pop_up.dart';
 import 'package:digit_ui_components/widgets/scrollable_content.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:health_campaign_field_worker_app/blocs/registration_delivery/custom_beneficairy_registration.dart';
-import 'package:registration_delivery/widgets/component_wrapper/product_variant_bloc_wrapper.dart';
-import 'package:survey_form/survey_form.dart';
-
-import 'package:registration_delivery/widgets/status_filter/status_filter.dart';
 import 'package:registration_delivery/blocs/delivery_intervention/deliver_intervention.dart';
 import 'package:registration_delivery/blocs/household_overview/household_overview.dart';
 import 'package:registration_delivery/blocs/search_households/search_bloc_common_wrapper.dart';
@@ -31,20 +24,21 @@ import 'package:registration_delivery/models/entities/registration_delivery_enum
 import 'package:registration_delivery/models/entities/status.dart';
 import 'package:registration_delivery/router/registration_delivery_router.gm.dart';
 import 'package:registration_delivery/utils/i18_key_constants.dart' as i18;
-import '../../models/entities/additional_fields_type.dart';
-import '../../utils/i18_key_constants.dart' as i18_local;
 import 'package:registration_delivery/utils/utils.dart';
-import '../../utils/extensions/extensions.dart';
-import '../../widgets/custom_back_navigation.dart';
+import 'package:registration_delivery/widgets/component_wrapper/product_variant_bloc_wrapper.dart';
 import 'package:registration_delivery/widgets/localized.dart';
-import 'package:registration_delivery/widgets/member_card/member_card.dart';
+import 'package:registration_delivery/widgets/status_filter/status_filter.dart';
 import 'package:registration_delivery/widgets/table_card/table_card.dart';
+import 'package:survey_form/survey_form.dart';
 
+import '../../blocs/registration_delivery/custom_beneficairy_registration.dart';
 import '../../router/app_router.dart';
 import '../../utils/app_enums.dart';
-import '../../utils/registration_delivery/utils_smc.dart';
-import '../../widgets/registration_delivery/custom_member_card.dart';
+import '../../utils/extensions/extensions.dart';
 import '../../utils/i18_key_constants.dart' as i18_local;
+import '../../utils/registration_delivery/utils_smc.dart';
+import '../../widgets/custom_back_navigation.dart';
+import '../../widgets/registration_delivery/custom_member_card.dart';
 
 @RoutePage()
 class CustomHouseholdOverviewPage extends LocalizedStatefulWidget {
@@ -745,11 +739,12 @@ class _CustomHouseholdOverviewPageState
                                                   ? state.householdMemberWrapper
                                                       .tasks
                                                       ?.where((element) =>
-                                                          element
-                                                              .projectBeneficiaryClientReferenceId ==
-                                                          projectBeneficiary
-                                                              ?.first
-                                                              .clientReferenceId)
+                                                          element.projectBeneficiaryClientReferenceId ==
+                                                              projectBeneficiary
+                                                                  ?.first
+                                                                  .clientReferenceId &&
+                                                          element.isDeleted !=
+                                                              true)
                                                       .toList()
                                                   : null;
                                               final referralData =

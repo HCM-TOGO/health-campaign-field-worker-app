@@ -2016,6 +2016,10 @@ class CustomStockDetailsPageState
                                         i18.stockDetails.commentsLabel,
                                       ),
                                       onChange: (val) {
+                                        if (val == '') {
+                                          field.control.value = null;
+                                          return;
+                                        }
                                         field.control.value = val;
                                       },
                                     );
