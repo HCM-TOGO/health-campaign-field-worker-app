@@ -33,6 +33,7 @@ import 'package:digit_dss/models/entities/dashboard_response_model.dart';
 import 'package:digit_dss/router/dashboard_router.gm.dart';
 import 'package:digit_dss/utils/utils.dart';
 import 'package:digit_location_tracker/utils/utils.dart';
+import 'package:digit_components/widgets/digit_card.dart';
 import 'package:digit_ui_components/digit_components.dart';
 import 'package:digit_ui_components/utils/component_utils.dart';
 import 'package:drift_db_viewer/drift_db_viewer.dart';
@@ -59,12 +60,12 @@ import '../utils/debound.dart';
 import '../utils/environment_config.dart';
 import '../utils/i18_key_constants.dart' as i18;
 import '../utils/least_level_boundary_singleton.dart';
-import '../utils/stock_in_hand_utils.dart';
 import '../utils/utils.dart';
 import '../widgets/header/back_navigation_help_header.dart';
 import '../widgets/home/home_item_card.dart';
 import '../widgets/localized.dart';
 import '../widgets/registration_delivery/custom_beneficiary_progress.dart';
+import '../widgets/stock_balance/stock_balance_card.dart';
 import '../widgets/showcase/config/showcase_constants.dart';
 import '../widgets/showcase/showcase_button.dart';
 import 'edit/task_list.dart';
@@ -88,7 +89,7 @@ class _HomePageState extends LocalizedState<HomePage> {
   final storage = const FlutterSecureStorage();
   late StreamSubscription<List<ConnectivityResult>> subscription;
   bool isTriggerLocalisation = true;
-  late Future<Map<String, double>> _stockInHandFuture;
+  // Stock in hand UI is handled by StockBalanceCard.
 
   @override
   initState() {
@@ -105,8 +106,6 @@ class _HomePageState extends LocalizedState<HomePage> {
     });
     //// Function to set initial Data required for the packages to run
     setPackagesSingleton(context);
-
-    _stockInHandFuture = _loadStockInHand();
   }
 
   //  Be sure to cancel subscription after you are done
@@ -181,24 +180,7 @@ class _HomePageState extends LocalizedState<HomePage> {
                     ),
               Padding(
                 padding: const EdgeInsets.symmetric(horizontal: spacer2),
-                child: FutureBuilder<Map<String, double>>(
-                  future: _stockInHandFuture,
-                  builder: (context, snapshot) {
-                    final data = snapshot.data;
-                    if (data == null) return const SizedBox.shrink();
-
-                    final spaq1 = data['spaq1'] ?? 0;
-                    final spaq2 = data['spaq2'] ?? 0;
-
-                    return InfoCard(
-                      type: InfoType.info,
-                      title: localizations.translate(i18.home.manageStockLabel),
-                      description:
-                          '${Constants.spaq1}: ${spaq1.toStringAsFixed(0)}\n'
-                          '${Constants.spaq2}: ${spaq2.toStringAsFixed(0)}',
-                    );
-                  },
-                ),
+                child: const StockBalanceCard(),
               ),
             ],
           ),
@@ -357,92 +339,6 @@ class _HomePageState extends LocalizedState<HomePage> {
         action: (ctx) => Navigator.pop(ctx),
       ),
     );
-  }
-
-  Future<Map<String, double>> _loadStockInHand() async {
-    final userId = context.loggedInUserUuid;
-    final stockOwnerIds = await _getStockOwnerIds();
-
-    final stockRepo =
-        context.read<LocalRepository<StockModel, StockSearchModel>>();
-    final taskRepo = context.read<LocalRepository<TaskModel, TaskSearchModel>>();
-
-    final received = await stockRepo.search(
-      StockSearchModel(receiverId: stockOwnerIds),
-    );
-    final sentMap = <String, StockModel>{};
-    for (final id in stockOwnerIds) {
-      final sent = await stockRepo.search(StockSearchModel(senderId: id));
-      for (final s in sent) {
-        sentMap[s.clientReferenceId] = s;
-      }
-    }
-
-    final allStocksMap = <String, StockModel>{};
-    for (final s in received) {
-      allStocksMap[s.clientReferenceId] = s;
-    }
-    allStocksMap.addAll(sentMap);
-
-    final tasks = await taskRepo.search(
-      TaskSearchModel(createdBy: userId),
-    );
-
-    final variantIds = <String>[
-      Constants.spaq1VariantId,
-      Constants.spaq2VariantId,
-      Constants.spaq1VariantIdProd,
-      Constants.spaq2VariantIdProd,
-    ].toSet().toList();
-
-    final results = <String, double>{};
-    for (final variantId in variantIds) {
-      final res = calculateStockInHand(
-        stockEntries: allStocksMap.values.toList(),
-        tasksCreatedByUser: tasks,
-        stockOwnerIds: stockOwnerIds,
-        productVariantId: variantId,
-      );
-      results[variantId] = res.stockInHand;
-    }
-
-    final spaq1 = (results[Constants.spaq1VariantId] ?? 0) +
-        (results[Constants.spaq1VariantIdProd] ?? 0);
-    final spaq2 = (results[Constants.spaq2VariantId] ?? 0) +
-        (results[Constants.spaq2VariantIdProd] ?? 0);
-
-    return {'spaq1': spaq1, 'spaq2': spaq2};
-  }
-
-  Future<List<String>> _getStockOwnerIds() async {
-    final roles = context.loggedInUserRoles.map((e) => e.code).toList();
-    final isDistributor = roles.contains(RolesType.distributor.toValue()) ||
-        roles.contains(RolesType.communityDistributor.toValue());
-
-    if (isDistributor) return [context.loggedInUserUuid];
-
-    final repo = context.read<
-        LocalRepository<ProjectFacilityModel, ProjectFacilitySearchModel>>();
-    final projectFacilities = await repo.search(
-      ProjectFacilitySearchModel(projectId: [context.projectId]),
-    );
-
-    final currentFacilities = projectFacilities.where((pf) {
-      final facilityLevel = pf.additionalFields?.fields
-          ?.where((f) => f.key == 'facilityLevel')
-          .firstOrNull
-          ?.value;
-      return facilityLevel == null || facilityLevel == 'current';
-    }).toList();
-
-    final facilityIds = currentFacilities
-        .map((e) => e.facilityId)
-        .whereType<String>()
-        .where((e) => e.isNotEmpty)
-        .toSet()
-        .toList();
-
-    return facilityIds.isEmpty ? [context.loggedInUserUuid] : facilityIds;
   }
 
   _HomeItemDataModel? _getItems(BuildContext context) {
@@ -738,7 +634,7 @@ class _HomePageState extends LocalizedState<HomePage> {
 
     // if ((envConfig.variables.envType == EnvType.demo && kReleaseMode) ||
     //     envConfig.variables.envType == EnvType.uat) {
-    filteredLabels.remove(i18.home.db);
+    // filteredLabels.remove(i18.home.db);
     // }
 
     final List<Widget> widgetList =
@@ -794,7 +690,7 @@ class _HomePageState extends LocalizedState<HomePage> {
                     LocalRepository<IndividualModel, IndividualSearchModel>>(),
                 // context.read<
                 //     LocalRepository<UserActionModel, UserActionSearchModel>>(),
-                context.read<LocalRepository<StockModel, StockSearchModel>>(),
+                // context.read<LocalRepository<StockModel, StockSearchModel>>(),
               ],
               remoteRepositories: [
                 // INFO : Need to add repo repo of package Here
