@@ -1548,6 +1548,74 @@ class CustomMemberCard extends StatelessWidget {
                               }
                             },
                           ),
+                          ActionCardModel(
+                            icon: Icons.edit_sharp,
+                            label: localizations.translate(
+                              i18_local
+                                  .householdOverView.editVaccinationDetails,
+                            ),
+                            action: () {
+                              Navigator.of(context, rootNavigator: true).pop();
+                              final zeroDoseTasks =
+                                  _getZeroDoseStatusData(context);
+                              if (zeroDoseTasks != null &&
+                                  zeroDoseTasks.isNotEmpty) {
+                                final bloc =
+                                    context.read<HouseholdOverviewBloc>();
+                                final projectId =
+                                    RegistrationDeliverySingleton().projectId!;
+                                final beneficiaryType =
+                                    RegistrationDeliverySingleton()
+                                        .beneficiaryType!;
+                                context.router
+                                    .push(
+                                  ZeroDoseCheckRoute(
+                                    eligibilityAssessmentType:
+                                        EligibilityAssessmentType.smc,
+                                    isAdministration: false,
+                                    isEditing: true,
+                                    projectBeneficiaryClientReferenceId:
+                                        projectBeneficiaryClientReferenceId,
+                                    individual: individual,
+                                    task: zeroDoseTasks.first,
+                                  ),
+                                )
+                                    .then((_) {
+                                  bloc.add(
+                                    HouseholdOverviewReloadEvent(
+                                      projectId: projectId,
+                                      projectBeneficiaryType: beneficiaryType,
+                                    ),
+                                  );
+                                });
+                              } else {
+                                DigitDialog.show(
+                                  context,
+                                  options: DigitDialogOptions(
+                                    titleText: localizations.translate(
+                                      i18_local.householdOverView
+                                          .noVaccinationTasksAvailableTitle,
+                                    ),
+                                    contentText: localizations.translate(
+                                      i18_local.householdOverView
+                                          .noVaccinationTasksAvailableContent,
+                                    ),
+                                    primaryAction: DigitDialogActions(
+                                      label: localizations.translate(
+                                        i18.common.coreCommonOk,
+                                      ),
+                                      action: (ctx) {
+                                        Navigator.of(
+                                          ctx,
+                                          rootNavigator: true,
+                                        ).pop();
+                                      },
+                                    ),
+                                  ),
+                                );
+                              }
+                            },
+                          ),
                         ],
                       ),
                     ),

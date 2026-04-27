@@ -216,6 +216,14 @@ class HouseholdOverView {
 
   String get noTasksAvailableContent =>
       'MEMBER_CARD_NO_TASKS_AVAILABLE_CONTENT';
+
+  String get editVaccinationDetails => 'MEMBER_CARD_EDIT_VACCINE_DETAILS';
+
+  String get noVaccinationTasksAvailableTitle =>
+      'MEMBER_CARD_NO_VACCINATION_TASKS_AVAILABLE_TITLE';
+
+  String get noVaccinationTasksAvailableContent =>
+      'MEMBER_CARD_NO_VACCINATION_TASKS_AVAILABLE_CONTENT';
 }
 
 class EditTasks {
@@ -586,6 +594,14 @@ class HomeShowcase {
 
   String get summaryReportSPAQ2 {
     return 'HOME_SHOWCASE_SUMMARY_REPORT_SPAQ2';
+  }
+
+  String get summaryReportUnprocessedRecords {
+    return 'HOME_SHOWCASE_SUMMARY_REPORT_UNPROCESSED_RECORDS';
+  }
+
+  String get summaryReportPendingEligible {
+    return 'HOME_SHOWCASE_SUMMARY_REPORT_PENDING_ELIGIBLE';
   }
 
   String get distributorProgressBar {

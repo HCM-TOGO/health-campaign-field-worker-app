@@ -1,20 +1,15 @@
-import 'package:collection/collection.dart';
 import 'package:digit_components/digit_components.dart';
-import 'package:digit_components/utils/date_utils.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import '../../widgets/localized.dart';
-import '../../widgets/reports/readonly_pluto_grid.dart';
-import 'package:intl/intl.dart';
 import 'package:reactive_forms/reactive_forms.dart';
-import 'package:registration_delivery/models/entities/household.dart';
-import 'package:registration_delivery/registration_delivery.dart';
 import 'package:registration_delivery/widgets/back_navigation_help_header.dart';
 
 import '../../../router/app_router.dart';
-import '../../../utils/utils.dart';
 import '../../../utils/i18_key_constants.dart' as i18Local;
+import '../../../utils/utils.dart';
 import '../../blocs/inventory_management/custom_summary_report_bloc.dart';
+import '../../widgets/localized.dart';
+import '../../widgets/reports/readonly_pluto_grid.dart';
 
 @RoutePage()
 class CustomSummaryReportPage extends LocalizedStatefulWidget {
@@ -53,6 +48,9 @@ class _CustomSummaryReportState
   static const _usedTablet_3_11monthKey = 'usedTablet3_11month';
   static const _usedTablet_12_59monthKey = 'usedTablet12s_59month';
   static const _zeroDoseChildrenKey = 'zeroDoseChildren';
+  static const _unprocessedRecordsWithoutExplanationKey =
+      'unprocessedRecordsWithoutExplanation';
+  static const _pendingEligibleChildrenKey = 'pendingEligibleChildren';
 
   FormGroup _form() {
     return fb.group({});
@@ -148,6 +146,19 @@ class _CustomSummaryReportState
                               key: _zeroDoseChildrenKey,
                               width: 180,
                             ),
+                            DigitGridColumn(
+                              label: localizations.translate(i18Local
+                                  .homeShowcase
+                                  .summaryReportUnprocessedRecords),
+                              key: _unprocessedRecordsWithoutExplanationKey,
+                              width: 180,
+                            ),
+                            DigitGridColumn(
+                              label: localizations.translate(i18Local
+                                  .homeShowcase.summaryReportPendingEligible),
+                              key: _pendingEligibleChildrenKey,
+                              width: 180,
+                            ),
                           ],
                           rows: [
                             for (final entry
@@ -196,6 +207,21 @@ class _CustomSummaryReportState
                                     value:
                                         (entry.value[Constants.zeroDose] ?? 0)
                                             .toString(),
+                                  ),
+                                  DigitGridCell(
+                                    key:
+                                        _unprocessedRecordsWithoutExplanationKey,
+                                    value:
+                                        (entry.value[Constants.unprocessed] ??
+                                                0)
+                                            .toString(),
+                                  ),
+                                  DigitGridCell(
+                                    key: _pendingEligibleChildrenKey,
+                                    value: (entry.value[
+                                                Constants.pendingEligible] ??
+                                            0)
+                                        .toString(),
                                   ),
                                 ],
                               ),

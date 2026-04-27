@@ -280,6 +280,12 @@ class MainApplicationState extends State<MainApplication>
                             productVariantDataRepository: context.repository<
                                 ProductVariantModel,
                                 ProductVariantSearchModel>(),
+                            individualDataRepository: context.repository<
+                                IndividualModel,
+                                IndividualSearchModel>(),
+                            projectBeneficiaryDataRepository: context.repository<
+                                ProjectBeneficiaryModel,
+                                ProjectBeneficiarySearchModel>(),
                           ),
                         ),
                         BlocProvider(
