@@ -135,6 +135,8 @@ class Constants {
   static const String tablet_3_11 = "tablet_3_11";
   static const String tablet_12_59 = "tablet_12_59";
   static const String zeroDose = 'zeroDose';
+  static const String unprocessed = 'unprocessed';
+  static const String pendingEligible = 'pendingEligible';
 
   // todo enable before cycle2
   static const bool isDownSyncEnabled = true;

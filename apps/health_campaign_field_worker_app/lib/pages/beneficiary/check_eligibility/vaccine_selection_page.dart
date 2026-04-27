@@ -499,13 +499,14 @@ class _VaccineSelectionPageState extends LocalizedState<VaccineSelectionPage> {
 
   @override
   Widget build(BuildContext context) {
-    final dob = context
-        .read<HouseholdOverviewBloc>()
-        .state
-        .selectedIndividual
-        ?.dateOfBirth;
+    final dob = widget.individual?.dateOfBirth ??
+        context
+            .read<HouseholdOverviewBloc>()
+            .state
+            .selectedIndividual
+            ?.dateOfBirth;
     final theme = Theme.of(context);
-    final ageInDays = calculateAgeInDaysFromDob(dob!);
+    final ageInDays = calculateAgeInDaysFromDob(dob ?? '');
 
     return BlocListener<ServiceBloc, ServiceState>(listener: (context, state) {
       state.maybeWhen(
@@ -986,9 +987,38 @@ class _VaccineSelectionPageState extends LocalizedState<VaccineSelectionPage> {
 
                                         final oldTask =
                                             deliverState.oldTask ?? widget.task;
-                                        final oldFields =
-                                            oldTask.additionalFields?.fields ??
-                                                [];
+                                        final keysToRewrite = {
+                                          additional_fields_local
+                                              .AdditionalFieldsType
+                                              .zeroDoseStatus
+                                              .toValue(),
+                                          additional_fields_local
+                                              .AdditionalFieldsType
+                                              .hasImmunizationCard
+                                              .toValue(),
+                                          additional_fields_local
+                                              .AdditionalFieldsType
+                                              .immunizationCardLost
+                                              .toValue(),
+                                          additional_fields_local
+                                              .AdditionalFieldsType
+                                              .receivedPenta1
+                                              .toValue(),
+                                          additional_fields_local
+                                              .AdditionalFieldsType
+                                              .selectedVaccines
+                                              .toValue(),
+                                          additional_fields_local
+                                              .AdditionalFieldsType
+                                              .noSelectedVaccines
+                                              .toValue(),
+                                        };
+                                        final oldFields = (oldTask
+                                                    .additionalFields?.fields ??
+                                                [])
+                                            .where((f) =>
+                                                !keysToRewrite.contains(f.key))
+                                            .toList();
 
                                         final updatedFields = [
                                           ...oldFields,
@@ -1051,14 +1081,7 @@ class _VaccineSelectionPageState extends LocalizedState<VaccineSelectionPage> {
                                             .add(
                                               DeliverInterventionSubmitEvent(
                                                 task: updatedTask,
-                                                isEditing: (deliverState
-                                                                .tasks ??
-                                                            [])
-                                                        .isNotEmpty &&
-                                                    RegistrationDeliverySingleton()
-                                                            .beneficiaryType ==
-                                                        BeneficiaryType
-                                                            .household,
+                                                isEditing: true,
                                                 boundaryModel:
                                                     RegistrationDeliverySingleton()
                                                         .boundary!,
