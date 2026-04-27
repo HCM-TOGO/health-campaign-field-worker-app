@@ -15,6 +15,7 @@ import '../../blocs/app_initialization/app_initialization.dart';
 import '../../data/repositories/local/inventory_management/custom_stock.dart';
 import '../../models/entities/roles_type.dart';
 import '../../utils/i18_key_constants.dart' as i18;
+import '../../utils/stock_in_hand_cache.dart';
 import '../../utils/stock_in_hand_utils.dart';
 import '../../utils/utils.dart';
 import '../localized.dart';
@@ -205,6 +206,11 @@ class _StockBalanceCardState extends LocalizedState<StockBalanceCard> {
     }
 
     if (mounted) {
+      StockInHandCache.instance.setCurrentOwnerId(ownerId);
+      StockInHandCache.instance.setBalances(
+        ownerId: ownerId,
+        balancesByVariantId: balances,
+      );
       setState(() => _balancesByVariantId = balances);
     }
   }
@@ -262,6 +268,7 @@ class _StockBalanceCardState extends LocalizedState<StockBalanceCard> {
                       (f) => f.id == value.code,
                     );
                     setState(() => _selectedFacility = selected);
+                    StockInHandCache.instance.setCurrentOwnerId(selected.id);
                     await _refreshBalances();
                   },
                 ),
