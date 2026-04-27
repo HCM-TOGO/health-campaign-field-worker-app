@@ -19,6 +19,7 @@ import 'package:referral_reconciliation/router/referral_reconciliation_router.gm
 import 'package:referral_reconciliation/utils/constants.dart';
 import 'package:referral_reconciliation/utils/extensions/extensions.dart';
 import 'package:survey_form/survey_form.dart';
+import 'package:registration_delivery/models/entities/side_effect.dart';
 
 import 'package:referral_reconciliation/blocs/referral_recon_service_definition.dart';
 import 'package:referral_reconciliation/utils/date_utils.dart';
@@ -34,10 +35,16 @@ import '../../widgets/digit_ui_component/custom_digit_input_field.dart';
 @RoutePage()
 class CustomReferralReasonChecklistPage extends LocalizedStatefulWidget {
   final String? referralClientRefId;
+  final bool isSideEffect;
+  final String? projectBeneficiaryClientReferenceId;
+  final String? taskClientReferenceId;
 
   const CustomReferralReasonChecklistPage({
     super.key,
     this.referralClientRefId,
+    this.isSideEffect = false,
+    this.projectBeneficiaryClientReferenceId,
+    this.taskClientReferenceId,
     super.appLocalizations,
   });
 
@@ -62,6 +69,19 @@ class _CustomReferralReasonChecklistPageState
 
   @override
   void initState() {
+    // In side-effect mode, eagerly select the SIDE_EFFECT service definition
+    // as soon as the checklist page mounts. The ReferralReconServiceDefinitionBloc
+    // uses .contains() — passing 'SIDE_EFFECT' matches any service definition
+    // code that contains that substring, regardless of exact project/role suffix.
+    if (widget.isSideEffect) {
+      WidgetsBinding.instance.addPostFrameCallback((_) {
+        context.read<ReferralReconServiceDefinitionBloc>().add(
+              const ReferralReconServiceDefinitionSelectionEvent(
+                serviceDefinitionCode: 'SIDE_EFFECT',
+              ),
+            );
+      });
+    }
     context.read<ServiceBloc>().add(
           ServiceSurveyFormEvent(
             value: Random().nextInt(100).toString(),
@@ -381,6 +401,119 @@ class _CustomReferralReasonChecklistPageState
                                 });
 
                             if (shouldSubmit ?? false) {
+                              // In side-effect mode, also create a SideEffectModel
+                              if (widget.isSideEffect) {
+                                // Guard: server requires both IDs to be non-null.
+                                // The button on the search page already enforces
+                                // this, but we double-check here for safety.
+                                if (widget.taskClientReferenceId == null ||
+                                    widget.projectBeneficiaryClientReferenceId ==
+                                        null) {
+                                  Toast.showToast(
+                                    context,
+                                    message:
+                                        'Cannot record side effect: task or beneficiary ID is missing.',
+                                    type: ToastType.error,
+                                  );
+                                  return;
+                                }
+                                // ── Grave-only gate ──────────────────────────
+                                // The service definition has two attributes:
+                                //   code='GRAVE'  → grave symptoms (3 values)
+                                //   code='MINEUR' → minor symptoms (8 values)
+                                //
+                                // Rule: create SideEffectModel ONLY when at
+                                // least one GRAVE option is selected.
+                                // Minor-only submissions are acknowledged
+                                // normally but don't change eligibility.
+
+                                // Find the index of the GRAVE attribute.
+                                final graveAttrIdx =
+                                    initialAttributes?.indexWhere(
+                                          (a) =>
+                                              a.code
+                                                  ?.toUpperCase()
+                                                  .contains('GRAVE') ??
+                                              false,
+                                        ) ??
+                                        -1;
+
+                                // Collect values selected in the GRAVE section.
+                                final graveSymptoms = <String>[];
+                                if (graveAttrIdx >= 0 &&
+                                    graveAttrIdx < controller.length) {
+                                  final graveVal =
+                                      controller[graveAttrIdx].text.trim();
+                                  if (graveVal.isNotEmpty) {
+                                    graveSymptoms.addAll(
+                                      graveVal
+                                          .split('.')
+                                          .where((s) => s.isNotEmpty),
+                                    );
+                                  }
+                                }
+
+                                if (graveSymptoms.isNotEmpty) {
+                                  // At least one GRAVE symptom → persist model
+                                  // → CDD will see beneficiary as INELIGIBLE.
+                                  final sideEffectClientRefId =
+                                      IdGen.i.identifier;
+                                  context
+                                      .repository<SideEffectModel,
+                                          SideEffectSearchModel>(context)
+                                      .create(
+                                        SideEffectModel(
+                                          clientReferenceId:
+                                              sideEffectClientRefId,
+                                          taskClientReferenceId:
+                                              widget.taskClientReferenceId,
+                                          projectBeneficiaryClientReferenceId:
+                                              widget
+                                                  .projectBeneficiaryClientReferenceId,
+                                          projectId:
+                                              ReferralReconSingleton().projectId,
+                                          symptoms: graveSymptoms,
+                                          tenantId:
+                                              ReferralReconSingleton().tenantId,
+                                          rowVersion: 1,
+                                          auditDetails: AuditDetails(
+                                            createdBy:
+                                                ReferralReconSingleton().userUUid,
+                                            createdTime:
+                                                context.millisecondsSinceEpoch(),
+                                            lastModifiedBy:
+                                                ReferralReconSingleton().userUUid,
+                                            lastModifiedTime:
+                                                context.millisecondsSinceEpoch(),
+                                          ),
+                                          clientAuditDetails: ClientAuditDetails(
+                                            createdBy:
+                                                ReferralReconSingleton().userUUid,
+                                            createdTime:
+                                                context.millisecondsSinceEpoch(),
+                                            lastModifiedBy:
+                                                ReferralReconSingleton().userUUid,
+                                            lastModifiedTime:
+                                                context.millisecondsSinceEpoch(),
+                                          ),
+                                          additionalFields:
+                                              SideEffectAdditionalFields(
+                                            version: 1,
+                                            fields: [
+                                              AdditionalField(
+                                                'boundaryCode',
+                                                ReferralReconSingleton()
+                                                    .boundary
+                                                    ?.code,
+                                              ),
+                                            ],
+                                          ),
+                                        ),
+                                      );
+                                }
+                                // MINEUR-only or no selection → no model created
+                                // → beneficiary remains ELIGIBLE.
+                              }
                               router.maybePop();
                               router.push(ReferralReconAcknowledgementRoute());
                             }

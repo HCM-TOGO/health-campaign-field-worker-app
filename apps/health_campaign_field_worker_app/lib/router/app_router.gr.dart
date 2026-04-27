@@ -239,6 +239,8 @@ abstract class _$AppRouter extends RootStackRouter {
           viewOnly: args.viewOnly,
           referralReconciliation: args.referralReconciliation,
           cycles: args.cycles,
+          isSideEffect: args.isSideEffect,
+          individual: args.individual,
         ),
       );
     },
@@ -468,6 +470,10 @@ abstract class _$AppRouter extends RootStackRouter {
         child: CustomReferralReasonChecklistPage(
           key: args.key,
           referralClientRefId: args.referralClientRefId,
+          isSideEffect: args.isSideEffect,
+          projectBeneficiaryClientReferenceId:
+              args.projectBeneficiaryClientReferenceId,
+          taskClientReferenceId: args.taskClientReferenceId,
           appLocalizations: args.appLocalizations,
         ),
       );
@@ -1694,6 +1700,8 @@ class CustomHFCreateReferralWrapperRoute
     bool viewOnly = false,
     HFReferralModel? referralReconciliation,
     required List<String> cycles,
+    bool isSideEffect = false,
+    IndividualModel? individual,
     List<PageRouteInfo>? children,
   }) : super(
           CustomHFCreateReferralWrapperRoute.name,
@@ -1703,6 +1711,8 @@ class CustomHFCreateReferralWrapperRoute
             viewOnly: viewOnly,
             referralReconciliation: referralReconciliation,
             cycles: cycles,
+            isSideEffect: isSideEffect,
+            individual: individual,
           ),
           initialChildren: children,
         );
@@ -1720,6 +1730,8 @@ class CustomHFCreateReferralWrapperRouteArgs {
     this.viewOnly = false,
     this.referralReconciliation,
     required this.cycles,
+    this.isSideEffect = false,
+    this.individual,
   });
 
   final Key? key;
@@ -1732,9 +1744,13 @@ class CustomHFCreateReferralWrapperRouteArgs {
 
   final List<String> cycles;
 
+  final bool isSideEffect;
+
+  final IndividualModel? individual;
+
   @override
   String toString() {
-    return 'CustomHFCreateReferralWrapperRouteArgs{key: $key, projectId: $projectId, viewOnly: $viewOnly, referralReconciliation: $referralReconciliation, cycles: $cycles}';
+    return 'CustomHFCreateReferralWrapperRouteArgs{key: $key, projectId: $projectId, viewOnly: $viewOnly, referralReconciliation: $referralReconciliation, cycles: $cycles, isSideEffect: $isSideEffect, individual: $individual}';
   }
 }
 
@@ -2572,6 +2588,9 @@ class CustomReferralReasonChecklistRoute
   CustomReferralReasonChecklistRoute({
     Key? key,
     String? referralClientRefId,
+    bool isSideEffect = false,
+    String? projectBeneficiaryClientReferenceId,
+    String? taskClientReferenceId,
     ReferralReconLocalization? appLocalizations,
     List<PageRouteInfo>? children,
   }) : super(
@@ -2579,6 +2598,10 @@ class CustomReferralReasonChecklistRoute
           args: CustomReferralReasonChecklistRouteArgs(
             key: key,
             referralClientRefId: referralClientRefId,
+            isSideEffect: isSideEffect,
+            projectBeneficiaryClientReferenceId:
+                projectBeneficiaryClientReferenceId,
+            taskClientReferenceId: taskClientReferenceId,
             appLocalizations: appLocalizations,
           ),
           initialChildren: children,
@@ -2594,6 +2617,9 @@ class CustomReferralReasonChecklistRouteArgs {
   const CustomReferralReasonChecklistRouteArgs({
     this.key,
     this.referralClientRefId,
+    this.isSideEffect = false,
+    this.projectBeneficiaryClientReferenceId,
+    this.taskClientReferenceId,
     this.appLocalizations,
   });
 
@@ -2601,11 +2627,17 @@ class CustomReferralReasonChecklistRouteArgs {
 
   final String? referralClientRefId;
 
+  final bool isSideEffect;
+
+  final String? projectBeneficiaryClientReferenceId;
+
+  final String? taskClientReferenceId;
+
   final ReferralReconLocalization? appLocalizations;
 
   @override
   String toString() {
-    return 'CustomReferralReasonChecklistRouteArgs{key: $key, referralClientRefId: $referralClientRefId, appLocalizations: $appLocalizations}';
+    return 'CustomReferralReasonChecklistRouteArgs{key: $key, referralClientRefId: $referralClientRefId, isSideEffect: $isSideEffect, projectBeneficiaryClientReferenceId: $projectBeneficiaryClientReferenceId, taskClientReferenceId: $taskClientReferenceId, appLocalizations: $appLocalizations}';
   }
 }
 
