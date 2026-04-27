@@ -588,6 +588,14 @@ class HomeShowcase {
     return 'HOME_SHOWCASE_SUMMARY_REPORT_SPAQ2';
   }
 
+  String get summaryReportUnprocessedRecords {
+    return 'HOME_SHOWCASE_SUMMARY_REPORT_UNPROCESSED_RECORDS';
+  }
+
+  String get summaryReportPendingEligible {
+    return 'HOME_SHOWCASE_SUMMARY_REPORT_PENDING_ELIGIBLE';
+  }
+
   String get distributorProgressBar {
     return 'DISTRIBUTOR_HOME_SHOWCASE_PROGRESS_BAR';
   }
