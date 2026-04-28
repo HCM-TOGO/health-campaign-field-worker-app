@@ -470,31 +470,34 @@ class _CustomReferralReasonChecklistPageState
                                           projectBeneficiaryClientReferenceId:
                                               widget
                                                   .projectBeneficiaryClientReferenceId,
-                                          projectId:
-                                              ReferralReconSingleton().projectId,
+                                          projectId: ReferralReconSingleton()
+                                              .projectId,
                                           symptoms: graveSymptoms,
                                           tenantId:
                                               ReferralReconSingleton().tenantId,
                                           rowVersion: 1,
                                           auditDetails: AuditDetails(
-                                            createdBy:
-                                                ReferralReconSingleton().userUUid,
-                                            createdTime:
-                                                context.millisecondsSinceEpoch(),
+                                            createdBy: ReferralReconSingleton()
+                                                .userUUid,
+                                            createdTime: context
+                                                .millisecondsSinceEpoch(),
                                             lastModifiedBy:
-                                                ReferralReconSingleton().userUUid,
-                                            lastModifiedTime:
-                                                context.millisecondsSinceEpoch(),
+                                                ReferralReconSingleton()
+                                                    .userUUid,
+                                            lastModifiedTime: context
+                                                .millisecondsSinceEpoch(),
                                           ),
-                                          clientAuditDetails: ClientAuditDetails(
-                                            createdBy:
-                                                ReferralReconSingleton().userUUid,
-                                            createdTime:
-                                                context.millisecondsSinceEpoch(),
+                                          clientAuditDetails:
+                                              ClientAuditDetails(
+                                            createdBy: ReferralReconSingleton()
+                                                .userUUid,
+                                            createdTime: context
+                                                .millisecondsSinceEpoch(),
                                             lastModifiedBy:
-                                                ReferralReconSingleton().userUUid,
-                                            lastModifiedTime:
-                                                context.millisecondsSinceEpoch(),
+                                                ReferralReconSingleton()
+                                                    .userUUid,
+                                            lastModifiedTime: context
+                                                .millisecondsSinceEpoch(),
                                           ),
                                           additionalFields:
                                               SideEffectAdditionalFields(
@@ -1031,7 +1034,7 @@ class _CustomReferralReasonChecklistPageState
                 .map((e) => Column(
                       children: [
                         DigitCheckbox(
-                          label: e,
+                          label: localizations.translate(e),
                           value: controller[index].text.split('.').contains(e),
                           onChanged: (value) {
                             context.read<ServiceBloc>().add(

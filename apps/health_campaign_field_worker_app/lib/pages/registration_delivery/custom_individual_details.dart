@@ -1095,31 +1095,31 @@ class CustomIndividualDetailsPageState
                             }
                           },
                         ),
-                        if (!widget.isHeadOfHousehold)
-                          DigitButton(
-                            capitalizeLetters: false,
-                            label: localizations.translate(
-                              i18_local.individualDetails
-                                  .linkQrCodeToBeneficiaryLabel,
-                            ),
-                            mainAxisSize: MainAxisSize.max,
-                            type: DigitButtonType.secondary,
-                            size: DigitButtonSize.large,
-                            isDisabled: false,
-                            onPressed: () {
-                              Navigator.of(context).push(
-                                MaterialPageRoute(
-                                  builder: (context) => const DigitScannerPage(
-                                    quantity: 5,
-                                    isGS1code: false,
-                                    singleValue: false,
-                                  ),
-                                  settings:
-                                      const RouteSettings(name: '/qr-scanner'),
-                                ),
-                              );
-                            },
-                          ),
+                        // if (!widget.isHeadOfHousehold)
+                        //   DigitButton(
+                        //     capitalizeLetters: false,
+                        //     label: localizations.translate(
+                        //       i18_local.individualDetails
+                        //           .linkQrCodeToBeneficiaryLabel,
+                        //     ),
+                        //     mainAxisSize: MainAxisSize.max,
+                        //     type: DigitButtonType.secondary,
+                        //     size: DigitButtonSize.large,
+                        //     isDisabled: false,
+                        //     onPressed: () {
+                        //       Navigator.of(context).push(
+                        //         MaterialPageRoute(
+                        //           builder: (context) => const DigitScannerPage(
+                        //             quantity: 5,
+                        //             isGS1code: false,
+                        //             singleValue: false,
+                        //           ),
+                        //           settings:
+                        //               const RouteSettings(name: '/qr-scanner'),
+                        //         ),
+                        //       );
+                        //     },
+                        //   ),
                         if (!widget.isHeadOfHousehold)
                           Text(
                               localizations.translate(i18_local
@@ -1179,41 +1179,41 @@ class CustomIndividualDetailsPageState
                               },
                             ),
                           ),
-                        if (!widget.isHeadOfHousehold && isRelocated)
-                          DigitButton(
-                            capitalizeLetters: false,
-                            label: localizations.translate(i18_local
-                                .householdDetails.previousBeneficiaryQRCode),
-                            mainAxisSize: MainAxisSize.max,
-                            type: DigitButtonType.secondary,
-                            size: DigitButtonSize.large,
-                            isDisabled: false,
-                            onPressed: () {
-                              Navigator.of(context).push(
-                                MaterialPageRoute(
-                                  builder: (context) => const DigitScannerPage(
-                                    quantity: 5,
-                                    isGS1code: false,
-                                    singleValue: false,
-                                  ),
-                                  settings:
-                                      const RouteSettings(name: '/qr-scanner'),
-                                ),
-                              );
-                            },
-                          ),
-                        if (!widget.isHeadOfHousehold && isRelocated)
-                          Row(
-                            mainAxisAlignment: MainAxisAlignment.center,
-                            children: [
-                              Text(
-                                localizations.translate(
-                                  i18.individualDetails.separatorLabelText,
-                                ),
-                                style: theme.textTheme.bodyLarge,
-                              ),
-                            ],
-                          ),
+                        // if (!widget.isHeadOfHousehold && isRelocated)
+                        //   DigitButton(
+                        //     capitalizeLetters: false,
+                        //     label: localizations.translate(i18_local
+                        //         .householdDetails.previousBeneficiaryQRCode),
+                        //     mainAxisSize: MainAxisSize.max,
+                        //     type: DigitButtonType.secondary,
+                        //     size: DigitButtonSize.large,
+                        //     isDisabled: false,
+                        //     onPressed: () {
+                        //       Navigator.of(context).push(
+                        //         MaterialPageRoute(
+                        //           builder: (context) => const DigitScannerPage(
+                        //             quantity: 5,
+                        //             isGS1code: false,
+                        //             singleValue: false,
+                        //           ),
+                        //           settings:
+                        //               const RouteSettings(name: '/qr-scanner'),
+                        //         ),
+                        //       );
+                        //     },
+                        //   ),
+                        // if (!widget.isHeadOfHousehold && isRelocated)
+                        //   Row(
+                        //     mainAxisAlignment: MainAxisAlignment.center,
+                        //     children: [
+                        //       Text(
+                        //         localizations.translate(
+                        //           i18.individualDetails.separatorLabelText,
+                        //         ),
+                        //         style: theme.textTheme.bodyLarge,
+                        //       ),
+                        //     ],
+                        //   ),
                         if (!widget.isHeadOfHousehold && isRelocated)
                           ReactiveWrapperField(
                             formControlName: _previousBeneficiaryIdKey,

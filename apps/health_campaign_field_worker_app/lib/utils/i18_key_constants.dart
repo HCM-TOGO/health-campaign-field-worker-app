@@ -1556,6 +1556,12 @@ class SearchBeneficiary {
   String get mobileNumberValidInfoDescription =>
       'MOBILE_NUMBER_VALID_INFO_DESCRIPTION';
   String get mobileNumberInfoTitle => 'MOBILE_NUMBER_VALID_INFO_TITLE';
+
+  String get sideEffectAlreadyRecorded => 'SIDE_EFFECT_ALREADY_RECORDED';
+
+  String get noTasksAssociated => 'NO_TASKS_ASSOCIATED_WITH_BENEFICIARY';
+
+  String get recordSideEffectActionLabel => 'RECORD_SIDE_EFFECT_ACTION_LABEL';
 }
 
 class IndividualDetails {

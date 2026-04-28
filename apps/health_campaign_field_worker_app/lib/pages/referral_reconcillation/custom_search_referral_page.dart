@@ -265,7 +265,10 @@ class _CustomSearchReferralReconciliationsPageState
                                                       width: theme
                                                           .spacerTheme.spacer2),
                                                   Text(
-                                                    'Record Side Effects',
+                                                    localizations.translate(
+                                                        i18_local
+                                                            .searchBeneficiary
+                                                            .recordSideEffectActionLabel),
                                                     style: textTheme.bodyL,
                                                   ),
                                                 ],
@@ -337,7 +340,8 @@ class _CustomSearchReferralReconciliationsPageState
                                                           .referralInfoDescription),
                                                 ),
                                               if (beneficiaryFound)
-                                                ...householdState.householdMembers
+                                                ...householdState
+                                                    .householdMembers
                                                     .where((wrapper) {
                                                   // Only show the card whose
                                                   // UNIQUE_BENEFICIARY_ID
@@ -346,14 +350,14 @@ class _CustomSearchReferralReconciliationsPageState
                                                       wrapper.headOfHousehold ??
                                                           wrapper.members
                                                               ?.firstOrNull;
-                                                  final benefId = ind
-                                                      ?.identifiers
-                                                      ?.firstWhereOrNull(
-                                                        (id) =>
-                                                            id.identifierType ==
-                                                            'UNIQUE_BENEFICIARY_ID',
-                                                      )
-                                                      ?.identifierId;
+                                                  final benefId =
+                                                      ind?.identifiers
+                                                          ?.firstWhereOrNull(
+                                                            (id) =>
+                                                                id.identifierType ==
+                                                                'UNIQUE_BENEFICIARY_ID',
+                                                          )
+                                                          ?.identifierId;
                                                   return benefId
                                                           ?.trim()
                                                           .toUpperCase() ==
@@ -373,14 +377,14 @@ class _CustomSearchReferralReconciliationsPageState
                                                           e != null &&
                                                           e.isNotEmpty)
                                                       .join(' ');
-                                                  final identifierId = ind
-                                                      ?.identifiers
-                                                      ?.firstWhereOrNull(
-                                                        (id) =>
-                                                            id.identifierType ==
-                                                            'UNIQUE_BENEFICIARY_ID',
-                                                      )
-                                                      ?.identifierId;
+                                                  final identifierId =
+                                                      ind?.identifiers
+                                                          ?.firstWhereOrNull(
+                                                            (id) =>
+                                                                id.identifierType ==
+                                                                'UNIQUE_BENEFICIARY_ID',
+                                                          )
+                                                          ?.identifierId;
                                                   return _BeneficiarySideEffectCard(
                                                     name: fullName.isNotEmpty
                                                         ? fullName
@@ -390,6 +394,12 @@ class _CustomSearchReferralReconciliationsPageState
                                                     taskCount:
                                                         wrapper.tasks?.length ??
                                                             0,
+                                                    hasSideEffects: wrapper
+                                                            .sideEffects
+                                                            ?.isNotEmpty ==
+                                                        true,
+                                                    localizations:
+                                                        localizations,
                                                   );
                                                 }).toList(),
                                             ],
@@ -490,16 +500,16 @@ class _CustomSearchReferralReconciliationsPageState
                                       ?.clientReferenceId;
 
                                   final taskId = wrapper
-                                      ?.tasks
-                                      ?.lastOrNull
-                                      ?.clientReferenceId;
+                                      ?.tasks?.lastOrNull?.clientReferenceId;
 
                                   // Require both a project beneficiary AND a
                                   // completed task — the server rejects null.
+                                  // Also do not allow recording if a side effect already exists.
                                   final canRecord = wrapper != null &&
                                       ind != null &&
                                       projectBeneficiaryId != null &&
-                                      taskId != null;
+                                      taskId != null &&
+                                      (wrapper.sideEffects?.isEmpty ?? true);
 
                                   return DigitButton(
                                     size: DigitButtonSize.large,
@@ -527,14 +537,14 @@ class _CustomSearchReferralReconciliationsPageState
                                                           s != null &&
                                                           s.isNotEmpty)
                                                       .join(' '),
-                                                  beneficiaryId: ind!
-                                                      .identifiers
-                                                      ?.firstWhereOrNull(
-                                                        (id) =>
-                                                            id.identifierType ==
-                                                            'UNIQUE_BENEFICIARY_ID',
-                                                      )
-                                                      ?.identifierId,
+                                                  beneficiaryId:
+                                                      ind!.identifiers
+                                                          ?.firstWhereOrNull(
+                                                            (id) =>
+                                                                id.identifierType ==
+                                                                'UNIQUE_BENEFICIARY_ID',
+                                                          )
+                                                          ?.identifierId,
                                                   additionalFields:
                                                       HFReferralAdditionalFields(
                                                     version: 1,
@@ -622,11 +632,15 @@ class _BeneficiarySideEffectCard extends StatelessWidget {
   final String name;
   final String beneficiaryId;
   final int taskCount;
+  final bool hasSideEffects;
+  final dynamic localizations;
 
   const _BeneficiarySideEffectCard({
     required this.name,
     required this.beneficiaryId,
     required this.taskCount,
+    this.hasSideEffects = false,
+    this.localizations,
   });
 
   @override
@@ -670,6 +684,25 @@ class _BeneficiarySideEffectCard extends StatelessWidget {
                         .copyWith(color: theme.colorTheme.text.secondary),
                   ),
                 ],
+              ),
+            ],
+            if (hasSideEffects) ...[
+              SizedBox(height: theme.spacerTheme.spacer2),
+              InfoCard(
+                title: localizations?.translate('ERROR') ?? 'Error',
+                type: InfoType.error,
+                description: localizations?.translate(i18_local
+                        .searchBeneficiary.sideEffectAlreadyRecorded) ??
+                    'A side effect has already been recorded for this beneficiary.',
+              ),
+            ] else if (taskCount == 0) ...[
+              SizedBox(height: theme.spacerTheme.spacer2),
+              InfoCard(
+                title: localizations?.translate('ERROR') ?? 'Error',
+                type: InfoType.error,
+                description: localizations?.translate(
+                        i18_local.searchBeneficiary.noTasksAssociated) ??
+                    'There are no tasks associated with this beneficiary.',
               ),
             ],
           ],
