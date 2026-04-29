@@ -324,21 +324,27 @@ mixin _$SummaryReportState {
   TResult when<TResult extends Object?>({
     required TResult Function() loading,
     required TResult Function() empty,
-    required TResult Function(Map<String, Map<String, int>> data) data,
+    required TResult Function(Map<String, Map<String, int>> data,
+            Map<String, int> zeroDoseStatusCounts)
+        data,
   }) =>
       throw _privateConstructorUsedError;
   @optionalTypeArgs
   TResult? whenOrNull<TResult extends Object?>({
     TResult? Function()? loading,
     TResult? Function()? empty,
-    TResult? Function(Map<String, Map<String, int>> data)? data,
+    TResult? Function(Map<String, Map<String, int>> data,
+            Map<String, int> zeroDoseStatusCounts)?
+        data,
   }) =>
       throw _privateConstructorUsedError;
   @optionalTypeArgs
   TResult maybeWhen<TResult extends Object?>({
     TResult Function()? loading,
     TResult Function()? empty,
-    TResult Function(Map<String, Map<String, int>> data)? data,
+    TResult Function(Map<String, Map<String, int>> data,
+            Map<String, int> zeroDoseStatusCounts)?
+        data,
     required TResult orElse(),
   }) =>
       throw _privateConstructorUsedError;
@@ -428,7 +434,9 @@ class _$SummaryReportLoadingStateImpl implements SummaryReportLoadingState {
   TResult when<TResult extends Object?>({
     required TResult Function() loading,
     required TResult Function() empty,
-    required TResult Function(Map<String, Map<String, int>> data) data,
+    required TResult Function(Map<String, Map<String, int>> data,
+            Map<String, int> zeroDoseStatusCounts)
+        data,
   }) {
     return loading();
   }
@@ -438,7 +446,9 @@ class _$SummaryReportLoadingStateImpl implements SummaryReportLoadingState {
   TResult? whenOrNull<TResult extends Object?>({
     TResult? Function()? loading,
     TResult? Function()? empty,
-    TResult? Function(Map<String, Map<String, int>> data)? data,
+    TResult? Function(Map<String, Map<String, int>> data,
+            Map<String, int> zeroDoseStatusCounts)?
+        data,
   }) {
     return loading?.call();
   }
@@ -448,7 +458,9 @@ class _$SummaryReportLoadingStateImpl implements SummaryReportLoadingState {
   TResult maybeWhen<TResult extends Object?>({
     TResult Function()? loading,
     TResult Function()? empty,
-    TResult Function(Map<String, Map<String, int>> data)? data,
+    TResult Function(Map<String, Map<String, int>> data,
+            Map<String, int> zeroDoseStatusCounts)?
+        data,
     required TResult orElse(),
   }) {
     if (loading != null) {
@@ -540,7 +552,9 @@ class _$SummaryReportEmptyStateImpl implements SummaryReportEmptyState {
   TResult when<TResult extends Object?>({
     required TResult Function() loading,
     required TResult Function() empty,
-    required TResult Function(Map<String, Map<String, int>> data) data,
+    required TResult Function(Map<String, Map<String, int>> data,
+            Map<String, int> zeroDoseStatusCounts)
+        data,
   }) {
     return empty();
   }
@@ -550,7 +564,9 @@ class _$SummaryReportEmptyStateImpl implements SummaryReportEmptyState {
   TResult? whenOrNull<TResult extends Object?>({
     TResult? Function()? loading,
     TResult? Function()? empty,
-    TResult? Function(Map<String, Map<String, int>> data)? data,
+    TResult? Function(Map<String, Map<String, int>> data,
+            Map<String, int> zeroDoseStatusCounts)?
+        data,
   }) {
     return empty?.call();
   }
@@ -560,7 +576,9 @@ class _$SummaryReportEmptyStateImpl implements SummaryReportEmptyState {
   TResult maybeWhen<TResult extends Object?>({
     TResult Function()? loading,
     TResult Function()? empty,
-    TResult Function(Map<String, Map<String, int>> data)? data,
+    TResult Function(Map<String, Map<String, int>> data,
+            Map<String, int> zeroDoseStatusCounts)?
+        data,
     required TResult orElse(),
   }) {
     if (empty != null) {
@@ -615,7 +633,9 @@ abstract class _$$SummaryReportDataStateImplCopyWith<$Res> {
           $Res Function(_$SummaryReportDataStateImpl) then) =
       __$$SummaryReportDataStateImplCopyWithImpl<$Res>;
   @useResult
-  $Res call({Map<String, Map<String, int>> data});
+  $Res call(
+      {Map<String, Map<String, int>> data,
+      Map<String, int> zeroDoseStatusCounts});
 }
 
 /// @nodoc
@@ -631,12 +651,17 @@ class __$$SummaryReportDataStateImplCopyWithImpl<$Res>
   @override
   $Res call({
     Object? data = null,
+    Object? zeroDoseStatusCounts = null,
   }) {
     return _then(_$SummaryReportDataStateImpl(
       data: null == data
           ? _value._data
           : data // ignore: cast_nullable_to_non_nullable
               as Map<String, Map<String, int>>,
+      zeroDoseStatusCounts: null == zeroDoseStatusCounts
+          ? _value._zeroDoseStatusCounts
+          : zeroDoseStatusCounts // ignore: cast_nullable_to_non_nullable
+              as Map<String, int>,
     ));
   }
 }
@@ -645,8 +670,10 @@ class __$$SummaryReportDataStateImplCopyWithImpl<$Res>
 
 class _$SummaryReportDataStateImpl implements SummaryReportDataState {
   const _$SummaryReportDataStateImpl(
-      {final Map<String, Map<String, int>> data = const {}})
-      : _data = data;
+      {final Map<String, Map<String, int>> data = const {},
+      final Map<String, int> zeroDoseStatusCounts = const {}})
+      : _data = data,
+        _zeroDoseStatusCounts = zeroDoseStatusCounts;
 
   final Map<String, Map<String, int>> _data;
   @override
@@ -657,9 +684,19 @@ class _$SummaryReportDataStateImpl implements SummaryReportDataState {
     return EqualUnmodifiableMapView(_data);
   }
 
+  final Map<String, int> _zeroDoseStatusCounts;
+  @override
+  @JsonKey()
+  Map<String, int> get zeroDoseStatusCounts {
+    if (_zeroDoseStatusCounts is EqualUnmodifiableMapView)
+      return _zeroDoseStatusCounts;
+    // ignore: implicit_dynamic_type
+    return EqualUnmodifiableMapView(_zeroDoseStatusCounts);
+  }
+
   @override
   String toString() {
-    return 'SummaryReportState.data(data: $data)';
+    return 'SummaryReportState.data(data: $data, zeroDoseStatusCounts: $zeroDoseStatusCounts)';
   }
 
   @override
@@ -667,12 +704,16 @@ class _$SummaryReportDataStateImpl implements SummaryReportDataState {
     return identical(this, other) ||
         (other.runtimeType == runtimeType &&
             other is _$SummaryReportDataStateImpl &&
-            const DeepCollectionEquality().equals(other._data, _data));
+            const DeepCollectionEquality().equals(other._data, _data) &&
+            const DeepCollectionEquality()
+                .equals(other._zeroDoseStatusCounts, _zeroDoseStatusCounts));
   }
 
   @override
-  int get hashCode =>
-      Object.hash(runtimeType, const DeepCollectionEquality().hash(_data));
+  int get hashCode => Object.hash(
+      runtimeType,
+      const DeepCollectionEquality().hash(_data),
+      const DeepCollectionEquality().hash(_zeroDoseStatusCounts));
 
   @JsonKey(ignore: true)
   @override
@@ -686,9 +727,11 @@ class _$SummaryReportDataStateImpl implements SummaryReportDataState {
   TResult when<TResult extends Object?>({
     required TResult Function() loading,
     required TResult Function() empty,
-    required TResult Function(Map<String, Map<String, int>> data) data,
+    required TResult Function(Map<String, Map<String, int>> data,
+            Map<String, int> zeroDoseStatusCounts)
+        data,
   }) {
-    return data(this.data);
+    return data(this.data, zeroDoseStatusCounts);
   }
 
   @override
@@ -696,9 +739,11 @@ class _$SummaryReportDataStateImpl implements SummaryReportDataState {
   TResult? whenOrNull<TResult extends Object?>({
     TResult? Function()? loading,
     TResult? Function()? empty,
-    TResult? Function(Map<String, Map<String, int>> data)? data,
+    TResult? Function(Map<String, Map<String, int>> data,
+            Map<String, int> zeroDoseStatusCounts)?
+        data,
   }) {
-    return data?.call(this.data);
+    return data?.call(this.data, zeroDoseStatusCounts);
   }
 
   @override
@@ -706,11 +751,13 @@ class _$SummaryReportDataStateImpl implements SummaryReportDataState {
   TResult maybeWhen<TResult extends Object?>({
     TResult Function()? loading,
     TResult Function()? empty,
-    TResult Function(Map<String, Map<String, int>> data)? data,
+    TResult Function(Map<String, Map<String, int>> data,
+            Map<String, int> zeroDoseStatusCounts)?
+        data,
     required TResult orElse(),
   }) {
     if (data != null) {
-      return data(this.data);
+      return data(this.data, zeroDoseStatusCounts);
     }
     return orElse();
   }
@@ -752,10 +799,12 @@ class _$SummaryReportDataStateImpl implements SummaryReportDataState {
 
 abstract class SummaryReportDataState implements SummaryReportState {
   const factory SummaryReportDataState(
-          {final Map<String, Map<String, int>> data}) =
+          {final Map<String, Map<String, int>> data,
+          final Map<String, int> zeroDoseStatusCounts}) =
       _$SummaryReportDataStateImpl;
 
   Map<String, Map<String, int>> get data;
+  Map<String, int> get zeroDoseStatusCounts;
   @JsonKey(ignore: true)
   _$$SummaryReportDataStateImplCopyWith<_$SummaryReportDataStateImpl>
       get copyWith => throw _privateConstructorUsedError;

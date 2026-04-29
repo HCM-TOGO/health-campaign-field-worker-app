@@ -604,6 +604,18 @@ class HomeShowcase {
     return 'HOME_SHOWCASE_SUMMARY_REPORT_PENDING_ELIGIBLE';
   }
 
+  String get zeroDoseBreakdownTitle {
+    return 'HOME_SHOWCASE_ZERO_DOSE_BREAKDOWN_TITLE';
+  }
+
+  String get zeroDoseBreakdownStatus {
+    return 'HOME_SHOWCASE_ZERO_DOSE_BREAKDOWN_STATUS';
+  }
+
+  String get zeroDoseBreakdownCount {
+    return 'HOME_SHOWCASE_ZERO_DOSE_BREAKDOWN_COUNT';
+  }
+
   String get distributorProgressBar {
     return 'DISTRIBUTOR_HOME_SHOWCASE_PROGRESS_BAR';
   }
