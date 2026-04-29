@@ -114,6 +114,7 @@ import '../pages/attendance/custom_session_select.dart';
 import '../pages/attendance/custom_mark_attendance.dart';
 import 'package:attendance_management/models/entities/attendee.dart';
 import 'package:attendance_management/models/entities/attendance_register.dart';
+import '../pages/referral_reconcillation/custom_referral_recon_acknowedgment_page.dart';
 
 import 'package:complaints/blocs/localization/app_localization.dart';
 part 'app_router.gr.dart';
@@ -328,11 +329,18 @@ class AppRouter extends _$AppRouter {
               RedirectRoute(
                   path: 'referral-checklist-view',
                   redirectTo: 'custom-referral-checklist-view'),
+              AutoRoute(
+                page: ReferralReconAcknowledgementRoute.page,
+                path: 'referral-acknowledgement',
+              ),
+              AutoRoute(
+                page: CustomReferralReconAcknowedgmentRoute.page,
+                path: 'custom-referral-acknowledgement',
+              ),
+              RedirectRoute(
+                  path: 'referral-acknowledgement',
+                  redirectTo: 'custom-referral-acknowledgement')
             ]),
-        AutoRoute(
-          page: ReferralReconAcknowledgementRoute.page,
-          path: 'referral-acknowledgement',
-        ),
         AutoRoute(
           page: ReferralReconProjectFacilitySelectionRoute.page,
           path: 'referral-project-facility',

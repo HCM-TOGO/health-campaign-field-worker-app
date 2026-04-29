@@ -350,7 +350,24 @@ class SummaryReportBloc extends Bloc<SummaryReportEvent, SummaryReportState> {
         sortMapByDateKeyAndRenameDate(dateVsEntityVsCountMap);
     dateVsEntityVsCountMap = addTotalEntryToMap(dateVsEntityVsCountMap);
 
-    emit(SummaryReportDataState(data: dateVsEntityVsCountMap));
+    final Map<String, int> zeroDoseStatusCounts = {};
+    for (final task in zeroDoseChildrenList) {
+      final statusField = task.additionalFields?.fields.firstWhereOrNull(
+        (f) =>
+            f.key ==
+            additional_fields_local.AdditionalFieldsType.zeroDoseStatus
+                .toValue(),
+      );
+      if (statusField != null) {
+        final status = statusField.value.toString();
+        zeroDoseStatusCounts[status] = (zeroDoseStatusCounts[status] ?? 0) + 1;
+      }
+    }
+
+    emit(SummaryReportDataState(
+      data: dateVsEntityVsCountMap,
+      zeroDoseStatusCounts: zeroDoseStatusCounts,
+    ));
   }
 
   void getUniqueSetOfDates(
@@ -512,5 +529,6 @@ class SummaryReportState with _$SummaryReportState {
 
   const factory SummaryReportState.data({
     @Default({}) Map<String, Map<String, int>> data,
+    @Default({}) Map<String, int> zeroDoseStatusCounts,
   }) = SummaryReportDataState;
 }

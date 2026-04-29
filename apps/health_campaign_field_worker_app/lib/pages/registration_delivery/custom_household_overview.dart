@@ -256,9 +256,11 @@ class _CustomHouseholdOverviewPageState
                                                         navigateToChecklist(
                                                             ctx,
                                                             RegistrationDeliverySingleton()
-                                                                        .beneficiaryType ==
-                                                                    BeneficiaryType
-                                                                        .individual
+                                                                            .beneficiaryType ==
+                                                                        BeneficiaryType
+                                                                            .individual &&
+                                                                    state.selectedIndividual !=
+                                                                        null
                                                                 ? state
                                                                     .selectedIndividual!
                                                                     .clientReferenceId

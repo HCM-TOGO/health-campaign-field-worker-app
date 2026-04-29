@@ -11,6 +11,8 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:health_campaign_field_worker_app/widgets/custom_back_navigation.dart';
+import 'package:intl/intl.dart';
+import 'package:registration_delivery/utils/constants.dart';
 import 'package:provider/provider.dart';
 import 'package:reactive_forms/reactive_forms.dart';
 import 'package:referral_reconciliation/models/entities/referral_recon_enums.dart';
@@ -72,23 +74,42 @@ class _CustomRecordReferralDetailsPageState
   bool _isSideEffectMode(RecordHFReferralState recordState) {
     return recordState.mapOrNull(
           create: (v) =>
-              v.hfReferralModel?.additionalFields?.fields
-                  .any((f) =>
-                      f.key == 'isSideEffect' &&
-                      f.value?.toString() == 'true') ??
+              v.hfReferralModel?.additionalFields?.fields.any((f) =>
+                  f.key == 'isSideEffect' && f.value?.toString() == 'true') ??
               false,
         ) ??
         false;
   }
 
-  String? _additionalFieldValue(
-      RecordHFReferralState recordState, String key) {
+  String? _additionalFieldValue(RecordHFReferralState recordState, String key) {
     return recordState.mapOrNull(
       create: (v) => v.hfReferralModel?.additionalFields?.fields
           .firstWhereOrNull((f) => f.key == key)
           ?.value
           ?.toString(),
     );
+  }
+
+  /// [IndividualModel.dateOfBirth] is usually app-formatted (e.g. d MMMM yyyy),
+  /// not ISO-8601; [DateTime.tryParse] alone leaves age empty.
+  DateTime? _parseIndividualDob(String? dob) {
+    if (dob == null || dob.trim().isEmpty) return null;
+    final trimmed = dob.trim();
+    final iso = DateTime.tryParse(trimmed);
+    if (iso != null) return iso;
+    try {
+      return DateFormat(Constants().dateFormat).parse(trimmed);
+    } catch (_) {
+      return null;
+    }
+  }
+
+  int? _ageInMonthsFromDob(String? dob) {
+    final birthDate = _parseIndividualDob(dob);
+    if (birthDate == null) return null;
+    final now = DateTime.now();
+    return ((now.year - birthDate.year) * 12 + now.month - birthDate.month)
+        .abs();
   }
 
   @override
@@ -141,21 +162,12 @@ class _CustomRecordReferralDetailsPageState
                         if (form.control(_genderKey).value != genderVal) {
                           form.control(_genderKey).value = genderVal;
                         }
-                        // Age in months
-                        final dob = individual.dateOfBirth;
-                        if (dob != null) {
-                          final birthDate = DateTime.tryParse(dob);
-                          if (birthDate != null) {
-                            final ageMonths = ((DateTime.now().year -
-                                            birthDate.year) *
-                                        12 +
-                                    DateTime.now().month -
-                                    birthDate.month)
-                                .abs();
-                            if (form.control(_ageKey).value != ageMonths) {
-                              form.control(_ageKey).value = ageMonths;
-                            }
-                          }
+                        // Age in months (DOB is app-formatted, not ISO-only)
+                        final ageMonths =
+                            _ageInMonthsFromDob(individual.dateOfBirth);
+                        if (ageMonths != null &&
+                            form.control(_ageKey).value != ageMonths) {
+                          form.control(_ageKey).value = ageMonths;
                         }
                         // Referral reason
                         form.control(_referralReason).value =
@@ -166,8 +178,8 @@ class _CustomRecordReferralDetailsPageState
                           create: (value) => value.viewOnly
                               ? ReferralReconSingleton()
                                   .referralReasons
-                                  .where(
-                                      (e) => e == value.hfReferralModel?.symptom)
+                                  .where((e) =>
+                                      e == value.hfReferralModel?.symptom)
                                   .first
                               : null,
                         );
@@ -486,9 +498,12 @@ class _CustomRecordReferralDetailsPageState
                                                         );
                                                     context.router.push(
                                                       CustomReferralReasonChecklistRoute(
+                                                        beneficiaryId:
+                                                            beneficiaryId,
                                                         referralClientRefId:
                                                             hfClientRefId,
-                                                        isSideEffect: isSideEffect,
+                                                        isSideEffect:
+                                                            isSideEffect,
                                                         projectBeneficiaryClientReferenceId:
                                                             _additionalFieldValue(
                                                           recordState,
@@ -551,6 +566,10 @@ class _CustomRecordReferralDetailsPageState
                                                           .control(
                                                               _referralReason)
                                                           .value as String;
+                                                      final beneficiaryId = form
+                                                          .control(
+                                                              _beneficiaryIdKey)
+                                                          .value as String?;
                                                       if (value1.isNotEmpty) {
                                                         context
                                                             .read<
@@ -607,6 +626,8 @@ class _CustomRecordReferralDetailsPageState
                                                             as StackRouter;
                                                         parent.push(
                                                           CustomReferralReasonChecklistRoute(
+                                                            beneficiaryId:
+                                                                beneficiaryId,
                                                             referralClientRefId:
                                                                 hfClientRefId,
                                                             isSideEffect:
@@ -696,9 +717,8 @@ class _CustomRecordReferralDetailsPageState
                                                       // side-effect mode — only SideEffectModel
                                                       // is created in the checklist step.
                                                       if (!isSideEffect) {
-                                                        final event =
-                                                            context.read<
-                                                                RecordHFReferralBloc>();
+                                                        final event = context.read<
+                                                            RecordHFReferralBloc>();
                                                         event.add(
                                                           RecordHFReferralCreateEntryEvent(
                                                             hfReferralModel:
@@ -845,6 +865,8 @@ class _CustomRecordReferralDetailsPageState
                                                           as StackRouter;
                                                       parent.push(
                                                         CustomReferralReasonChecklistRoute(
+                                                          beneficiaryId:
+                                                              beneficiaryId,
                                                           referralClientRefId:
                                                               hfClientRefId,
                                                           isSideEffect:
@@ -1081,15 +1103,16 @@ class _CustomRecordReferralDetailsPageState
                                                   selectedOption:
                                                       ReferralReconSingleton()
                                                           .genderOptions
-                                                          .map((item) =>
-                                                              DropdownItem(
-                                                                name: localizations
-                                                                    .translate(
-                                                                        item.toUpperCase()),
-                                                                code: item
-                                                                    .toString()
-                                                                    .toUpperCase(),
-                                                              ))
+                                                          .map(
+                                                              (item) =>
+                                                                  DropdownItem(
+                                                                    name: localizations
+                                                                        .translate(
+                                                                            item.toUpperCase()),
+                                                                    code: item
+                                                                        .toString()
+                                                                        .toUpperCase(),
+                                                                  ))
                                                           .firstWhere(
                                                             (item) =>
                                                                 item.code ==
@@ -1177,29 +1200,30 @@ class _CustomRecordReferralDetailsPageState
                                                         "",
                                                     errorMessage:
                                                         field.errorText,
-                                                    radioDigitButtons: (isSideEffect
-                                                            // Side-effect mode: show only the
-                                                            // SIDE_EFFECT reason from the
-                                                            // backend-provided referralReasons.
-                                                            ? ReferralReconSingleton()
-                                                                .referralReasons
-                                                                .where((r) => r
-                                                                    .toString()
-                                                                    .toUpperCase()
-                                                                    .contains(
-                                                                        'SIDE_EFFECT'))
-                                                                .toList()
-                                                            // Normal mode: exclude side-effect
-                                                            // reasons.
-                                                            : ReferralReconSingleton()
-                                                                .referralReasons
-                                                                .where((r) => !r
-                                                                    .toString()
-                                                                    .toUpperCase()
-                                                                    .contains(
-                                                                        'SIDE_EFFECT'))
-                                                                .toList())
-                                                        .map((r) {
+                                                    radioDigitButtons:
+                                                        (isSideEffect
+                                                                // Side-effect mode: show only the
+                                                                // SIDE_EFFECT reason from the
+                                                                // backend-provided referralReasons.
+                                                                ? ReferralReconSingleton()
+                                                                    .referralReasons
+                                                                    .where((r) => r
+                                                                        .toString()
+                                                                        .toUpperCase()
+                                                                        .contains(
+                                                                            'SIDE_EFFECT'))
+                                                                    .toList()
+                                                                // Normal mode: exclude side-effect
+                                                                // reasons.
+                                                                : ReferralReconSingleton()
+                                                                    .referralReasons
+                                                                    .where((r) => !r
+                                                                        .toString()
+                                                                        .toUpperCase()
+                                                                        .contains(
+                                                                            'SIDE_EFFECT'))
+                                                                    .toList())
+                                                            .map((r) {
                                                       final code = r
                                                           .toString()
                                                           .toUpperCase();
@@ -1209,16 +1233,16 @@ class _CustomRecordReferralDetailsPageState
                                                       final translated =
                                                           localizations
                                                               .translate(code);
-                                                      final displayName =
-                                                          translated == code
-                                                              ? code
-                                                                  .split('_')
-                                                                  .where((w) =>
-                                                                      w.isNotEmpty)
-                                                                  .map((w) =>
-                                                                      '${w[0].toUpperCase()}${w.substring(1).toLowerCase()}')
-                                                                  .join(' ')
-                                                              : translated;
+                                                      final displayName = translated ==
+                                                              code
+                                                          ? code
+                                                              .split('_')
+                                                              .where((w) =>
+                                                                  w.isNotEmpty)
+                                                              .map((w) =>
+                                                                  '${w[0].toUpperCase()}${w.substring(1).toLowerCase()}')
+                                                              .join(' ')
+                                                          : translated;
                                                       return RadioButtonModel(
                                                         code: code,
                                                         name: displayName,
@@ -1246,8 +1270,8 @@ class _CustomRecordReferralDetailsPageState
     );
   }
 
-  FormGroup buildForm(RecordHFReferralState referralState,
-      IndividualModel? individual) {
+  FormGroup buildForm(
+      RecordHFReferralState referralState, IndividualModel? individual) {
     return fb.group(<String, Object>{
       _nameOfChildKey: FormControl<String>(
         value: referralState.mapOrNull(
@@ -1311,7 +1335,8 @@ class _CustomRecordReferralDetailsPageState
                 create: (value) => value.viewOnly &&
                         value.hfReferralModel?.additionalFields?.fields
                                 .where((e) =>
-                                    e.key == ReferralReconEnums.gender.toValue())
+                                    e.key ==
+                                    ReferralReconEnums.gender.toValue())
                                 .firstOrNull
                                 ?.value !=
                             null
@@ -1333,17 +1358,7 @@ class _CustomRecordReferralDetailsPageState
         // Side-effect mode: compute age in months from the IndividualModel.
         // Normal / view-only mode: fall back to additionalFields on the record.
         value: individual != null
-            ? () {
-                final dob = individual.dateOfBirth;
-                if (dob == null) return null;
-                final birthDate = DateTime.tryParse(dob);
-                if (birthDate == null) return null;
-                final now = DateTime.now();
-                return ((now.year - birthDate.year) * 12 +
-                        now.month -
-                        birthDate.month)
-                    .abs();
-              }()
+            ? _ageInMonthsFromDob(individual.dateOfBirth)
             : referralState.mapOrNull(
                 create: (value) => value.viewOnly &&
                         value.hfReferralModel?.additionalFields?.fields
@@ -1352,14 +1367,14 @@ class _CustomRecordReferralDetailsPageState
                                 .firstOrNull
                                 ?.value !=
                             null
-                    ? int.tryParse(
-                        value.hfReferralModel?.additionalFields?.fields
-                                .where((e) =>
-                                    e.key == ReferralReconEnums.age.toValue())
-                                .firstOrNull
-                                ?.value
-                                .toString() ??
-                            '')
+                    ? int.tryParse(value
+                            .hfReferralModel?.additionalFields?.fields
+                            .where((e) =>
+                                e.key == ReferralReconEnums.age.toValue())
+                            .firstOrNull
+                            ?.value
+                            .toString() ??
+                        '')
                     : null,
               ),
         disabled: individual != null ||

@@ -332,7 +332,7 @@ bool checkIfBeneficiaryDeceased(
                   .toValue() &&
           f.value == status_local.Status.beneficiaryDeceased.toValue(),
     );
-    final cycleIndex = task.additionalFields!.fields
+    final cycleIndex = task.additionalFields?.fields
         .firstWhereOrNull(
           (f) =>
               f.key ==

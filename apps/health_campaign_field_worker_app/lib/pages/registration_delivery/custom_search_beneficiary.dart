@@ -944,34 +944,34 @@ class _CustomSearchBeneficiaryPageState
                     );
                   },
                 ),
-                BlocBuilder<CustomSearchHouseholdsBloc,
-                    CustomSearchHouseholdsState>(
-                  builder: (context, searchHouseholdsState) {
-                    return DigitButton(
-                      prefixIcon: Icons.qr_code_scanner,
-                      capitalizeLetters: false,
-                      label: localizations.translate(
-                        i18_scanner.scanner.scannerLabel,
-                      ),
-                      mainAxisSize: MainAxisSize.max,
-                      type: DigitButtonType.secondary,
-                      size: DigitButtonSize.large,
-                      isDisabled: false,
-                      onPressed: () {
-                        Navigator.of(context).push(
-                          MaterialPageRoute(
-                            builder: (context) => const DigitScannerPage(
-                              quantity: 5,
-                              isGS1code: false,
-                              singleValue: false,
-                            ),
-                            settings: const RouteSettings(name: '/qr-scanner'),
-                          ),
-                        );
-                      },
-                    );
-                  },
-                ),
+                // BlocBuilder<CustomSearchHouseholdsBloc,
+                //     CustomSearchHouseholdsState>(
+                //   builder: (context, searchHouseholdsState) {
+                //     return DigitButton(
+                //       prefixIcon: Icons.qr_code_scanner,
+                //       capitalizeLetters: false,
+                //       label: localizations.translate(
+                //         i18_scanner.scanner.scannerLabel,
+                //       ),
+                //       mainAxisSize: MainAxisSize.max,
+                //       type: DigitButtonType.secondary,
+                //       size: DigitButtonSize.large,
+                //       isDisabled: false,
+                //       onPressed: () {
+                //         Navigator.of(context).push(
+                //           MaterialPageRoute(
+                //             builder: (context) => const DigitScannerPage(
+                //               quantity: 5,
+                //               isGS1code: false,
+                //               singleValue: false,
+                //             ),
+                //             settings: const RouteSettings(name: '/qr-scanner'),
+                //           ),
+                //         );
+                //       },
+                //     );
+                //   },
+                // ),
               ]),
         ),
       ),

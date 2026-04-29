@@ -604,6 +604,18 @@ class HomeShowcase {
     return 'HOME_SHOWCASE_SUMMARY_REPORT_PENDING_ELIGIBLE';
   }
 
+  String get zeroDoseBreakdownTitle {
+    return 'HOME_SHOWCASE_ZERO_DOSE_BREAKDOWN_TITLE';
+  }
+
+  String get zeroDoseBreakdownStatus {
+    return 'HOME_SHOWCASE_ZERO_DOSE_BREAKDOWN_STATUS';
+  }
+
+  String get zeroDoseBreakdownCount {
+    return 'HOME_SHOWCASE_ZERO_DOSE_BREAKDOWN_COUNT';
+  }
+
   String get distributorProgressBar {
     return 'DISTRIBUTOR_HOME_SHOWCASE_PROGRESS_BAR';
   }
@@ -1556,6 +1568,12 @@ class SearchBeneficiary {
   String get mobileNumberValidInfoDescription =>
       'MOBILE_NUMBER_VALID_INFO_DESCRIPTION';
   String get mobileNumberInfoTitle => 'MOBILE_NUMBER_VALID_INFO_TITLE';
+
+  String get sideEffectAlreadyRecorded => 'SIDE_EFFECT_ALREADY_RECORDED';
+
+  String get noTasksAssociated => 'NO_TASKS_ASSOCIATED_WITH_BENEFICIARY';
+
+  String get recordSideEffectActionLabel => 'RECORD_SIDE_EFFECT_ACTION_LABEL';
 }
 
 class IndividualDetails {

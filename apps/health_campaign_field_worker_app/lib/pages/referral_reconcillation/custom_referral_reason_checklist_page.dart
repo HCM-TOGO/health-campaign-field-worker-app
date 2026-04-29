@@ -38,6 +38,7 @@ class CustomReferralReasonChecklistPage extends LocalizedStatefulWidget {
   final bool isSideEffect;
   final String? projectBeneficiaryClientReferenceId;
   final String? taskClientReferenceId;
+  final String? beneficiaryId;
 
   const CustomReferralReasonChecklistPage({
     super.key,
@@ -45,6 +46,7 @@ class CustomReferralReasonChecklistPage extends LocalizedStatefulWidget {
     this.isSideEffect = false,
     this.projectBeneficiaryClientReferenceId,
     this.taskClientReferenceId,
+    this.beneficiaryId,
     super.appLocalizations,
   });
 
@@ -371,7 +373,12 @@ class _CustomReferralReasonChecklistPageState
                                                                 'boundaryCode',
                                                                 SurveyFormSingleton()
                                                                     .boundary
-                                                                    ?.code)
+                                                                    ?.code),
+                                                            AdditionalField(
+                                                              'beneficiaryId',
+                                                              widget
+                                                                  .beneficiaryId,
+                                                            )
                                                           ])),
                                                 ),
                                               );
@@ -470,31 +477,34 @@ class _CustomReferralReasonChecklistPageState
                                           projectBeneficiaryClientReferenceId:
                                               widget
                                                   .projectBeneficiaryClientReferenceId,
-                                          projectId:
-                                              ReferralReconSingleton().projectId,
+                                          projectId: ReferralReconSingleton()
+                                              .projectId,
                                           symptoms: graveSymptoms,
                                           tenantId:
                                               ReferralReconSingleton().tenantId,
                                           rowVersion: 1,
                                           auditDetails: AuditDetails(
-                                            createdBy:
-                                                ReferralReconSingleton().userUUid,
-                                            createdTime:
-                                                context.millisecondsSinceEpoch(),
+                                            createdBy: ReferralReconSingleton()
+                                                .userUUid,
+                                            createdTime: context
+                                                .millisecondsSinceEpoch(),
                                             lastModifiedBy:
-                                                ReferralReconSingleton().userUUid,
-                                            lastModifiedTime:
-                                                context.millisecondsSinceEpoch(),
+                                                ReferralReconSingleton()
+                                                    .userUUid,
+                                            lastModifiedTime: context
+                                                .millisecondsSinceEpoch(),
                                           ),
-                                          clientAuditDetails: ClientAuditDetails(
-                                            createdBy:
-                                                ReferralReconSingleton().userUUid,
-                                            createdTime:
-                                                context.millisecondsSinceEpoch(),
+                                          clientAuditDetails:
+                                              ClientAuditDetails(
+                                            createdBy: ReferralReconSingleton()
+                                                .userUUid,
+                                            createdTime: context
+                                                .millisecondsSinceEpoch(),
                                             lastModifiedBy:
-                                                ReferralReconSingleton().userUUid,
-                                            lastModifiedTime:
-                                                context.millisecondsSinceEpoch(),
+                                                ReferralReconSingleton()
+                                                    .userUUid,
+                                            lastModifiedTime: context
+                                                .millisecondsSinceEpoch(),
                                           ),
                                           additionalFields:
                                               SideEffectAdditionalFields(
@@ -515,7 +525,8 @@ class _CustomReferralReasonChecklistPageState
                                 // → beneficiary remains ELIGIBLE.
                               }
                               router.maybePop();
-                              router.push(ReferralReconAcknowledgementRoute());
+                              router.push(
+                                  CustomReferralReconAcknowedgmentRoute());
                             }
                           },
                         ),
@@ -1031,7 +1042,7 @@ class _CustomReferralReasonChecklistPageState
                 .map((e) => Column(
                       children: [
                         DigitCheckbox(
-                          label: e,
+                          label: localizations.translate(e),
                           value: controller[index].text.split('.').contains(e),
                           onChanged: (value) {
                             context.read<ServiceBloc>().add(
