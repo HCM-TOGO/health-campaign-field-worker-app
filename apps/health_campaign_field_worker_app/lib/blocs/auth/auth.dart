@@ -13,6 +13,7 @@ import '../../models/auth/auth_model.dart';
 import '../../models/entities/roles_type.dart';
 import '../../models/role_actions/role_actions_model.dart';
 import '../../utils/environment_config.dart';
+import '../../utils/stock_in_hand_cache.dart';
 
 // part 'auth.freezed.dart' need to be added to auto generate the files for freezed model
 part 'auth.freezed.dart';
@@ -151,6 +152,7 @@ class AuthBloc extends Bloc<AuthEvent, AuthState> {
   FutureOr<void> _onLogout(AuthLogoutEvent event, AuthEmitter emit) async {
     try {
       emit(const AuthLoadingState());
+      StockInHandCache.instance.clear();
       await localSecureStore.deleteAll();
       await localSecureStore.setBoundaryRefetch(true);
     } catch (error) {

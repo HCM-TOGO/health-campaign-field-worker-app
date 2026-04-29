@@ -28,5 +28,12 @@ class StockInHandCache {
     if (ownerId == null) return const {};
     return getBalances(ownerId);
   }
+
+  /// Call on logout (or when switching user) so the next session does not
+  /// briefly read the previous user's [currentOwnerId] or stale maps.
+  void clear() {
+    _byOwnerId.clear();
+    _currentOwnerId = null;
+  }
 }
 

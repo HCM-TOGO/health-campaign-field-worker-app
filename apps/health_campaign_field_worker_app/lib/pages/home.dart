@@ -126,6 +126,8 @@ class _HomePageState extends LocalizedState<HomePage> {
     final roles = state.userModel.roles.map((e) {
       return e.code;
     });
+    final isDistributorRole =
+        roles.contains(RolesType.distributor.toValue());
 
     if (!(roles.contains(RolesType.distributor.toValue()) ||
         roles.contains(RolesType.communityDistributor.toValue()) ||
@@ -178,10 +180,11 @@ class _HomePageState extends LocalizedState<HomePage> {
                         ),
                       ),
                     ),
-              Padding(
-                padding: const EdgeInsets.symmetric(horizontal: spacer2),
-                child: const StockBalanceCard(),
-              ),
+              if (isDistributorRole)
+                Padding(
+                  padding: const EdgeInsets.symmetric(horizontal: spacer2),
+                  child: const StockBalanceCard(),
+                ),
             ],
           ),
           footer: Padding(
