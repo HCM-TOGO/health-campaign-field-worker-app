@@ -492,6 +492,21 @@ abstract class _$AppRouter extends RootStackRouter {
         ),
       );
     },
+    CustomReferralReconAcknowedgmentRoute.name: (routeData) {
+      final args = routeData.argsAs<CustomReferralReconAcknowedgmentRouteArgs>(
+          orElse: () => const CustomReferralReconAcknowedgmentRouteArgs());
+      return AutoRoutePage<dynamic>(
+        routeData: routeData,
+        child: CustomReferralReconAcknowedgmentPage(
+          key: args.key,
+          appLocalizations: args.appLocalizations,
+          isDataRecordSuccess: args.isDataRecordSuccess,
+          label: args.label,
+          description: args.description,
+          descriptionTableData: args.descriptionTableData,
+        ),
+      );
+    },
     CustomReferralReconProjectFacilitySelectionRoute.name: (routeData) {
       final args = routeData
           .argsAs<CustomReferralReconProjectFacilitySelectionRouteArgs>();
@@ -2683,6 +2698,65 @@ class CustomReferralReasonChecklistPreviewRouteArgs {
   @override
   String toString() {
     return 'CustomReferralReasonChecklistPreviewRouteArgs{key: $key, appLocalizations: $appLocalizations}';
+  }
+}
+
+/// generated route for
+/// [CustomReferralReconAcknowedgmentPage]
+class CustomReferralReconAcknowedgmentRoute
+    extends PageRouteInfo<CustomReferralReconAcknowedgmentRouteArgs> {
+  CustomReferralReconAcknowedgmentRoute({
+    Key? key,
+    ReferralReconLocalization? appLocalizations,
+    bool isDataRecordSuccess = false,
+    String? label,
+    String? description,
+    Map<String, dynamic>? descriptionTableData,
+    List<PageRouteInfo>? children,
+  }) : super(
+          CustomReferralReconAcknowedgmentRoute.name,
+          args: CustomReferralReconAcknowedgmentRouteArgs(
+            key: key,
+            appLocalizations: appLocalizations,
+            isDataRecordSuccess: isDataRecordSuccess,
+            label: label,
+            description: description,
+            descriptionTableData: descriptionTableData,
+          ),
+          initialChildren: children,
+        );
+
+  static const String name = 'CustomReferralReconAcknowedgmentRoute';
+
+  static const PageInfo<CustomReferralReconAcknowedgmentRouteArgs> page =
+      PageInfo<CustomReferralReconAcknowedgmentRouteArgs>(name);
+}
+
+class CustomReferralReconAcknowedgmentRouteArgs {
+  const CustomReferralReconAcknowedgmentRouteArgs({
+    this.key,
+    this.appLocalizations,
+    this.isDataRecordSuccess = false,
+    this.label,
+    this.description,
+    this.descriptionTableData,
+  });
+
+  final Key? key;
+
+  final ReferralReconLocalization? appLocalizations;
+
+  final bool isDataRecordSuccess;
+
+  final String? label;
+
+  final String? description;
+
+  final Map<String, dynamic>? descriptionTableData;
+
+  @override
+  String toString() {
+    return 'CustomReferralReconAcknowedgmentRouteArgs{key: $key, appLocalizations: $appLocalizations, isDataRecordSuccess: $isDataRecordSuccess, label: $label, description: $description, descriptionTableData: $descriptionTableData}';
   }
 }
 

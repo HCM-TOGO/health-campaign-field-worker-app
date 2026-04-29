@@ -525,7 +525,8 @@ class _CustomReferralReasonChecklistPageState
                                 // → beneficiary remains ELIGIBLE.
                               }
                               router.maybePop();
-                              router.push(ReferralReconAcknowledgementRoute());
+                              router.push(
+                                  CustomReferralReconAcknowedgmentRoute());
                             }
                           },
                         ),

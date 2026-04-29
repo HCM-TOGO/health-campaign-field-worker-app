@@ -499,7 +499,7 @@ class _CustomRecordReferralDetailsPageState
                                                     context.router.push(
                                                       CustomReferralReasonChecklistRoute(
                                                         beneficiaryId:
-                                                            _beneficiaryIdKey,
+                                                            beneficiaryId,
                                                         referralClientRefId:
                                                             hfClientRefId,
                                                         isSideEffect:
@@ -566,6 +566,10 @@ class _CustomRecordReferralDetailsPageState
                                                           .control(
                                                               _referralReason)
                                                           .value as String;
+                                                      final beneficiaryId = form
+                                                          .control(
+                                                              _beneficiaryIdKey)
+                                                          .value as String?;
                                                       if (value1.isNotEmpty) {
                                                         context
                                                             .read<
@@ -623,7 +627,7 @@ class _CustomRecordReferralDetailsPageState
                                                         parent.push(
                                                           CustomReferralReasonChecklistRoute(
                                                             beneficiaryId:
-                                                                _beneficiaryIdKey,
+                                                                beneficiaryId,
                                                             referralClientRefId:
                                                                 hfClientRefId,
                                                             isSideEffect:
@@ -862,7 +866,7 @@ class _CustomRecordReferralDetailsPageState
                                                       parent.push(
                                                         CustomReferralReasonChecklistRoute(
                                                           beneficiaryId:
-                                                              _beneficiaryIdKey,
+                                                              beneficiaryId,
                                                           referralClientRefId:
                                                               hfClientRefId,
                                                           isSideEffect:
