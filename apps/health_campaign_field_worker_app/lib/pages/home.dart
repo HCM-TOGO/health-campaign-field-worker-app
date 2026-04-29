@@ -622,14 +622,14 @@ class _HomePageState extends LocalizedState<HomePage> {
                 .map((e) => e.displayName)
                 .toList()
                 .contains(element) ||
-            element == i18.home.db ||
-            element == i18.home.editTasks)
+            element == i18.home.db)
         .toList();
 
     final showcaseKeys = filteredLabels
         .where((f) => f != i18.home.db)
         .map((label) => homeItemsShowcaseMap[label]!)
         .toList();
+    if (context.isCDD) filteredLabels.add(i18.home.editTasks);
     if (context.isCDD) filteredLabels.add(i18.home.summaryLabel);
 
     // if ((envConfig.variables.envType == EnvType.demo && kReleaseMode) ||
