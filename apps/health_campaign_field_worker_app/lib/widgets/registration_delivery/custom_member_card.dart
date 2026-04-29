@@ -711,16 +711,14 @@ class CustomMemberCard extends StatelessWidget {
                             ),
                           );
 
-                          // TODO: Currently it's been shifted to the zero dose flow
-
-                          // context.read<DeliverInterventionBloc>().add(
-                          //       DeliverInterventionSubmitEvent(
-                          //         task: refusalTask,
-                          //         isEditing: false,
-                          //         boundaryModel:
-                          //             RegistrationDeliverySingleton().boundary!,
-                          //       ),
-                          //     );
+                          context.read<DeliverInterventionBloc>().add(
+                                DeliverInterventionSubmitEvent(
+                                  task: refusalTask,
+                                  isEditing: false,
+                                  boundaryModel:
+                                      RegistrationDeliverySingleton().boundary!,
+                                ),
+                              );
 
                           final reloadState =
                               context.read<HouseholdOverviewBloc>();
@@ -802,16 +800,14 @@ class CustomMemberCard extends StatelessWidget {
                             ),
                           );
 
-                          // TODO: Currently it's been shifted to the zero dose flow
-
-                          // context.read<DeliverInterventionBloc>().add(
-                          //       DeliverInterventionSubmitEvent(
-                          //         task: refusalTask,
-                          //         isEditing: false,
-                          //         boundaryModel:
-                          //             RegistrationDeliverySingleton().boundary!,
-                          //       ),
-                          //     );
+                          context.read<DeliverInterventionBloc>().add(
+                                DeliverInterventionSubmitEvent(
+                                  task: absentTask,
+                                  isEditing: false,
+                                  boundaryModel:
+                                      RegistrationDeliverySingleton().boundary!,
+                                ),
+                              );
 
                           final reloadState =
                               context.read<HouseholdOverviewBloc>();
@@ -981,16 +977,14 @@ class CustomMemberCard extends StatelessWidget {
                             ),
                           );
 
-                          // TODO: Currently it's been shifted to the zero dose flow
-
-                          // context.read<DeliverInterventionBloc>().add(
-                          //       DeliverInterventionSubmitEvent(
-                          //         task: refusalTask,
-                          //         isEditing: false,
-                          //         boundaryModel:
-                          //             RegistrationDeliverySingleton().boundary!,
-                          //       ),
-                          //     );
+                          context.read<DeliverInterventionBloc>().add(
+                                DeliverInterventionSubmitEvent(
+                                  task: task,
+                                  isEditing: false,
+                                  boundaryModel:
+                                      RegistrationDeliverySingleton().boundary!,
+                                ),
+                              );
 
                           final reloadState =
                               context.read<HouseholdOverviewBloc>();
@@ -1073,16 +1067,14 @@ class CustomMemberCard extends StatelessWidget {
                             ),
                           );
 
-                          // TODO: Currently it's been shifted to the zero dose flow
-
-                          // context.read<DeliverInterventionBloc>().add(
-                          //       DeliverInterventionSubmitEvent(
-                          //         task: refusalTask,
-                          //         isEditing: false,
-                          //         boundaryModel:
-                          //             RegistrationDeliverySingleton().boundary!,
-                          //       ),
-                          //     );
+                          context.read<DeliverInterventionBloc>().add(
+                                DeliverInterventionSubmitEvent(
+                                  task: task,
+                                  isEditing: false,
+                                  boundaryModel:
+                                      RegistrationDeliverySingleton().boundary!,
+                                ),
+                              );
 
                           final reloadState =
                               context.read<HouseholdOverviewBloc>();
@@ -1165,16 +1157,14 @@ class CustomMemberCard extends StatelessWidget {
                             ),
                           );
 
-                          // TODO: Currently it's been shifted to the zero dose flow
-
-                          // context.read<DeliverInterventionBloc>().add(
-                          //       DeliverInterventionSubmitEvent(
-                          //         task: refusalTask,
-                          //         isEditing: false,
-                          //         boundaryModel:
-                          //             RegistrationDeliverySingleton().boundary!,
-                          //       ),
-                          //     );
+                          context.read<DeliverInterventionBloc>().add(
+                                DeliverInterventionSubmitEvent(
+                                  task: task,
+                                  isEditing: false,
+                                  boundaryModel:
+                                      RegistrationDeliverySingleton().boundary!,
+                                ),
+                              );
 
                           final reloadState =
                               context.read<HouseholdOverviewBloc>();

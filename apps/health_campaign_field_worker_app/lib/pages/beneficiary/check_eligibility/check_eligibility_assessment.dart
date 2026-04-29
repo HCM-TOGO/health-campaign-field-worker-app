@@ -11,6 +11,7 @@ import 'package:health_campaign_field_worker_app/widgets/custom_back_navigation.
 import 'package:registration_delivery/blocs/household_overview/household_overview.dart';
 import 'package:intl/intl.dart';
 import 'package:registration_delivery/models/entities/status.dart';
+import 'package:registration_delivery/utils/utils.dart';
 import 'package:survey_form/survey_form.dart';
 import 'package:registration_delivery/blocs/delivery_intervention/deliver_intervention.dart';
 import 'package:registration_delivery/blocs/search_households/search_households.dart';
@@ -521,22 +522,31 @@ class _EligibilityChecklistViewPage
                                       ),
                                     );
 
-                                    // TODO: Currently, it's been shifted to the zero dose flow
-                                    // context.read<DeliverInterventionBloc>().add(
-                                    //       DeliverInterventionSubmitEvent(
-                                    //           task: task,
-                                    //           isEditing: false,
-                                    //           boundaryModel: context.boundary,
-                                    //           navigateToSummary: false,
-                                    //           householdMemberWrapper:
-                                    //               householdOverviewState
-                                    //                   .householdMemberWrapper),
-                                    //     );
-                                    // final searchBloc =
-                                    //     context.read<SearchHouseholdsBloc>();
-                                    // searchBloc.add(
-                                    //   const SearchHouseholdsClearEvent(),
-                                    // );
+                                    context.read<DeliverInterventionBloc>().add(
+                                          DeliverInterventionSubmitEvent(
+                                            task: task,
+                                            isEditing: false,
+                                            boundaryModel: context.boundary,
+                                          ),
+                                        );
+
+                                    final reloadState =
+                                        context.read<HouseholdOverviewBloc>();
+                                    Future.delayed(
+                                      const Duration(milliseconds: 500),
+                                      () {
+                                        reloadState.add(
+                                          HouseholdOverviewReloadEvent(
+                                            projectId:
+                                                RegistrationDeliverySingleton()
+                                                    .projectId!,
+                                            projectBeneficiaryType:
+                                                RegistrationDeliverySingleton()
+                                                    .beneficiaryType!,
+                                          ),
+                                        );
+                                      },
+                                    );
 
                                     router.push(ZeroDoseCheckRoute(
                                       eligibilityAssessmentType:
@@ -1123,9 +1133,7 @@ class _EligibilityChecklistViewPage
           responses[q2Key] == yes) {
         if (!isReferral &&
             (responses.containsKey(q3Key) && responses[q3Key]!.isNotEmpty)) {
-          isReferral = responses[q3Key] == test_unavailable
-              ? true
-              : false;
+          isReferral = responses[q3Key] == test_unavailable ? true : false;
         }
         if (!isReferral &&
             (responses.containsKey(q4Key) && responses[q4Key]!.isNotEmpty)) {

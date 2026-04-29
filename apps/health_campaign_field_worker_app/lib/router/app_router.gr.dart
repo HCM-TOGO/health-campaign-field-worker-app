@@ -474,6 +474,7 @@ abstract class _$AppRouter extends RootStackRouter {
           projectBeneficiaryClientReferenceId:
               args.projectBeneficiaryClientReferenceId,
           taskClientReferenceId: args.taskClientReferenceId,
+          beneficiaryId: args.beneficiaryId,
           appLocalizations: args.appLocalizations,
         ),
       );
@@ -2591,6 +2592,7 @@ class CustomReferralReasonChecklistRoute
     bool isSideEffect = false,
     String? projectBeneficiaryClientReferenceId,
     String? taskClientReferenceId,
+    String? beneficiaryId,
     ReferralReconLocalization? appLocalizations,
     List<PageRouteInfo>? children,
   }) : super(
@@ -2602,6 +2604,7 @@ class CustomReferralReasonChecklistRoute
             projectBeneficiaryClientReferenceId:
                 projectBeneficiaryClientReferenceId,
             taskClientReferenceId: taskClientReferenceId,
+            beneficiaryId: beneficiaryId,
             appLocalizations: appLocalizations,
           ),
           initialChildren: children,
@@ -2620,6 +2623,7 @@ class CustomReferralReasonChecklistRouteArgs {
     this.isSideEffect = false,
     this.projectBeneficiaryClientReferenceId,
     this.taskClientReferenceId,
+    this.beneficiaryId,
     this.appLocalizations,
   });
 
@@ -2633,11 +2637,13 @@ class CustomReferralReasonChecklistRouteArgs {
 
   final String? taskClientReferenceId;
 
+  final String? beneficiaryId;
+
   final ReferralReconLocalization? appLocalizations;
 
   @override
   String toString() {
-    return 'CustomReferralReasonChecklistRouteArgs{key: $key, referralClientRefId: $referralClientRefId, isSideEffect: $isSideEffect, projectBeneficiaryClientReferenceId: $projectBeneficiaryClientReferenceId, taskClientReferenceId: $taskClientReferenceId, appLocalizations: $appLocalizations}';
+    return 'CustomReferralReasonChecklistRouteArgs{key: $key, referralClientRefId: $referralClientRefId, isSideEffect: $isSideEffect, projectBeneficiaryClientReferenceId: $projectBeneficiaryClientReferenceId, taskClientReferenceId: $taskClientReferenceId, beneficiaryId: $beneficiaryId, appLocalizations: $appLocalizations}';
   }
 }
 

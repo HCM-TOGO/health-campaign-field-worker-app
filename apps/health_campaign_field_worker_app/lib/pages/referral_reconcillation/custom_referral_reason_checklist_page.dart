@@ -38,6 +38,7 @@ class CustomReferralReasonChecklistPage extends LocalizedStatefulWidget {
   final bool isSideEffect;
   final String? projectBeneficiaryClientReferenceId;
   final String? taskClientReferenceId;
+  final String? beneficiaryId;
 
   const CustomReferralReasonChecklistPage({
     super.key,
@@ -45,6 +46,7 @@ class CustomReferralReasonChecklistPage extends LocalizedStatefulWidget {
     this.isSideEffect = false,
     this.projectBeneficiaryClientReferenceId,
     this.taskClientReferenceId,
+    this.beneficiaryId,
     super.appLocalizations,
   });
 
@@ -371,7 +373,12 @@ class _CustomReferralReasonChecklistPageState
                                                                 'boundaryCode',
                                                                 SurveyFormSingleton()
                                                                     .boundary
-                                                                    ?.code)
+                                                                    ?.code),
+                                                            AdditionalField(
+                                                              'beneficiaryId',
+                                                              widget
+                                                                  .beneficiaryId,
+                                                            )
                                                           ])),
                                                 ),
                                               );

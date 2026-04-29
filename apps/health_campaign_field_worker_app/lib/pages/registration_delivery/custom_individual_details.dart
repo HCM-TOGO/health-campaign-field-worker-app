@@ -1414,6 +1414,20 @@ class CustomIndividualDetailsPageState
               'previousBeneficiaryId',
               form.control(_previousBeneficiaryIdKey).value!,
             ),
+          if (form.control(_idTypeKey).value != null &&
+              // ignore: avoid_dynamic_calls
+              form.control(_idTypeKey).value!.isNotEmpty)
+            AdditionalField(
+              'idType',
+              form.control(_idTypeKey).value!,
+            ),
+          if (form.control(_idNumberKey).value != null &&
+              // ignore: avoid_dynamic_calls
+              form.control(_idNumberKey).value!.isNotEmpty)
+            AdditionalField(
+              'idNumber',
+              form.control(_idNumberKey).value!,
+            ),
         ],
       ),
     );
