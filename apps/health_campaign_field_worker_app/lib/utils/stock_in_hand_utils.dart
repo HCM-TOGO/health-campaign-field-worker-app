@@ -91,8 +91,11 @@ StockInHandResult calculateStockInHand({
     if (qty <= 0) continue;
 
     final transactionType = stock.transactionType?.toUpperCase() ?? '';
+    final transactionReason = stock.transactionReason?.toUpperCase() ?? '';
 
-    if (ownerIds.contains(stock.receiverId) && transactionType == 'RECEIVED') {
+    if (ownerIds.contains(stock.receiverId) &&
+        transactionType == 'RECEIVED' &&
+        transactionReason != 'RETURNED') {
       received += qty;
     }
 

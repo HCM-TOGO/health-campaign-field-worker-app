@@ -181,11 +181,14 @@ class _HomePageState extends LocalizedState<HomePage> {
                         ),
                       ),
                     ),
-              if (isDistributorRole)
-                Padding(
+              Visibility(
+                visible: isDistributorRole,
+                maintainState: true,
+                child: Padding(
                   padding: const EdgeInsets.symmetric(horizontal: spacer2),
                   child: const StockBalanceCard(),
                 ),
+              ),
             ],
           ),
           footer: Padding(
