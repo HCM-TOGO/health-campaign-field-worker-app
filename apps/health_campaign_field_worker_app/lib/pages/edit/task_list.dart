@@ -2,8 +2,11 @@ import 'dart:async';
 
 import 'package:collection/collection.dart';
 import 'package:digit_data_model/data_model.dart';
+import 'package:digit_ui_components/digit_components.dart';
+import 'package:digit_ui_components/theme/digit_extended_theme.dart';
 import 'package:digit_ui_components/widgets/atoms/digit_search_bar.dart';
 import 'package:digit_ui_components/widgets/atoms/switch.dart';
+import 'package:digit_ui_components/widgets/molecules/digit_card.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:registration_delivery/registration_delivery.dart';
@@ -14,8 +17,8 @@ import '../../models/entities/identifier_types.dart';
 import '../../router/app_router.dart';
 import '../../utils/i18_key_constants.dart' as i18;
 import '../../utils/upper_case.dart';
+import '../../widgets/header/back_navigation_help_header.dart';
 import '../../widgets/localized.dart';
-import '../../widgets/showcase/showcase_wrappers.dart';
 
 @RoutePage()
 class TaskListPage extends LocalizedStatefulWidget {
@@ -204,127 +207,165 @@ class _TaskListPageState extends LocalizedState<TaskListPage> {
 
   @override
   Widget build(BuildContext context) {
+    final theme = Theme.of(context);
+    final textTheme = theme.digitTextTheme(context);
+
     return Scaffold(
-      appBar: AppBar(
-        title: Text(localizations.translate(i18.editTasks.editTasksTitle)),
-      ),
-      body: FutureBuilder<List<TaskModel>>(
-        future: _tasksFuture,
-        builder: (context, snapshot) {
-          if (snapshot.connectionState == ConnectionState.waiting) {
-            return const Center(child: CircularProgressIndicator());
-          }
-
-          if (snapshot.hasError) {
-            return Center(
-              child: Text(
-                'Error loading tasks: ${snapshot.error}',
-                style: const TextStyle(color: Colors.red),
+      backgroundColor: theme.colorTheme.generic.background,
+      body: Column(
+        crossAxisAlignment: CrossAxisAlignment.stretch,
+        children: [
+          const BackNavigationHelpHeaderWidget(showHelp: false),
+          Padding(
+            padding: const EdgeInsets.fromLTRB(spacer4, spacer2, spacer4, spacer2),
+            child: Text(
+              localizations.translate(i18.editTasks.editTasksTitle),
+              style: textTheme.headingXl.copyWith(
+                color: theme.colorTheme.primary.primary2,
               ),
-            );
-          }
-
-          final tasks = _filteredTasks;
-
-          return Column(
-            children: [
-              // Toggle Search
-              Padding(
-                padding: const EdgeInsets.all(1.5 * kPadding),
-                child: Row(
-                  children: [
-                    DigitSwitch(
-                      mainAxisAlignment: MainAxisAlignment.start,
-                      label: localizations
-                          .translate(i18.editTasks.enableSearchLabel),
-                      value: _isSearchEnabled,
-                      onChanged: (value) {
-                        _toggleSearch(value);
-                        if (!value) {
-                          searchController.clear();
-                        }
-                      },
+            ),
+          ),
+          Expanded(
+            child: FutureBuilder<List<TaskModel>>(
+              future: _tasksFuture,
+              builder: (context, snapshot) {
+                if (snapshot.connectionState == ConnectionState.waiting) {
+                  return Center(
+                    child: CircularProgressIndicator(
+                      color: theme.colorTheme.primary.primary2,
                     ),
-                  ],
-                ),
-              ),
+                  );
+                }
 
-              // Search Bar
-              if (_isSearchEnabled)
-                Padding(
-                  padding:
-                      const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
-                  child: DigitSearchBar(
-                    inputFormatters: [UpperCaseTextFormatter()],
-                    controller: searchController,
-                    icon: const Icon(Icons.search),
-                    hintText: localizations
-                        .translate(i18.editTasks.searchByBeneficiaryIdLabel),
-                    textCapitalization: TextCapitalization.characters,
-                    onChanged: _filterTasksByBeneficiaryId,
-                  ),
-                ),
+                if (snapshot.hasError) {
+                  return Center(
+                    child: Padding(
+                      padding: const EdgeInsets.all(spacer4),
+                      child: Text(
+                        'Error loading tasks: ${snapshot.error}',
+                        style: textTheme.bodyL.copyWith(
+                          color: theme.colorTheme.alert.error,
+                        ),
+                        textAlign: TextAlign.center,
+                      ),
+                    ),
+                  );
+                }
 
-              // Task List or "No results"
-              Expanded(
-                child: Builder(
-                  builder: (context) {
-                    // Case 1: Still loading or empty
-                    if (tasks.isEmpty) {
-                      // If search is ON and query entered, show no match message
-                      if (_isSearchEnabled && _searchQuery.isNotEmpty) {
-                        return Center(
-                          child: Text(
-                            '${localizations.translate(i18.editTasks.noMatchFound)} "$_searchQuery"',
-                            style: const TextStyle(
-                              fontSize: 16,
-                              color: Colors.black54,
-                              fontStyle: FontStyle.italic,
-                            ),
-                          ),
-                        );
-                      }
-                      // If search is OFF, show general empty message
-                      return Center(
-                        child: Text(localizations
-                            .translate(i18.editTasks.noTasksFound)),
-                      );
-                    }
+                final tasks = _filteredTasks;
 
-                    // Case 2: Show tasks normally
-                    return ListView.builder(
-                      padding: const EdgeInsets.all(12),
-                      itemCount: tasks.length,
-                      itemBuilder: (context, index) {
-                        final task = tasks[index];
-                        final individual = _individualsByTask[task.id ??
-                            task.projectBeneficiaryClientReferenceId!];
-
-                        return Card(
-                          margin: const EdgeInsets.symmetric(vertical: 8),
-                          elevation: 2,
-                          shape: RoundedRectangleBorder(
-                            borderRadius: BorderRadius.circular(12),
-                          ),
-                          child: InkWell(
-                            borderRadius: BorderRadius.circular(12),
-                            onTap: () {
-                              context.router
-                                  .push(
-                                    TaskDetailRoute(
-                                      taskModel: task,
-                                      individualModel: _individualsByTask[task
-                                              .id ??
-                                          task.projectBeneficiaryClientReferenceId!],
-                                    ),
-                                  )
-                                  .then((_) => setState(() => _tasksFuture =
-                                      _fetchTasksWithIndividual()));
+                return Column(
+                  children: [
+                    Padding(
+                      padding: const EdgeInsets.symmetric(horizontal: spacer4),
+                      child: Row(
+                        children: [
+                          DigitSwitch(
+                            mainAxisAlignment: MainAxisAlignment.start,
+                            label: localizations
+                                .translate(i18.editTasks.enableSearchLabel),
+                            value: _isSearchEnabled,
+                            onChanged: (value) {
+                              _toggleSearch(value);
+                              if (!value) {
+                                searchController.clear();
+                              }
                             },
-                            child: Padding(
-                              padding: const EdgeInsets.all(16),
-                              child: Column(
-                                crossAxisAlignment: CrossAxisAlignment.start,
+                          ),
+                        ],
+                      ),
+                    ),
+                    if (_isSearchEnabled)
+                      Padding(
+                        padding: const EdgeInsets.fromLTRB(
+                          spacer4,
+                          spacer2,
+                          spacer4,
+                          spacer2,
+                        ),
+                        child: DigitSearchBar(
+                          inputFormatters: [UpperCaseTextFormatter()],
+                          controller: searchController,
+                          icon: Icon(
+                            Icons.search,
+                            color: theme.colorTheme.primary.primary2,
+                          ),
+                          hintText: localizations.translate(
+                            i18.editTasks.searchByBeneficiaryIdLabel,
+                          ),
+                          textCapitalization: TextCapitalization.characters,
+                          onChanged: _filterTasksByBeneficiaryId,
+                        ),
+                      ),
+                    Expanded(
+                      child: Builder(
+                        builder: (context) {
+                          if (tasks.isEmpty) {
+                            if (_isSearchEnabled &&
+                                _searchQuery.isNotEmpty) {
+                              return Center(
+                                child: Padding(
+                                  padding: const EdgeInsets.all(spacer4),
+                                  child: Text(
+                                    '${localizations.translate(i18.editTasks.noMatchFound)} "$_searchQuery"',
+                                    style: textTheme.bodyL.copyWith(
+                                      color: theme.colorTheme.text.secondary,
+                                      fontStyle: FontStyle.italic,
+                                    ),
+                                    textAlign: TextAlign.center,
+                                  ),
+                                ),
+                              );
+                            }
+                            return Center(
+                              child: Padding(
+                                padding: const EdgeInsets.all(spacer4),
+                                child: Text(
+                                  localizations.translate(
+                                    i18.editTasks.noTasksFound,
+                                  ),
+                                  style: textTheme.bodyL.copyWith(
+                                    color: theme.colorTheme.text.secondary,
+                                  ),
+                                  textAlign: TextAlign.center,
+                                ),
+                              ),
+                            );
+                          }
+
+                          return ListView.separated(
+                            padding: const EdgeInsets.fromLTRB(
+                              spacer4,
+                              0,
+                              spacer4,
+                              spacer4,
+                            ),
+                            itemCount: tasks.length,
+                            separatorBuilder: (_, __) =>
+                                const SizedBox(height: spacer2),
+                            itemBuilder: (context, index) {
+                              final task = tasks[index];
+                              final individual = _individualsByTask[task.id ??
+                                  task.projectBeneficiaryClientReferenceId!];
+
+                              return DigitCard(
+                                margin: EdgeInsets.zero,
+                                scrollPhysics:
+                                    const NeverScrollableScrollPhysics(),
+                                onPressed: () {
+                                  context.router
+                                      .push(
+                                        TaskDetailRoute(
+                                          taskModel: task,
+                                          individualModel: _individualsByTask[
+                                              task.id ??
+                                                  task.projectBeneficiaryClientReferenceId!],
+                                        ),
+                                      )
+                                      .then((_) => setState(() =>
+                                          _tasksFuture =
+                                              _fetchTasksWithIndividual()));
+                                },
                                 children: [
                                   Text(
                                     (() {
@@ -363,23 +404,22 @@ class _TaskListPageState extends LocalizedState<TaskListPage> {
                                       }
                                       return '${localizations.translate(i18.editTasks.taskLabel)} #$suffix';
                                     })(),
-                                    style: const TextStyle(
-                                      fontSize: 18,
-                                      fontWeight: FontWeight.bold,
+                                    style: textTheme.headingM.copyWith(
+                                      fontWeight: FontWeight.w600,
+                                      color: theme.colorTheme.text.primary,
                                     ),
                                   ),
                                   if (individual != null) ...{
                                     if (individual.name?.givenName != null ||
                                         individual.name?.familyName !=
                                             null) ...[
-                                      const SizedBox(height: 4),
+                                      const SizedBox(height: spacer1),
                                       Text(
                                         '${localizations.translate(i18.editTasks.nameLabel)}: ${individual.name?.givenName ?? ''} ${individual.name?.familyName ?? ''}'
                                             .trim(),
-                                        style: const TextStyle(
-                                          fontSize: 16,
-                                          fontWeight: FontWeight.bold,
-                                          color: Colors.black54,
+                                        style: textTheme.bodyL.copyWith(
+                                          fontWeight: FontWeight.w500,
+                                          color: theme.colorTheme.text.secondary,
                                         ),
                                       ),
                                     ],
@@ -389,30 +429,36 @@ class _TaskListPageState extends LocalizedState<TaskListPage> {
                                                 .identifierType ==
                                             IdentifierTypes.uniqueBeneficiaryID
                                                 .toValue()) ...[
-                                      const SizedBox(height: 4),
+                                      const SizedBox(height: spacer1),
                                       Text(
                                         '${localizations.translate(i18.editTasks.beneficiaryIdLabel)}: ${_individualsByTask[task.id ?? task.projectBeneficiaryClientReferenceId!]?.identifiers?.first.identifierId}',
-                                        style: const TextStyle(
-                                          fontSize: 16,
-                                          fontWeight: FontWeight.bold,
-                                          color: Colors.black54,
+                                        style: textTheme.bodyL.copyWith(
+                                          fontWeight: FontWeight.w500,
+                                          color: theme.colorTheme.text.secondary,
                                         ),
                                       ),
                                     ],
                                   },
-                                  const SizedBox(height: 12),
+                                  const SizedBox(height: spacer3),
                                   SingleChildScrollView(
                                     scrollDirection: Axis.horizontal,
                                     child: Row(
                                       children: [
-                                        _buildTaskField(i18.editTasks.idLabel,
-                                            task.id?.toString()),
                                         _buildTaskField(
-                                            i18.editTasks.statusLabel,
-                                            task.status),
+                                          context,
+                                          i18.editTasks.idLabel,
+                                          task.id?.toString(),
+                                        ),
                                         _buildTaskField(
-                                            i18.editTasks.createdByLabel,
-                                            task.createdBy),
+                                          context,
+                                          i18.editTasks.statusLabel,
+                                          task.status,
+                                        ),
+                                        _buildTaskField(
+                                          context,
+                                          i18.editTasks.createdByLabel,
+                                          task.createdBy,
+                                        ),
                                       ]
                                           .where((widget) => widget != null)
                                           .cast<Widget>()
@@ -420,63 +466,67 @@ class _TaskListPageState extends LocalizedState<TaskListPage> {
                                     ),
                                   ),
                                   Padding(
-                                    padding: const EdgeInsets.only(top: 8),
+                                    padding: const EdgeInsets.only(top: spacer2),
                                     child: Text(
                                       localizations.translate(
-                                          i18.editTasks.tapToViewOrEdit),
-                                      style: TextStyle(
-                                        color: Theme.of(context)
-                                            .colorScheme
-                                            .primary,
+                                        i18.editTasks.tapToViewOrEdit,
+                                      ),
+                                      style: textTheme.bodyS.copyWith(
+                                        color: theme.colorTheme.primary.primary1,
                                         fontStyle: FontStyle.italic,
                                       ),
                                     ),
                                   ),
                                 ],
-                              ),
-                            ),
-                          ),
-                        );
-                      },
-                    );
-                  },
-                ),
-              ),
-            ],
-          );
-        },
+                              );
+                            },
+                          );
+                        },
+                      ),
+                    ),
+                  ],
+                );
+              },
+            ),
+          ),
+        ],
       ),
     );
   }
 
-  Widget? _buildTaskField(String label, String? value) {
+  Widget? _buildTaskField(
+    BuildContext context,
+    String label,
+    String? value,
+  ) {
     if (value == null) return null;
 
+    final theme = Theme.of(context);
+    final textTheme = theme.digitTextTheme(context);
+
     return Container(
-      margin: const EdgeInsets.only(right: 16),
-      padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
+      margin: const EdgeInsets.only(right: spacer4),
+      padding: const EdgeInsets.symmetric(horizontal: spacer3, vertical: spacer2),
       decoration: BoxDecoration(
-        color: Colors.grey.shade100,
-        borderRadius: BorderRadius.circular(8),
-        border: Border.all(color: Colors.grey.withOpacity(0.4)),
+        color: theme.colorTheme.paper.secondary,
+        borderRadius: BorderRadius.circular(spacer2),
+        border: Border.all(color: theme.colorTheme.generic.divider),
       ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           Text(
             localizations.translate(label),
-            style: const TextStyle(
-              fontSize: 12,
+            style: textTheme.bodyS.copyWith(
               fontWeight: FontWeight.w600,
-              color: Colors.black54,
+              color: theme.colorTheme.text.secondary,
             ),
           ),
-          const SizedBox(height: 4),
+          const SizedBox(height: spacer1),
           Text(
             value,
-            style: const TextStyle(
-              fontSize: 13,
-              color: Colors.black87,
+            style: textTheme.bodyS.copyWith(
+              color: theme.colorTheme.text.primary,
             ),
           ),
         ],

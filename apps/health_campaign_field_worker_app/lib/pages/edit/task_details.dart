@@ -4,6 +4,7 @@ import 'package:digit_components/digit_components.dart';
 import 'package:digit_data_model/data_model.dart';
 import 'package:digit_ui_components/models/DropdownModels.dart';
 import 'package:digit_ui_components/theme/digit_extended_theme.dart';
+import 'package:digit_ui_components/theme/spacers.dart';
 import 'package:digit_ui_components/utils/date_utils.dart';
 import 'package:digit_ui_components/widgets/atoms/digit_dropdown_input.dart'
     as digit_ui;
@@ -173,6 +174,8 @@ class _TaskDetailPageState extends LocalizedState<TaskDetailPage> {
   }
 
   Future<void> _showSaveDialog() async {
+    final theme = Theme.of(context);
+
     if (_controllers['status']?.text == null ||
         _controllers['status']?.text.trim() == '') {
       ScaffoldMessenger.of(context).showSnackBar(
@@ -180,7 +183,7 @@ class _TaskDetailPageState extends LocalizedState<TaskDetailPage> {
           content: Text(
             localizations.translate(i18.editTasks.statusRequiredError),
           ),
-          backgroundColor: Colors.red,
+          backgroundColor: theme.colorTheme.alert.error,
         ),
       );
       return;
@@ -198,7 +201,7 @@ class _TaskDetailPageState extends LocalizedState<TaskDetailPage> {
             localizations
                 .translate(i18.editTasks.productVariantIdRequiredError),
           ),
-          backgroundColor: Colors.red,
+          backgroundColor: theme.colorTheme.alert.error,
         ),
       );
       return;
@@ -206,16 +209,26 @@ class _TaskDetailPageState extends LocalizedState<TaskDetailPage> {
 
     final result = await showDialog<bool>(
       context: context,
-      builder: (BuildContext context) {
+      builder: (BuildContext dialogContext) {
+        final dialogTheme = Theme.of(dialogContext);
+        final dialogTextTheme = dialogTheme.digitTextTheme(dialogContext);
         return AlertDialog(
-          title: Text(localizations.translate(i18.editTasks.updateDialogTitle)),
+          backgroundColor: dialogTheme.colorTheme.paper.primary,
+          title: Text(
+            localizations.translate(i18.editTasks.updateDialogTitle),
+            style: dialogTextTheme.headingM.copyWith(
+              color: dialogTheme.colorTheme.text.primary,
+            ),
+          ),
           content: Column(
             mainAxisSize: MainAxisSize.min,
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               Text(
                 localizations.translate(i18.editTasks.updateDialogMessage),
-                style: const TextStyle(fontSize: 16),
+                style: dialogTextTheme.bodyL.copyWith(
+                  color: dialogTheme.colorTheme.text.primary,
+                ),
               ),
               const SizedBox(height: 16),
               TextField(
@@ -234,7 +247,7 @@ class _TaskDetailPageState extends LocalizedState<TaskDetailPage> {
           ),
           actions: [
             TextButton(
-              onPressed: () => Navigator.of(context).pop(false),
+              onPressed: () => Navigator.of(dialogContext).pop(false),
               child: Text(localizations.translate(i18.common.coreCommonCancel)),
             ),
             ElevatedButton(
@@ -247,7 +260,7 @@ class _TaskDetailPageState extends LocalizedState<TaskDetailPage> {
                         localizations
                             .translate(i18.editTasks.updateReasonRequiredError),
                       ),
-                      backgroundColor: Colors.red,
+                      backgroundColor: theme.colorTheme.alert.error,
                     ),
                   );
                   return;
@@ -259,7 +272,7 @@ class _TaskDetailPageState extends LocalizedState<TaskDetailPage> {
                         localizations
                             .translate(i18.editTasks.reasonMinLengthError),
                       ),
-                      backgroundColor: Colors.red,
+                      backgroundColor: theme.colorTheme.alert.error,
                     ),
                   );
                   return;
@@ -271,16 +284,16 @@ class _TaskDetailPageState extends LocalizedState<TaskDetailPage> {
                         localizations
                             .translate(i18.editTasks.reasonMaxLengthError),
                       ),
-                      backgroundColor: Colors.red,
+                      backgroundColor: theme.colorTheme.alert.error,
                     ),
                   );
                   return;
                 }
-                Navigator.of(context).pop(true);
+                Navigator.of(dialogContext).pop(true);
               },
               style: ElevatedButton.styleFrom(
-                backgroundColor: Colors.green,
-                foregroundColor: Colors.white,
+                backgroundColor: dialogTheme.colorTheme.primary.primary2,
+                foregroundColor: dialogTheme.colorTheme.paper.primary,
               ),
               child: Text(localizations.translate(i18.common.coreCommonSave)),
             ),
@@ -331,7 +344,7 @@ class _TaskDetailPageState extends LocalizedState<TaskDetailPage> {
             content: Text(
               localizations.translate(i18.editTasks.updateSuccessMessage),
             ),
-            backgroundColor: Colors.green,
+            backgroundColor: Theme.of(context).colorTheme.alert.success,
           ),
         );
         Navigator.pop(context);
@@ -344,7 +357,7 @@ class _TaskDetailPageState extends LocalizedState<TaskDetailPage> {
             content: Text(
               localizations.translate(i18.editTasks.updateErrorMessage),
             ),
-            backgroundColor: Colors.red,
+            backgroundColor: Theme.of(context).colorTheme.alert.error,
           ),
         );
         debugPrint('Error saving changes: $e');
@@ -551,14 +564,27 @@ class _TaskDetailPageState extends LocalizedState<TaskDetailPage> {
   Future<void> _showDeleteDialog() async {
     final result = await showDialog<bool>(
       context: context,
-      builder: (BuildContext context) {
+      builder: (BuildContext dialogContext) {
+        final dialogTheme = Theme.of(dialogContext);
+        final dialogTextTheme = dialogTheme.digitTextTheme(dialogContext);
         return AlertDialog(
-          title: Text(localizations.translate(i18.editTasks.deleteDialogTitle)),
+          backgroundColor: dialogTheme.colorTheme.paper.primary,
+          title: Text(
+            localizations.translate(i18.editTasks.deleteDialogTitle),
+            style: dialogTextTheme.headingM.copyWith(
+              color: dialogTheme.colorTheme.text.primary,
+            ),
+          ),
           content: Column(
             mainAxisSize: MainAxisSize.min,
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              Text(localizations.translate(i18.editTasks.deleteDialogMessage)),
+              Text(
+                localizations.translate(i18.editTasks.deleteDialogMessage),
+                style: dialogTextTheme.bodyL.copyWith(
+                  color: dialogTheme.colorTheme.text.primary,
+                ),
+              ),
               const SizedBox(height: 16),
               TextField(
                 controller: _deleteReasonController,
@@ -576,7 +602,7 @@ class _TaskDetailPageState extends LocalizedState<TaskDetailPage> {
           ),
           actions: [
             TextButton(
-              onPressed: () => Navigator.of(context).pop(false),
+              onPressed: () => Navigator.of(dialogContext).pop(false),
               child: Text(localizations.translate(i18.common.coreCommonCancel)),
             ),
             ElevatedButton(
@@ -587,7 +613,7 @@ class _TaskDetailPageState extends LocalizedState<TaskDetailPage> {
                     SnackBar(
                       content: Text(localizations
                           .translate(i18.editTasks.deleteReasonRequiredError)),
-                      backgroundColor: Colors.red,
+                      backgroundColor: Theme.of(context).colorTheme.alert.error,
                     ),
                   );
                   return;
@@ -597,7 +623,7 @@ class _TaskDetailPageState extends LocalizedState<TaskDetailPage> {
                     SnackBar(
                       content: Text(localizations
                           .translate(i18.editTasks.reasonMinLengthError)),
-                      backgroundColor: Colors.red,
+                      backgroundColor: Theme.of(context).colorTheme.alert.error,
                     ),
                   );
                   return;
@@ -607,16 +633,16 @@ class _TaskDetailPageState extends LocalizedState<TaskDetailPage> {
                     SnackBar(
                       content: Text(localizations
                           .translate(i18.editTasks.reasonMaxLengthError)),
-                      backgroundColor: Colors.red,
+                      backgroundColor: Theme.of(context).colorTheme.alert.error,
                     ),
                   );
                   return;
                 }
-                Navigator.of(context).pop(true);
+                Navigator.of(dialogContext).pop(true);
               },
               style: ElevatedButton.styleFrom(
-                backgroundColor: Colors.red,
-                foregroundColor: Colors.white,
+                backgroundColor: dialogTheme.colorTheme.alert.error,
+                foregroundColor: dialogTheme.colorTheme.paper.primary,
               ),
               child: Text(localizations.translate(i18.common.coreCommonDelete)),
             ),
@@ -667,7 +693,7 @@ class _TaskDetailPageState extends LocalizedState<TaskDetailPage> {
             content: Text(
               localizations.translate(i18.editTasks.deleteSuccessMessage),
             ),
-            backgroundColor: Colors.green,
+            backgroundColor: Theme.of(context).colorTheme.alert.success,
           ),
         );
         Navigator.pop(context);
@@ -680,7 +706,7 @@ class _TaskDetailPageState extends LocalizedState<TaskDetailPage> {
             content: Text(
               localizations.translate(i18.editTasks.deleteErrorMessage),
             ),
-            backgroundColor: Colors.red,
+            backgroundColor: Theme.of(context).colorTheme.alert.error,
           ),
         );
         debugPrint('Error deleting task: $e');
@@ -805,10 +831,11 @@ class _TaskDetailPageState extends LocalizedState<TaskDetailPage> {
     final textTheme = theme.digitTextTheme(context);
 
     return Scaffold(
-      backgroundColor: theme.colorScheme.surface,
+      backgroundColor: theme.colorTheme.generic.background,
       appBar: AppBar(
-        backgroundColor: theme.colorScheme.primary,
-        foregroundColor: theme.colorScheme.onPrimary,
+        backgroundColor: theme.colorTheme.primary.primary2,
+        foregroundColor: theme.colorTheme.paper.primary,
+        iconTheme: IconThemeData(color: theme.colorTheme.paper.primary),
         title: Text(
           (() {
             final fields = _originalTask.additionalFields?.fields ?? const [];
@@ -839,7 +866,7 @@ class _TaskDetailPageState extends LocalizedState<TaskDetailPage> {
             return '${localizations.translate(i18.editTasks.taskLabel)} #$suffix';
           })(),
           style: textTheme.headingL.copyWith(
-            color: theme.colorScheme.onPrimary,
+            color: theme.colorTheme.paper.primary,
             fontWeight: FontWeight.w600,
           ),
         ),
@@ -847,18 +874,23 @@ class _TaskDetailPageState extends LocalizedState<TaskDetailPage> {
           DigitIconButton(
             icon: Icons.delete,
             onPressed: _saving ? null : _showDeleteDialog,
-            iconColor: Colors.red,
+            iconColor: theme.colorTheme.alert.error,
           ),
           DigitIconButton(
             icon: Icons.save,
             onPressed: _saving ? null : _showSaveDialog,
+            iconColor: theme.colorTheme.paper.primary,
           ),
         ],
       ),
       body: _saving
-          ? const Center(child: CircularProgressIndicator())
+          ? Center(
+              child: CircularProgressIndicator(
+                color: theme.colorTheme.primary.primary2,
+              ),
+            )
           : SingleChildScrollView(
-              padding: const EdgeInsets.all(4),
+              padding: const EdgeInsets.fromLTRB(spacer4, spacer2, spacer4, spacer4),
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
@@ -958,7 +990,7 @@ class _TaskDetailPageState extends LocalizedState<TaskDetailPage> {
               children: [
                 Icon(
                   Icons.person,
-                  color: theme.colorScheme.primary,
+                  color: theme.colorTheme.primary.primary2,
                   size: 24,
                 ),
                 const SizedBox(width: 8),
@@ -967,7 +999,7 @@ class _TaskDetailPageState extends LocalizedState<TaskDetailPage> {
                       .translate(i18.editTasks.beneficiaryDetailsSectionTitle),
                   style: textTheme.headingL.copyWith(
                     fontWeight: FontWeight.w600,
-                    color: theme.colorScheme.primary,
+                    color: theme.colorTheme.primary.primary2,
                   ),
                 ),
               ],
@@ -1053,7 +1085,7 @@ class _TaskDetailPageState extends LocalizedState<TaskDetailPage> {
               children: [
                 Icon(
                   Icons.inventory_2,
-                  color: theme.colorScheme.primary,
+                  color: theme.colorTheme.primary.primary2,
                   size: 24,
                 ),
                 const SizedBox(width: 8),
@@ -1061,7 +1093,7 @@ class _TaskDetailPageState extends LocalizedState<TaskDetailPage> {
                   localizations.translate(i18.editTasks.resourcesSectionTitle),
                   style: textTheme.headingL.copyWith(
                     fontWeight: FontWeight.w600,
-                    color: theme.colorScheme.primary,
+                    color: theme.colorTheme.primary.primary2,
                   ),
                 ),
               ],
@@ -1093,10 +1125,10 @@ class _TaskDetailPageState extends LocalizedState<TaskDetailPage> {
       margin: const EdgeInsets.only(bottom: 12),
       padding: const EdgeInsets.all(12),
       decoration: BoxDecoration(
-        color: theme.colorScheme.surfaceContainerHighest.withOpacity(0.3),
+        color: theme.colorTheme.paper.secondary.withOpacity(0.6),
         borderRadius: BorderRadius.circular(8),
         border: Border.all(
-          color: theme.colorScheme.outline.withOpacity(0.2),
+          color: theme.colorTheme.generic.divider.withOpacity(0.6),
         ),
       ),
       child: Column(
@@ -1107,7 +1139,7 @@ class _TaskDetailPageState extends LocalizedState<TaskDetailPage> {
             '${localizations.translate(i18.editTasks.resourceLabel)} ${index + 1}',
             style: textTheme.headingM.copyWith(
               fontWeight: FontWeight.w600,
-              color: theme.colorScheme.primary,
+              color: theme.colorTheme.primary.primary2,
             ),
           ),
           const SizedBox(height: 8),
@@ -1118,7 +1150,7 @@ class _TaskDetailPageState extends LocalizedState<TaskDetailPage> {
               label:
                   localizations.translate(i18.editTasks.productVariantIdLabel),
               labelStyle: TextStyle(
-                color: theme.colorScheme.onSurfaceVariant,
+                color: theme.colorTheme.text.secondary,
                 fontSize: 16,
               ),
               child: digit_ui.DigitDropdown(
@@ -1150,7 +1182,7 @@ class _TaskDetailPageState extends LocalizedState<TaskDetailPage> {
             Text(
               localizations.translate(i18.editTasks.noProductVariantsFound),
               style: textTheme.bodyS.copyWith(
-                color: theme.colorScheme.onSurfaceVariant,
+                color: theme.colorTheme.text.secondary,
               ),
             ),
 
@@ -1215,7 +1247,7 @@ class _TaskDetailPageState extends LocalizedState<TaskDetailPage> {
               children: [
                 Icon(
                   Icons.info_outline,
-                  color: theme.colorScheme.primary,
+                  color: theme.colorTheme.primary.primary2,
                   size: 24,
                 ),
                 const SizedBox(width: 8),
@@ -1224,7 +1256,7 @@ class _TaskDetailPageState extends LocalizedState<TaskDetailPage> {
                       .translate(i18.editTasks.additionalDetailsSectionTitle),
                   style: textTheme.headingL.copyWith(
                     fontWeight: FontWeight.w600,
-                    color: theme.colorScheme.primary,
+                    color: theme.colorTheme.primary.primary2,
                   ),
                 ),
               ],
@@ -1281,7 +1313,7 @@ class _TaskDetailPageState extends LocalizedState<TaskDetailPage> {
               children: [
                 Icon(
                   Icons.assignment,
-                  color: theme.colorScheme.primary,
+                  color: theme.colorTheme.primary.primary2,
                   size: 24,
                 ),
                 const SizedBox(width: 8),
@@ -1289,7 +1321,7 @@ class _TaskDetailPageState extends LocalizedState<TaskDetailPage> {
                   localizations.translate(i18.editTasks.taskInfoSectionTitle),
                   style: textTheme.headingL.copyWith(
                     fontWeight: FontWeight.w600,
-                    color: theme.colorScheme.primary,
+                    color: theme.colorTheme.primary.primary2,
                   ),
                 ),
               ],
@@ -1298,7 +1330,7 @@ class _TaskDetailPageState extends LocalizedState<TaskDetailPage> {
             LabeledField(
               label: localizations.translate(i18.editTasks.statusLabel),
               labelStyle: TextStyle(
-                color: theme.colorScheme.onSurfaceVariant,
+                color: theme.colorTheme.text.secondary,
                 fontSize: 16,
               ),
               child: digit_ui.DigitDropdown(
@@ -1384,7 +1416,7 @@ class _TaskDetailPageState extends LocalizedState<TaskDetailPage> {
               children: [
                 Icon(
                   Icons.visibility_off,
-                  color: theme.colorScheme.error,
+                  color: theme.colorTheme.alert.error,
                   size: 24,
                 ),
                 const SizedBox(width: 8),
@@ -1393,7 +1425,7 @@ class _TaskDetailPageState extends LocalizedState<TaskDetailPage> {
                       .translate(i18.editTasks.systemFieldsSectionTitle),
                   style: textTheme.headingL.copyWith(
                     fontWeight: FontWeight.w600,
-                    color: theme.colorScheme.error,
+                    color: theme.colorTheme.alert.error,
                   ),
                 ),
               ],
