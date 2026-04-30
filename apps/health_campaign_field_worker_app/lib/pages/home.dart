@@ -127,7 +127,8 @@ class _HomePageState extends LocalizedState<HomePage> {
       return e.code;
     });
     final isDistributorRole =
-        roles.contains(RolesType.distributor.toValue());
+        roles.contains(RolesType.communityDistributor.toValue()) ||
+            roles.contains(RolesType.communityDistributor.toValue());
 
     if (!(roles.contains(RolesType.distributor.toValue()) ||
         roles.contains(RolesType.communityDistributor.toValue()) ||
