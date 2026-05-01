@@ -404,6 +404,10 @@ class MainApplicationState extends State<MainApplication>
                             stockRemoteRepository: ctx.read<
                                 RemoteRepository<StockModel,
                                     StockSearchModel>>(),
+                            taskLocalRepository: ctx.read<
+                                LocalRepository<TaskModel, TaskSearchModel>>(),
+                            taskRemoteRepository: ctx.read<
+                                RemoteRepository<TaskModel, TaskSearchModel>>(),
                             context: context,
                             attendanceLogLocalRepository: ctx.read<
                                 LocalRepository<AttendanceLogModel,

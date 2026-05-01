@@ -17,6 +17,7 @@ import 'package:inventory_management/models/entities/stock.dart';
 import 'package:inventory_management/models/entities/transaction_type.dart';
 import 'package:isar/isar.dart';
 import 'package:recase/recase.dart';
+import 'package:registration_delivery/models/entities/task.dart';
 import 'package:survey_form/models/entities/service_definition.dart';
 
 import '../../../models/app_config/app_config_model.dart' as app_configuration;
@@ -112,6 +113,8 @@ class ProjectBloc extends Bloc<ProjectEvent, ProjectState> {
   /// Stock Repositories
   final RemoteRepository<StockModel, StockSearchModel> stockRemoteRepository;
   final LocalRepository<StockModel, StockSearchModel> stockLocalRepository;
+  final RemoteRepository<TaskModel, TaskSearchModel> taskRemoteRepository;
+  final LocalRepository<TaskModel, TaskSearchModel> taskLocalRepository;
 
   final DashboardRemoteRepository dashboardRemoteRepository;
   BuildContext context;
@@ -146,6 +149,8 @@ class ProjectBloc extends Bloc<ProjectEvent, ProjectState> {
     required this.attendanceLogRemoteRepository,
     required this.stockLocalRepository,
     required this.stockRemoteRepository,
+    required this.taskRemoteRepository,
+    required this.taskLocalRepository,
     required this.context,
   })  : localSecureStore = localSecureStore ?? LocalSecureStore.instance,
         super(const ProjectState()) {
@@ -622,6 +627,7 @@ class ProjectBloc extends Bloc<ProjectEvent, ProjectState> {
           await facilityLocalRepository.search(FacilitySearchModel());
       await downloadStockDataBasedOnRole(
           projectFacilities, facilities, event.model.address?.boundaryType);
+      await downloadTaskDataForLoggedInUser();
     } catch (_) {
       emit(state.copyWith(
         loading: false,
@@ -784,6 +790,15 @@ class ProjectBloc extends Bloc<ProjectEvent, ProjectState> {
         limit: initialLimit, offSet: offset);
 
     return stockEntries;
+  }
+
+  FutureOr<void> downloadTaskDataForLoggedInUser() async {
+    final tasks = await taskRemoteRepository.search(
+      TaskSearchModel(createdBy: context.loggedInUserUuid),
+    );
+
+    if (tasks.isEmpty) return;
+    await taskLocalRepository.bulkCreate(tasks);
   }
 }
 
