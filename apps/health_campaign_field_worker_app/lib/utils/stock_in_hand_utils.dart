@@ -9,6 +9,7 @@ class StockInHandResult {
   final double damaged;
   final double lost;
   final double administered;
+  final bool isDistributor;
 
   const StockInHandResult({
     required this.received,
@@ -16,10 +17,12 @@ class StockInHandResult {
     required this.damaged,
     required this.lost,
     required this.administered,
+    required this.isDistributor,
   });
 
-  double get stockInHand =>
-      received - (returned + damaged + lost) - administered;
+  double get stockInHand => isDistributor
+      ? received - (returned + damaged + lost) - administered
+      : received + returned - (damaged + lost) - administered;
 }
 
 String _additionalFieldValue(StockModel stock, String key) {
@@ -63,6 +66,7 @@ StockInHandResult calculateStockInHand({
   required List<TaskModel> tasksCreatedByUser,
   required List<String> stockOwnerIds,
   required String productVariantId,
+  required bool isDistributor,
 }) {
   double received = 0;
   double returned = 0;
@@ -77,6 +81,7 @@ StockInHandResult calculateStockInHand({
       damaged: 0,
       lost: 0,
       administered: 0,
+      isDistributor: isDistributor,
     );
   }
 
@@ -122,5 +127,6 @@ StockInHandResult calculateStockInHand({
     damaged: damaged,
     lost: lost,
     administered: administered,
+    isDistributor: isDistributor,
   );
 }

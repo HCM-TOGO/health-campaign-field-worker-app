@@ -258,6 +258,7 @@ class _StockBalanceCardState extends LocalizedState<StockBalanceCard> {
         tasksCreatedByUser: tasksCreatedByUser,
         stockOwnerIds: ownerIds,
         productVariantId: pv.id,
+        isDistributor: isDistributor,
       );
       balances[pv.id] = max(res.stockInHand, 0);
     }
