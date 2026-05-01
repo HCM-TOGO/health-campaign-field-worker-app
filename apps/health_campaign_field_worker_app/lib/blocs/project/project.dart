@@ -719,7 +719,10 @@ class ProjectBloc extends Bloc<ProjectEvent, ProjectState> {
           .toList();
       final stockSearchModel = StockSearchModel(
         receiverId: receiverIds,
-        transactionType: [TransactionType.dispatched.toValue()],
+        transactionType: [
+          TransactionType.dispatched.toValue(),
+          TransactionType.received.toValue()
+        ],
       );
       final stockEntriesDownloaded =
           await downloadStockEntries(stockSearchModel);
@@ -735,7 +738,10 @@ class ProjectBloc extends Bloc<ProjectEvent, ProjectState> {
           .toList();
       final stockSearchModel = StockSearchModel(
         receiverId: receiverIds,
-        transactionType: [TransactionType.dispatched.toValue()],
+        transactionType: [
+          TransactionType.dispatched.toValue(),
+          TransactionType.received.toValue()
+        ],
       );
       final stockEntriesDownloaded =
           await downloadStockEntries(stockSearchModel);

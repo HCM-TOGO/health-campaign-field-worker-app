@@ -14,6 +14,7 @@ import 'package:registration_delivery/registration_delivery.dart';
 import '../../blocs/app_initialization/app_initialization.dart';
 import '../../data/repositories/local/inventory_management/custom_stock.dart';
 import '../../models/entities/roles_type.dart';
+import '../../utils/constants.dart';
 import '../../utils/i18_key_constants.dart' as i18;
 import '../../utils/stock_in_hand_cache.dart';
 import '../../utils/stock_in_hand_utils.dart';
@@ -40,6 +41,28 @@ class _StockBalanceCardState extends LocalizedState<StockBalanceCard> {
   StreamSubscription<List<OpLog>>? _stockOpLogSub;
   StreamSubscription<List<OpLog>>? _taskOpLogSub;
 
+  List<FacilityModel> _filterFacilitiesByUsage(List<FacilityModel> facilities) {
+    final boundaryType = context.selectedProject.address?.boundaryType;
+    List<FacilityModel> filteredFacilities;
+
+    if (boundaryType == Constants.countryBoundaryLevel ||
+        boundaryType == Constants.stateBoundaryLevel) {
+      filteredFacilities = facilities
+          .where((element) => element.usage == Constants.stateFacility)
+          .toList();
+    } else if (boundaryType == Constants.lgaBoundaryLevel) {
+      filteredFacilities = facilities
+          .where((element) => element.usage == Constants.lgaFacility)
+          .toList();
+    } else {
+      filteredFacilities = facilities
+          .where((element) => element.usage == Constants.healthFacility)
+          .toList();
+    }
+
+    return filteredFacilities.isEmpty ? facilities : filteredFacilities;
+  }
+
   bool get _isDistributor => context.loggedInUserRoles.any(
         (role) =>
             role.code == RolesType.distributor.toValue() ||
@@ -63,14 +86,14 @@ class _StockBalanceCardState extends LocalizedState<StockBalanceCard> {
   Future<void> _loadData() async {
     setState(() => _isLoading = true);
 
-    final projectFacilityRepo = context
-        .read<LocalRepository<ProjectFacilityModel, ProjectFacilitySearchModel>>();
+    final projectFacilityRepo = context.read<
+        LocalRepository<ProjectFacilityModel, ProjectFacilitySearchModel>>();
     final facilityRepo =
         context.read<LocalRepository<FacilityModel, FacilitySearchModel>>();
-    final projectResourceRepo = context
-        .read<LocalRepository<ProjectResourceModel, ProjectResourceSearchModel>>();
-    final productVariantRepo = context
-        .read<LocalRepository<ProductVariantModel, ProductVariantSearchModel>>();
+    final projectResourceRepo = context.read<
+        LocalRepository<ProjectResourceModel, ProjectResourceSearchModel>>();
+    final productVariantRepo = context.read<
+        LocalRepository<ProductVariantModel, ProductVariantSearchModel>>();
 
     final projectFacilities = await projectFacilityRepo.search(
       ProjectFacilitySearchModel(projectId: [context.projectId]),
@@ -84,12 +107,15 @@ class _StockBalanceCardState extends LocalizedState<StockBalanceCard> {
       return facilityLevel == null || facilityLevel == 'current';
     }).toList();
 
-    final facilityIds =
-        currentFacilities.map((pf) => pf.facilityId).whereType<String>().toList();
+    final facilityIds = currentFacilities
+        .map((pf) => pf.facilityId)
+        .whereType<String>()
+        .toList();
 
     final facilities = facilityIds.isEmpty
         ? <FacilityModel>[]
         : await facilityRepo.search(FacilitySearchModel(id: facilityIds));
+    final filteredFacilities = _filterFacilitiesByUsage(facilities);
 
     final projectResources = await projectResourceRepo.search(
       ProjectResourceSearchModel(projectId: [context.projectId]),
@@ -104,22 +130,23 @@ class _StockBalanceCardState extends LocalizedState<StockBalanceCard> {
 
     final variants = productVariantIds.isEmpty
         ? <ProductVariantModel>[]
-        : await productVariantRepo.search(ProductVariantSearchModel(id: productVariantIds));
+        : await productVariantRepo
+            .search(ProductVariantSearchModel(id: productVariantIds));
 
     if (!mounted) return;
 
     final previousFacilityId = _selectedFacility?.id;
-    final selected = facilities.isEmpty
+    final selected = filteredFacilities.isEmpty
         ? null
         : (previousFacilityId != null
-            ? facilities.firstWhere(
+            ? filteredFacilities.firstWhere(
                 (f) => f.id == previousFacilityId,
-                orElse: () => facilities.first,
+                orElse: () => filteredFacilities.first,
               )
-            : facilities.first);
+            : filteredFacilities.first);
 
     setState(() {
-      _facilities = facilities;
+      _facilities = filteredFacilities;
       _selectedFacility = selected;
       _productVariants = variants;
     });
@@ -169,16 +196,35 @@ class _StockBalanceCardState extends LocalizedState<StockBalanceCard> {
     final stockRepo =
         context.read<LocalRepository<StockModel, StockSearchModel>>()
             as CustomStockLocalRepository;
-    final taskRepo = context.read<LocalRepository<TaskModel, TaskSearchModel>>();
+    final taskRepo =
+        context.read<LocalRepository<TaskModel, TaskSearchModel>>();
 
-    final receivedStocks = await stockRepo.search(
+    final isDistributor = _isDistributor;
+
+    final receivedStocksRaw = await stockRepo.search(
       StockSearchModel(receiverId: [ownerId]),
-      context.loggedInUserUuid,
+      isDistributor ? context.loggedInUserUuid : null,
     );
-    final sentStocks = await stockRepo.search(
+    final sentStocksRaw = await stockRepo.search(
       StockSearchModel(senderId: ownerId),
-      context.loggedInUserUuid,
+      isDistributor ? context.loggedInUserUuid : null,
     );
+
+    // For non-distributor roles, apply createdBy filter after facility-based fetch.
+    final receivedStocks = isDistributor
+        ? receivedStocksRaw
+        : receivedStocksRaw
+            .where(
+              (s) => s.clientAuditDetails?.createdBy == context.loggedInUserUuid,
+            )
+            .toList();
+    final sentStocks = isDistributor
+        ? sentStocksRaw
+        : sentStocksRaw
+            .where(
+              (s) => s.clientAuditDetails?.createdBy == context.loggedInUserUuid,
+            )
+            .toList();
 
     final allStocksMap = <String, StockModel>{};
     for (final s in receivedStocks) {
@@ -296,7 +342,8 @@ class _StockBalanceCardState extends LocalizedState<StockBalanceCard> {
                   children: [
                     LinearProgressIndicator(
                       value: max(progress, 0.0),
-                      backgroundColor: theme.colorScheme.surfaceContainerHighest,
+                      backgroundColor:
+                          theme.colorScheme.surfaceContainerHighest,
                       valueColor: AlwaysStoppedAnimation<Color>(color),
                       minHeight: 7.0,
                       borderRadius: const BorderRadius.horizontal(
@@ -324,4 +371,3 @@ class _StockBalanceCardState extends LocalizedState<StockBalanceCard> {
     );
   }
 }
-
