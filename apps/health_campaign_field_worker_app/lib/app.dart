@@ -240,7 +240,7 @@ class MainApplicationState extends State<MainApplication>
 
                     final localizationModulesList = appConfig.backendInterface;
                     var firstLanguage;
-                    firstLanguage = appConfig.languages?.lastOrNull?.value;
+                    firstLanguage = appConfig.languages?.firstOrNull?.value;
 
                     final selectedLocale =
                         AppSharedPreferences().getSelectedLocale ??
@@ -269,8 +269,7 @@ class MainApplicationState extends State<MainApplication>
 
                     return MultiBlocProvider(
                       providers: [
-
-                          BlocProvider(
+                        BlocProvider(
                           create: (context) => SummaryReportBloc(
                             householdMemberRepository: context.repository<
                                 HouseholdMemberModel,
@@ -281,11 +280,10 @@ class MainApplicationState extends State<MainApplication>
                                 ProductVariantModel,
                                 ProductVariantSearchModel>(),
                             individualDataRepository: context.repository<
-                                IndividualModel,
-                                IndividualSearchModel>(),
-                            projectBeneficiaryDataRepository: context.repository<
-                                ProjectBeneficiaryModel,
-                                ProjectBeneficiarySearchModel>(),
+                                IndividualModel, IndividualSearchModel>(),
+                            projectBeneficiaryDataRepository:
+                                context.repository<ProjectBeneficiaryModel,
+                                    ProjectBeneficiarySearchModel>(),
                           ),
                         ),
                         BlocProvider(
