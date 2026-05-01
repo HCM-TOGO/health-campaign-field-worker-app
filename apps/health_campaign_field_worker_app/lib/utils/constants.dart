@@ -139,7 +139,7 @@ class Constants {
   static const String pendingEligible = 'pendingEligible';
 
   // todo enable before cycle2
-  static const bool isDownSyncEnabled = true;
+  static const bool isDownSyncEnabled = false;
   static const String dashboardAnalyticsPath =
       '/dashboard-analytics/dashboard/getChartV2';
 
