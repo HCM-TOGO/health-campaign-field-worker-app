@@ -187,8 +187,16 @@ class _StockBalanceCardState extends LocalizedState<StockBalanceCard> {
 
   Future<void> _refreshBalances() async {
     if (!mounted) return;
-    final ownerId = _effectiveOwnerId;
-    if (ownerId == null || _productVariants.isEmpty) {
+    final isDistributor = _isDistributor;
+    final ownerIds = isDistributor
+        ? [context.loggedInUserUuid]
+        : _facilities
+            .map((facility) => facility.id)
+            .where((id) => id.isNotEmpty)
+            .toSet()
+            .toList();
+
+    if (ownerIds.isEmpty || _productVariants.isEmpty) {
       if (mounted) setState(() => _balancesByVariantId = {});
       return;
     }
@@ -198,17 +206,20 @@ class _StockBalanceCardState extends LocalizedState<StockBalanceCard> {
             as CustomStockLocalRepository;
     final taskRepo =
         context.read<LocalRepository<TaskModel, TaskSearchModel>>();
-
-    final isDistributor = _isDistributor;
+    final ownerId = ownerIds.first;
 
     final receivedStocksRaw = await stockRepo.search(
-      StockSearchModel(receiverId: [ownerId]),
+      StockSearchModel(receiverId: ownerIds),
       isDistributor ? context.loggedInUserUuid : null,
     );
-    final sentStocksRaw = await stockRepo.search(
-      StockSearchModel(senderId: ownerId),
-      isDistributor ? context.loggedInUserUuid : null,
-    );
+    final sentStocksRaw = <StockModel>[];
+    for (final senderId in ownerIds) {
+      final stocks = await stockRepo.search(
+        StockSearchModel(senderId: senderId),
+        isDistributor ? context.loggedInUserUuid : null,
+      );
+      sentStocksRaw.addAll(stocks);
+    }
 
     // For non-distributor roles, apply createdBy filter after facility-based fetch.
     final receivedStocks = isDistributor
@@ -245,16 +256,18 @@ class _StockBalanceCardState extends LocalizedState<StockBalanceCard> {
       final res = calculateStockInHand(
         stockEntries: allStocks,
         tasksCreatedByUser: tasksCreatedByUser,
-        stockOwnerIds: [ownerId],
+        stockOwnerIds: ownerIds,
         productVariantId: pv.id,
       );
       balances[pv.id] = max(res.stockInHand, 0);
     }
 
     if (mounted) {
-      StockInHandCache.instance.setCurrentOwnerId(ownerId);
+      final sortedOwnerIds = [...ownerIds]..sort();
+      final cacheKey = isDistributor ? ownerId : sortedOwnerIds.join('|');
+      StockInHandCache.instance.setCurrentOwnerId(cacheKey);
       StockInHandCache.instance.setBalances(
-        ownerId: ownerId,
+        ownerId: cacheKey,
         balancesByVariantId: balances,
       );
       setState(() => _balancesByVariantId = balances);
