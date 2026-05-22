@@ -321,6 +321,10 @@ class EditTasks {
   String get additionalDetailsSectionTitle =>
       'ADDITIONAL_DETAILS_SECTION_TITLE';
 
+  String get editableFieldsHintTitle => 'EDIT_TASKS_EDITABLE_FIELDS_HINT_TITLE';
+
+  String get editableFieldBadge => 'EDIT_TASKS_EDITABLE_FIELD_BADGE';
+
   String get schemaLabel => 'SCHEMA_LABEL';
 
   String get versionLabel => 'VERSION_LABEL';

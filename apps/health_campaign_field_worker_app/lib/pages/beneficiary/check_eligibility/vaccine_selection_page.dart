@@ -342,6 +342,22 @@ class _VaccineSelectionPageState extends LocalizedState<VaccineSelectionPage> {
     return true;
   }
 
+  void _goToPreviousVaccineGroup() {
+    if (currentIndex > 0) {
+      setState(() {
+        currentIndex--;
+      });
+    }
+  }
+
+  Widget _buildBackHeader(BuildContext context) {
+    return CustomBackNavigationHelpHeaderWidget(
+      showHelp: false,
+      defaultPopRoute: currentIndex == 0,
+      handleback: currentIndex > 0 ? _goToPreviousVaccineGroup : null,
+    );
+  }
+
   String _numberToWords(int number) {
     // Simple mapping for numbers 0-6, extend as needed
     const words = [
@@ -594,11 +610,16 @@ class _VaccineSelectionPageState extends LocalizedState<VaccineSelectionPage> {
         }
 
         if (currentIndex < lastIndex) {
-          return ScrollableContent(
-            header: const Column(children: [
-              CustomBackNavigationHelpHeaderWidget(
-                showHelp: false,
-              )
+          return PopScope(
+            canPop: currentIndex == 0,
+            onPopInvoked: (didPop) {
+              if (!didPop && currentIndex > 0) {
+                _goToPreviousVaccineGroup();
+              }
+            },
+            child: ScrollableContent(
+            header: Column(children: [
+              _buildBackHeader(context),
             ]),
             enableFixedDigitButton: true,
             footer: DigitCard(
@@ -643,11 +664,17 @@ class _VaccineSelectionPageState extends LocalizedState<VaccineSelectionPage> {
                 vaccineCodes: currentVaccineCodes,
               ),
             ],
+          ),
           );
         }
 
         return PopScope(
-            canPop: true,
+            canPop: currentIndex == 0,
+            onPopInvoked: (didPop) {
+              if (!didPop && currentIndex > 0) {
+                _goToPreviousVaccineGroup();
+              }
+            },
             child: Scaffold(body: BlocBuilder<LocationBloc, LocationState>(
                 builder: (context, locationState) {
               return BlocBuilder<HouseholdOverviewBloc, HouseholdOverviewState>(
@@ -690,10 +717,8 @@ class _VaccineSelectionPageState extends LocalizedState<VaccineSelectionPage> {
                         orElse: () => Text(state.runtimeType.toString()),
                         serviceDefinitionFetch: (value) {
                           return ScrollableContent(
-                            header: const Column(children: [
-                              CustomBackNavigationHelpHeaderWidget(
-                                showHelp: false,
-                              )
+                            header: Column(children: [
+                              _buildBackHeader(context),
                             ]),
                             enableFixedDigitButton: true,
                             footer: DigitCard(

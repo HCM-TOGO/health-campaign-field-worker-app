@@ -5,10 +5,12 @@ import 'package:digit_data_model/data_model.dart';
 import 'package:digit_ui_components/models/DropdownModels.dart';
 import 'package:digit_ui_components/theme/digit_extended_theme.dart';
 import 'package:digit_ui_components/theme/spacers.dart';
+import 'package:digit_ui_components/digit_components.dart' hide LabeledField;
 import 'package:digit_ui_components/utils/date_utils.dart';
 import 'package:digit_ui_components/widgets/atoms/digit_dropdown_input.dart'
     as digit_ui;
 import 'package:flutter/material.dart';
+import 'package:intl/intl.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:provider/provider.dart';
 import 'package:registration_delivery/registration_delivery.dart';
@@ -54,6 +56,17 @@ class _TaskDetailPageState extends LocalizedState<TaskDetailPage> {
 
   bool _saving = false;
   late bool showResources;
+
+  static const _hiddenAdditionalFieldKeys = {
+    'dateOfAdministration',
+    'dateOfVerification',
+  };
+
+  static const _editableAdditionalFieldKeys = {'name', 'age'};
+
+  static const _genderFieldKey = 'gender';
+
+  static const _datePickerAdditionalFieldKeys = {'dateOfDelivery'};
 
   List<String> allowedStatuses = [
     Status.delivered.toValue(),
@@ -145,10 +158,11 @@ class _TaskDetailPageState extends LocalizedState<TaskDetailPage> {
 
     final fieldsList = _additionalFields?.fields ?? [];
 
-    // Exclude cycleIndex, doseIndex, and dateOfAdministration from editable additional fields
     _additionalFieldControllers = {
       for (final field in fieldsList)
-        field.key: TextEditingController(text: field.value?.toString() ?? '')
+        if (!_hiddenAdditionalFieldKeys.contains(field.key))
+          field.key:
+              TextEditingController(text: field.value?.toString() ?? '')
     };
   }
 
@@ -420,6 +434,15 @@ class _TaskDetailPageState extends LocalizedState<TaskDetailPage> {
       }
     }
 
+    // Apply edits from additional field controllers
+    updatedFields = updatedFields.map((field) {
+      final controller = _additionalFieldControllers[field.key];
+      if (controller != null) {
+        return AdditionalField(field.key, controller.text);
+      }
+      return field;
+    }).toList();
+
     // Remove any existing editCount and updateReason before adding updated ones
     updatedFields = updatedFields
         .where((f) => f.key != 'editCount' && f.key != 'updateReason')
@@ -545,6 +568,9 @@ class _TaskDetailPageState extends LocalizedState<TaskDetailPage> {
           lastModifiedTime: DateTime.now().millisecondsSinceEpoch,
         );
 
+    final parsedCreatedDate =
+        int.tryParse(_controllers['createdDate']?.text.trim() ?? '');
+
     // Create updated task model
     final updatedTask = task.copyWith(
       status: changeStatus
@@ -552,6 +578,7 @@ class _TaskDetailPageState extends LocalizedState<TaskDetailPage> {
               ? _controllers['status']!.text
               : task.status)
           : task.status,
+      createdDate: parsedCreatedDate ?? task.createdDate,
       additionalFields: newAdditionalFields,
       resources: updatedResources,
       clientAuditDetails: updatedClientAuditDetails,
@@ -890,10 +917,14 @@ class _TaskDetailPageState extends LocalizedState<TaskDetailPage> {
               ),
             )
           : SingleChildScrollView(
-              padding: const EdgeInsets.fromLTRB(spacer4, spacer2, spacer4, spacer4),
+              padding:
+                  const EdgeInsets.fromLTRB(spacer4, spacer2, spacer4, spacer4),
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
+                  _buildEditableFieldsBanner(),
+                  const SizedBox(height: 16),
+
                   // Beneficiary Details Section
                   if (_individual != null) ...[
                     _buildIndividualDetailsSection(),
@@ -1146,7 +1177,8 @@ class _TaskDetailPageState extends LocalizedState<TaskDetailPage> {
 
           // Product Variant Dropdown
           if (productVariants != null && productVariants!.isNotEmpty)
-            LabeledField(
+            _wrapEditableField(
+              child: LabeledField(
               label:
                   localizations.translate(i18.editTasks.productVariantIdLabel),
               labelStyle: TextStyle(
@@ -1177,6 +1209,7 @@ class _TaskDetailPageState extends LocalizedState<TaskDetailPage> {
                   }
                 },
               ),
+            ),
             )
           else
             Text(
@@ -1277,11 +1310,7 @@ class _TaskDetailPageState extends LocalizedState<TaskDetailPage> {
             ..._additionalFieldControllers.entries.map((entry) {
               return Padding(
                 padding: const EdgeInsets.only(bottom: 12),
-                child: CustomDigitTextField(
-                  label: _formatFieldLabel(entry.key),
-                  controller: entry.value,
-                  readOnly: true,
-                ),
+                child: _buildAdditionalFieldWidget(entry.key, entry.value),
               );
             }),
           ],
@@ -1327,7 +1356,8 @@ class _TaskDetailPageState extends LocalizedState<TaskDetailPage> {
               ],
             ),
             const SizedBox(height: 8),
-            LabeledField(
+            _wrapEditableField(
+              child: LabeledField(
               label: localizations.translate(i18.editTasks.statusLabel),
               labelStyle: TextStyle(
                 color: theme.colorTheme.text.secondary,
@@ -1361,37 +1391,38 @@ class _TaskDetailPageState extends LocalizedState<TaskDetailPage> {
                 },
               ),
             ),
-            const SizedBox(height: 12),
-            Row(
-              children: [
-                Expanded(
-                  child: CustomDigitTextField(
-                    label:
-                        localizations.translate(i18.editTasks.createdByLabel),
-                    controller: _controllers['createdBy'],
-                    readOnly: true,
-                  ),
-                ),
-              ],
             ),
+            // const SizedBox(height: 12),
+            // Row(
+            //   children: [
+            //     Expanded(
+            //       child: CustomDigitTextField(
+            //         label:
+            //             localizations.translate(i18.editTasks.createdByLabel),
+            //         controller: _controllers['createdBy'],
+            //         readOnly: true,
+            //       ),
+            //     ),
+            //   ],
+            // ),
             const SizedBox(height: 12),
             Row(
               children: [
+                // Expanded(
+                //   child: CustomDigitTextField(
+                //     label:
+                //         localizations.translate(i18.editTasks.isDeletedLabel),
+                //     controller: _controllers['isDeleted'],
+                //     readOnly: true,
+                //   ),
+                // ),
+                // const SizedBox(width: 8),
                 Expanded(
-                  child: CustomDigitTextField(
-                    label:
-                        localizations.translate(i18.editTasks.isDeletedLabel),
-                    controller: _controllers['isDeleted'],
-                    readOnly: true,
-                  ),
-                ),
-                const SizedBox(width: 8),
-                Expanded(
-                  child: CustomDigitTextField(
-                    label:
-                        localizations.translate(i18.editTasks.createdDateLabel),
-                    controller: _controllers['createdDate'],
-                    readOnly: true,
+                  child: _buildDatePickerField(
+                    label: localizations
+                        .translate(i18.editTasks.createdDateLabel),
+                    controller: _controllers['createdDate']!,
+                    showEditableBadge: true,
                   ),
                 ),
               ],
@@ -1454,6 +1485,269 @@ class _TaskDetailPageState extends LocalizedState<TaskDetailPage> {
         .split('_')
         .map((word) => word[0].toUpperCase() + word.substring(1))
         .join(' ');
+  }
+
+  bool _isAdditionalFieldEditable(String key) {
+    return _editableAdditionalFieldKeys.contains(key) ||
+        key == _genderFieldKey ||
+        _datePickerAdditionalFieldKeys.contains(key);
+  }
+
+  List<String> _allEditableFieldLabels() {
+    final labels = <String>[
+      localizations.translate(i18.editTasks.statusLabel),
+      localizations.translate(i18.editTasks.createdDateLabel),
+      _formatFieldLabel('name'),
+      _formatFieldLabel('age'),
+      localizations.translate(i18.editTasks.genderLabel),
+      _formatFieldLabel('dateOfDelivery'),
+    ];
+    if (showResources) {
+      labels.insert(
+        1,
+        localizations.translate(i18.editTasks.productVariantIdLabel),
+      );
+    }
+    return labels;
+  }
+
+  Widget _buildEditableFieldsBanner() {
+    final theme = Theme.of(context);
+    final textTheme = theme.digitTextTheme(context);
+
+    return Container(
+      width: double.infinity,
+      padding: const EdgeInsets.all(12),
+      decoration: BoxDecoration(
+        color: theme.colorTheme.primary.primary2.withOpacity(0.08),
+        borderRadius: BorderRadius.circular(8),
+        border: Border.all(
+          color: theme.colorTheme.primary.primary2.withOpacity(0.35),
+        ),
+      ),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Row(
+            children: [
+              Icon(
+                Icons.edit_note,
+                color: theme.colorTheme.primary.primary2,
+                size: 22,
+              ),
+              const SizedBox(width: 8),
+              Expanded(
+                child: Text(
+                  localizations
+                      .translate(i18.editTasks.editableFieldsHintTitle),
+                  style: textTheme.headingS.copyWith(
+                    fontWeight: FontWeight.w600,
+                    color: theme.colorTheme.primary.primary2,
+                  ),
+                ),
+              ),
+            ],
+          ),
+          const SizedBox(height: 10),
+          Wrap(
+            spacing: 8,
+            runSpacing: 8,
+            children: _allEditableFieldLabels()
+                .map(
+                  (label) => Chip(
+                    avatar: Icon(
+                      Icons.edit,
+                      size: 16,
+                      color: theme.colorTheme.primary.primary2,
+                    ),
+                    label: Text(label),
+                    labelStyle: textTheme.bodyS.copyWith(
+                      fontWeight: FontWeight.w500,
+                    ),
+                    backgroundColor:
+                        theme.colorTheme.paper.primary.withOpacity(0.9),
+                    side: BorderSide(
+                      color: theme.colorTheme.primary.primary2.withOpacity(0.4),
+                    ),
+                  ),
+                )
+                .toList(),
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget _wrapEditableField({required Widget child}) {
+    final theme = Theme.of(context);
+    final textTheme = theme.digitTextTheme(context);
+    final badgeLabel =
+        localizations.translate(i18.editTasks.editableFieldBadge);
+
+    return Container(
+      padding: const EdgeInsets.all(12),
+      decoration: BoxDecoration(
+        borderRadius: BorderRadius.circular(8),
+        border: Border.all(
+          color: theme.colorTheme.primary.primary2.withOpacity(0.35),
+        ),
+        color: theme.colorTheme.primary.primary2.withOpacity(0.04),
+      ),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Row(
+            children: [
+              Icon(
+                Icons.edit,
+                size: 14,
+                color: theme.colorTheme.primary.primary2,
+              ),
+              const SizedBox(width: 4),
+              Text(
+                badgeLabel,
+                style: textTheme.bodyS.copyWith(
+                  color: theme.colorTheme.primary.primary2,
+                  fontWeight: FontWeight.w600,
+                ),
+              ),
+            ],
+          ),
+          const SizedBox(height: 8),
+          child,
+        ],
+      ),
+    );
+  }
+
+  List<String> _genderOptions() {
+    return RegistrationDeliverySingleton().genderOptions ??
+        const ['MALE', 'FEMALE', 'OTHER'];
+  }
+
+  String _normalizeGenderCode(String value) => value.trim().toUpperCase();
+
+  Widget _buildGenderDropdown(TextEditingController controller) {
+    final theme = Theme.of(context);
+    final options = _genderOptions();
+    final selectedCode = _normalizeGenderCode(controller.text);
+
+    return _wrapEditableField(
+      child: LabeledField(
+        label: localizations.translate(i18.editTasks.genderLabel),
+        labelStyle: TextStyle(
+          color: theme.colorTheme.text.secondary,
+          fontSize: 16,
+        ),
+        child: digit_ui.DigitDropdown(
+          isDisabled: false,
+          readOnly: false,
+          selectedOption: options
+                  .map(
+                    (code) => DropdownItem(
+                      code: _normalizeGenderCode(code),
+                      name: localizations.translate(code),
+                    ),
+                  )
+                  .where((item) => item.code == selectedCode)
+                  .firstOrNull ??
+              DropdownItem(
+                code: selectedCode,
+                name: selectedCode.isNotEmpty
+                    ? localizations.translate(selectedCode)
+                    : localizations.translate(i18.editTasks.genderLabel),
+              ),
+          items: options
+              .map(
+                (code) => DropdownItem(
+                  code: _normalizeGenderCode(code),
+                  name: localizations.translate(code),
+                ),
+              )
+              .toList(),
+          onSelect: (selected) {
+            if (selected != null) {
+              setState(() {
+                controller.text = selected.code;
+              });
+            }
+          },
+        ),
+      ),
+    );
+  }
+
+  String _datePickerInitialValue(TextEditingController controller) {
+    final millis = int.tryParse(controller.text.trim());
+    if (millis != null) {
+      return local_utils.formatDateFromMillis(millis);
+    }
+    final date = DigitDateUtils.getFormattedDateToDateTime(controller.text);
+    if (date != null) {
+      return DateFormat('dd MMM yyyy').format(date);
+    }
+    return controller.text;
+  }
+
+  Widget _buildDatePickerField({
+    required String label,
+    required TextEditingController controller,
+    bool readOnly = false,
+    bool showEditableBadge = false,
+  }) {
+    final field = LabeledField(
+      label: label,
+      labelStyle: TextStyle(
+        color: Theme.of(context).colorTheme.text.secondary,
+        fontSize: 16,
+      ),
+      child: DigitDateFormInput(
+        readOnly: readOnly,
+        initialValue: _datePickerInitialValue(controller),
+        lastDate: DateTime.now(),
+        cancelText: localizations.translate(i18.common.coreCommonCancel),
+        confirmText: localizations.translate(i18.common.coreCommonOk),
+        onChange: (value) {
+          if (value.isEmpty) return;
+          final date = DigitDateUtils.getFormattedDateToDateTime(value) ??
+              DateFormat('dd/MM/yyyy').tryParse(value);
+          if (date != null) {
+            controller.text = date.millisecondsSinceEpoch.toString();
+          }
+        },
+      ),
+    );
+
+    return showEditableBadge ? _wrapEditableField(child: field) : field;
+  }
+
+  Widget _buildAdditionalFieldWidget(
+    String key,
+    TextEditingController controller,
+  ) {
+    final label = _formatFieldLabel(key);
+    final isEditable = _isAdditionalFieldEditable(key);
+
+    if (key == _genderFieldKey) {
+      return _buildGenderDropdown(controller);
+    }
+
+    Widget field;
+
+    if (_datePickerAdditionalFieldKeys.contains(key)) {
+      field = _buildDatePickerField(
+        label: label,
+        controller: controller,
+      );
+    } else {
+      field = CustomDigitTextField(
+        label: label,
+        controller: controller,
+        readOnly: !isEditable,
+      );
+    }
+
+    return isEditable ? _wrapEditableField(child: field) : field;
   }
 
   String? getSku(String variantId) {
