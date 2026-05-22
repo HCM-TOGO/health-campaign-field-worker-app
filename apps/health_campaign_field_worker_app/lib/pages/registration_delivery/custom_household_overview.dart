@@ -694,7 +694,7 @@ class _CustomHouseholdOverviewPageState
                                             )
                                           : const Offstage(),
                                       Offstage(
-                                        offstage: isClosedHousehold,
+                                        offstage: false,
                                         child: Column(
                                           children: (state
                                                       .householdMemberWrapper
@@ -1134,7 +1134,7 @@ class _CustomHouseholdOverviewPageState
                                     ],
                                   ),
                                   Offstage(
-                                    offstage: isClosedHousehold,
+                                    offstage: false,
                                     child: DigitButton(
                                       mainAxisSize: MainAxisSize.max,
                                       onPressed: () {

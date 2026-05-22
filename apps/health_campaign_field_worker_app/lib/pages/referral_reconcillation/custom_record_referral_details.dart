@@ -112,6 +112,21 @@ class _CustomRecordReferralDetailsPageState
         .abs();
   }
 
+  String _individualDisplayName(IndividualModel individual) {
+    return [
+      individual.name?.givenName,
+      individual.name?.familyName,
+    ].whereType<String>().where((e) => e.isNotEmpty).join(' ');
+  }
+
+  String? _individualBeneficiaryId(IndividualModel individual) {
+    return individual.identifiers
+        ?.firstWhereOrNull(
+          (id) => id.identifierType == 'UNIQUE_BENEFICIARY_ID',
+        )
+        ?.identifierId;
+  }
+
   @override
   void dispose() {
     clickedStatus.dispose();
@@ -155,6 +170,19 @@ class _CustomRecordReferralDetailsPageState
                       // may fire before individual is non-null.
                       final isSideEffect = _isSideEffectMode(recordState);
                       if (isSideEffect && individual != null) {
+                        final displayName =
+                            _individualDisplayName(individual);
+                        if (displayName.isNotEmpty &&
+                            form.control(_nameOfChildKey).value !=
+                                displayName) {
+                          form.control(_nameOfChildKey).value = displayName;
+                        }
+                        final benefId =
+                            _individualBeneficiaryId(individual);
+                        if (benefId != null &&
+                            form.control(_beneficiaryIdKey).value != benefId) {
+                          form.control(_beneficiaryIdKey).value = benefId;
+                        }
                         // Gender — genderOptions are uppercase codes (e.g. 'MALE'),
                         // but individual.gender?.name is lowercase enum name.
                         // Uppercase it so the Dropdown.selectedOption match works.
@@ -1274,23 +1302,26 @@ class _CustomRecordReferralDetailsPageState
       RecordHFReferralState referralState, IndividualModel? individual) {
     return fb.group(<String, Object>{
       _nameOfChildKey: FormControl<String>(
-        value: referralState.mapOrNull(
-          create: (value) => value.viewOnly &&
-                  value.hfReferralModel?.additionalFields?.fields
-                          .where((e) =>
-                              e.key ==
-                              ReferralReconEnums.nameOfReferral.toValue())
-                          .firstOrNull
-                          ?.value !=
-                      null
-              ? value.hfReferralModel?.additionalFields?.fields
-                  .where((e) =>
-                      e.key == ReferralReconEnums.nameOfReferral.toValue())
-                  .firstOrNull
-                  ?.value
-                  .toString()
-              : value.hfReferralModel?.name ?? '',
-        ),
+        value: individual != null
+            ? _individualDisplayName(individual)
+            : referralState.mapOrNull(
+                create: (value) => value.viewOnly &&
+                        value.hfReferralModel?.additionalFields?.fields
+                                .where((e) =>
+                                    e.key ==
+                                    ReferralReconEnums.nameOfReferral.toValue())
+                                .firstOrNull
+                                ?.value !=
+                            null
+                    ? value.hfReferralModel?.additionalFields?.fields
+                        .where((e) =>
+                            e.key ==
+                            ReferralReconEnums.nameOfReferral.toValue())
+                        .firstOrNull
+                        ?.value
+                        .toString()
+                    : value.hfReferralModel?.name ?? '',
+              ),
         disabled: referralState.mapOrNull(
               create: (value) => value.viewOnly,
             ) ??
@@ -1308,9 +1339,11 @@ class _CustomRecordReferralDetailsPageState
       ),
       _beneficiaryIdKey: FormControl<String>(
         validators: [Validators.required],
-        value: referralState.mapOrNull(
-          create: (value) => value.hfReferralModel?.beneficiaryId,
-        ),
+        value: individual != null
+            ? _individualBeneficiaryId(individual)
+            : referralState.mapOrNull(
+                create: (value) => value.hfReferralModel?.beneficiaryId,
+              ),
         disabled: referralState.mapOrNull(
               create: (value) => value.viewOnly,
             ) ??

@@ -73,6 +73,10 @@ class _EligibilityChecklistViewPage
   final String no = "NO";
   final String negative = "NEGATIVE";
   final String test_unavailable = "TEST_UNAVAILABLE";
+  static const String _kbea2Key = "KBEA2";
+  static const String _kbea3Key = "KBEA3";
+  static const String _kbea4Key = "KBEA4";
+  static const String _rdtResultKey = "KBEA2.YES.KBEA2A";
   bool triggerLocalization = false;
 
   @override
@@ -763,7 +767,9 @@ class _EligibilityChecklistViewPage
                                           ),
                                         ] else if (e.dataType ==
                                             'SingleValueList') ...[
-                                          if (!(e.code ?? '').contains('.'))
+                                          if (!(e.code ?? '').contains('.') &&
+                                              _shouldShowSpaqQuestionsForCode(
+                                                  e.code))
                                             DigitCard(
                                               child: _buildChecklist(
                                                 e,
@@ -809,7 +815,8 @@ class _EligibilityChecklistViewPage
 
       // Ensure the current index is added to visible indexes and not excluded
       if (!visibleChecklistIndexes.contains(index) &&
-          !excludedIndexes.contains(index)) {
+          !excludedIndexes.contains(index) &&
+          _shouldShowSpaqQuestionsForCode(item.code)) {
         visibleChecklistIndexes.add(index);
       }
 
@@ -859,7 +866,11 @@ class _EligibilityChecklistViewPage
                           ),
                         ).value;
 
-                        // Remove corresponding controllers based on the removed attributes
+                        if (item.code == _rdtResultKey) {
+                          _updateSpaqQuestionsVisibility(value);
+                        } else if (item.code == _kbea2Key && value != yes) {
+                          _showSpaqQuestions();
+                        }
                       });
                     },
                     items: item.values != null
@@ -1078,12 +1089,15 @@ class _EligibilityChecklistViewPage
     };
 
     if (responses.isNotEmpty) {
-      if (responses.containsKey(q3Key) && responses[q3Key]!.isNotEmpty) {
-        isIneligible = responses[q3Key] == yes ? true : false;
-      }
-      if (!isIneligible &&
-          (responses.containsKey(q5Key) && responses[q5Key]!.isNotEmpty)) {
-        isIneligible = responses[q5Key] == yes ? true : false;
+      final skipSpaqQuestions = _isRdtPositiveFromResponses(responses);
+      if (!skipSpaqQuestions) {
+        if (responses.containsKey(q3Key) && responses[q3Key]!.isNotEmpty) {
+          isIneligible = responses[q3Key] == yes ? true : false;
+        }
+        if (!isIneligible &&
+            (responses.containsKey(q5Key) && responses[q5Key]!.isNotEmpty)) {
+          isIneligible = responses[q5Key] == yes ? true : false;
+        }
       }
       if (responses.containsKey(q2Key) &&
           responses[q2Key]!.isNotEmpty &&
@@ -1094,7 +1108,7 @@ class _EligibilityChecklistViewPage
           isIneligible = responses[q6Key] == yes ? true : false;
         }
       }
-      if (isIneligible) {
+      if (isIneligible && !_isRdtPositiveFromResponses(responses)) {
         for (var entry in responses.entries) {
           if (entry.key == q3Key || entry.key == q5Key) {
             entry.value == yes
@@ -1273,6 +1287,57 @@ class _EligibilityChecklistViewPage
     }
 
     return dotCount;
+  }
+
+  int? _indexForAttributeCode(String code) {
+    final attributes = initialAttributes;
+    if (attributes == null) return null;
+    final index = attributes.indexWhere((a) => a.code == code);
+    return index >= 0 ? index : null;
+  }
+
+  bool _isRdtPositive() {
+    final kbea2Index = _indexForAttributeCode(_kbea2Key);
+    final rdtIndex = _indexForAttributeCode(_rdtResultKey);
+    if (kbea2Index == null || rdtIndex == null) return false;
+    return controller[kbea2Index].text.trim() == yes &&
+        controller[rdtIndex].text.trim() == positive;
+  }
+
+  bool _isRdtPositiveFromResponses(Map<String?, String> responses) {
+    return responses[_kbea2Key] == yes &&
+        responses[_rdtResultKey] == positive;
+  }
+
+  bool _shouldShowSpaqQuestionsForCode(String? code) {
+    if (code == _kbea3Key || code == _kbea4Key) {
+      return !_isRdtPositive();
+    }
+    return true;
+  }
+
+  void _updateSpaqQuestionsVisibility(String? rdtValue) {
+    final kbea3Index = _indexForAttributeCode(_kbea3Key);
+    final kbea4Index = _indexForAttributeCode(_kbea4Key);
+    if (rdtValue == positive) {
+      for (final index in [kbea3Index, kbea4Index]) {
+        if (index != null) {
+          visibleChecklistIndexes.remove(index);
+          controller[index].clear();
+        }
+      }
+    } else {
+      _showSpaqQuestions();
+    }
+  }
+
+  void _showSpaqQuestions() {
+    for (final code in [_kbea3Key, _kbea4Key]) {
+      final index = _indexForAttributeCode(code);
+      if (index != null && !visibleChecklistIndexes.contains(index)) {
+        visibleChecklistIndexes.add(index);
+      }
+    }
   }
 
   Future<bool> _onBackPressed(BuildContext context, bool isIneligible) async {

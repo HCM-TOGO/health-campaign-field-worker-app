@@ -117,14 +117,14 @@ class _CustomSearchReferralReconciliationsPageState
   void _triggerHouseholdSearch(
       BuildContext context, CustomSearchHouseholdsBloc bloc, String value) {
     final trimmed = value.trim();
+    setState(_clearHouseholdSelection);
 
     if (trimmed.isEmpty) {
       bloc.add(const SearchHouseholdsClearEvent());
       return;
     }
 
-    // If input length equals a beneficiary ID, search by tag (ID).
-    if (trimmed.length == _beneficiaryIdLength) {
+    if (_isSearchingByBeneficiaryId(trimmed)) {
       bloc.add(
         CustomSearchHouseholdsEvent.searchByTag(
           tag: trimmed,
@@ -132,7 +132,6 @@ class _CustomSearchReferralReconciliationsPageState
         ),
       );
     } else if (trimmed.length >= 3) {
-      // Otherwise search by name (household head).
       bloc.add(
         CustomSearchHouseholdsEvent.searchByHouseholdHead(
           searchText: trimmed,
@@ -151,6 +150,150 @@ class _CustomSearchReferralReconciliationsPageState
   }
 
   bool _isSideEffectMode = false;
+  HouseholdMemberWrapper? _selectedHouseholdMember;
+  String? _selectedIndividualClientRef;
+
+  bool _isSearchingByBeneficiaryId(String value) =>
+      isBeneficiaryIdValid(value.trim());
+
+  bool isBeneficiaryIdValid(String value) {
+    if (value.trim().length != _beneficiaryIdLength) return false;
+    for (var i = 0; i < value.length; i++) {
+      if ((i == 4 || i == 9) && value[i] != '-') return false;
+      if (value[i].codeUnitAt(0) >= 97 && value[i].codeUnitAt(0) <= 122) {
+        return false;
+      }
+    }
+    return true;
+  }
+
+  void _clearHouseholdSelection() {
+    _selectedHouseholdMember = null;
+    _selectedIndividualClientRef = null;
+  }
+
+  String? _beneficiaryIdForIndividual(IndividualModel? individual) {
+    return individual?.identifiers
+        ?.firstWhereOrNull(
+          (id) => id.identifierType == 'UNIQUE_BENEFICIARY_ID',
+        )
+        ?.identifierId;
+  }
+
+  String _fullName(IndividualModel? individual) {
+    return [
+      individual?.name?.givenName,
+      individual?.name?.familyName,
+    ].where((e) => e != null && e.isNotEmpty).join(' ');
+  }
+
+  bool _nameMatches(IndividualModel individual, String query) {
+    final q = query.trim().toUpperCase();
+    if (q.length < 3) return false;
+    final given = individual.name?.givenName?.trim().toUpperCase() ?? '';
+    final family = individual.name?.familyName?.trim().toUpperCase() ?? '';
+    final full = '$given $family'.trim();
+    return given.contains(q) ||
+        family.contains(q) ||
+        full.contains(q) ||
+        q.contains(given) && given.isNotEmpty ||
+        q.contains(family) && family.isNotEmpty;
+  }
+
+  /// Same shape as [searchByTag]: one card per person with tasks/side-effects scoped.
+  HouseholdMemberWrapper _wrapperForIndividual(
+    HouseholdMemberWrapper source,
+    IndividualModel individual,
+  ) {
+    final projectBeneficiaries = source.projectBeneficiaries
+        ?.where(
+          (e) => e.beneficiaryClientReferenceId == individual.clientReferenceId,
+        )
+        .toList();
+    final projectBeneficiaryIds =
+        projectBeneficiaries?.map((e) => e.clientReferenceId).toList() ?? [];
+
+    final tasks = source.tasks
+        ?.where((t) =>
+            projectBeneficiaryIds.contains(t.projectBeneficiaryClientReferenceId))
+        .toList();
+    final taskIds = tasks?.map((t) => t.clientReferenceId).toList() ?? [];
+
+    final sideEffects = source.sideEffects
+        ?.where((s) => taskIds.contains(s.taskClientReferenceId))
+        .toList();
+
+    final referrals = source.referrals
+        ?.where((r) => projectBeneficiaryIds
+            .contains(r.projectBeneficiaryClientReferenceId))
+        .toList();
+
+    return source.copyWith(
+      headOfHousehold: individual,
+      members: [individual],
+      projectBeneficiaries: (projectBeneficiaries?.isEmpty ?? true)
+          ? null
+          : projectBeneficiaries,
+      tasks: (tasks?.isEmpty ?? true) ? null : tasks,
+      sideEffects: (sideEffects?.isEmpty ?? true) ? null : sideEffects,
+      referrals: (referrals?.isEmpty ?? true) ? null : referrals,
+    );
+  }
+
+  /// Tag search: bloc already returns one wrapper per person. Name search: expand here.
+  List<HouseholdMemberWrapper> _sideEffectCardWrappers(
+    CustomSearchHouseholdsState householdState,
+    String query,
+  ) {
+    final trimmed = query.trim();
+    if (trimmed.isEmpty) return [];
+
+    if (_isSearchingByBeneficiaryId(trimmed)) {
+      final upperQuery = trimmed.toUpperCase();
+      return householdState.householdMembers
+          .where((wrapper) {
+            final benefId = _beneficiaryIdForIndividual(
+              wrapper.headOfHousehold ?? wrapper.members?.firstOrNull,
+            );
+            return benefId?.trim().toUpperCase() == upperQuery;
+          })
+          .toList();
+    }
+
+    final seen = <String>{};
+    final cards = <HouseholdMemberWrapper>[];
+
+    for (final wrapper in householdState.householdMembers) {
+      final individuals = <IndividualModel>[
+        ...?wrapper.members,
+        if (wrapper.headOfHousehold != null) wrapper.headOfHousehold!,
+      ];
+
+      var matchedInWrapper = false;
+      for (final individual in individuals) {
+        final clientRef = individual.clientReferenceId;
+        if (clientRef == null || seen.contains(clientRef)) continue;
+        if (!_nameMatches(individual, trimmed)) continue;
+        matchedInWrapper = true;
+        seen.add(clientRef);
+        cards.add(_wrapperForIndividual(wrapper, individual));
+      }
+
+      // Only show head when their name actually matches the query (not as a default).
+      if (!matchedInWrapper && wrapper.headOfHousehold != null) {
+        final head = wrapper.headOfHousehold!;
+        final clientRef = head.clientReferenceId;
+        if (clientRef != null &&
+            !seen.contains(clientRef) &&
+            _nameMatches(head, trimmed)) {
+          seen.add(clientRef);
+          cards.add(_wrapperForIndividual(wrapper, head));
+        }
+      }
+    }
+
+    return cards;
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -199,8 +342,12 @@ class _CustomSearchReferralReconciliationsPageState
                             return BlocBuilder<SearchReferralsBloc,
                                 SearchReferralsState>(
                               builder: (context, searchState) {
+                                final sideEffectCards = _sideEffectCardWrappers(
+                                  householdState,
+                                  searchController.text,
+                                );
                                 final bool beneficiaryFound =
-                                    householdState.householdMembers.isNotEmpty;
+                                    sideEffectCards.isNotEmpty;
 
                                 return ScrollableContent(
                                   header: const Column(children: [
@@ -245,12 +392,14 @@ class _CustomSearchReferralReconciliationsPageState
                                                   Switch(
                                                     value: _isSideEffectMode,
                                                     onChanged: (val) {
-                                                      setInnerState(() =>
-                                                          _isSideEffectMode =
-                                                              val);
-                                                      setState(() =>
-                                                          _isSideEffectMode =
-                                                              val);
+                                                      setInnerState(() {
+                                                        _isSideEffectMode = val;
+                                                        _clearHouseholdSelection();
+                                                      });
+                                                      setState(() {
+                                                        _isSideEffectMode = val;
+                                                        _clearHouseholdSelection();
+                                                      });
                                                       searchController.clear();
                                                       context
                                                           .read<
@@ -286,8 +435,11 @@ class _CustomSearchReferralReconciliationsPageState
                                               ],
                                               controller: searchController,
                                               hintText: localizations.translate(
-                                                i18_local.searchBeneficiary
-                                                    .searchBeneficiaryReferralHintText,
+                                                _isSideEffectMode
+                                                    ? i18_local.searchBeneficiary
+                                                        .beneficiarySearchHintText
+                                                    : i18_local.searchBeneficiary
+                                                        .searchBeneficiaryReferralHintText,
                                               ),
                                               textCapitalization:
                                                   TextCapitalization.words,
@@ -328,7 +480,9 @@ class _CustomSearchReferralReconciliationsPageState
                                               if (!householdState.loading &&
                                                   searchController
                                                       .text.isNotEmpty &&
-                                                  !beneficiaryFound)
+                                                  (householdState
+                                                          .resultsNotFound ||
+                                                      !beneficiaryFound))
                                                 InfoCard(
                                                   title: localizations.translate(
                                                       i18.referralReconciliation
@@ -339,69 +493,6 @@ class _CustomSearchReferralReconciliationsPageState
                                                           .referralReconciliation
                                                           .referralInfoDescription),
                                                 ),
-                                              if (beneficiaryFound)
-                                                ...householdState
-                                                    .householdMembers
-                                                    .where((wrapper) {
-                                                  // Only show the card whose
-                                                  // UNIQUE_BENEFICIARY_ID
-                                                  // matches the typed tag.
-                                                  final ind =
-                                                      wrapper.headOfHousehold ??
-                                                          wrapper.members
-                                                              ?.firstOrNull;
-                                                  final benefId =
-                                                      ind?.identifiers
-                                                          ?.firstWhereOrNull(
-                                                            (id) =>
-                                                                id.identifierType ==
-                                                                'UNIQUE_BENEFICIARY_ID',
-                                                          )
-                                                          ?.identifierId;
-                                                  return benefId
-                                                          ?.trim()
-                                                          .toUpperCase() ==
-                                                      searchController.text
-                                                          .trim()
-                                                          .toUpperCase();
-                                                }).map((wrapper) {
-                                                  final ind =
-                                                      wrapper.headOfHousehold ??
-                                                          wrapper.members
-                                                              ?.firstOrNull;
-                                                  final fullName = [
-                                                    ind?.name?.givenName,
-                                                    ind?.name?.familyName,
-                                                  ]
-                                                      .where((e) =>
-                                                          e != null &&
-                                                          e.isNotEmpty)
-                                                      .join(' ');
-                                                  final identifierId =
-                                                      ind?.identifiers
-                                                          ?.firstWhereOrNull(
-                                                            (id) =>
-                                                                id.identifierType ==
-                                                                'UNIQUE_BENEFICIARY_ID',
-                                                          )
-                                                          ?.identifierId;
-                                                  return _BeneficiarySideEffectCard(
-                                                    name: fullName.isNotEmpty
-                                                        ? fullName
-                                                        : '—',
-                                                    beneficiaryId:
-                                                        identifierId ?? '—',
-                                                    taskCount:
-                                                        wrapper.tasks?.length ??
-                                                            0,
-                                                    hasSideEffects: wrapper
-                                                            .sideEffects
-                                                            ?.isNotEmpty ==
-                                                        true,
-                                                    localizations:
-                                                        localizations,
-                                                  );
-                                                }).toList(),
                                             ],
 
                                             // ── Referral mode: info card ──
@@ -423,6 +514,58 @@ class _CustomSearchReferralReconciliationsPageState
                                         ),
                                       ),
                                     ),
+
+                                    // ── Side-effect mode: beneficiary cards ──
+                                    if (_isSideEffectMode && beneficiaryFound)
+                                      SliverList(
+                                        delegate:
+                                            SliverChildBuilderDelegate(
+                                          (ctx, index) {
+                                            final wrapper =
+                                                sideEffectCards[index];
+                                            final ind =
+                                                wrapper.headOfHousehold ??
+                                                    wrapper.members
+                                                        ?.firstOrNull;
+                                            final fullName = _fullName(ind);
+                                            final identifierId =
+                                                _beneficiaryIdForIndividual(ind);
+                                            final isSelected =
+                                                _selectedIndividualClientRef ==
+                                                    ind?.clientReferenceId;
+                                            return _BeneficiarySideEffectCard(
+                                              name: fullName.isNotEmpty
+                                                  ? fullName
+                                                  : '—',
+                                              beneficiaryId:
+                                                  identifierId ?? '—',
+                                              taskCount:
+                                                  wrapper.tasks?.length ?? 0,
+                                              hasSideEffects: wrapper
+                                                      .sideEffects
+                                                      ?.isNotEmpty ==
+                                                  true,
+                                              isSelected: isSelected,
+                                              localizations: localizations,
+                                              onTap: () {
+                                                setInnerState(() {
+                                                  _selectedHouseholdMember =
+                                                      wrapper;
+                                                  _selectedIndividualClientRef =
+                                                      ind?.clientReferenceId;
+                                                });
+                                                setState(() {
+                                                  _selectedHouseholdMember =
+                                                      wrapper;
+                                                  _selectedIndividualClientRef =
+                                                      ind?.clientReferenceId;
+                                                });
+                                              },
+                                            );
+                                          },
+                                          childCount: sideEffectCards.length,
+                                        ),
+                                      ),
 
                                     // ── Referral mode: results list ──
                                     if (!_isSideEffectMode)
@@ -488,11 +631,15 @@ class _CustomSearchReferralReconciliationsPageState
                               BlocBuilder<CustomSearchHouseholdsBloc,
                                   CustomSearchHouseholdsState>(
                                 builder: (context, hsState) {
-                                  final wrapper =
-                                      hsState.householdMembers.firstOrNull;
+                                  final cards = _sideEffectCardWrappers(
+                                    hsState,
+                                    searchController.text,
+                                  );
+                                  final wrapper = _selectedHouseholdMember ??
+                                      (cards.length == 1 ? cards.first : null);
 
-                                  final ind = wrapper?.headOfHousehold ??
-                                      wrapper?.members?.firstOrNull;
+                                  // Scoped wrapper always stores the selected person here.
+                                  final ind = wrapper?.headOfHousehold;
 
                                   final projectBeneficiaryId = wrapper
                                       ?.projectBeneficiaries
@@ -529,22 +676,10 @@ class _CustomSearchReferralReconciliationsPageState
                                                     HFReferralModel(
                                                   clientReferenceId:
                                                       IdGen.i.identifier,
-                                                  name: [
-                                                    ind!.name?.givenName,
-                                                    ind!.name?.familyName,
-                                                  ]
-                                                      .where((s) =>
-                                                          s != null &&
-                                                          s.isNotEmpty)
-                                                      .join(' '),
+                                                  name: _fullName(ind),
                                                   beneficiaryId:
-                                                      ind!.identifiers
-                                                          ?.firstWhereOrNull(
-                                                            (id) =>
-                                                                id.identifierType ==
-                                                                'UNIQUE_BENEFICIARY_ID',
-                                                          )
-                                                          ?.identifierId,
+                                                      _beneficiaryIdForIndividual(
+                                                          ind),
                                                   additionalFields:
                                                       HFReferralAdditionalFields(
                                                     version: 1,
@@ -633,6 +768,8 @@ class _BeneficiarySideEffectCard extends StatelessWidget {
   final String beneficiaryId;
   final int taskCount;
   final bool hasSideEffects;
+  final bool isSelected;
+  final VoidCallback? onTap;
   final dynamic localizations;
 
   const _BeneficiarySideEffectCard({
@@ -640,6 +777,8 @@ class _BeneficiarySideEffectCard extends StatelessWidget {
     required this.beneficiaryId,
     required this.taskCount,
     this.hasSideEffects = false,
+    this.isSelected = false,
+    this.onTap,
     this.localizations,
   });
 
@@ -650,9 +789,20 @@ class _BeneficiarySideEffectCard extends StatelessWidget {
 
     return Card(
       margin: EdgeInsets.symmetric(vertical: theme.spacerTheme.spacer2),
-      elevation: 2,
-      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
-      child: Padding(
+      elevation: isSelected ? 4 : 2,
+      shape: RoundedRectangleBorder(
+        borderRadius: BorderRadius.circular(8),
+        side: BorderSide(
+          color: isSelected
+              ? theme.colorTheme.primary.primary2
+              : Colors.transparent,
+          width: isSelected ? 2 : 0,
+        ),
+      ),
+      child: InkWell(
+        onTap: onTap,
+        borderRadius: BorderRadius.circular(8),
+        child: Padding(
         padding: EdgeInsets.all(theme.spacerTheme.spacer4),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
@@ -707,6 +857,7 @@ class _BeneficiarySideEffectCard extends StatelessWidget {
             ],
           ],
         ),
+      ),
       ),
     );
   }

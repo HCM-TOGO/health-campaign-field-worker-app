@@ -1374,15 +1374,38 @@ class CustomIndividualDetailsPageState
       ),
     );
 
-    List<IdentifierModel>? identifiers = individual.identifiers;
-    if (isEditIndividual == false) {
-      identifiers?.add(IdentifierModel(
-        clientReferenceId: individual.clientReferenceId,
-        identifierId: beneficiaryId,
-        identifierType: IdentifierTypes.uniqueBeneficiaryID.toValue(),
-        clientAuditDetails: individual.clientAuditDetails,
-        auditDetails: individual.auditDetails,
-      ));
+    final hasUniqueBeneficiaryId = individual.identifiers?.any(
+          (e) =>
+              e.identifierType ==
+              IdentifierTypes.uniqueBeneficiaryID.toValue(),
+        ) ??
+        false;
+
+    final List<IdentifierModel> resolvedIdentifiers;
+    if (isEditIndividual) {
+      resolvedIdentifiers = List<IdentifierModel>.from(
+        individual.identifiers ?? [],
+      );
+      if (!hasUniqueBeneficiaryId && beneficiaryId != null) {
+        resolvedIdentifiers.add(
+          IdentifierModel(
+            clientReferenceId: individual.clientReferenceId,
+            tenantId: RegistrationDeliverySingleton().tenantId,
+            rowVersion: 1,
+            identifierId: beneficiaryId,
+            identifierType: IdentifierTypes.uniqueBeneficiaryID.toValue(),
+            clientAuditDetails: individual.clientAuditDetails,
+            auditDetails: individual.auditDetails,
+          ),
+        );
+      }
+    } else {
+      resolvedIdentifiers = [
+        identifier.copyWith(
+          identifierId: beneficiaryId,
+          identifierType: IdentifierTypes.uniqueBeneficiaryID.toValue(),
+        ),
+      ];
     }
 
     String? individualName = form.control(_individualNameKey).value as String?;
@@ -1396,14 +1419,7 @@ class CustomIndividualDetailsPageState
               .byName(form.control(_genderKey).value.toString().toLowerCase()),
       mobileNumber: form.control(_mobileNumberKey).value,
       dateOfBirth: dobString,
-      identifiers: isEditIndividual && identifier.identifierId != null
-          ? identifiers
-          : [
-              identifier.copyWith(
-                identifierId: beneficiaryId,
-                identifierType: IdentifierTypes.uniqueBeneficiaryID.toValue(),
-              ),
-            ],
+      identifiers: resolvedIdentifiers,
       additionalFields: IndividualAdditionalFields(
         version: 1,
         fields: [
