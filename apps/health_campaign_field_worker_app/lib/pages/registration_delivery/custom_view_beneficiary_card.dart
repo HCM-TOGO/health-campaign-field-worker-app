@@ -504,7 +504,8 @@ class CustomViewBeneficiaryCardState
       bool isNotEligible,
       bool isBeneficiaryRefused) {
     if (projectBeneficiaries.isNotEmpty) {
-      if (tasks.isEmpty) {
+      if (tasks.isEmpty ||
+          tasks.lastOrNull!.status == Status.closeHousehold.toValue()) {
         return Status.registered.toValue();
       } else {
         return getTaskStatus(tasks.toList()).toValue();
