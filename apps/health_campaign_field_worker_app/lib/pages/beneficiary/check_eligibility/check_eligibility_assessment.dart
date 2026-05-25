@@ -73,6 +73,7 @@ class _EligibilityChecklistViewPage
   final String no = "NO";
   final String negative = "NEGATIVE";
   final String test_unavailable = "TEST_UNAVAILABLE";
+  static const String _kbea1Key = "KBEA1";
   static const String _kbea2Key = "KBEA2";
   static const String _kbea3Key = "KBEA3";
   static const String _kbea4Key = "KBEA4";
@@ -868,6 +869,12 @@ class _EligibilityChecklistViewPage
 
                         if (item.code == _rdtResultKey) {
                           _updateSpaqQuestionsVisibility(value);
+                        } else if (item.code == _kbea1Key) {
+                          if (value == yes) {
+                            _hideQuestionsForKbea1Yes();
+                          } else {
+                            _showQuestionsForKbea1No();
+                          }
                         } else if (item.code == _kbea2Key && value != yes) {
                           _showSpaqQuestions();
                         }
@@ -1305,15 +1312,43 @@ class _EligibilityChecklistViewPage
   }
 
   bool _isRdtPositiveFromResponses(Map<String?, String> responses) {
-    return responses[_kbea2Key] == yes &&
-        responses[_rdtResultKey] == positive;
+    return responses[_kbea2Key] == yes && responses[_rdtResultKey] == positive;
+  }
+
+  bool _isKbea1Yes() {
+    final kbea1Index = _indexForAttributeCode(_kbea1Key);
+    if (kbea1Index == null) return false;
+    return controller[kbea1Index].text.trim() == yes;
   }
 
   bool _shouldShowSpaqQuestionsForCode(String? code) {
+    if (_isKbea1Yes() && code != _kbea1Key) {
+      return false;
+    }
     if (code == _kbea3Key || code == _kbea4Key) {
       return !_isRdtPositive();
     }
     return true;
+  }
+
+  void _hideQuestionsForKbea1Yes() {
+    final kbea1Index = _indexForAttributeCode(_kbea1Key);
+    final attributes = initialAttributes;
+    if (attributes == null) return;
+    for (int i = 0; i < attributes.length; i++) {
+      if (i != kbea1Index) {
+        visibleChecklistIndexes.remove(i);
+        controller[i].clear();
+      }
+    }
+  }
+
+  void _showQuestionsForKbea1No() {
+    final kbea2Index = _indexForAttributeCode(_kbea2Key);
+    if (kbea2Index != null && !visibleChecklistIndexes.contains(kbea2Index)) {
+      visibleChecklistIndexes.add(kbea2Index);
+    }
+    _showSpaqQuestions();
   }
 
   void _updateSpaqQuestionsVisibility(String? rdtValue) {
