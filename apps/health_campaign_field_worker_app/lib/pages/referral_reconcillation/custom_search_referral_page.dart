@@ -61,6 +61,9 @@ class _CustomSearchReferralReconciliationsPageState
 
   CustomSearchHouseholdsBloc? _customSearchHouseholdsBloc;
 
+  /// Avoid re-dispatching [searchByHousehold] for the same tag + household.
+  String? _tagExpandedHouseholdKey;
+
   // Beneficiary-ID pattern: XXXX-XXXXX-XXXXX (14 chars including dashes)
   static const int _beneficiaryIdLength = 14;
 
@@ -117,7 +120,10 @@ class _CustomSearchReferralReconciliationsPageState
   void _triggerHouseholdSearch(
       BuildContext context, CustomSearchHouseholdsBloc bloc, String value) {
     final trimmed = value.trim();
-    setState(_clearHouseholdSelection);
+    setState(() {
+      _clearHouseholdSelection();
+      _tagExpandedHouseholdKey = null;
+    });
 
     if (trimmed.isEmpty) {
       bloc.add(const SearchHouseholdsClearEvent());
@@ -240,7 +246,104 @@ class _CustomSearchReferralReconciliationsPageState
     );
   }
 
-  /// Tag search: bloc already returns one wrapper per person. Name search: expand here.
+  bool _beneficiaryIdMatches(IndividualModel? individual, String upperQuery) {
+    final id = _beneficiaryIdForIndividual(individual);
+    return id != null && id.trim().toUpperCase() == upperQuery;
+  }
+
+  /// Head name, or head ID when the bloc returned the full household.
+  bool _isHeadSearchMatch(HouseholdMemberWrapper wrapper, String trimmed) {
+    final head = wrapper.headOfHousehold;
+    if (head == null) return false;
+    if (_isSearchingByBeneficiaryId(trimmed)) {
+      if (!_beneficiaryIdMatches(head, trimmed.toUpperCase())) return false;
+      // [searchByTag] returns a single-member wrapper; full list comes from
+      // [searchByHousehold] after [_maybeExpandHouseholdForHeadTagSearch].
+      return (wrapper.members?.length ?? 0) > 1;
+    }
+    return _nameMatches(head, trimmed);
+  }
+
+  /// After [searchByTag], reload the household when the matched person is head.
+  Future<void> _maybeExpandHouseholdForHeadTagSearch(
+    BuildContext context,
+    CustomSearchHouseholdsState state,
+  ) async {
+    final trimmed = searchController.text.trim();
+    if (!_isSideEffectMode || state.loading || !_isSearchingByBeneficiaryId(trimmed)) {
+      return;
+    }
+
+    final upperQuery = trimmed.toUpperCase();
+    final bloc = context.read<CustomSearchHouseholdsBloc>();
+
+    for (final wrapper in state.householdMembers) {
+      final household = wrapper.household;
+      final matched = wrapper.members?.firstOrNull ?? wrapper.headOfHousehold;
+      final householdId = household?.clientReferenceId;
+      final individualId = matched?.clientReferenceId;
+      if (household == null ||
+          matched == null ||
+          householdId == null ||
+          individualId == null) {
+        continue;
+      }
+      if (!_beneficiaryIdMatches(matched, upperQuery)) continue;
+      if ((wrapper.members?.length ?? 0) > 1) continue;
+
+      final expandKey = '$trimmed::$householdId';
+      if (_tagExpandedHouseholdKey == expandKey) continue;
+
+      final memberships = await context
+          .repository<HouseholdMemberModel, HouseholdMemberSearchModel>(context)
+          .search(
+        HouseholdMemberSearchModel(
+          householdClientReferenceId: [householdId],
+          individualClientReferenceId: [individualId],
+        ),
+      );
+      if (!mounted) return;
+      if (memberships.firstOrNull?.isHeadOfHousehold != true) continue;
+
+      _tagExpandedHouseholdKey = expandKey;
+      bloc.add(
+        CustomSearchHouseholdsEvent.searchByHousehold(
+          projectId: RegistrationDeliverySingleton().projectId!,
+          latitude: 0,
+          longitude: 0,
+          isProximityEnabled: false,
+          maxRadius: null,
+          householdModel: household,
+        ),
+      );
+      return;
+    }
+  }
+
+  List<HouseholdMemberWrapper> _cardsForAllMembers(
+    HouseholdMemberWrapper wrapper,
+    Set<String> seen,
+  ) {
+    final cards = <HouseholdMemberWrapper>[];
+    final members = wrapper.members ?? [];
+    if (members.isEmpty) {
+      final head = wrapper.headOfHousehold;
+      final ref = head?.clientReferenceId;
+      if (ref != null && !seen.contains(ref)) {
+        seen.add(ref);
+        cards.add(_wrapperForIndividual(wrapper, head!));
+      }
+      return cards;
+    }
+    for (final individual in members) {
+      final ref = individual.clientReferenceId;
+      if (ref == null || seen.contains(ref)) continue;
+      seen.add(ref);
+      cards.add(_wrapperForIndividual(wrapper, individual));
+    }
+    return cards;
+  }
+
   List<HouseholdMemberWrapper> _sideEffectCardWrappers(
     CustomSearchHouseholdsState householdState,
     String query,
@@ -248,47 +351,35 @@ class _CustomSearchReferralReconciliationsPageState
     final trimmed = query.trim();
     if (trimmed.isEmpty) return [];
 
-    if (_isSearchingByBeneficiaryId(trimmed)) {
-      final upperQuery = trimmed.toUpperCase();
-      return householdState.householdMembers
-          .where((wrapper) {
-            final benefId = _beneficiaryIdForIndividual(
-              wrapper.headOfHousehold ?? wrapper.members?.firstOrNull,
-            );
-            return benefId?.trim().toUpperCase() == upperQuery;
-          })
-          .toList();
-    }
-
     final seen = <String>{};
     final cards = <HouseholdMemberWrapper>[];
 
     for (final wrapper in householdState.householdMembers) {
-      final individuals = <IndividualModel>[
-        ...?wrapper.members,
-        if (wrapper.headOfHousehold != null) wrapper.headOfHousehold!,
-      ];
-
-      var matchedInWrapper = false;
-      for (final individual in individuals) {
-        final clientRef = individual.clientReferenceId;
-        if (clientRef == null || seen.contains(clientRef)) continue;
-        if (!_nameMatches(individual, trimmed)) continue;
-        matchedInWrapper = true;
-        seen.add(clientRef);
-        cards.add(_wrapperForIndividual(wrapper, individual));
+      if (_isHeadSearchMatch(wrapper, trimmed)) {
+        cards.addAll(_cardsForAllMembers(wrapper, seen));
+        continue;
       }
 
-      // Only show head when their name actually matches the query (not as a default).
-      if (!matchedInWrapper && wrapper.headOfHousehold != null) {
-        final head = wrapper.headOfHousehold!;
-        final clientRef = head.clientReferenceId;
-        if (clientRef != null &&
-            !seen.contains(clientRef) &&
-            _nameMatches(head, trimmed)) {
-          seen.add(clientRef);
-          cards.add(_wrapperForIndividual(wrapper, head));
+      if (_isSearchingByBeneficiaryId(trimmed)) {
+        final upperQuery = trimmed.toUpperCase();
+        for (final individual in wrapper.members ?? []) {
+          if (!_beneficiaryIdMatches(individual, upperQuery)) continue;
+          final ref = individual.clientReferenceId;
+          if (ref == null || seen.contains(ref)) continue;
+          seen.add(ref);
+          cards.add(_wrapperForIndividual(wrapper, individual));
         }
+        continue;
+      }
+
+      final headRef = wrapper.headOfHousehold?.clientReferenceId;
+      for (final individual in wrapper.members ?? []) {
+        if (individual.clientReferenceId == headRef) continue;
+        if (!_nameMatches(individual, trimmed)) continue;
+        final ref = individual.clientReferenceId;
+        if (ref == null || seen.contains(ref)) continue;
+        seen.add(ref);
+        cards.add(_wrapperForIndividual(wrapper, individual));
       }
     }
 
@@ -334,9 +425,21 @@ class _CustomSearchReferralReconciliationsPageState
                           serviceDataRepository: context.repository<
                               ServiceModel, ServiceSearchModel>(context),
                         ),
-                        child: BlocBuilder<CustomSearchHouseholdsBloc,
+                        child: BlocListener<CustomSearchHouseholdsBloc,
                             CustomSearchHouseholdsState>(
-                          builder: (context, householdState) {
+                          listenWhen: (previous, current) =>
+                              previous.loading != current.loading ||
+                              previous.householdMembers !=
+                                  current.householdMembers,
+                          listener: (context, householdState) {
+                            _maybeExpandHouseholdForHeadTagSearch(
+                              context,
+                              householdState,
+                            );
+                          },
+                          child: BlocBuilder<CustomSearchHouseholdsBloc,
+                              CustomSearchHouseholdsState>(
+                            builder: (context, householdState) {
                             final householdBloc =
                                 context.read<CustomSearchHouseholdsBloc>();
                             return BlocBuilder<SearchReferralsBloc,
@@ -615,6 +718,7 @@ class _CustomSearchReferralReconciliationsPageState
                               },
                             );
                           },
+                          ),
                         ),
                       ),
                     ),
