@@ -963,18 +963,40 @@ void setPackagesSingleton(BuildContext context) {
 
 Future<void> _fetchAndStoreCddUsers(BuildContext context) async {
   try {
-    final repo = context
+    // Read both repos before any await to avoid BuildContext across async gaps
+    final staffRepo = context
         .read<RemoteRepository<ProjectStaffModel, ProjectStaffSearchModel>>();
-    final response = await repo.dio.post(
-      repo.searchPath,
+    final individualRepo = context
+        .read<RemoteRepository<IndividualModel, IndividualSearchModel>>();
+
+    // Step 1: get all project staff for this project → collect user UUIDs
+    final projectStaffList = await staffRepo.search(
+      ProjectStaffSearchModel(
+        projectId: [ReferralReconSingleton().projectId],
+      ),
+    );
+
+    if (projectStaffList.isEmpty) return;
+
+    final userUuids = projectStaffList
+        .where((s) => s.userId != null)
+        .map((s) => s.userId!)
+        .toList();
+
+    if (userUuids.isEmpty) return;
+
+    // Step 2: fetch individual details by userUuid; parse raw response to get
+    // userDetails.roles which is not part of IndividualModel
+    final response = await individualRepo.dio.post(
+      individualRepo.searchPath,
       queryParameters: {
         'offset': 0,
-        'limit': 100,
+        'limit': userUuids.length,
         'tenantId': DigitDataModelSingleton().tenantId,
       },
       data: {
-        'ProjectStaff': {
-          'projectId': [ReferralReconSingleton().projectId],
+        'Individual': {
+          'userUuid': userUuids,
         },
       },
     );
