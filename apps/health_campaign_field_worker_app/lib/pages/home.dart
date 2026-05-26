@@ -60,6 +60,7 @@ import '../utils/debound.dart';
 import '../utils/environment_config.dart';
 import '../utils/i18_key_constants.dart' as i18;
 import '../utils/least_level_boundary_singleton.dart';
+import '../utils/hf_referral_cdd_singleton.dart';
 import '../utils/utils.dart';
 import '../widgets/header/back_navigation_help_header.dart';
 import '../widgets/home/home_item_card.dart';
@@ -816,6 +817,10 @@ void setPackagesSingleton(BuildContext context) {
                   [],
         );
 
+        if (context.isHealthFacilitySupervisor) {
+          _fetchAndStoreCddUsers(context);
+        }
+
         RegistrationDeliverySingleton().setInitialData(
           loggedInUserUuid: context.loggedInUserUuid,
           maxRadius: appConfiguration.maxRadius!,
@@ -954,6 +959,64 @@ void setPackagesSingleton(BuildContext context) {
               }),
         );
       });
+}
+
+Future<void> _fetchAndStoreCddUsers(BuildContext context) async {
+  try {
+    final repo = context
+        .read<RemoteRepository<ProjectStaffModel, ProjectStaffSearchModel>>();
+    final response = await repo.dio.post(
+      repo.searchPath,
+      queryParameters: {
+        'offset': 0,
+        'limit': 100,
+        'tenantId': DigitDataModelSingleton().tenantId,
+      },
+      data: {
+        'ProjectStaff': {
+          'projectId': [ReferralReconSingleton().projectId],
+        },
+      },
+    );
+
+    final responseMap = response.data;
+    if (responseMap is! Map<String, dynamic> ||
+        !responseMap.containsKey('Individual')) return;
+
+    final individualList = responseMap['Individual'];
+    if (individualList is! List) return;
+
+    const cddRoles = {'COMMUNITY_DISTRIBUTOR', 'DISTRIBUTOR'};
+
+    final users = individualList
+        .whereType<Map<String, dynamic>>()
+        .where((ind) {
+          final userDetails = ind['userDetails'];
+          if (userDetails is! Map<String, dynamic>) return false;
+          final roles = userDetails['roles'];
+          if (roles is! List) return false;
+          return roles.any((role) =>
+              role is Map<String, dynamic> && cddRoles.contains(role['code']));
+        })
+        .map((ind) {
+          final nameMap = ind['name'];
+          final givenName = nameMap is Map<String, dynamic>
+              ? nameMap['givenName'] as String? ?? ''
+              : '';
+          final userDetails = ind['userDetails'] as Map<String, dynamic>?;
+          final username = userDetails?['username'] as String? ?? '';
+          return CddUser(
+            name: givenName.isNotEmpty ? givenName : username,
+            username: username,
+          );
+        })
+        .where((u) => u.username.isNotEmpty)
+        .toList();
+
+    HFReferralCddSingleton().setCddUsers(users);
+  } catch (_) {
+    // silently ignore — singleton retains empty list for this session
+  }
 }
 
 void loadLocalization(
