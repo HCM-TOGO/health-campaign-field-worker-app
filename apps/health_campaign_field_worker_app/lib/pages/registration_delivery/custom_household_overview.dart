@@ -1203,7 +1203,7 @@ class _CustomHouseholdOverviewPageState
                                       size: DigitButtonSize.large,
                                       isDisabled: (state.householdMemberWrapper
                                                   .members?.length ??
-                                              0) >=
+                                              0) >
                                           (state.householdMemberWrapper
                                                   .household!.memberCount ??
                                               0),
