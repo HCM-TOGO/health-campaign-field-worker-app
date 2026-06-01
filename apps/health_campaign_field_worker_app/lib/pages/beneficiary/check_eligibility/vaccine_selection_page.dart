@@ -618,53 +618,53 @@ class _VaccineSelectionPageState extends LocalizedState<VaccineSelectionPage> {
               }
             },
             child: ScrollableContent(
-            header: Column(children: [
-              _buildBackHeader(context),
-            ]),
-            enableFixedDigitButton: true,
-            footer: DigitCard(
-              margin: const EdgeInsets.fromLTRB(0, kPadding, 0, 0),
-              padding: const EdgeInsets.fromLTRB(kPadding, 0, kPadding, 0),
-              children: [
-                DigitElevatedButton(
-                  onPressed: () async {
-                    if (!isValid(
-                        responses: currentResponses,
-                        allVaccineCodes: allVaccineCodes,
-                        vaccineCodes: currentVaccineCodes)) {
-                      await DigitToast.show(
-                        context,
-                        options: DigitToastOptions(
-                          localizations.translate(
-                            i18.common.corecommonRequired,
+              header: Column(children: [
+                _buildBackHeader(context),
+              ]),
+              enableFixedDigitButton: true,
+              footer: DigitCard(
+                margin: const EdgeInsets.fromLTRB(0, kPadding, 0, 0),
+                padding: const EdgeInsets.fromLTRB(kPadding, 0, kPadding, 0),
+                children: [
+                  DigitElevatedButton(
+                    onPressed: () async {
+                      if (!isValid(
+                          responses: currentResponses,
+                          allVaccineCodes: allVaccineCodes,
+                          vaccineCodes: currentVaccineCodes)) {
+                        await DigitToast.show(
+                          context,
+                          options: DigitToastOptions(
+                            localizations.translate(
+                              i18.common.corecommonRequired,
+                            ),
+                            true,
+                            theme,
                           ),
-                          true,
-                          theme,
-                        ),
-                      );
-                      return;
-                    }
-                    saveResponses(currentResponses);
-                    setState(() {
-                      currentIndex++;
-                    });
-                  },
-                  child: Text(
-                    localizations.translate(i18.common.coreCommonNext),
-                  ),
-                )
+                        );
+                        return;
+                      }
+                      saveResponses(currentResponses);
+                      setState(() {
+                        currentIndex++;
+                      });
+                    },
+                    child: Text(
+                      localizations.translate(i18.common.coreCommonNext),
+                    ),
+                  )
+                ],
+              ),
+              children: [
+                _buildVaccineRadioChecklist(
+                  context: context,
+                  index: currentIndex,
+                  vaccineCodeToName: vaccineCodeToName,
+                  vaccineResponses: currentResponses,
+                  vaccineCodes: currentVaccineCodes,
+                ),
               ],
             ),
-            children: [
-              _buildVaccineRadioChecklist(
-                context: context,
-                index: currentIndex,
-                vaccineCodeToName: vaccineCodeToName,
-                vaccineResponses: currentResponses,
-                vaccineCodes: currentVaccineCodes,
-              ),
-            ],
-          ),
           );
         }
 
@@ -681,7 +681,7 @@ class _VaccineSelectionPageState extends LocalizedState<VaccineSelectionPage> {
                 builder: (context, householdOverviewState) {
                   double? latitude = locationState.latitude;
                   double? longitude = locationState.longitude;
-                  String vaccineSelection = "ZERO_DOSE_ASSESSMENT";
+                  String vaccineSelection = "UPDATED_ZERO_DOSE_ASSESSMENT";
                   return BlocBuilder<ServiceDefinitionBloc,
                       ServiceDefinitionState>(
                     builder: (context, state) {
