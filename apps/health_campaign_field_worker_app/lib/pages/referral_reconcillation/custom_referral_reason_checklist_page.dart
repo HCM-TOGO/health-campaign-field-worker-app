@@ -30,6 +30,7 @@ import 'package:referral_reconciliation/utils/utils.dart';
 import 'package:referral_reconciliation/widgets/localized.dart';
 
 import '../../utils/upper_case.dart';
+import '../../widgets/custom_back_navigation.dart';
 import '../../widgets/digit_ui_component/custom_digit_input_field.dart';
 
 @RoutePage()
@@ -87,7 +88,7 @@ class _CustomReferralReasonChecklistPageState
     context.read<ServiceBloc>().add(
           ServiceSurveyFormEvent(
             value: Random().nextInt(100).toString(),
-            submitTriggered: true,
+            submitTriggered: false,
           ),
         );
     super.initState();
@@ -99,7 +100,7 @@ class _CustomReferralReasonChecklistPageState
     final textTheme = theme.digitTextTheme(context);
 
     return PopScope(
-      canPop: false,
+      canPop: true,
       child: Scaffold(
         body: BlocBuilder<ReferralReconServiceDefinitionBloc,
             ReferralReconServiceDefinitionState>(
@@ -125,6 +126,11 @@ class _CustomReferralReasonChecklistPageState
               serviceDefinitionFetch: (value) {
                 return ScrollableContent(
                   enableFixedDigitButton: true,
+                  header: const Column(children: [
+                    CustomBackNavigationHelpHeaderWidget(
+                      showHelp: false,
+                    )
+                  ]),
                   footer: DigitCard(
                       cardType: CardType.primary,
                       margin: const EdgeInsets.only(top: spacer2),
