@@ -100,6 +100,16 @@ class CustomIndividualDetailsPageState
   @override
   void initState() {
     customSearchHouseholdsBloc = context.read<CustomSearchHouseholdsBloc>();
+    final state = context.read<CustomBeneficiaryRegistrationBloc>().state;
+    final individual = state.mapOrNull<IndividualModel>(
+      editIndividual: (value) => value.individualModel,
+    );
+    final previousBenefId = individual?.additionalFields?.fields
+        .firstWhereOrNull((f) => f.key == 'previousBeneficiaryId')
+        ?.value;
+    if (previousBenefId != null && previousBenefId.toString().isNotEmpty) {
+      yesNoValue = yes;
+    }
     super.initState();
   }
 
@@ -1376,8 +1386,7 @@ class CustomIndividualDetailsPageState
 
     final hasUniqueBeneficiaryId = individual.identifiers?.any(
           (e) =>
-              e.identifierType ==
-              IdentifierTypes.uniqueBeneficiaryID.toValue(),
+              e.identifierType == IdentifierTypes.uniqueBeneficiaryID.toValue(),
         ) ??
         false;
 
@@ -1423,7 +1432,8 @@ class CustomIndividualDetailsPageState
       additionalFields: IndividualAdditionalFields(
         version: 1,
         fields: [
-          if (form.control(_previousBeneficiaryIdKey).value != null &&
+          if (isRelocated &&
+              form.control(_previousBeneficiaryIdKey).value != null &&
               // ignore: avoid_dynamic_calls
               form.control(_previousBeneficiaryIdKey).value!.isNotEmpty)
             AdditionalField(
@@ -1500,10 +1510,30 @@ class CustomIndividualDetailsPageState
             : null,
       ),
       _idTypeKey: FormControl<String>(
-        value: individual?.identifiers?.firstOrNull?.identifierType,
+        value: () {
+          final savedIdType = individual?.additionalFields?.fields
+              .firstWhereOrNull((f) => f.key == 'idType')
+              ?.value as String?;
+          if (savedIdType != null && savedIdType != 'DEFAULT') {
+            return savedIdType;
+          }
+          // For DEFAULT or missing, fall back to identifierType from identifiers
+          return individual?.identifiers?.firstOrNull?.identifierType;
+        }(),
       ),
       _idNumberKey: FormControl<String>(
-        value: individual?.identifiers?.firstOrNull?.identifierId,
+        value: () {
+          final savedIdType = individual?.additionalFields?.fields
+              .firstWhereOrNull((f) => f.key == 'idType')
+              ?.value as String?;
+          if (savedIdType != null && savedIdType != 'DEFAULT') {
+            return individual?.additionalFields?.fields
+                .firstWhereOrNull((f) => f.key == 'idNumber')
+                ?.value as String?;
+          }
+          // For DEFAULT, fall back to the UNIQUE_BENEFICIARY_ID from identifiers
+          return individual?.identifiers?.firstOrNull?.identifierId;
+        }(),
       ),
       _genderKey: FormControl<String>(value: getGenderOptions(individual)),
       _mobileNumberKey:
