@@ -8,25 +8,24 @@ import 'package:digit_ui_components/widgets/atoms/table_cell.dart';
 import 'package:digit_ui_components/widgets/molecules/digit_card.dart';
 import 'package:digit_ui_components/widgets/molecules/digit_table.dart';
 import 'package:flutter/material.dart';
-import 'package:registration_delivery/models/entities/project_beneficiary.dart';
-
 import 'package:registration_delivery/blocs/search_households/search_households.dart';
+import 'package:registration_delivery/models/entities/project_beneficiary.dart';
 import 'package:registration_delivery/models/entities/status.dart';
 import 'package:registration_delivery/models/entities/task.dart';
-import 'package:registration_delivery/utils/constants.dart';
 import 'package:registration_delivery/utils/i18_key_constants.dart' as i18;
+import 'package:registration_delivery/utils/utils.dart';
+import 'package:registration_delivery/widgets/beneficiary/beneficiary_card.dart';
+import 'package:registration_delivery/widgets/localized.dart';
+
+import '../../models/entities/additional_fields_type.dart'
+    as additional_fields_local;
 import '../../models/entities/additional_fields_type.dart';
 import '../../utils/app_enums.dart';
 import '../../utils/extensions/extensions.dart';
 import '../../utils/i18_key_constants.dart' as i18_local;
-import 'package:registration_delivery/utils/utils.dart';
-import 'package:registration_delivery/widgets/beneficiary/beneficiary_card.dart';
-import 'package:registration_delivery/widgets/localized.dart';
-import '../../models/entities/additional_fields_type.dart'
-    as additional_fields_local;
-import '../../utils/registration_delivery/utils_smc.dart' as util_local;
 import '../../utils/registration_delivery/utils_smc.dart'
     show checkBeneficiaryReferredSMC;
+import '../../utils/registration_delivery/utils_smc.dart' as util_local;
 
 class CustomViewBeneficiaryCard extends LocalizedStatefulWidget {
   final HouseholdMemberWrapper householdMember;
@@ -504,8 +503,14 @@ class CustomViewBeneficiaryCardState
       bool isNotEligible,
       bool isBeneficiaryRefused) {
     if (projectBeneficiaries.isNotEmpty) {
-      if (tasks.isEmpty ||
-          tasks.lastOrNull!.status == Status.closeHousehold.toValue()) {
+      if (tasks.isEmpty) {
+        return Status.registered.toValue();
+      }
+      if (tasks.isNotEmpty &&
+          tasks.last.status == Status.closeHousehold.toValue()) {
+        if (projectBeneficiaries.length == 1) {
+          return Status.closeHousehold.toValue();
+        }
         return Status.registered.toValue();
       } else {
         return getTaskStatus(tasks.toList()).toValue();
