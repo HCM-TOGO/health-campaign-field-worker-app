@@ -28,6 +28,7 @@ import '../data/local_store/no_sql/schema/project_types.dart';
 import '../data/local_store/no_sql/schema/row_versions.dart';
 import '../data/local_store/no_sql/schema/service_registry.dart';
 import '../data/repositories/local/inventory_management/custom_stock.dart';
+import '../data/repositories/local/registration_delivery/custom_individual_local_repository.dart';
 import '../data/repositories/remote/downsync.dart';
 import '../data/sync_registry.dart';
 import '../data/sync_service_mapper.dart';
@@ -154,7 +155,7 @@ class Constants {
       FacilityLocalRepository(sql, FacilityOpLogManager(isar)),
       ProjectLocalRepository(sql, ProjectOpLogManager(isar)),
       ProjectStaffLocalRepository(sql, ProjectStaffOpLogManager(isar)),
-      IndividualLocalRepository(sql, IndividualOpLogManager(isar)),
+      CustomIndividualLocalRepository(sql, IndividualOpLogManager(isar)),
       ProjectFacilityLocalRepository(sql, ProjectFacilityOpLogManager(isar)),
       ProjectResourceLocalRepository(
         sql,
