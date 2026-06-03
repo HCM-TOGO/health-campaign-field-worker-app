@@ -242,16 +242,21 @@ class _CustomRecordReferralDetailsPageState
                         form.control(_referralReason).value =
                             _sideEffectServiceCode;
                       } else if (!isSideEffect) {
-                        form.control(_referralReason).value =
-                            recordState.mapOrNull(
-                          create: (value) => value.viewOnly
-                              ? ReferralReconSingleton()
-                                  .referralReasons
-                                  .where((e) =>
-                                      e == value.hfReferralModel?.symptom)
-                                  .first
-                              : null,
-                        );
+                        final isViewOnly = recordState.mapOrNull(
+                              create: (value) => value.viewOnly,
+                            ) ??
+                            false;
+                        if (isViewOnly &&
+                            form.control(_referralReason).value == null) {
+                          form.control(_referralReason).value =
+                              recordState.mapOrNull(
+                            create: (value) => ReferralReconSingleton()
+                                .referralReasons
+                                .where(
+                                    (e) => e == value.hfReferralModel?.symptom)
+                                .firstOrNull,
+                          );
+                        }
                       }
                       return ScrollableContent(
                         enableFixedDigitButton: true,
@@ -287,7 +292,7 @@ class _CustomRecordReferralDetailsPageState
                                                   i18.common.coreCommonSubmit),
                                           onPressed: isClicked
                                               ? () {}
-                                              : () {
+                                              : () async {
                                                   if (form
                                                           .control(_genderKey)
                                                           .value ==
@@ -1382,17 +1387,25 @@ class _CustomRecordReferralDetailsPageState
                                           }),
                                     ]),
                                 StatefulBuilder(builder: (context, set) {
-                                  form.control(_referralReason).value =
-                                      recordState.mapOrNull(
-                                    create: (value) => value.viewOnly
-                                        ? ReferralReconSingleton()
-                                            .referralReasons
-                                            .where((e) =>
-                                                e ==
-                                                value.hfReferralModel?.symptom)
-                                            .first
-                                        : null,
-                                  );
+                                  final isViewOnly = recordState.mapOrNull(
+                                        create: (value) => value.viewOnly,
+                                      ) ??
+                                      false;
+                                  if (isViewOnly &&
+                                      form.control(_referralReason).value ==
+                                          null) {
+                                    form.control(_referralReason).value =
+                                        recordState.mapOrNull(
+                                      create: (value) =>
+                                          ReferralReconSingleton()
+                                              .referralReasons
+                                              .where((e) =>
+                                                  e ==
+                                                  value
+                                                      .hfReferralModel?.symptom)
+                                              .firstOrNull,
+                                    );
+                                  }
                                   return DigitCard(
                                       cardType: CardType.primary,
                                       margin: const EdgeInsets.all(spacer2),
