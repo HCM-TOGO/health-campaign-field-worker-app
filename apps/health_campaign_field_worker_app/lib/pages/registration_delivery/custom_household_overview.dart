@@ -112,6 +112,10 @@ class _CustomHouseholdOverviewPageState
                               context
                                   .read<SearchHouseholdsBloc>()
                                   .add(const SearchHouseholdsEvent.clear());
+                              (context.router.parent() as StackRouter)
+                                  .popUntilRouteWithName(
+                                CustomSearchBeneficiaryRoute.name,
+                              );
                             },
                           ),
                         ),
@@ -1234,7 +1238,7 @@ class _CustomHouseholdOverviewPageState
             RegistrationDeliverySingleton().beneficiaryType!,
       ),
     );
-    await context.router.popAndPush(
+    await context.router.push(
       CustomBeneficiaryRegistrationWrapperRoute(
         initialState: BeneficiaryRegistrationAddMemberState(
           addressModel: address,

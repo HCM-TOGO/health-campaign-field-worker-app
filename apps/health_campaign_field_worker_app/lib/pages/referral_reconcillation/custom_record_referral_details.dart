@@ -6,6 +6,7 @@ import 'package:digit_ui_components/digit_components.dart';
 import 'package:digit_ui_components/models/RadioButtonModel.dart';
 import 'package:digit_ui_components/theme/digit_extended_theme.dart';
 import 'package:digit_ui_components/widgets/atoms/dropdown_wrapper.dart';
+import 'package:digit_ui_components/widgets/atoms/pop_up_card.dart';
 import 'package:digit_ui_components/widgets/molecules/digit_card.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
@@ -212,15 +213,13 @@ class _CustomRecordReferralDetailsPageState
                       // may fire before individual is non-null.
                       final isSideEffect = _isSideEffectMode(recordState);
                       if (isSideEffect && individual != null) {
-                        final displayName =
-                            _individualDisplayName(individual);
+                        final displayName = _individualDisplayName(individual);
                         if (displayName.isNotEmpty &&
                             form.control(_nameOfChildKey).value !=
                                 displayName) {
                           form.control(_nameOfChildKey).value = displayName;
                         }
-                        final benefId =
-                            _individualBeneficiaryId(individual);
+                        final benefId = _individualBeneficiaryId(individual);
                         if (benefId != null &&
                             form.control(_beneficiaryIdKey).value != benefId) {
                           form.control(_beneficiaryIdKey).value = benefId;
@@ -243,16 +242,21 @@ class _CustomRecordReferralDetailsPageState
                         form.control(_referralReason).value =
                             _sideEffectServiceCode;
                       } else if (!isSideEffect) {
-                        form.control(_referralReason).value =
-                            recordState.mapOrNull(
-                          create: (value) => value.viewOnly
-                              ? ReferralReconSingleton()
-                                  .referralReasons
-                                  .where((e) =>
-                                      e == value.hfReferralModel?.symptom)
-                                  .first
-                              : null,
-                        );
+                        final isViewOnly = recordState.mapOrNull(
+                              create: (value) => value.viewOnly,
+                            ) ??
+                            false;
+                        if (isViewOnly &&
+                            form.control(_referralReason).value == null) {
+                          form.control(_referralReason).value =
+                              recordState.mapOrNull(
+                            create: (value) => ReferralReconSingleton()
+                                .referralReasons
+                                .where(
+                                    (e) => e == value.hfReferralModel?.symptom)
+                                .firstOrNull,
+                          );
+                        }
                       }
                       return ScrollableContent(
                         enableFixedDigitButton: true,
@@ -288,7 +292,7 @@ class _CustomRecordReferralDetailsPageState
                                                   i18.common.coreCommonSubmit),
                                           onPressed: isClicked
                                               ? () {}
-                                              : () {
+                                              : () async {
                                                   if (form
                                                           .control(_genderKey)
                                                           .value ==
@@ -421,7 +425,8 @@ class _CustomRecordReferralDetailsPageState
                                                     );
                                                     final hfClientRefId =
                                                         _referralClientRefIdForChecklist(
-                                                      isSideEffect: isSideEffect,
+                                                      isSideEffect:
+                                                          isSideEffect,
                                                       recordState: recordState,
                                                     );
 
@@ -436,8 +441,8 @@ class _CustomRecordReferralDetailsPageState
                                                                 hfClientRefId,
                                                             projectFacilityId:
                                                                 facilityId,
-                                                            projectId:
-                                                                widget.projectId,
+                                                            projectId: widget
+                                                                .projectId,
                                                             name: nameOfChild
                                                                 .trim(),
                                                             beneficiaryId:
@@ -523,9 +528,9 @@ class _CustomRecordReferralDetailsPageState
                                                                     dateOfEvaluation,
                                                                   ),
                                                                 if (nameOfChild
-                                                                        .toString()
-                                                                        .trim()
-                                                                        .isNotEmpty)
+                                                                    .toString()
+                                                                    .trim()
+                                                                    .isNotEmpty)
                                                                   AdditionalField(
                                                                     ReferralReconEnums
                                                                         .nameOfReferral
@@ -543,9 +548,9 @@ class _CustomRecordReferralDetailsPageState
                                                                     age,
                                                                   ),
                                                                 if (gender
-                                                                        .toString()
-                                                                        .trim()
-                                                                        .isNotEmpty)
+                                                                    .toString()
+                                                                    .trim()
+                                                                    .isNotEmpty)
                                                                   AdditionalField(
                                                                     ReferralReconEnums
                                                                         .gender
@@ -558,36 +563,114 @@ class _CustomRecordReferralDetailsPageState
                                                         ),
                                                       );
                                                     }
-                                                    context
-                                                        .read<
-                                                            ReferralReconServiceDefinitionBloc>()
-                                                        .add(
-                                                          ReferralReconServiceDefinitionSelectionEvent(
-                                                              serviceDefinitionCode:
-                                                                  symptom),
+                                                    if (symptom.toUpperCase() ==
+                                                        'SICK') {
+                                                      final shouldSubmit =
+                                                          await showDialog<
+                                                              bool>(
+                                                        context: context,
+                                                        builder:
+                                                            (BuildContext ctx) {
+                                                          return Popup(
+                                                            title: localizations
+                                                                .translate(
+                                                              i18.checklist
+                                                                  .checklistDialogLabel,
+                                                            ),
+                                                            description:
+                                                                localizations
+                                                                    .translate(
+                                                              i18.checklist
+                                                                  .checklistDialogDescription,
+                                                            ),
+                                                            actions: [
+                                                              DigitButton(
+                                                                label: localizations
+                                                                    .translate(
+                                                                  i18.checklist
+                                                                      .checklistDialogPrimaryAction,
+                                                                ),
+                                                                type:
+                                                                    DigitButtonType
+                                                                        .primary,
+                                                                size:
+                                                                    DigitButtonSize
+                                                                        .large,
+                                                                onPressed: () {
+                                                                  Navigator.of(
+                                                                    ctx,
+                                                                    rootNavigator:
+                                                                        true,
+                                                                  ).pop(true);
+                                                                },
+                                                              ),
+                                                              DigitButton(
+                                                                label: localizations
+                                                                    .translate(
+                                                                  i18.checklist
+                                                                      .checklistDialogSecondaryAction,
+                                                                ),
+                                                                type: DigitButtonType
+                                                                    .secondary,
+                                                                size:
+                                                                    DigitButtonSize
+                                                                        .large,
+                                                                onPressed: () {
+                                                                  Navigator.of(
+                                                                    ctx,
+                                                                    rootNavigator:
+                                                                        true,
+                                                                  ).pop(false);
+                                                                },
+                                                              ),
+                                                            ],
+                                                          );
+                                                        },
+                                                      );
+                                                      if (!context.mounted)
+                                                        return;
+                                                      if (shouldSubmit ??
+                                                          false) {
+                                                        context.router.push(
+                                                          CustomReferralReconAcknowedgmentRoute(),
                                                         );
-                                                    _pushReferralReasonChecklist(
-                                                      route:
-                                                          CustomReferralReasonChecklistRoute(
-                                                        beneficiaryId:
-                                                            beneficiaryId,
-                                                        referralClientRefId:
-                                                            hfClientRefId,
-                                                        isSideEffect:
-                                                            isSideEffect,
-                                                        projectBeneficiaryClientReferenceId:
-                                                            _additionalFieldValue(
-                                                          recordState,
-                                                          'projectBeneficiaryClientReferenceId',
+                                                      } else {
+                                                        clickedStatus.value =
+                                                            false;
+                                                      }
+                                                    } else {
+                                                      context
+                                                          .read<
+                                                              ReferralReconServiceDefinitionBloc>()
+                                                          .add(
+                                                            ReferralReconServiceDefinitionSelectionEvent(
+                                                                serviceDefinitionCode:
+                                                                    symptom),
+                                                          );
+                                                      _pushReferralReasonChecklist(
+                                                        route:
+                                                            CustomReferralReasonChecklistRoute(
+                                                          beneficiaryId:
+                                                              beneficiaryId,
+                                                          referralClientRefId:
+                                                              hfClientRefId,
+                                                          isSideEffect:
+                                                              isSideEffect,
+                                                          projectBeneficiaryClientReferenceId:
+                                                              _additionalFieldValue(
+                                                            recordState,
+                                                            'projectBeneficiaryClientReferenceId',
+                                                          ),
+                                                          taskClientReferenceId:
+                                                              _additionalFieldValue(
+                                                            recordState,
+                                                            'taskClientReferenceId',
+                                                          ),
                                                         ),
-                                                        taskClientReferenceId:
-                                                            _additionalFieldValue(
-                                                          recordState,
-                                                          'taskClientReferenceId',
-                                                        ),
-                                                      ),
-                                                      recordState: recordState,
-                                                    );
+                                                        recordState:
+                                                            recordState,
+                                                      );
+                                                    }
                                                   }
                                                 },
                                         );
@@ -618,7 +701,7 @@ class _CustomRecordReferralDetailsPageState
                                                         .coreCommonSubmit),
                                             onPressed: isClicked
                                                 ? () {}
-                                                : () {
+                                                : () async {
                                                     if (form
                                                             .control(_genderKey)
                                                             .value ==
@@ -787,7 +870,8 @@ class _CustomRecordReferralDetailsPageState
                                                           _referralClientRefIdForChecklist(
                                                         isSideEffect:
                                                             isSideEffect,
-                                                        recordState: recordState,
+                                                        recordState:
+                                                            recordState,
                                                       );
 
                                                       // Do NOT create HFReferralModel in
@@ -927,37 +1011,122 @@ class _CustomRecordReferralDetailsPageState
                                                           ),
                                                         );
                                                       }
-                                                      context
-                                                          .read<
-                                                              ReferralReconServiceDefinitionBloc>()
-                                                          .add(
-                                                            ReferralReconServiceDefinitionSelectionEvent(
-                                                              serviceDefinitionCode:
-                                                                  symptom,
-                                                            ),
+                                                      if (symptom
+                                                              .toUpperCase() ==
+                                                          'SICK') {
+                                                        final shouldSubmit =
+                                                            await showDialog<
+                                                                bool>(
+                                                          context: context,
+                                                          builder: (BuildContext
+                                                              ctx) {
+                                                            return Popup(
+                                                              title:
+                                                                  localizations
+                                                                      .translate(
+                                                                i18.checklist
+                                                                    .checklistDialogLabel,
+                                                              ),
+                                                              description:
+                                                                  localizations
+                                                                      .translate(
+                                                                i18.checklist
+                                                                    .checklistDialogDescription,
+                                                              ),
+                                                              actions: [
+                                                                DigitButton(
+                                                                  label: localizations
+                                                                      .translate(
+                                                                    i18.checklist
+                                                                        .checklistDialogPrimaryAction,
+                                                                  ),
+                                                                  type: DigitButtonType
+                                                                      .primary,
+                                                                  size:
+                                                                      DigitButtonSize
+                                                                          .large,
+                                                                  onPressed:
+                                                                      () {
+                                                                    Navigator
+                                                                        .of(
+                                                                      ctx,
+                                                                      rootNavigator:
+                                                                          true,
+                                                                    ).pop(true);
+                                                                  },
+                                                                ),
+                                                                DigitButton(
+                                                                  label: localizations
+                                                                      .translate(
+                                                                    i18.checklist
+                                                                        .checklistDialogSecondaryAction,
+                                                                  ),
+                                                                  type: DigitButtonType
+                                                                      .secondary,
+                                                                  size:
+                                                                      DigitButtonSize
+                                                                          .large,
+                                                                  onPressed:
+                                                                      () {
+                                                                    Navigator
+                                                                        .of(
+                                                                      ctx,
+                                                                      rootNavigator:
+                                                                          true,
+                                                                    ).pop(
+                                                                        false);
+                                                                  },
+                                                                ),
+                                                              ],
+                                                            );
+                                                          },
+                                                        );
+                                                        if (!context.mounted) {
+                                                          return;
+                                                        }
+                                                        if (shouldSubmit ??
+                                                            false) {
+                                                          context.router.push(
+                                                            CustomReferralReconAcknowedgmentRoute(),
                                                           );
-                                                      _pushReferralReasonChecklist(
-                                                        route:
-                                                            CustomReferralReasonChecklistRoute(
-                                                          beneficiaryId:
-                                                              beneficiaryId,
-                                                          referralClientRefId:
-                                                              hfClientRefId,
-                                                          isSideEffect:
-                                                              isSideEffect,
-                                                          projectBeneficiaryClientReferenceId:
-                                                              _additionalFieldValue(
-                                                            recordState,
-                                                            'projectBeneficiaryClientReferenceId',
+                                                        } else {
+                                                          clickedStatus.value =
+                                                              false;
+                                                        }
+                                                      } else {
+                                                        context
+                                                            .read<
+                                                                ReferralReconServiceDefinitionBloc>()
+                                                            .add(
+                                                              ReferralReconServiceDefinitionSelectionEvent(
+                                                                serviceDefinitionCode:
+                                                                    symptom,
+                                                              ),
+                                                            );
+                                                        _pushReferralReasonChecklist(
+                                                          route:
+                                                              CustomReferralReasonChecklistRoute(
+                                                            beneficiaryId:
+                                                                beneficiaryId,
+                                                            referralClientRefId:
+                                                                hfClientRefId,
+                                                            isSideEffect:
+                                                                isSideEffect,
+                                                            projectBeneficiaryClientReferenceId:
+                                                                _additionalFieldValue(
+                                                              recordState,
+                                                              'projectBeneficiaryClientReferenceId',
+                                                            ),
+                                                            taskClientReferenceId:
+                                                                _additionalFieldValue(
+                                                              recordState,
+                                                              'taskClientReferenceId',
+                                                            ),
                                                           ),
-                                                          taskClientReferenceId:
-                                                              _additionalFieldValue(
-                                                            recordState,
-                                                            'taskClientReferenceId',
-                                                          ),
-                                                        ),
-                                                        recordState: recordState,
-                                                      );
+                                                          recordState:
+                                                              recordState,
+                                                        );
+                                                      }
                                                     }
                                                   },
                                           );
@@ -1218,17 +1387,25 @@ class _CustomRecordReferralDetailsPageState
                                           }),
                                     ]),
                                 StatefulBuilder(builder: (context, set) {
-                                  form.control(_referralReason).value =
-                                      recordState.mapOrNull(
-                                    create: (value) => value.viewOnly
-                                        ? ReferralReconSingleton()
-                                            .referralReasons
-                                            .where((e) =>
-                                                e ==
-                                                value.hfReferralModel?.symptom)
-                                            .first
-                                        : null,
-                                  );
+                                  final isViewOnly = recordState.mapOrNull(
+                                        create: (value) => value.viewOnly,
+                                      ) ??
+                                      false;
+                                  if (isViewOnly &&
+                                      form.control(_referralReason).value ==
+                                          null) {
+                                    form.control(_referralReason).value =
+                                        recordState.mapOrNull(
+                                      create: (value) =>
+                                          ReferralReconSingleton()
+                                              .referralReasons
+                                              .where((e) =>
+                                                  e ==
+                                                  value
+                                                      .hfReferralModel?.symptom)
+                                              .firstOrNull,
+                                    );
+                                  }
                                   return DigitCard(
                                       cardType: CardType.primary,
                                       margin: const EdgeInsets.all(spacer2),
