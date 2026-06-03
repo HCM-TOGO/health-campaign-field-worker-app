@@ -1,5 +1,6 @@
 import 'package:auto_route/auto_route.dart';
 import 'package:collection/collection.dart';
+import 'package:digit_components/digit_components.dart' show DigitIconButton;
 import 'package:digit_data_model/data_model.dart';
 import 'package:digit_scanner/blocs/scanner.dart';
 import 'package:digit_ui_components/enum/app_enums.dart';
@@ -39,7 +40,19 @@ import 'package:registration_delivery/utils/utils.dart';
 import '../../blocs/registration_delivery/custom_search_household.dart';
 import '../../data/repositories/local/registration_delivery/custom_individual_global_repository.dart';
 import '../../data/repositories/local/registration_delivery/custom_registration_delivery.dart';
+import '../../data/repositories/local/search/individual_global_search_smc.dart';
+import '../../utils/constants.dart';
 import '../../utils/upper_case.dart';
+
+class _SideEffectCardEntry {
+  const _SideEffectCardEntry({
+    required this.wrapper,
+    required this.isHouseholdHead,
+  });
+
+  final HouseholdMemberWrapper wrapper;
+  final bool isHouseholdHead;
+}
 
 @RoutePage()
 class CustomSearchReferralReconciliationsPage extends LocalizedStatefulWidget {
@@ -108,6 +121,8 @@ class _CustomSearchReferralReconciliationsPageState
           context.read<CustomIndividualGlobalSearchRepository>(),
       houseHoldGlobalSearchRepository:
           context.read<HouseHoldGlobalSearchRepository>(),
+      individualGlobalSearchSMCRepository:
+          context.read<IndividualGlobalSearchSMCRepository>(),
     );
   }
 
@@ -137,6 +152,17 @@ class _CustomSearchReferralReconciliationsPageState
           projectId: RegistrationDeliverySingleton().projectId!,
         ),
       );
+    } else if (_isMobileNumberQuery(trimmed)) {
+      if (trimmed.length == Constants.mobileNumberLength) {
+        bloc.add(
+          CustomSearchHouseholdsEvent.searchByMobileNumber(
+            mobileNumber: trimmed,
+            projectId: RegistrationDeliverySingleton().projectId!,
+          ),
+        );
+      } else {
+        bloc.add(const SearchHouseholdsClearEvent());
+      }
     } else if (trimmed.length >= 3) {
       bloc.add(
         CustomSearchHouseholdsEvent.searchByHouseholdHead(
@@ -161,6 +187,11 @@ class _CustomSearchReferralReconciliationsPageState
 
   bool _isSearchingByBeneficiaryId(String value) =>
       isBeneficiaryIdValid(value.trim());
+
+  bool _isMobileNumberQuery(String value) {
+    final trimmed = value.trim();
+    return trimmed.isNotEmpty && RegExp(r'^\d+$').hasMatch(trimmed);
+  }
 
   bool isBeneficiaryIdValid(String value) {
     if (value.trim().length != _beneficiaryIdLength) return false;
@@ -220,8 +251,8 @@ class _CustomSearchReferralReconciliationsPageState
         projectBeneficiaries?.map((e) => e.clientReferenceId).toList() ?? [];
 
     final tasks = source.tasks
-        ?.where((t) =>
-            projectBeneficiaryIds.contains(t.projectBeneficiaryClientReferenceId))
+        ?.where((t) => projectBeneficiaryIds
+            .contains(t.projectBeneficiaryClientReferenceId))
         .toList();
     final taskIds = tasks?.map((t) => t.clientReferenceId).toList() ?? [];
 
@@ -237,9 +268,8 @@ class _CustomSearchReferralReconciliationsPageState
     return source.copyWith(
       headOfHousehold: individual,
       members: [individual],
-      projectBeneficiaries: (projectBeneficiaries?.isEmpty ?? true)
-          ? null
-          : projectBeneficiaries,
+      projectBeneficiaries:
+          (projectBeneficiaries?.isEmpty ?? true) ? null : projectBeneficiaries,
       tasks: (tasks?.isEmpty ?? true) ? null : tasks,
       sideEffects: (sideEffects?.isEmpty ?? true) ? null : sideEffects,
       referrals: (referrals?.isEmpty ?? true) ? null : referrals,
@@ -270,7 +300,9 @@ class _CustomSearchReferralReconciliationsPageState
     CustomSearchHouseholdsState state,
   ) async {
     final trimmed = searchController.text.trim();
-    if (!_isSideEffectMode || state.loading || !_isSearchingByBeneficiaryId(trimmed)) {
+    if (!_isSideEffectMode ||
+        state.loading ||
+        !_isSearchingByBeneficiaryId(trimmed)) {
       return;
     }
 
@@ -297,11 +329,11 @@ class _CustomSearchReferralReconciliationsPageState
       final memberships = await context
           .repository<HouseholdMemberModel, HouseholdMemberSearchModel>(context)
           .search(
-        HouseholdMemberSearchModel(
-          householdClientReferenceId: [householdId],
-          individualClientReferenceId: [individualId],
-        ),
-      );
+            HouseholdMemberSearchModel(
+              householdClientReferenceId: [householdId],
+              individualClientReferenceId: [individualId],
+            ),
+          );
       if (!mounted) return;
       if (memberships.firstOrNull?.isHeadOfHousehold != true) continue;
 
@@ -320,18 +352,24 @@ class _CustomSearchReferralReconciliationsPageState
     }
   }
 
-  List<HouseholdMemberWrapper> _cardsForAllMembers(
+  List<_SideEffectCardEntry> _cardsForAllMembers(
     HouseholdMemberWrapper wrapper,
     Set<String> seen,
   ) {
-    final cards = <HouseholdMemberWrapper>[];
+    final cards = <_SideEffectCardEntry>[];
+    final householdHeadRef = wrapper.headOfHousehold?.clientReferenceId;
     final members = wrapper.members ?? [];
     if (members.isEmpty) {
       final head = wrapper.headOfHousehold;
       final ref = head?.clientReferenceId;
       if (ref != null && !seen.contains(ref)) {
         seen.add(ref);
-        cards.add(_wrapperForIndividual(wrapper, head!));
+        cards.add(
+          _SideEffectCardEntry(
+            wrapper: _wrapperForIndividual(wrapper, head!),
+            isHouseholdHead: true,
+          ),
+        );
       }
       return cards;
     }
@@ -339,12 +377,17 @@ class _CustomSearchReferralReconciliationsPageState
       final ref = individual.clientReferenceId;
       if (ref == null || seen.contains(ref)) continue;
       seen.add(ref);
-      cards.add(_wrapperForIndividual(wrapper, individual));
+      cards.add(
+        _SideEffectCardEntry(
+          wrapper: _wrapperForIndividual(wrapper, individual),
+          isHouseholdHead: ref == householdHeadRef,
+        ),
+      );
     }
     return cards;
   }
 
-  List<HouseholdMemberWrapper> _sideEffectCardWrappers(
+  List<_SideEffectCardEntry> _sideEffectCardWrappers(
     CustomSearchHouseholdsState householdState,
     String query,
   ) {
@@ -352,10 +395,12 @@ class _CustomSearchReferralReconciliationsPageState
     if (trimmed.isEmpty) return [];
 
     final seen = <String>{};
-    final cards = <HouseholdMemberWrapper>[];
+    final cards = <_SideEffectCardEntry>[];
 
     for (final wrapper in householdState.householdMembers) {
-      if (_isHeadSearchMatch(wrapper, trimmed)) {
+      if (_isHeadSearchMatch(wrapper, trimmed) ||
+          (_isMobileNumberQuery(trimmed) &&
+              trimmed.length == Constants.mobileNumberLength)) {
         cards.addAll(_cardsForAllMembers(wrapper, seen));
         continue;
       }
@@ -367,7 +412,13 @@ class _CustomSearchReferralReconciliationsPageState
           final ref = individual.clientReferenceId;
           if (ref == null || seen.contains(ref)) continue;
           seen.add(ref);
-          cards.add(_wrapperForIndividual(wrapper, individual));
+          cards.add(
+            _SideEffectCardEntry(
+              wrapper: _wrapperForIndividual(wrapper, individual),
+              isHouseholdHead:
+                  ref == wrapper.headOfHousehold?.clientReferenceId,
+            ),
+          );
         }
         continue;
       }
@@ -379,7 +430,12 @@ class _CustomSearchReferralReconciliationsPageState
         final ref = individual.clientReferenceId;
         if (ref == null || seen.contains(ref)) continue;
         seen.add(ref);
-        cards.add(_wrapperForIndividual(wrapper, individual));
+        cards.add(
+          _SideEffectCardEntry(
+            wrapper: _wrapperForIndividual(wrapper, individual),
+            isHouseholdHead: false,
+          ),
+        );
       }
     }
 
@@ -440,152 +496,179 @@ class _CustomSearchReferralReconciliationsPageState
                           child: BlocBuilder<CustomSearchHouseholdsBloc,
                               CustomSearchHouseholdsState>(
                             builder: (context, householdState) {
-                            final householdBloc =
-                                context.read<CustomSearchHouseholdsBloc>();
-                            return BlocBuilder<SearchReferralsBloc,
-                                SearchReferralsState>(
-                              builder: (context, searchState) {
-                                final sideEffectCards = _sideEffectCardWrappers(
-                                  householdState,
-                                  searchController.text,
-                                );
-                                final bool beneficiaryFound =
-                                    sideEffectCards.isNotEmpty;
+                              final householdBloc =
+                                  context.read<CustomSearchHouseholdsBloc>();
+                              return BlocBuilder<SearchReferralsBloc,
+                                  SearchReferralsState>(
+                                builder: (context, searchState) {
+                                  final sideEffectCards =
+                                      _sideEffectCardWrappers(
+                                    householdState,
+                                    searchController.text,
+                                  );
+                                  final bool beneficiaryFound =
+                                      sideEffectCards.isNotEmpty;
 
-                                return ScrollableContent(
-                                  header: const Column(children: [
-                                    CustomBackNavigationHelpHeaderWidget(
-                                        showHelp: false),
-                                  ]),
-                                  slivers: [
-                                    SliverToBoxAdapter(
-                                      child: Padding(
-                                        padding: EdgeInsets.all(
-                                            theme.spacerTheme.spacer2),
-                                        child: Column(
-                                          crossAxisAlignment:
-                                              CrossAxisAlignment.start,
-                                          children: [
-                                            // ── Page title ──
-                                            Padding(
-                                              padding: EdgeInsets.symmetric(
-                                                  horizontal:
-                                                      theme.spacerTheme.spacer2,
-                                                  vertical: theme
-                                                      .spacerTheme.spacer2),
-                                              child: Text(
-                                                localizations.translate(
-                                                  i18_local.searchBeneficiary
-                                                      .searchBeneficiaryLabelText,
+                                  return ScrollableContent(
+                                    header: const Column(children: [
+                                      CustomBackNavigationHelpHeaderWidget(
+                                          showHelp: false),
+                                    ]),
+                                    slivers: [
+                                      SliverToBoxAdapter(
+                                        child: Padding(
+                                          padding: EdgeInsets.all(
+                                              theme.spacerTheme.spacer2),
+                                          child: Column(
+                                            crossAxisAlignment:
+                                                CrossAxisAlignment.start,
+                                            children: [
+                                              // ── Page title ──
+                                              Padding(
+                                                padding: EdgeInsets.symmetric(
+                                                    horizontal: theme
+                                                        .spacerTheme.spacer2,
+                                                    vertical: theme
+                                                        .spacerTheme.spacer2),
+                                                child: Text(
+                                                  localizations.translate(
+                                                    i18_local.searchBeneficiary
+                                                        .searchBeneficiaryLabelText,
+                                                  ),
+                                                  style: textTheme.headingXl
+                                                      .copyWith(
+                                                          color: theme
+                                                              .colorTheme
+                                                              .text
+                                                              .primary),
                                                 ),
-                                                style: textTheme.headingXl
-                                                    .copyWith(
-                                                        color: theme.colorTheme
-                                                            .text.primary),
                                               ),
-                                            ),
 
-                                            // ── Toggle ──
-                                            Padding(
-                                              padding: EdgeInsets.symmetric(
-                                                  horizontal: theme
+                                              // ── Toggle ──
+                                              Padding(
+                                                padding: EdgeInsets.symmetric(
+                                                    horizontal: theme
+                                                        .spacerTheme.spacer2),
+                                                child: Row(
+                                                  children: [
+                                                    Switch(
+                                                      value: _isSideEffectMode,
+                                                      onChanged: (val) {
+                                                        setInnerState(() {
+                                                          _isSideEffectMode =
+                                                              val;
+                                                          _clearHouseholdSelection();
+                                                        });
+                                                        setState(() {
+                                                          _isSideEffectMode =
+                                                              val;
+                                                          _clearHouseholdSelection();
+                                                        });
+                                                        searchController
+                                                            .clear();
+                                                        context
+                                                            .read<
+                                                                SearchReferralsBloc>()
+                                                            .add(
+                                                                const SearchReferralsClearEvent());
+                                                        householdBloc.add(
+                                                            const SearchHouseholdsClearEvent());
+                                                      },
+                                                    ),
+                                                    SizedBox(
+                                                        width: theme.spacerTheme
+                                                            .spacer2),
+                                                    Text(
+                                                      localizations.translate(
+                                                          i18_local
+                                                              .searchBeneficiary
+                                                              .recordSideEffectActionLabel),
+                                                      style: textTheme.bodyL,
+                                                    ),
+                                                  ],
+                                                ),
+                                              ),
+
+                                              SizedBox(
+                                                  height: theme
                                                       .spacerTheme.spacer2),
-                                              child: Row(
-                                                children: [
-                                                  Switch(
-                                                    value: _isSideEffectMode,
-                                                    onChanged: (val) {
-                                                      setInnerState(() {
-                                                        _isSideEffectMode = val;
-                                                        _clearHouseholdSelection();
-                                                      });
-                                                      setState(() {
-                                                        _isSideEffectMode = val;
-                                                        _clearHouseholdSelection();
-                                                      });
-                                                      searchController.clear();
-                                                      context
-                                                          .read<
-                                                              SearchReferralsBloc>()
-                                                          .add(
-                                                              const SearchReferralsClearEvent());
-                                                      householdBloc.add(
-                                                          const SearchHouseholdsClearEvent());
-                                                    },
-                                                  ),
-                                                  SizedBox(
-                                                      width: theme
-                                                          .spacerTheme.spacer2),
-                                                  Text(
-                                                    localizations.translate(
-                                                        i18_local
-                                                            .searchBeneficiary
-                                                            .recordSideEffectActionLabel),
-                                                    style: textTheme.bodyL,
-                                                  ),
+
+                                              // ── Search bar ──
+                                              DigitSearchBar(
+                                                inputFormatters: [
+                                                  UpperCaseTextFormatter()
                                                 ],
-                                              ),
-                                            ),
-
-                                            SizedBox(
-                                                height:
-                                                    theme.spacerTheme.spacer2),
-
-                                            // ── Search bar ──
-                                            DigitSearchBar(
-                                              inputFormatters: [
-                                                UpperCaseTextFormatter()
-                                              ],
-                                              controller: searchController,
-                                              hintText: localizations.translate(
-                                                _isSideEffectMode
-                                                    ? i18_local.searchBeneficiary
-                                                        .beneficiarySearchHintText
-                                                    : i18_local.searchBeneficiary
-                                                        .searchBeneficiaryReferralHintText,
-                                              ),
-                                              textCapitalization:
-                                                  TextCapitalization.words,
-                                              onChanged: (value) {
-                                                if (_isSideEffectMode) {
-                                                  _triggerHouseholdSearch(
-                                                      context,
-                                                      householdBloc,
-                                                      value);
-                                                } else {
-                                                  final referralBloc =
-                                                      context.read<
-                                                          SearchReferralsBloc>();
-                                                  if (value.trim().length < 2) {
-                                                    referralBloc.add(
-                                                        const SearchReferralsClearEvent());
+                                                controller: searchController,
+                                                hintText:
+                                                    localizations.translate(
+                                                  _isSideEffectMode
+                                                      ? i18_local
+                                                          .searchBeneficiary
+                                                          .beneficiarySearchHintText
+                                                      : i18_local
+                                                          .searchBeneficiary
+                                                          .searchBeneficiaryReferralHintText,
+                                                ),
+                                                textCapitalization:
+                                                    TextCapitalization.words,
+                                                onChanged: (value) {
+                                                  if (_isSideEffectMode) {
+                                                    _triggerHouseholdSearch(
+                                                        context,
+                                                        householdBloc,
+                                                        value);
                                                   } else {
-                                                    referralBloc.add(
-                                                        SearchReferralsByNameEvent(
-                                                            searchText:
-                                                                value.trim()));
+                                                    final referralBloc =
+                                                        context.read<
+                                                            SearchReferralsBloc>();
+                                                    if (value.trim().length <
+                                                        2) {
+                                                      referralBloc.add(
+                                                          const SearchReferralsClearEvent());
+                                                    } else {
+                                                      referralBloc.add(
+                                                          SearchReferralsByNameEvent(
+                                                              searchText: value
+                                                                  .trim()));
+                                                    }
                                                   }
-                                                }
-                                              },
-                                            ),
+                                                },
+                                              ),
 
-                                            SizedBox(
-                                                height:
-                                                    theme.spacerTheme.spacer2 *
-                                                        2),
+                                              SizedBox(
+                                                  height: theme
+                                                          .spacerTheme.spacer2 *
+                                                      2),
 
-                                            // ── Side-effect mode results ──
-                                            if (_isSideEffectMode) ...[
-                                              if (householdState.loading)
-                                                const Center(
-                                                    child:
-                                                        CircularProgressIndicator()),
-                                              if (!householdState.loading &&
+                                              // ── Side-effect mode results ──
+                                              if (_isSideEffectMode) ...[
+                                                if (householdState.loading)
+                                                  const Center(
+                                                      child:
+                                                          CircularProgressIndicator()),
+                                                if (!householdState.loading &&
+                                                    searchController
+                                                        .text.isNotEmpty &&
+                                                    (householdState
+                                                            .resultsNotFound ||
+                                                        !beneficiaryFound))
+                                                  InfoCard(
+                                                    title: localizations.translate(i18
+                                                        .referralReconciliation
+                                                        .beneficiaryInfoTitle),
+                                                    type: InfoType.info,
+                                                    description: localizations
+                                                        .translate(i18
+                                                            .referralReconciliation
+                                                            .referralInfoDescription),
+                                                  ),
+                                              ],
+
+                                              // ── Referral mode: info card ──
+                                              if (!_isSideEffectMode &&
+                                                  searchState.resultsNotFound &&
                                                   searchController
-                                                      .text.isNotEmpty &&
-                                                  (householdState
-                                                          .resultsNotFound ||
-                                                      !beneficiaryFound))
+                                                      .text.isNotEmpty)
                                                 InfoCard(
                                                   title: localizations.translate(
                                                       i18.referralReconciliation
@@ -597,127 +680,113 @@ class _CustomSearchReferralReconciliationsPageState
                                                           .referralInfoDescription),
                                                 ),
                                             ],
-
-                                            // ── Referral mode: info card ──
-                                            if (!_isSideEffectMode &&
-                                                searchState.resultsNotFound &&
-                                                searchController
-                                                    .text.isNotEmpty)
-                                              InfoCard(
-                                                title: localizations.translate(
-                                                    i18.referralReconciliation
-                                                        .beneficiaryInfoTitle),
-                                                type: InfoType.info,
-                                                description:
-                                                    localizations.translate(i18
-                                                        .referralReconciliation
-                                                        .referralInfoDescription),
-                                              ),
-                                          ],
-                                        ),
-                                      ),
-                                    ),
-
-                                    // ── Side-effect mode: beneficiary cards ──
-                                    if (_isSideEffectMode && beneficiaryFound)
-                                      SliverList(
-                                        delegate:
-                                            SliverChildBuilderDelegate(
-                                          (ctx, index) {
-                                            final wrapper =
-                                                sideEffectCards[index];
-                                            final ind =
-                                                wrapper.headOfHousehold ??
-                                                    wrapper.members
-                                                        ?.firstOrNull;
-                                            final fullName = _fullName(ind);
-                                            final identifierId =
-                                                _beneficiaryIdForIndividual(ind);
-                                            final isSelected =
-                                                _selectedIndividualClientRef ==
-                                                    ind?.clientReferenceId;
-                                            return _BeneficiarySideEffectCard(
-                                              name: fullName.isNotEmpty
-                                                  ? fullName
-                                                  : '—',
-                                              beneficiaryId:
-                                                  identifierId ?? '—',
-                                              taskCount:
-                                                  wrapper.tasks?.length ?? 0,
-                                              hasSideEffects: wrapper
-                                                      .sideEffects
-                                                      ?.isNotEmpty ==
-                                                  true,
-                                              isSelected: isSelected,
-                                              localizations: localizations,
-                                              onTap: () {
-                                                setInnerState(() {
-                                                  _selectedHouseholdMember =
-                                                      wrapper;
-                                                  _selectedIndividualClientRef =
-                                                      ind?.clientReferenceId;
-                                                });
-                                                setState(() {
-                                                  _selectedHouseholdMember =
-                                                      wrapper;
-                                                  _selectedIndividualClientRef =
-                                                      ind?.clientReferenceId;
-                                                });
-                                              },
-                                            );
-                                          },
-                                          childCount: sideEffectCards.length,
+                                          ),
                                         ),
                                       ),
 
-                                    // ── Referral mode: results list ──
-                                    if (!_isSideEffectMode)
-                                      SliverList(
-                                        delegate: SliverChildBuilderDelegate(
-                                          (ctx, index) {
-                                            final i = searchState.referrals
-                                                .elementAt(index);
-                                            return Container(
-                                              margin: EdgeInsets.only(
-                                                  bottom: theme
-                                                      .spacerTheme.spacer2),
-                                              child: ViewReferralCard(
-                                                hfReferralModel: i,
-                                                onOpenPressed: () {
-                                                  context
-                                                      .read<ServiceBloc>()
-                                                      .add(ServiceSearchEvent(
-                                                        serviceSearchModel:
-                                                            ServiceSearchModel(
-                                                          relatedClientReferenceId:
-                                                              i.clientReferenceId,
-                                                        ),
-                                                      ));
-                                                  context.router.push(
-                                                    CustomHFCreateReferralWrapperRoute(
-                                                      viewOnly: true,
-                                                      referralReconciliation: i,
-                                                      projectId:
-                                                          ReferralReconSingleton()
-                                                              .projectId,
-                                                      cycles:
-                                                          ReferralReconSingleton()
-                                                              .cycles,
-                                                    ),
-                                                  );
+                                      // ── Side-effect mode: beneficiary cards ──
+                                      if (_isSideEffectMode && beneficiaryFound)
+                                        SliverList(
+                                          delegate: SliverChildBuilderDelegate(
+                                            (ctx, index) {
+                                              final cardEntry =
+                                                  sideEffectCards[index];
+                                              final wrapper = cardEntry.wrapper;
+                                              final ind = wrapper
+                                                      .headOfHousehold ??
+                                                  wrapper.members?.firstOrNull;
+                                              final fullName = _fullName(ind);
+                                              final identifierId =
+                                                  _beneficiaryIdForIndividual(
+                                                      ind);
+                                              final isSelected =
+                                                  _selectedIndividualClientRef ==
+                                                      ind?.clientReferenceId;
+                                              return _BeneficiarySideEffectCard(
+                                                name: fullName.isNotEmpty
+                                                    ? fullName
+                                                    : '—',
+                                                beneficiaryId:
+                                                    identifierId ?? '—',
+                                                taskCount:
+                                                    wrapper.tasks?.length ?? 0,
+                                                hasSideEffects: wrapper
+                                                        .sideEffects
+                                                        ?.isNotEmpty ==
+                                                    true,
+                                                isHouseholdHead:
+                                                    cardEntry.isHouseholdHead,
+                                                isSelected: isSelected,
+                                                localizations: localizations,
+                                                onTap: () {
+                                                  setInnerState(() {
+                                                    _selectedHouseholdMember =
+                                                        wrapper;
+                                                    _selectedIndividualClientRef =
+                                                        ind?.clientReferenceId;
+                                                  });
+                                                  setState(() {
+                                                    _selectedHouseholdMember =
+                                                        wrapper;
+                                                    _selectedIndividualClientRef =
+                                                        ind?.clientReferenceId;
+                                                  });
                                                 },
-                                              ),
-                                            );
-                                          },
-                                          childCount:
-                                              searchState.referrals.length,
+                                              );
+                                            },
+                                            childCount: sideEffectCards.length,
+                                          ),
                                         ),
-                                      ),
-                                  ],
-                                );
-                              },
-                            );
-                          },
+
+                                      // ── Referral mode: results list ──
+                                      if (!_isSideEffectMode)
+                                        SliverList(
+                                          delegate: SliverChildBuilderDelegate(
+                                            (ctx, index) {
+                                              final i = searchState.referrals
+                                                  .elementAt(index);
+                                              return Container(
+                                                margin: EdgeInsets.only(
+                                                    bottom: theme
+                                                        .spacerTheme.spacer2),
+                                                child: ViewReferralCard(
+                                                  hfReferralModel: i,
+                                                  onOpenPressed: () {
+                                                    context
+                                                        .read<ServiceBloc>()
+                                                        .add(ServiceSearchEvent(
+                                                          serviceSearchModel:
+                                                              ServiceSearchModel(
+                                                            relatedClientReferenceId:
+                                                                i.clientReferenceId,
+                                                          ),
+                                                        ));
+                                                    context.router.push(
+                                                      CustomHFCreateReferralWrapperRoute(
+                                                        viewOnly: true,
+                                                        referralReconciliation:
+                                                            i,
+                                                        projectId:
+                                                            ReferralReconSingleton()
+                                                                .projectId,
+                                                        cycles:
+                                                            ReferralReconSingleton()
+                                                                .cycles,
+                                                      ),
+                                                    );
+                                                  },
+                                                ),
+                                              );
+                                            },
+                                            childCount:
+                                                searchState.referrals.length,
+                                          ),
+                                        ),
+                                    ],
+                                  );
+                                },
+                              );
+                            },
                           ),
                         ),
                       ),
@@ -740,7 +809,9 @@ class _CustomSearchReferralReconciliationsPageState
                                     searchController.text,
                                   );
                                   final wrapper = _selectedHouseholdMember ??
-                                      (cards.length == 1 ? cards.first : null);
+                                      (cards.length == 1
+                                          ? cards.first.wrapper
+                                          : null);
 
                                   // Scoped wrapper always stores the selected person here.
                                   final ind = wrapper?.headOfHousehold;
@@ -872,6 +943,7 @@ class _BeneficiarySideEffectCard extends StatelessWidget {
   final String beneficiaryId;
   final int taskCount;
   final bool hasSideEffects;
+  final bool isHouseholdHead;
   final bool isSelected;
   final VoidCallback? onTap;
   final dynamic localizations;
@@ -881,6 +953,7 @@ class _BeneficiarySideEffectCard extends StatelessWidget {
     required this.beneficiaryId,
     required this.taskCount,
     this.hasSideEffects = false,
+    this.isHouseholdHead = false,
     this.isSelected = false,
     this.onTap,
     this.localizations,
@@ -907,61 +980,80 @@ class _BeneficiarySideEffectCard extends StatelessWidget {
         onTap: onTap,
         borderRadius: BorderRadius.circular(8),
         child: Padding(
-        padding: EdgeInsets.all(theme.spacerTheme.spacer4),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            Text(name, style: textTheme.headingM),
-            SizedBox(height: theme.spacerTheme.spacer2),
-            Row(
-              children: [
-                Icon(Icons.badge_outlined,
-                    size: 16, color: theme.colorTheme.text.secondary),
-                SizedBox(width: theme.spacerTheme.spacer1),
-                Text(
-                  beneficiaryId,
-                  style: textTheme.bodyS
-                      .copyWith(color: theme.colorTheme.text.secondary),
-                ),
-              ],
-            ),
-            if (taskCount > 0) ...[
-              SizedBox(height: theme.spacerTheme.spacer1),
+          padding: EdgeInsets.all(theme.spacerTheme.spacer4),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Text(name, style: textTheme.headingM),
+              SizedBox(height: theme.spacerTheme.spacer2),
               Row(
                 children: [
-                  Icon(Icons.assignment_outlined,
+                  Icon(Icons.badge_outlined,
                       size: 16, color: theme.colorTheme.text.secondary),
                   SizedBox(width: theme.spacerTheme.spacer1),
                   Text(
-                    'Tasks: $taskCount',
+                    beneficiaryId,
                     style: textTheme.bodyS
                         .copyWith(color: theme.colorTheme.text.secondary),
                   ),
                 ],
               ),
+              if (taskCount > 0) ...[
+                SizedBox(height: theme.spacerTheme.spacer1),
+                Row(
+                  children: [
+                    Icon(Icons.assignment_outlined,
+                        size: 16, color: theme.colorTheme.text.secondary),
+                    SizedBox(width: theme.spacerTheme.spacer1),
+                    Text(
+                      'Tasks: $taskCount',
+                      style: textTheme.bodyS
+                          .copyWith(color: theme.colorTheme.text.secondary),
+                    ),
+                  ],
+                ),
+              ],
+              if (hasSideEffects) ...[
+                SizedBox(height: theme.spacerTheme.spacer2),
+                InfoCard(
+                  title: localizations?.translate(
+                          i18_local.searchBeneficiary.referralInfoTitle) ??
+                      'Info',
+                  type: InfoType.info,
+                  description: localizations?.translate(i18_local
+                          .searchBeneficiary.sideEffectAlreadyRecorded) ??
+                      'A side effect has already been recorded for this beneficiary.',
+                ),
+              ] else if (isHouseholdHead) ...[
+                SizedBox(height: theme.spacerTheme.spacer2),
+                Align(
+                  alignment: Alignment.centerLeft,
+                  child: DigitIconButton(
+                    icon: Icons.info_rounded,
+                    iconSize: 20,
+                    iconText: localizations?.translate(i18_local
+                            .householdOverView
+                            .householdOverViewHouseholderHeadLabel) ??
+                        'Head of household',
+                    iconTextColor: theme.colorScheme.error,
+                    iconColor: theme.colorScheme.error,
+                  ),
+                ),
+              ] else if (taskCount == 0) ...[
+                SizedBox(height: theme.spacerTheme.spacer2),
+                InfoCard(
+                  title: localizations?.translate(
+                          i18_local.searchBeneficiary.referralInfoTitle) ??
+                      'Info',
+                  type: InfoType.info,
+                  description: localizations?.translate(
+                          i18_local.searchBeneficiary.noTasksAssociated) ??
+                      'There are no tasks associated with this beneficiary.',
+                ),
+              ],
             ],
-            if (hasSideEffects) ...[
-              SizedBox(height: theme.spacerTheme.spacer2),
-              InfoCard(
-                title: localizations?.translate('ERROR') ?? 'Error',
-                type: InfoType.error,
-                description: localizations?.translate(i18_local
-                        .searchBeneficiary.sideEffectAlreadyRecorded) ??
-                    'A side effect has already been recorded for this beneficiary.',
-              ),
-            ] else if (taskCount == 0) ...[
-              SizedBox(height: theme.spacerTheme.spacer2),
-              InfoCard(
-                title: localizations?.translate('ERROR') ?? 'Error',
-                type: InfoType.error,
-                description: localizations?.translate(
-                        i18_local.searchBeneficiary.noTasksAssociated) ??
-                    'There are no tasks associated with this beneficiary.',
-              ),
-            ],
-          ],
+          ),
         ),
-      ),
       ),
     );
   }

@@ -1542,7 +1542,7 @@ class SearchBeneficiary {
 
   String get noOfResourcesDelivered => 'NO_OF_RESOURCES_DELIVERED';
 
-  String get beneficiarySearchHintText => 'BENEFICIARY_SEARCH_HINT_TEXT';
+  String get beneficiarySearchHintText => 'BENEFICIARY_SEARCH_HINT_TEXT_SOME';
 
   String get beneficiarySearchByBeneficiaryIdHintText =>
       'BENEFICIARY_SEARCH_BY_BENEFICIARY_ID_HINT_TEXT';
@@ -1556,6 +1556,8 @@ class SearchBeneficiary {
   String get beneficiaryInfoDescription => 'BENEFICIARY_INFO_DESCRIPTION_TEXT';
 
   String get beneficiaryInfoTitle => 'BENEFICIARY_INFO_TITLE';
+
+  String get referralInfoTitle => 'REFERRAL_INFO_TITLE';
 
   String get beneficiaryAddActionLabel => 'BENEFICIARY_ADD_ACTION_LABEL';
 
