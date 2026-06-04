@@ -70,7 +70,7 @@ class CustomSurveyFormViewPageState
   }
 
   bool isDateAttribute(String? code) {
-    return (code == "UHFWA_Q9" || code == "CDD_UPA_Q10" || code == "UHFA_Q5");
+    return (code == "UHFWA_Q7" || code == "CDD_UPA_Q5" || code == "UHFA_Q3");
   }
 
   @override

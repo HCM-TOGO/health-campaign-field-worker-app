@@ -770,6 +770,7 @@ class StockReconciliationDetails {
 
   String get commentRequiredError => 'RECONCILIATION_COMMENT_IS_REQUIRED';
   String get qrCodeInvalidFormat => 'QR_CODE_INVALID_FORMAT';
+  String get distributorInfoCardContent => 'DISTRIBUTOR_INFO_CARD_CONTENT';
 }
 
 class InventoryReportDetails {
