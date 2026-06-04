@@ -38,6 +38,7 @@ import 'package:referral_reconciliation/widgets/view_referral_card.dart';
 import 'package:registration_delivery/utils/utils.dart';
 
 import '../../blocs/registration_delivery/custom_search_household.dart';
+import '../../models/entities/assessment_checklist/status.dart';
 import '../../data/repositories/local/registration_delivery/custom_individual_global_repository.dart';
 import '../../data/repositories/local/registration_delivery/custom_registration_delivery.dart';
 import '../../data/repositories/local/search/individual_global_search_smc.dart';
@@ -252,7 +253,8 @@ class _CustomSearchReferralReconciliationsPageState
 
     final tasks = source.tasks
         ?.where((t) => projectBeneficiaryIds
-            .contains(t.projectBeneficiaryClientReferenceId))
+            .contains(t.projectBeneficiaryClientReferenceId) &&
+            t.status != Status.closeHousehold.toValue())
         .toList();
     final taskIds = tasks?.map((t) => t.clientReferenceId).toList() ?? [];
 
