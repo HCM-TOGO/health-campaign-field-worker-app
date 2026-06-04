@@ -59,7 +59,7 @@ class _CustomRecordReferralDetailsPageState
   // static const _referredByKey = 'referredBy';
   static const _genderKey = 'gender';
   // static const _cycleKey = 'cycle';
-  static const _beneficiaryIdKey = '';
+  static const _beneficiaryIdKey = 'beneficiaryId';
   static const _referralCodeKey = 'referralCode';
   static const _ageKey = 'ageInMonths';
 
@@ -69,6 +69,7 @@ class _CustomRecordReferralDetailsPageState
 
   String selectedReasonIndex = '';
   final clickedStatus = ValueNotifier<bool>(false);
+  final _referralReasonShowError = ValueNotifier<bool>(false);
 
   // ---- helpers reading from bloc state ----
 
@@ -131,7 +132,25 @@ class _CustomRecordReferralDetailsPageState
   @override
   void dispose() {
     clickedStatus.dispose();
+    _referralReasonShowError.dispose();
     super.dispose();
+  }
+
+  bool _validateBeforeSubmit(FormGroup form, {required bool viewOnly}) {
+    form.markAllAsTouched();
+    final reason = form.control(_referralReason).value;
+    final reasonEmpty = reason == null || reason.toString().trim().isEmpty;
+    if (!viewOnly && reasonEmpty) {
+      _referralReasonShowError.value = true;
+      clickedStatus.value = false;
+      return false;
+    }
+    _referralReasonShowError.value = false;
+    if (!form.valid) {
+      clickedStatus.value = false;
+      return false;
+    }
+    return true;
   }
 
   /// Re-enable submit after returning from the checklist without completing it.
@@ -238,9 +257,6 @@ class _CustomRecordReferralDetailsPageState
                             form.control(_ageKey).value != ageMonths) {
                           form.control(_ageKey).value = ageMonths;
                         }
-                        // Referral reason
-                        form.control(_referralReason).value =
-                            _sideEffectServiceCode;
                       } else if (!isSideEffect) {
                         final isViewOnly = recordState.mapOrNull(
                               create: (value) => value.viewOnly,
@@ -304,87 +320,49 @@ class _CustomRecordReferralDetailsPageState
                                           onPressed: isClicked
                                               ? () {}
                                               : () async {
-                                                  if (form
-                                                          .control(_genderKey)
-                                                          .value ==
-                                                      null) {
-                                                    clickedStatus.value = false;
-                                                    form
-                                                        .control(_genderKey)
-                                                        .setErrors({'': true});
-                                                  } else if (form
-                                                          .control(
-                                                              _referralReason)
-                                                          .value ==
-                                                      null) {
-                                                    clickedStatus.value = false;
-                                                    form
-                                                        .control(
-                                                            _referralReason)
-                                                        .setErrors({'': true});
-                                                  } else if (form
-                                                          .control(
-                                                              _beneficiaryIdKey)
-                                                          .value ==
-                                                      null) {
-                                                    clickedStatus.value = false;
-                                                    form
-                                                        .control(
-                                                            _beneficiaryIdKey)
-                                                        .setErrors({'': true});
+                                                  if (!_validateBeforeSubmit(
+                                                    form,
+                                                    viewOnly: viewOnly,
+                                                  )) {
+                                                    return;
                                                   }
-
-                                                  form.markAllAsTouched();
 
                                                   if (viewOnly) {
                                                     final symptom = form
                                                         .control(
                                                             _referralReason)
                                                         .value as String;
-                                                    if (symptom.toUpperCase() ==
-                                                        'SICK') {
-                                                      context.router.popUntil(
-                                                          (route) =>
-                                                              route.settings
-                                                                  .name ==
-                                                              CustomSearchReferralReconciliationsRoute
-                                                                  .name);
-                                                      context.router.maybePop();
-                                                    } else {
-                                                      context
-                                                          .read<
-                                                              ReferralReconServiceDefinitionBloc>()
-                                                          .add(
-                                                            ReferralReconServiceDefinitionSelectionEvent(
-                                                              serviceDefinitionCode:
-                                                                  symptom,
-                                                            ),
-                                                          );
-                                                      context
-                                                          .read<ServiceBloc>()
-                                                          .add(
-                                                            ServiceSearchEvent(
-                                                              serviceSearchModel:
-                                                                  ServiceSearchModel(
-                                                                relatedClientReferenceId:
-                                                                    recordState
-                                                                        .mapOrNull(
-                                                                  create: (value) => value
-                                                                          .viewOnly
-                                                                      ? value
-                                                                          .hfReferralModel
-                                                                          ?.clientReferenceId
-                                                                      : null,
-                                                                ),
+                                                    context
+                                                        .read<
+                                                            ReferralReconServiceDefinitionBloc>()
+                                                        .add(
+                                                          ReferralReconServiceDefinitionSelectionEvent(
+                                                            serviceDefinitionCode:
+                                                                symptom,
+                                                          ),
+                                                        );
+                                                    context
+                                                        .read<ServiceBloc>()
+                                                        .add(
+                                                          ServiceSearchEvent(
+                                                            serviceSearchModel:
+                                                                ServiceSearchModel(
+                                                              relatedClientReferenceId:
+                                                                  recordState
+                                                                      .mapOrNull(
+                                                                create: (value) => value
+                                                                        .viewOnly
+                                                                    ? value
+                                                                        .hfReferralModel
+                                                                        ?.clientReferenceId
+                                                                    : null,
                                                               ),
                                                             ),
-                                                          );
-                                                      context.router.push(
-                                                        CustomReferralReasonChecklistPreviewRoute(),
-                                                      );
-                                                    }
-                                                  } else if (!form.valid) {
-                                                    return;
+                                                          ),
+                                                        );
+                                                    context.router.push(
+                                                      CustomReferralReasonChecklistPreviewRoute(),
+                                                    );
                                                   } else if (value
                                                       .serviceDefinitionList
                                                       .isEmpty) {
@@ -735,19 +713,12 @@ class _CustomRecordReferralDetailsPageState
                                             onPressed: isClicked
                                                 ? () {}
                                                 : () async {
-                                                    if (form
-                                                            .control(_genderKey)
-                                                            .value ==
-                                                        null) {
-                                                      clickedStatus.value =
-                                                          false;
-                                                      form
-                                                          .control(_genderKey)
-                                                          .setErrors(
-                                                              {'': true});
+                                                    if (!_validateBeforeSubmit(
+                                                      form,
+                                                      viewOnly: viewOnly,
+                                                    )) {
+                                                      return;
                                                     }
-                                                    form.markAllAsTouched();
-                                                    if (form.invalid) return;
 
                                                     if (viewOnly) {
                                                       final symptom = form
@@ -846,8 +817,6 @@ class _CustomRecordReferralDetailsPageState
                                                               recordState,
                                                         );
                                                       }
-                                                    } else if (!form.valid) {
-                                                      return;
                                                     } else if (value
                                                         .serviceDefinitionList
                                                         .isEmpty) {
@@ -1250,11 +1219,6 @@ class _CustomRecordReferralDetailsPageState
                                                 localizations.translate(
                                                   i18.common.corecommonRequired,
                                                 ),
-                                            'onlyAlphabets': (_) =>
-                                                localizations.translate(
-                                                  i18_local.individualDetails
-                                                      .onlyAlphabetsValidationMessage,
-                                                ),
                                           },
                                           formControlName: _beneficiaryIdKey,
                                           showErrors: (control) =>
@@ -1272,7 +1236,7 @@ class _CustomRecordReferralDetailsPageState
                                                 inputFormatters: [
                                                   FilteringTextInputFormatter
                                                       .allow(
-                                                    RegExp(r'[A-Z0-9-]'),
+                                                    RegExp(r'[A-Za-z0-9-]'),
                                                   ),
                                                   UpperCaseTextFormatter(),
                                                 ],
@@ -1455,103 +1419,81 @@ class _CustomRecordReferralDetailsPageState
                                               .firstOrNull,
                                     );
                                   }
+                                  final reasonOptions = (isSideEffect
+                                          ? ReferralReconSingleton()
+                                              .referralReasons
+                                              .where((r) => r
+                                                  .toString()
+                                                  .toUpperCase()
+                                                  .contains('SIDE_EFFECT'))
+                                          : ReferralReconSingleton()
+                                              .referralReasons
+                                              .where((r) => !r
+                                                  .toString()
+                                                  .toUpperCase()
+                                                  .contains('SIDE_EFFECT')))
+                                      .map((r) {
+                                    final code = r.toString().toUpperCase();
+                                    final translated =
+                                        localizations.translate(code);
+                                    final displayName = translated == code
+                                        ? code
+                                            .split('_')
+                                            .where((w) => w.isNotEmpty)
+                                            .map((w) =>
+                                                '${w[0].toUpperCase()}${w.substring(1).toLowerCase()}')
+                                            .join(' ')
+                                        : translated;
+                                    return RadioButtonModel(
+                                      code: code,
+                                      name: displayName,
+                                    );
+                                  }).toList();
+
                                   return DigitCard(
                                       cardType: CardType.primary,
                                       margin: const EdgeInsets.all(spacer2),
                                       children: [
                                         SizedBox(
                                           width: double.infinity,
-                                          child: ReactiveWrapperField<String>(
-                                              formControlName: _referralReason,
-                                              validationMessages: {
-                                                'required': (_) =>
-                                                    localizations.translate(
-                                                      i18.common
-                                                          .corecommonRequired,
-                                                    ),
-                                              },
-                                              showErrors: (control) =>
-                                                  control.invalid &&
-                                                  control.touched,
-                                              // Ensures error is shown if invalid and touched
-                                              builder: (field) {
-                                                return LabeledField(
-                                                  isRequired: true,
-                                                  label:
-                                                      localizations.translate(
-                                                    i18.referralReconciliation
-                                                        .reasonForReferralHeader,
-                                                  ),
-                                                  child: RadioList(
-                                                    readOnly: viewOnly,
-                                                    onChanged: (val) {
-                                                      form
+                                          child: ValueListenableBuilder<bool>(
+                                            valueListenable:
+                                                _referralReasonShowError,
+                                            builder: (context, showError, _) {
+                                              return LabeledField(
+                                                isRequired: true,
+                                                label: localizations.translate(
+                                                  i18.referralReconciliation
+                                                      .reasonForReferralHeader,
+                                                ),
+                                                child: RadioList(
+                                                  readOnly: viewOnly,
+                                                  onChanged: (val) {
+                                                    form
+                                                        .control(
+                                                            _referralReason)
+                                                        .value = val.code;
+                                                    _referralReasonShowError
+                                                        .value = false;
+                                                    setState(() {});
+                                                  },
+                                                  groupValue: form
                                                           .control(
                                                               _referralReason)
-                                                          .markAsTouched();
-                                                      form
-                                                          .control(
-                                                              _referralReason)
-                                                          .value = val.code;
-                                                    },
-                                                    groupValue: form
-                                                            .control(
-                                                                _referralReason)
-                                                            .value ??
-                                                        "",
-                                                    errorMessage:
-                                                        field.errorText,
-                                                    radioDigitButtons:
-                                                        (isSideEffect
-                                                                // Side-effect mode: show only the
-                                                                // SIDE_EFFECT reason from the
-                                                                // backend-provided referralReasons.
-                                                                ? ReferralReconSingleton()
-                                                                    .referralReasons
-                                                                    .where((r) => r
-                                                                        .toString()
-                                                                        .toUpperCase()
-                                                                        .contains(
-                                                                            'SIDE_EFFECT'))
-                                                                    .toList()
-                                                                // Normal mode: exclude side-effect
-                                                                // reasons.
-                                                                : ReferralReconSingleton()
-                                                                    .referralReasons
-                                                                    .where((r) => !r
-                                                                        .toString()
-                                                                        .toUpperCase()
-                                                                        .contains(
-                                                                            'SIDE_EFFECT'))
-                                                                    .toList())
-                                                            .map((r) {
-                                                      final code = r
-                                                          .toString()
-                                                          .toUpperCase();
-                                                      // Translate if the key exists;
-                                                      // if the library echoes the key
-                                                      // back, fall back to title-case.
-                                                      final translated =
-                                                          localizations
-                                                              .translate(code);
-                                                      final displayName = translated ==
-                                                              code
-                                                          ? code
-                                                              .split('_')
-                                                              .where((w) =>
-                                                                  w.isNotEmpty)
-                                                              .map((w) =>
-                                                                  '${w[0].toUpperCase()}${w.substring(1).toLowerCase()}')
-                                                              .join(' ')
-                                                          : translated;
-                                                      return RadioButtonModel(
-                                                        code: code,
-                                                        name: displayName,
-                                                      );
-                                                    }).toList(),
-                                                  ),
-                                                );
-                                              }),
+                                                          .value
+                                                          ?.toString() ??
+                                                      '',
+                                                  errorMessage: showError
+                                                      ? localizations.translate(
+                                                          i18.common
+                                                              .corecommonRequired)
+                                                      : null,
+                                                  radioDigitButtons:
+                                                      reasonOptions,
+                                                ),
+                                              );
+                                            },
+                                          ),
                                         ),
                                       ]);
                                 }),
