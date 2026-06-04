@@ -104,19 +104,10 @@ class _CustomHouseholdOverviewPageState
                         return true;
                       },
                       child: ScrollableContent(
-                        header: Padding(
-                          padding: const EdgeInsets.only(bottom: spacer2),
+                        header: const Padding(
+                          padding: EdgeInsets.only(bottom: spacer2),
                           child: CustomBackNavigationHelpHeaderWidget(
                             showHelp: false,
-                            handleback: () {
-                              context
-                                  .read<SearchHouseholdsBloc>()
-                                  .add(const SearchHouseholdsEvent.clear());
-                              (context.router.parent() as StackRouter)
-                                  .popUntilRouteWithName(
-                                CustomSearchBeneficiaryRoute.name,
-                              );
-                            },
                           ),
                         ),
                         enableFixedDigitButton: true,
