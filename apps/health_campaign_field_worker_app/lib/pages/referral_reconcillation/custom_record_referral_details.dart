@@ -1270,6 +1270,10 @@ class _CustomRecordReferralDetailsPageState
                                                   .toString(),
                                               child: DigitTextFormInput(
                                                 inputFormatters: [
+                                                  FilteringTextInputFormatter
+                                                      .allow(
+                                                    RegExp(r'[A-Z0-9-]'),
+                                                  ),
                                                   UpperCaseTextFormatter(),
                                                 ],
                                                 onChange: (val) => {
