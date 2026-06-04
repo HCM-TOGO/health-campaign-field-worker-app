@@ -564,7 +564,18 @@ class _CustomSearchBeneficiaryPageState
                                                 Status.closeHousehold
                                                     .toValue() &&
                                             (householdMemberWrapper.tasks ?? [])
-                                                .isNotEmpty) ||
+                                                .isNotEmpty &&
+                                            (householdMemberWrapper
+                                                        .projectBeneficiaries !=
+                                                    null &&
+                                                (householdMemberWrapper
+                                                            .projectBeneficiaries ??
+                                                        [])
+                                                    .isNotEmpty &&
+                                                householdMemberWrapper
+                                                        .projectBeneficiaries
+                                                        ?.length ==
+                                                    1)) ||
                                         (householdMemberWrapper
                                                     .projectBeneficiaries ??
                                                 [])

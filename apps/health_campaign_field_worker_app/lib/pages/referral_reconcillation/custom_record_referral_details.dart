@@ -282,12 +282,23 @@ class _CustomRecordReferralDetailsPageState
                                           mainAxisSize: MainAxisSize.max,
                                           label: localizations
                                               .translate(recordState.mapOrNull(
-                                                    create: (value) => value
-                                                            .viewOnly
-                                                        ? i18.common
-                                                            .coreCommonNext
-                                                        : i18.common
-                                                            .coreCommonSubmit,
+                                                    create: (value) {
+                                                      if (!value.viewOnly) {
+                                                        return i18.common
+                                                            .coreCommonSubmit;
+                                                      }
+                                                      final symptom = form
+                                                          .control(
+                                                              _referralReason)
+                                                          .value
+                                                          ?.toString()
+                                                          .toUpperCase();
+                                                      return symptom == 'SICK'
+                                                          ? i18.common
+                                                              .corecommonclose
+                                                          : i18.common
+                                                              .coreCommonNext;
+                                                    },
                                                   ) ??
                                                   i18.common.coreCommonSubmit),
                                           onPressed: isClicked
@@ -330,37 +341,48 @@ class _CustomRecordReferralDetailsPageState
                                                         .control(
                                                             _referralReason)
                                                         .value as String;
-                                                    context
-                                                        .read<
-                                                            ReferralReconServiceDefinitionBloc>()
-                                                        .add(
-                                                          ReferralReconServiceDefinitionSelectionEvent(
-                                                            serviceDefinitionCode:
-                                                                symptom,
-                                                          ),
-                                                        );
-                                                    context
-                                                        .read<ServiceBloc>()
-                                                        .add(
-                                                          ServiceSearchEvent(
-                                                            serviceSearchModel:
-                                                                ServiceSearchModel(
-                                                              relatedClientReferenceId:
-                                                                  recordState
-                                                                      .mapOrNull(
-                                                                create: (value) => value
-                                                                        .viewOnly
-                                                                    ? value
-                                                                        .hfReferralModel
-                                                                        ?.clientReferenceId
-                                                                    : null,
+                                                    if (symptom.toUpperCase() ==
+                                                        'SICK') {
+                                                      context.router.popUntil(
+                                                          (route) =>
+                                                              route.settings
+                                                                  .name ==
+                                                              CustomSearchReferralReconciliationsRoute
+                                                                  .name);
+                                                      context.router.maybePop();
+                                                    } else {
+                                                      context
+                                                          .read<
+                                                              ReferralReconServiceDefinitionBloc>()
+                                                          .add(
+                                                            ReferralReconServiceDefinitionSelectionEvent(
+                                                              serviceDefinitionCode:
+                                                                  symptom,
+                                                            ),
+                                                          );
+                                                      context
+                                                          .read<ServiceBloc>()
+                                                          .add(
+                                                            ServiceSearchEvent(
+                                                              serviceSearchModel:
+                                                                  ServiceSearchModel(
+                                                                relatedClientReferenceId:
+                                                                    recordState
+                                                                        .mapOrNull(
+                                                                  create: (value) => value
+                                                                          .viewOnly
+                                                                      ? value
+                                                                          .hfReferralModel
+                                                                          ?.clientReferenceId
+                                                                      : null,
+                                                                ),
                                                               ),
                                                             ),
-                                                          ),
-                                                        );
-                                                    context.router.push(
-                                                      CustomReferralReasonChecklistPreviewRoute(),
-                                                    );
+                                                          );
+                                                      context.router.push(
+                                                        CustomReferralReasonChecklistPreviewRoute(),
+                                                      );
+                                                    }
                                                   } else if (!form.valid) {
                                                     return;
                                                   } else if (value
@@ -690,12 +712,23 @@ class _CustomRecordReferralDetailsPageState
                                             mainAxisSize: MainAxisSize.max,
                                             label: localizations.translate(
                                                 recordState.mapOrNull(
-                                                      create: (value) => value
-                                                              .viewOnly
-                                                          ? i18.common
-                                                              .coreCommonNext
-                                                          : i18.common
-                                                              .coreCommonSubmit,
+                                                      create: (value) {
+                                                        if (!value.viewOnly) {
+                                                          return i18.common
+                                                              .coreCommonSubmit;
+                                                        }
+                                                        final symptom = form
+                                                            .control(
+                                                                _referralReason)
+                                                            .value
+                                                            ?.toString()
+                                                            .toUpperCase();
+                                                        return symptom == 'SICK'
+                                                            ? i18_local.common
+                                                                .corecommonclose
+                                                            : i18.common
+                                                                .coreCommonNext;
+                                                      },
                                                     ) ??
                                                     i18.common
                                                         .coreCommonSubmit),
@@ -725,7 +758,19 @@ class _CustomRecordReferralDetailsPageState
                                                           .control(
                                                               _beneficiaryIdKey)
                                                           .value as String?;
-                                                      if (value1.isNotEmpty) {
+                                                      if (symptom
+                                                              .toUpperCase() ==
+                                                          'SICK') {
+                                                        context.router.popUntil(
+                                                            (route) =>
+                                                                route.settings
+                                                                    .name ==
+                                                                CustomSearchReferralReconciliationsRoute
+                                                                    .name);
+                                                        context.router
+                                                            .maybePop();
+                                                      } else if (value1
+                                                          .isNotEmpty) {
                                                         context
                                                             .read<
                                                                 ReferralReconServiceDefinitionBloc>()
