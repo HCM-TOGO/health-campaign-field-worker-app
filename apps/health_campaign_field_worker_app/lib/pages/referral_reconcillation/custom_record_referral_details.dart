@@ -250,11 +250,13 @@ class _CustomRecordReferralDetailsPageState
                         if (form.control(_genderKey).value != genderVal) {
                           form.control(_genderKey).value = genderVal;
                         }
-                        // Age in months (DOB is app-formatted, not ISO-only)
+                        // Age in months (DOB is app-formatted, not ISO-only).
+                        // Only pre-fill when the field is still empty so the
+                        // user's manual edits aren't overwritten on rebuild.
                         final ageMonths =
                             _ageInMonthsFromDob(individual.dateOfBirth);
                         if (ageMonths != null &&
-                            form.control(_ageKey).value != ageMonths) {
+                            form.control(_ageKey).value == null) {
                           form.control(_ageKey).value = ageMonths;
                         }
                       } else if (!isSideEffect) {
@@ -1419,19 +1421,27 @@ class _CustomRecordReferralDetailsPageState
                                               .firstOrNull,
                                     );
                                   }
+                                  final allReferralReasons =
+                                      ReferralReconSingleton().referralReasons;
+                                  final sideEffectReasons = allReferralReasons
+                                      .where((r) => r
+                                          .toString()
+                                          .toUpperCase()
+                                          .contains('SIDE_EFFECT'))
+                                      .toList();
+                                  // Side-effect mode normally shows only the
+                                  // SIDE_EFFECT-tagged reasons, but some backend
+                                  // configs don't define any. In that case fall
+                                  // back to the full reason list so the user
+                                  // still sees options.
                                   final reasonOptions = (isSideEffect
-                                          ? ReferralReconSingleton()
-                                              .referralReasons
-                                              .where((r) => r
-                                                  .toString()
-                                                  .toUpperCase()
-                                                  .contains('SIDE_EFFECT'))
-                                          : ReferralReconSingleton()
-                                              .referralReasons
-                                              .where((r) => !r
-                                                  .toString()
-                                                  .toUpperCase()
-                                                  .contains('SIDE_EFFECT')))
+                                          ? (sideEffectReasons.isNotEmpty
+                                              ? sideEffectReasons
+                                              : allReferralReasons)
+                                          : allReferralReasons.where((r) => !r
+                                              .toString()
+                                              .toUpperCase()
+                                              .contains('SIDE_EFFECT')))
                                       .map((r) {
                                     final code = r.toString().toUpperCase();
                                     final translated =
@@ -1625,11 +1635,13 @@ class _CustomRecordReferralDetailsPageState
                         '')
                     : null,
               ),
-        disabled: individual != null ||
-            (referralState.mapOrNull(
-                  create: (value) => value.viewOnly,
-                ) ??
-                false),
+        // Age stays editable in side-effect mode (pre-filled from DOB but the
+        // user may correct it); only locked in view-only mode. Keeping it
+        // enabled also lets the campaign min/max validators run on edits.
+        disabled: referralState.mapOrNull(
+              create: (value) => value.viewOnly,
+            ) ??
+            false,
         validators: (ReferralReconSingleton()
                         .validIndividualAgeForCampaign
                         .validMaxAge !=

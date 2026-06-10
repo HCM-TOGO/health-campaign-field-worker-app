@@ -240,7 +240,18 @@ class MainApplicationState extends State<MainApplication>
 
                     final localizationModulesList = appConfig.backendInterface;
                     var firstLanguage;
-                    firstLanguage = appConfig.languages?.firstOrNull?.value;
+                    // Default the app to French: prefer the language whose value
+                    // starts with 'fr', falling back to the first configured
+                    // language. This locale is used both to load/store the
+                    // localization strings and as the default selected locale,
+                    // so they must stay in sync.
+                    firstLanguage = (appConfig.languages
+                                ?.where((element) => element.value
+                                    .toLowerCase()
+                                    .startsWith('fr'))
+                                .firstOrNull ??
+                            appConfig.languages?.firstOrNull)
+                        ?.value;
 
                     final selectedLocale =
                         AppSharedPreferences().getSelectedLocale ??

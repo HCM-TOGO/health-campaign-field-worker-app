@@ -73,6 +73,22 @@ class CustomSurveyFormViewPageState
     return (code == "UHFWA_Q7" || code == "CDD_UPA_Q5" || code == "UHFA_Q3");
   }
 
+  /// Parses a survey date string regardless of whether it came from the
+  /// initial value (`d MMM yyyy`, e.g. "5 Jun 2026") or from the date picker,
+  /// which writes `dd/MM/yyyy` (e.g. "12/04/2026"). Returns null if neither
+  /// format matches so callers can fall back gracefully.
+  DateTime? parseSurveyDate(String value) {
+    final trimmed = value.trim();
+    for (final format in ['dd/MM/yyyy', 'd MMM yyyy']) {
+      try {
+        return DateFormat(format).parseStrict(trimmed);
+      } catch (_) {
+        // Try the next supported format.
+      }
+    }
+    return null;
+  }
+
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
@@ -241,11 +257,7 @@ class CustomSurveyFormViewPageState
                                                               .trim()
                                                               .isNotEmpty
                                                           ? (isDateAttribute(attribute?[i].code)
-                                                              ? DateFormat('d MMM yyyy')
-                                                                  .parse(controller[i]
-                                                                      .text
-                                                                      .toString())
-                                                                  .millisecondsSinceEpoch
+                                                              ? (parseSurveyDate(controller[i].text.toString())?.millisecondsSinceEpoch ?? DateTime.now().millisecondsSinceEpoch)
                                                                   .toString()
                                                               : controller[i]
                                                                   .text
@@ -263,7 +275,9 @@ class CustomSurveyFormViewPageState
                                                                   : '0')
                                                       : visibleSurveyFormIndexes
                                                               .contains(i)
-                                                          ? controller[i].text.toString()
+                                                          ? controller[i]
+                                                              .text
+                                                              .toString()
                                                           : i18.surveyForm.notSelectedKey,
                                               rowVersion: 1,
                                               additionalDetails:
@@ -508,7 +522,7 @@ class CustomSurveyFormViewPageState
                                               readOnly: true,
                                               errorMessage: field.errorText,
                                               initialValue:
-                                                  DateFormat('d MMM yyyy')
+                                                  DateFormat('dd/MM/yyyy')
                                                       .format(DateTime.now())
                                                       .toString(),
                                               controller: controller[index],
