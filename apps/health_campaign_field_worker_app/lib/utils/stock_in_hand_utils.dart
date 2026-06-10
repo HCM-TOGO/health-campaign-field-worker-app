@@ -8,6 +8,7 @@ class StockInHandResult {
   final double returned;
   final double damaged;
   final double lost;
+  final double dispatched;
   final double administered;
   final bool isDistributor;
 
@@ -16,13 +17,14 @@ class StockInHandResult {
     required this.returned,
     required this.damaged,
     required this.lost,
+    required this.dispatched,
     required this.administered,
     required this.isDistributor,
   });
 
   double get stockInHand => isDistributor
-      ? received - (returned + damaged + lost) - administered
-      : received + returned - (damaged + lost) - administered;
+      ? received - (returned + damaged + lost + dispatched) - administered
+      : received + returned - (damaged + lost + dispatched) - administered;
 }
 
 String _additionalFieldValue(StockModel stock, String key) {
@@ -72,6 +74,7 @@ StockInHandResult calculateStockInHand({
   double returned = 0;
   double damaged = 0;
   double lost = 0;
+  double dispatched = 0;
 
   final ownerIds = stockOwnerIds.where((e) => e.isNotEmpty).toSet();
   if (ownerIds.isEmpty) {
@@ -80,6 +83,7 @@ StockInHandResult calculateStockInHand({
       returned: 0,
       damaged: 0,
       lost: 0,
+      dispatched: 0,
       administered: 0,
       isDistributor: isDistributor,
     );
@@ -104,9 +108,23 @@ StockInHandResult calculateStockInHand({
       received += qty;
     }
 
-    if (_isReturned(stock)) returned += qty;
-    if (_isDamaged(stock)) damaged += qty;
-    if (_isLost(stock)) lost += qty;
+    final isReturned = _isReturned(stock);
+    final isDamaged = _isDamaged(stock);
+    final isLost = _isLost(stock);
+
+    if (isReturned) returned += qty;
+    if (isDamaged) damaged += qty;
+    if (isLost) lost += qty;
+
+    // Stock dispatched (sent) out of the owner's hands reduces stock-in-hand.
+    // Returned/damaged/lost are already accounted for above, so exclude them.
+    if (ownerIds.contains(stock.senderId) &&
+        transactionType == 'DISPATCHED' &&
+        !isReturned &&
+        !isDamaged &&
+        !isLost) {
+      dispatched += qty;
+    }
   }
 
   double administered = 0;
@@ -126,6 +144,7 @@ StockInHandResult calculateStockInHand({
     returned: returned,
     damaged: damaged,
     lost: lost,
+    dispatched: dispatched,
     administered: administered,
     isDistributor: isDistributor,
   );
