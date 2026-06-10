@@ -306,6 +306,14 @@ class CustomWarehouseDetailsPageState
                                 .translate('FAC_${teamFacilities.first.id}');
                             controller1.text = localizations
                                 .translate('FAC_${teamFacilities.first.id}');
+                            // Restore the required team code, which gets cleared
+                            // when the warehouse field is tapped (see onTap below).
+                            // Without this the form stays invalid after reselecting
+                            // the warehouse and the submit button gets stuck.
+                            form.control(_teamCodeKey).value =
+                                context.loggedInUser.userName.toString() +
+                                    Constants.pipeSeparator +
+                                    context.loggedInUserUuid;
                             selectedFacilityId = teamFacilities.first.id;
                             deliveryTeamSelected = true;
                           }
