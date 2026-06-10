@@ -219,6 +219,8 @@ class CustomHouseHoldDetailsPageState
                                   clientReferenceId:
                                       householdModel?.clientReferenceId ??
                                           IdGen.i.identifier,
+                                  householdType: RegistrationDeliverySingleton()
+                                      .householdType,
                                   clientAuditDetails: ClientAuditDetails(
                                     createdBy: RegistrationDeliverySingleton()
                                         .loggedInUserUuid
@@ -279,6 +281,8 @@ class CustomHouseHoldDetailsPageState
                               var household = householdModel.copyWith(
                                   memberCount: memberCount,
                                   address: addressModel,
+                                  householdType: RegistrationDeliverySingleton()
+                                      .householdType,
                                   clientAuditDetails: (householdModel
                                                   .clientAuditDetails
                                                   ?.createdBy !=
