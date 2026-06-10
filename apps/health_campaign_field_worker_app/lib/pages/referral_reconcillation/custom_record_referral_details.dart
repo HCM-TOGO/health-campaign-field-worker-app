@@ -138,9 +138,17 @@ class _CustomRecordReferralDetailsPageState
 
   bool _validateBeforeSubmit(FormGroup form, {required bool viewOnly}) {
     form.markAllAsTouched();
+    // In view-only mode every control is built `disabled: true`, so the whole
+    // FormGroup reports status DISABLED and `form.valid` is always false.
+    // Gating on validity here would silently block the Next button, so skip
+    // it — the data is already pre-filled and there is nothing to validate.
+    if (viewOnly) {
+      _referralReasonShowError.value = false;
+      return true;
+    }
     final reason = form.control(_referralReason).value;
     final reasonEmpty = reason == null || reason.toString().trim().isEmpty;
-    if (!viewOnly && reasonEmpty) {
+    if (reasonEmpty) {
       _referralReasonShowError.value = true;
       clickedStatus.value = false;
       return false;

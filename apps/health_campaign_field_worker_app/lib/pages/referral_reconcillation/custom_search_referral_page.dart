@@ -252,9 +252,12 @@ class _CustomSearchReferralReconciliationsPageState
         projectBeneficiaries?.map((e) => e.clientReferenceId).toList() ?? [];
 
     final tasks = source.tasks
-        ?.where((t) => projectBeneficiaryIds
-            .contains(t.projectBeneficiaryClientReferenceId) &&
-            t.status != Status.closeHousehold.toValue())
+        ?.where((t) =>
+            projectBeneficiaryIds
+                .contains(t.projectBeneficiaryClientReferenceId) &&
+            (t.status == Status.administeredSuccess.toValue() ||
+                t.status == Status.delivered.toValue() ||
+                t.status == Status.beneficiaryReferred.toValue()))
         .toList();
     final taskIds = tasks?.map((t) => t.clientReferenceId).toList() ?? [];
 
