@@ -59,7 +59,7 @@ class SummaryReportBloc extends Bloc<SummaryReportEvent, SummaryReportState> {
     List<ProjectBeneficiaryModel> projectBeneficiaryListData = [];
     List<IndividualModel> individualListData = [];
     final currentCycle =
-        RegistrationDeliverySingleton().projectType?.cycles?.firstWhere(
+        RegistrationDeliverySingleton().projectType?.cycles?.firstWhereOrNull(
               (e) =>
                   (e.startDate) < DateTime.now().millisecondsSinceEpoch &&
                   (e.endDate) > DateTime.now().millisecondsSinceEpoch,
