@@ -1229,7 +1229,7 @@ class _CustomHouseholdOverviewPageState
             RegistrationDeliverySingleton().beneficiaryType!,
       ),
     );
-    await context.router.push(
+    await context.router.pushAndPopUntil(
       CustomBeneficiaryRegistrationWrapperRoute(
         initialState: BeneficiaryRegistrationAddMemberState(
           addressModel: address,
@@ -1239,6 +1239,7 @@ class _CustomHouseholdOverviewPageState
           CustomIndividualDetailsRoute(),
         ],
       ),
+      predicate: (route) => route.isFirst,
     );
   }
 

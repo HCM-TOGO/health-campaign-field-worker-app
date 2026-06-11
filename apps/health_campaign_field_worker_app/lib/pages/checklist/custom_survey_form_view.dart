@@ -416,7 +416,7 @@ class CustomSurveyFormViewPageState
                           ),
                         ),
                         ...initialAttributes!
-                            .where((att) => att.isActive == true)
+                            .where((att) => att.isActive == true && !(att.code ?? '').contains('.'))
                             .map((
                           e,
                         ) {
@@ -687,6 +687,7 @@ class CustomSurveyFormViewPageState
                               if (!(e.code ?? '').contains('.'))
                                 DigitCard(
                                     cardType: CardType.secondary,
+                                    margin: EdgeInsets.zero,
                                     children: [
                                       _buildSurveyForm(
                                         e,
@@ -739,7 +740,6 @@ class CustomSurveyFormViewPageState
                                                             .coreCommonReasonRequired,
                                                       );
                                                     }
-
                                                     return null;
                                                   },
                                                   builder: (field) =>
@@ -1334,8 +1334,7 @@ class CustomSurveyFormViewPageState
             childItem.code!.startsWith('$parentCode.$parentControllerValue.')))
           DigitCard(
               cardType: CardType.secondary,
-              margin: const EdgeInsets.only(
-                  bottom: spacer2, left: spacer2, right: spacer2),
+              margin: const EdgeInsets.only(bottom: spacer1),
               children: [
                 _buildSurveyForm(
                     matchingChildItem,
