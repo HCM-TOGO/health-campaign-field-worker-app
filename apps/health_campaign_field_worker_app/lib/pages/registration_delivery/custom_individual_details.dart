@@ -1518,7 +1518,7 @@ class CustomIndividualDetailsPageState
             return savedIdType;
           }
           // For DEFAULT or missing, fall back to identifierType from identifiers
-          return individual?.identifiers?.firstOrNull?.identifierType;
+          return individual?.identifiers?.firstOrNull?.identifierType ?? 'DEFAULT';
         }(),
       ),
       _idNumberKey: FormControl<String>(
