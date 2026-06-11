@@ -311,6 +311,7 @@ class CustomDigitDobPicker extends LocalizedStatefulWidget {
   final String? monthErrorMessage;
   final DateTime? initialDate;
   final String? requiredErrMsg;
+  final bool isRequired;
   final void Function(DateTime?)? onChangeOfFormControl;
 
   const CustomDigitDobPicker({
@@ -335,6 +336,7 @@ class CustomDigitDobPicker extends LocalizedStatefulWidget {
     this.cancelText = 'Cancel',
     this.requiredErrMsg,
     this.onChangeOfFormControl,
+    this.isRequired = false,
   });
 
   @override
@@ -441,6 +443,7 @@ class _DigitDobPickerState extends LocalizedState<CustomDigitDobPicker> {
               children: [
                 LabeledField(
                   label: widget.datePickerLabel,
+                  isRequired: widget.isRequired,
                   child: DigitDateFormInput(
                     readOnly: widget.readOnly,
                     editable: false,

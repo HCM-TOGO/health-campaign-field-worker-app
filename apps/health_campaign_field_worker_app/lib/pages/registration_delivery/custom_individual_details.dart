@@ -830,6 +830,7 @@ class CustomIndividualDetailsPageState
                                         : i18_local.individualDetails
                                             .nameLabelTextNewUpdate,
                                   ),
+                                  isRequired: true,
                                   child: DigitTextFormInput(
                                     inputFormatters: [
                                       UpperCaseTextFormatter(),
@@ -1054,6 +1055,7 @@ class CustomIndividualDetailsPageState
                             requiredErrMsg: localizations.translate(
                               i18.common.corecommonRequired,
                             ),
+                            isRequired: true,
                             onChangeOfFormControl: (dob) {
                               final control = form.control(_dobKey);
                               if (dob == null) {
@@ -1083,6 +1085,7 @@ class CustomIndividualDetailsPageState
                           label: localizations.translate(
                             i18.individualDetails.genderLabelText,
                           ),
+                          isRequired: true,
                           valueMapper: (value) =>
                               localizations.translate(value),
                           initialValue: form.control(_genderKey).value,
@@ -1518,7 +1521,8 @@ class CustomIndividualDetailsPageState
             return savedIdType;
           }
           // For DEFAULT or missing, fall back to identifierType from identifiers
-          return individual?.identifiers?.firstOrNull?.identifierType ?? 'DEFAULT';
+          return individual?.identifiers?.firstOrNull?.identifierType ??
+              'DEFAULT';
         }(),
       ),
       _idNumberKey: FormControl<String>(
