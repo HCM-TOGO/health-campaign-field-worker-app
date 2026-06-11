@@ -382,10 +382,10 @@ class _CustomHouseholdOverviewPageState
                                                                 ?.additionalFields
                                                                 ?.fields
                                                                 .firstWhereOrNull(
-                                                                  (field) =>
-                                                                      field.key ==
-                                                                      'dateOfRegistration',
-                                                                );
+                                                              (field) =>
+                                                                  field.key ==
+                                                                  'dateOfRegistration',
+                                                            );
                                                             final timestamp = int.tryParse(
                                                                     registrationDateField
                                                                             ?.value
@@ -1243,7 +1243,7 @@ class _CustomHouseholdOverviewPageState
             RegistrationDeliverySingleton().beneficiaryType!,
       ),
     );
-    await context.router.pushAndPopUntil(
+    await context.router.push(
       CustomBeneficiaryRegistrationWrapperRoute(
         initialState: BeneficiaryRegistrationAddMemberState(
           addressModel: address,
@@ -1253,7 +1253,6 @@ class _CustomHouseholdOverviewPageState
           CustomIndividualDetailsRoute(),
         ],
       ),
-      predicate: (route) => route.isFirst,
     );
   }
 

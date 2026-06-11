@@ -60,6 +60,7 @@ class ZeroDoseCheckPage extends LocalizedStatefulWidget {
   final bool? hasSideEffects;
   final SideEffectModel sideEffect;
   final bool isRefused;
+  final ReferralModel? referral;
 
   ZeroDoseCheckPage({
     super.key,
@@ -72,6 +73,7 @@ class ZeroDoseCheckPage extends LocalizedStatefulWidget {
     this.individual,
     this.hasSideEffects = false,
     this.isRefused = false,
+    this.referral,
     SideEffectModel? sideEffect,
     TaskModel? task,
   })  : task = task ?? TaskModel(clientReferenceId: ''),
@@ -504,6 +506,7 @@ class ZeroDoseCheckPageState extends LocalizedState<ZeroDoseCheckPage> {
                                     hasImmunizationCard: hasImmunizationCard,
                                     immunizationCardLost: immunizationCardLost,
                                     receivedPenta1: receivedPenta1,
+                                    referral: widget.referral,
                                   ));
                                 } else {
                                   final shouldSubmit = await DigitDialog.show(
@@ -660,6 +663,14 @@ class ZeroDoseCheckPageState extends LocalizedState<ZeroDoseCheckPage> {
                                   );
                                   if (shouldSubmit ?? false) {
                                     if (context.mounted) {
+                                      if (widget.referral != null) {
+                                        context.read<ReferralBloc>().add(
+                                              ReferralSubmitEvent(
+                                                widget.referral!,
+                                                false,
+                                              ),
+                                            );
+                                      }
                                       if (widget.isChecklistAssessmentDone ==
                                           true) {
                                         final householdMember = context
@@ -756,7 +767,9 @@ class ZeroDoseCheckPageState extends LocalizedState<ZeroDoseCheckPage> {
                                             .add(
                                               DeliverInterventionSubmitEvent(
                                                 task: updatedTask,
-                                                isEditing: true,
+                                                isEditing:
+                                                    deliverState.isEditing ??
+                                                        true,
                                                 boundaryModel:
                                                     RegistrationDeliverySingleton()
                                                         .boundary!,

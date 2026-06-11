@@ -64,7 +64,7 @@ class CustomBeneficiaryAcknowledgementPageState
             };
     } else {
       String? beneficiaryId = widget.selectedIndividual != null
-          ? householdMember!.members
+          ? householdMember?.members
               ?.firstWhereOrNull((member) =>
                   member.clientReferenceId ==
                   widget.selectedIndividual?.clientReferenceId)
@@ -134,11 +134,34 @@ class CustomBeneficiaryAcknowledgementPageState
                             i18.householdDetails.viewHouseHoldDetailsAction,
                           ),
                           onPressed: () {
-                            context.router.popAndPush(
-                              BeneficiaryWrapperRoute(
-                                wrapper: householdMemberWrapper!,
-                              ),
-                            );
+                            final wrapper = householdMemberWrapper!;
+                            // The stale household overview / edit pages are
+                            // still sitting beneath this acknowledgement (see
+                            // the back-to-search handler below), so a plain
+                            // popAndPush would reveal them on back. Rebuild the
+                            // registration-delivery wrapper's stack as
+                            // [search, household overview] so backing out of
+                            // the overview lands on a fresh search page.
+                            context.read<CustomSearchHouseholdsBloc>().add(
+                                  const CustomSearchHouseholdsEvent.clear(),
+                                );
+                            RoutingController? wrapperRouter = context.router;
+                            while (wrapperRouter != null &&
+                                wrapperRouter.routeData.name !=
+                                    CustomRegistrationDeliveryWrapperRoute
+                                        .name) {
+                              wrapperRouter = wrapperRouter.parent();
+                            }
+                            if (wrapperRouter is StackRouter) {
+                              wrapperRouter.replaceAll([
+                                CustomSearchBeneficiaryRoute(),
+                                BeneficiaryWrapperRoute(wrapper: wrapper),
+                              ]);
+                            } else {
+                              context.router.popAndPush(
+                                BeneficiaryWrapperRoute(wrapper: wrapper),
+                              );
+                            }
                           },
                           type: DigitButtonType.primary,
                           size: DigitButtonSize.large),

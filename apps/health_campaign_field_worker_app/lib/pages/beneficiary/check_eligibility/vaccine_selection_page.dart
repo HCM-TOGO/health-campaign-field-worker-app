@@ -66,6 +66,7 @@ class VaccineSelectionPage extends LocalizedStatefulWidget {
   final String? hasImmunizationCard;
   final String? immunizationCardLost;
   final String? receivedPenta1;
+  final ReferralModel? referral;
 
   const VaccineSelectionPage({
     super.key,
@@ -82,6 +83,7 @@ class VaccineSelectionPage extends LocalizedStatefulWidget {
     this.hasImmunizationCard,
     this.immunizationCardLost,
     this.receivedPenta1,
+    this.referral,
   });
 
   @override
@@ -1000,6 +1002,15 @@ class _VaccineSelectionPageState extends LocalizedState<VaccineSelectionPage> {
                                             ),
                                           );
 
+                                      if (widget.referral != null) {
+                                        context.read<ReferralBloc>().add(
+                                              ReferralSubmitEvent(
+                                                widget.referral!,
+                                                false,
+                                              ),
+                                            );
+                                      }
+
                                       if (widget.isChecklistAssessmentDone ==
                                           true) {
                                         final householdMember = context
@@ -1106,7 +1117,9 @@ class _VaccineSelectionPageState extends LocalizedState<VaccineSelectionPage> {
                                             .add(
                                               DeliverInterventionSubmitEvent(
                                                 task: updatedTask,
-                                                isEditing: true,
+                                                isEditing:
+                                                    deliverState.isEditing ??
+                                                        true,
                                                 boundaryModel:
                                                     RegistrationDeliverySingleton()
                                                         .boundary!,
