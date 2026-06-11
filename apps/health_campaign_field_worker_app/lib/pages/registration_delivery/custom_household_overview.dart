@@ -377,10 +377,24 @@ class _CustomHouseholdOverviewPageState
                                                                 wrapper = state
                                                                     .householdMemberWrapper;
 
-                                                            final timestamp = wrapper
-                                                                .headOfHousehold
-                                                                ?.clientAuditDetails
-                                                                ?.createdTime;
+                                                            final registrationDateField = wrapper
+                                                                .household
+                                                                ?.additionalFields
+                                                                ?.fields
+                                                                .firstWhereOrNull(
+                                                                  (field) =>
+                                                                      field.key ==
+                                                                      'dateOfRegistration',
+                                                                );
+                                                            final timestamp = int.tryParse(
+                                                                    registrationDateField
+                                                                            ?.value
+                                                                            ?.toString() ??
+                                                                        '') ??
+                                                                wrapper
+                                                                    .headOfHousehold
+                                                                    ?.clientAuditDetails
+                                                                    ?.createdTime;
                                                             final date = DateTime
                                                                 .fromMillisecondsSinceEpoch(
                                                               timestamp ??

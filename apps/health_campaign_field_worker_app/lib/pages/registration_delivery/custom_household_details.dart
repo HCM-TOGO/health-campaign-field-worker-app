@@ -255,7 +255,12 @@ class CustomHouseHoldDetailsPageState
                                         AdditionalField(
                                             IdentifierTypes.uniqueBeneficiaryID
                                                 .toValue(),
-                                            householdid)
+                                            householdid),
+                                        AdditionalField(
+                                            _dateOfRegistrationKey,
+                                            dateOfRegistration
+                                                .millisecondsSinceEpoch
+                                                .toString()),
                                       ]));
 
                               bloc.add(
@@ -309,6 +314,16 @@ class CustomHouseHoldDetailsPageState
                                           1,
                                       fields: [
                                         //[TODO: Use pregnant women form value based on project config
+                                        ...?householdModel
+                                            .additionalFields?.fields
+                                            .where((field) =>
+                                                field.key !=
+                                                _dateOfRegistrationKey),
+                                        AdditionalField(
+                                            _dateOfRegistrationKey,
+                                            dateOfRegistration
+                                                .millisecondsSinceEpoch
+                                                .toString()),
                                       ]));
 
                               bloc.add(
@@ -411,6 +426,24 @@ class CustomHouseHoldDetailsPageState
                                         const Duration(
                                             days: 15)), // Last 15 days
                                     lastDate: DateTime.now(),
+                                    onChange: (value) {
+                                      if (value.trim().isEmpty) return;
+                                      DateTime? parsedDate;
+                                      try {
+                                        parsedDate = DateFormat('dd/MM/yyyy')
+                                            .parseStrict(value);
+                                      } catch (_) {
+                                        try {
+                                          parsedDate = DateFormat('d MMMM yyyy')
+                                              .parseStrict(value);
+                                        } catch (_) {
+                                          return;
+                                        }
+                                      }
+                                      form
+                                          .control(_dateOfRegistrationKey)
+                                          .value = parsedDate;
+                                    },
                                   ),
                                 ),
                               ),
