@@ -681,8 +681,10 @@ class ZeroDoseCheckPageState extends LocalizedState<ZeroDoseCheckPage> {
                                             .read<DeliverInterventionBloc>()
                                             .state;
 
-                                        final oldTask =
-                                            deliverState.oldTask ?? widget.task;
+                                        final oldTask = widget.referral != null
+                                            ? widget.task
+                                            : deliverState.oldTask ??
+                                                widget.task;
                                         final keysToRewrite = {
                                           additional_fields_local
                                               .AdditionalFieldsType
@@ -767,7 +769,9 @@ class ZeroDoseCheckPageState extends LocalizedState<ZeroDoseCheckPage> {
                                             .add(
                                               DeliverInterventionSubmitEvent(
                                                 task: updatedTask,
-                                                isEditing: true,
+                                                // Referred: task not yet persisted → create.
+                                                // Administration / edit: update existing task.
+                                                isEditing: widget.referral == null,
                                                 boundaryModel:
                                                     RegistrationDeliverySingleton()
                                                         .boundary!,

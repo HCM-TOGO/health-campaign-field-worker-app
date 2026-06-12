@@ -1021,8 +1021,10 @@ class _VaccineSelectionPageState extends LocalizedState<VaccineSelectionPage> {
                                             .read<DeliverInterventionBloc>()
                                             .state;
 
-                                        final oldTask =
-                                            deliverState.oldTask ?? widget.task;
+                                        final oldTask = widget.referral != null
+                                            ? widget.task
+                                            : deliverState.oldTask ??
+                                                widget.task;
                                         final keysToRewrite = {
                                           additional_fields_local
                                               .AdditionalFieldsType
@@ -1117,7 +1119,9 @@ class _VaccineSelectionPageState extends LocalizedState<VaccineSelectionPage> {
                                             .add(
                                               DeliverInterventionSubmitEvent(
                                                 task: updatedTask,
-                                                isEditing: true,
+                                                // Referred: task not yet persisted → create.
+                                                // Administration / edit: update existing task.
+                                                isEditing: widget.referral == null,
                                                 boundaryModel:
                                                     RegistrationDeliverySingleton()
                                                         .boundary!,
