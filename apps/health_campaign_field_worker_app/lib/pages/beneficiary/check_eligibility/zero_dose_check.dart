@@ -767,9 +767,7 @@ class ZeroDoseCheckPageState extends LocalizedState<ZeroDoseCheckPage> {
                                             .add(
                                               DeliverInterventionSubmitEvent(
                                                 task: updatedTask,
-                                                isEditing:
-                                                    deliverState.isEditing ??
-                                                        true,
+                                                isEditing: true,
                                                 boundaryModel:
                                                     RegistrationDeliverySingleton()
                                                         .boundary!,
