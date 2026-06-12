@@ -170,30 +170,35 @@ class CustomBeneficiaryAcknowledgementPageState
                             .acknowledgementSuccess
                             .backToSearchActionLabelText),
                         onPressed: () {
-                          context.read<CustomSearchHouseholdsBloc>().add(
-                                const CustomSearchHouseholdsEvent.clear(),
-                              );
-                          // By the time we reach this acknowledgement, the
-                          // add-member flow has already destroyed the original
-                          // CustomSearchBeneficiaryRoute, so there is nothing to
-                          // pop back to - the registration-delivery wrapper's
-                          // stack bottoms out at the (stale) household overview.
-                          // Walk up to that wrapper's router and replace its
-                          // whole stack with a fresh search page. The wrapper
-                          // then holds only [search], so backing out of search
-                          // bubbles up and pops the wrapper off, landing on Home.
-                          RoutingController? wrapperRouter = context.router;
-                          while (wrapperRouter != null &&
-                              wrapperRouter.routeData.name !=
-                                  CustomRegistrationDeliveryWrapperRoute.name) {
-                            wrapperRouter = wrapperRouter.parent();
-                          }
-                          if (wrapperRouter is StackRouter) {
-                            wrapperRouter
-                                .replaceAll([CustomSearchBeneficiaryRoute()]);
+                          if (widget.acknowledgementType == AcknowledgementType.addMember) {
+                            context.router.popUntilRouteWithName(BeneficiaryWrapperRoute.name);
                           } else {
-                            context.router
-                                .navigate(CustomSearchBeneficiaryRoute());
+                            final wrapper = householdMemberWrapper!;
+                            context.read<CustomSearchHouseholdsBloc>().add(
+                                  const CustomSearchHouseholdsEvent.clear(),
+                                );
+                            // By the time we reach this acknowledgement, the
+                            // add-member flow has already destroyed the original
+                            // CustomSearchBeneficiaryRoute, so there is nothing to
+                            // pop back to - the registration-delivery wrapper's
+                            // stack bottoms out at the (stale) household overview.
+                            // Walk up to that wrapper's router and replace its
+                            // whole stack with a fresh search page. The wrapper
+                            // then holds only [search], so backing out of search
+                            // bubbles up and pops the wrapper off, landing on Home.
+                            RoutingController? wrapperRouter = context.router;
+                            while (wrapperRouter != null &&
+                                wrapperRouter.routeData.name !=
+                                    CustomRegistrationDeliveryWrapperRoute.name) {
+                              wrapperRouter = wrapperRouter.parent();
+                            }
+                            if (wrapperRouter is StackRouter) {
+                              wrapperRouter
+                                  .replaceAll([CustomSearchBeneficiaryRoute()]);
+                            } else {
+                              context.router
+                                  .navigate(CustomSearchBeneficiaryRoute());
+                            }
                           }
                         },
                         type: DigitButtonType.secondary,
