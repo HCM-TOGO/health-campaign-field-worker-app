@@ -1117,9 +1117,7 @@ class _VaccineSelectionPageState extends LocalizedState<VaccineSelectionPage> {
                                             .add(
                                               DeliverInterventionSubmitEvent(
                                                 task: updatedTask,
-                                                isEditing:
-                                                    deliverState.isEditing ??
-                                                        true,
+                                                isEditing: true,
                                                 boundaryModel:
                                                     RegistrationDeliverySingleton()
                                                         .boundary!,
