@@ -1254,6 +1254,7 @@ class _CustomHouseholdOverviewPageState
         ],
       ),
     );
+    callReloadEvent(offset: 0, limit: 10);
   }
 
   bool isOutsideProjectDateRange() {
