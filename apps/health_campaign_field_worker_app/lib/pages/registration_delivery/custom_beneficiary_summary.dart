@@ -100,6 +100,7 @@ class CustomSummaryBeneficiaryPageState
               router.push(CustomBeneficiaryAcknowledgementRoute(
                 enableViewHousehold: true,
                 acknowledgementType: AcknowledgementType.addMember,
+                selectedIndividual: value.individualModel,
               ));
               // }
             },

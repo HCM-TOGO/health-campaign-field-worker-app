@@ -170,6 +170,7 @@ class CustomBeneficiaryRegistrationBloc
               locality: locality,
             )),
             individualModel: individual,
+            registrationDate: value.registrationDate,
             projectBeneficiaryModel: ProjectBeneficiaryModel(
               tag: event.tag,
               rowVersion: 1,
@@ -212,7 +213,8 @@ class CustomBeneficiaryRegistrationBloc
               addressModel: value.householdModel?.address,
               householdModel: value.householdModel,
               individualModel: value.individualModel,
-              projectBeneficiaryModel: value.projectBeneficiaryModel));
+              projectBeneficiaryModel: value.projectBeneficiaryModel,
+              registrationDate: value.registrationDate));
         } else {
           final individual = value.individualModel;
           final household = value.householdModel;
@@ -753,6 +755,7 @@ class CustomBeneficiaryRegistrationBloc
           emit(value.copyWith(loading: false));
           emit(BeneficiaryRegistrationPersistedState(
             householdModel: value.householdModel,
+            individualModel: event.individualModel,
           ));
         }
       },

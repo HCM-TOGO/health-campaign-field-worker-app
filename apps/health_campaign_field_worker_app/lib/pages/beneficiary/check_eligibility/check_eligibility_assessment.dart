@@ -108,6 +108,8 @@ class _EligibilityChecklistViewPage
     var projectBeneficiaryClientReferenceId =
         widget.projectBeneficiaryClientReferenceId;
 
+    var individual = widget.individual;
+
     return WillPopScope(
         onWillPop: context.isHealthFacilitySupervisor &&
                 widget.referralClientRefId != null
@@ -356,6 +358,14 @@ class _EligibilityChecklistViewPage
                                                 'longitude',
                                                 longitude,
                                               ),
+                                              AdditionalField(
+                                                'projectBeneficiaryClientReferenceId',
+                                                projectBeneficiaryClientReferenceId,
+                                              ),
+                                              AdditionalField(
+                                                'individualClientReferenceId',
+                                                individual!.clientReferenceId,
+                                              ),
                                             ],
                                           ),
                                         ));
@@ -419,7 +429,17 @@ class _EligibilityChecklistViewPage
                                                           'lat', latitude),
                                                       AdditionalField(
                                                           'boundaryCode',
-                                                          context.boundary.code)
+                                                          context
+                                                              .boundary.code),
+                                                      AdditionalField(
+                                                        'projectBeneficiaryClientReferenceId',
+                                                        projectBeneficiaryClientReferenceId,
+                                                      ),
+                                                      AdditionalField(
+                                                        'individualClientReferenceId',
+                                                        individual!
+                                                            .clientReferenceId,
+                                                      ),
                                                     ],
                                                   )),
                                             ),

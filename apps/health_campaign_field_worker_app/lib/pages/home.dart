@@ -88,6 +88,7 @@ class HomePage extends LocalizedStatefulWidget {
 class _HomePageState extends LocalizedState<HomePage> {
   bool skipProgressBar = false;
   final storage = const FlutterSecureStorage();
+  final _homeShowcaseData = HomePageShowcaseData();
   late StreamSubscription<List<ConnectivityResult>> subscription;
   bool isTriggerLocalisation = true;
   // Stock in hand UI is handled by StockBalanceCard.
@@ -141,7 +142,8 @@ class _HomePageState extends LocalizedState<HomePage> {
 
     final homeItems = mappedItems?.homeItems ?? [];
     final showcaseKeys = <GlobalKey>[
-      if (!skipProgressBar) homeShowcaseData.distributorProgressBar.showcaseKey,
+      if (!skipProgressBar)
+        _homeShowcaseData.distributorProgressBar.showcaseKey,
       ...(mappedItems?.showcaseKeys ?? []),
     ];
 
@@ -172,7 +174,7 @@ class _HomePageState extends LocalizedState<HomePage> {
               ),
               skipProgressBar
                   ? const SizedBox.shrink()
-                  : homeShowcaseData.distributorProgressBar.buildWith(
+                  : _homeShowcaseData.distributorProgressBar.buildWith(
                       child: CustomBeneficiaryProgressBar(
                         label: localizations.translate(
                           i18.home.progressIndicatorTitle,
@@ -356,7 +358,7 @@ class _HomePageState extends LocalizedState<HomePage> {
     }
 
     final Map<String, Widget> homeItemsMap = {
-      i18.home.dashboard: homeShowcaseData.dashBoard.buildWith(
+      i18.home.dashboard: _homeShowcaseData.dashBoard.buildWith(
         child: HomeItemCard(
           icon: Icons.bar_chart_sharp,
           label: i18.home.dashboard,
@@ -370,7 +372,7 @@ class _HomePageState extends LocalizedState<HomePage> {
         ),
       ),
       i18.home.beneficiaryLabel:
-          homeShowcaseData.distributorBeneficiaries.buildWith(
+          _homeShowcaseData.distributorBeneficiaries.buildWith(
         child: HomeItemCard(
           icon: Icons.family_restroom_rounded,
           label: i18.home.beneficiaryLabel,
@@ -382,7 +384,7 @@ class _HomePageState extends LocalizedState<HomePage> {
         ),
       ),
       i18.home.beneficiaryReferralLabel:
-          homeShowcaseData.hfBeneficiaryReferral.buildWith(
+          _homeShowcaseData.hfBeneficiaryReferral.buildWith(
         child: HomeItemCard(
           icon: Icons.supervised_user_circle_rounded,
           label: i18.home.beneficiaryReferralLabel,
@@ -396,7 +398,7 @@ class _HomePageState extends LocalizedState<HomePage> {
         ),
       ),
       i18.home.manageStockLabel:
-          homeShowcaseData.warehouseManagerManageStock.buildWith(
+          _homeShowcaseData.warehouseManagerManageStock.buildWith(
         child: HomeItemCard(
           icon: Icons.store_mall_directory,
           label: i18.home.manageStockLabel,
@@ -414,7 +416,7 @@ class _HomePageState extends LocalizedState<HomePage> {
           },
         ),
       ),
-      i18.home.summaryLabel: homeShowcaseData.summaryReport.buildWith(
+      i18.home.summaryLabel: _homeShowcaseData.summaryReport.buildWith(
         child: HomeItemCard(
           icon: Icons.summarize,
           label: i18.home.summaryLabel,
@@ -424,7 +426,7 @@ class _HomePageState extends LocalizedState<HomePage> {
         ),
       ),
       i18.home.stockReconciliationLabel:
-          homeShowcaseData.wareHouseManagerStockReconciliation.buildWith(
+          _homeShowcaseData.wareHouseManagerStockReconciliation.buildWith(
         child: HomeItemCard(
           icon: Icons.menu_book,
           label: i18.home.stockReconciliationLabel,
@@ -433,7 +435,7 @@ class _HomePageState extends LocalizedState<HomePage> {
           },
         ),
       ),
-      i18.home.viewReportsLabel: homeShowcaseData.inventoryReport.buildWith(
+      i18.home.viewReportsLabel: _homeShowcaseData.inventoryReport.buildWith(
         child: HomeItemCard(
           icon: Icons.announcement,
           label: i18.home.viewReportsLabel,
@@ -449,7 +451,7 @@ class _HomePageState extends LocalizedState<HomePage> {
           await context.router.push(CustomSearchReferralReconciliationsRoute());
         },
       ),
-      i18.home.syncDataLabel: homeShowcaseData.distributorSyncData.buildWith(
+      i18.home.syncDataLabel: _homeShowcaseData.distributorSyncData.buildWith(
         child: StreamBuilder<Map<String, dynamic>?>(
           stream: FlutterBackgroundService().on('serviceRunning'),
           builder: (context, snapshot) {
@@ -475,7 +477,7 @@ class _HomePageState extends LocalizedState<HomePage> {
           },
         ),
       ),
-      i18.home.db: homeShowcaseData.db.buildWith(
+      i18.home.db: _homeShowcaseData.db.buildWith(
         child: HomeItemCard(
           icon: Icons.table_chart,
           label: i18.home.db,
@@ -490,7 +492,7 @@ class _HomePageState extends LocalizedState<HomePage> {
           },
         ),
       ),
-      i18.home.dashboard: homeShowcaseData.dashBoard.buildWith(
+      i18.home.dashboard: _homeShowcaseData.dashBoard.buildWith(
         child: HomeItemCard(
           icon: Icons.bar_chart_sharp,
           label: i18.home.dashboard,
@@ -505,7 +507,7 @@ class _HomePageState extends LocalizedState<HomePage> {
         ),
       ),
       i18.home.fileComplaint:
-          homeShowcaseData.distributorFileComplaint.buildWith(
+          _homeShowcaseData.distributorFileComplaint.buildWith(
         child: HomeItemCard(
           icon: Icons.announcement,
           label: i18.home.fileComplaint,
@@ -519,7 +521,7 @@ class _HomePageState extends LocalizedState<HomePage> {
         ),
       ),
       i18.home.manageAttendanceLabel:
-          homeShowcaseData.manageAttendance.buildWith(
+          _homeShowcaseData.manageAttendance.buildWith(
         child: HomeItemCard(
           icon: Icons.fingerprint_outlined,
           label: i18.home.manageAttendanceLabel,
@@ -533,7 +535,7 @@ class _HomePageState extends LocalizedState<HomePage> {
           },
         ),
       ),
-      i18.home.mySurveyForm: homeShowcaseData.supervisorMySurveyForm.buildWith(
+      i18.home.mySurveyForm: _homeShowcaseData.supervisorMySurveyForm.buildWith(
         child: HomeItemCard(
           enableCustomIcon: true,
           customIcon: mySurveyFormSvg,
@@ -550,7 +552,8 @@ class _HomePageState extends LocalizedState<HomePage> {
           },
         ),
       ),
-      i18.home.closedHouseHoldLabel: homeShowcaseData.closedHouseHold.buildWith(
+      i18.home.closedHouseHoldLabel:
+          _homeShowcaseData.closedHouseHold.buildWith(
         child: HomeItemCard(
           icon: Icons.home,
           enableCustomIcon: true,
@@ -562,7 +565,7 @@ class _HomePageState extends LocalizedState<HomePage> {
           },
         ),
       ),
-      i18.home.editTasks: homeShowcaseData.editTasks.buildWith(
+      i18.home.editTasks: _homeShowcaseData.editTasks.buildWith(
         child: HomeItemCard(
           icon: Icons.edit_note,
           label: i18.home.editTasks,
@@ -576,32 +579,33 @@ class _HomePageState extends LocalizedState<HomePage> {
     final Map<String, GlobalKey> homeItemsShowcaseMap = {
       // INFO : Need to add showcase keys of package Here
       i18.home.closedHouseHoldLabel:
-          homeShowcaseData.closedHouseHold.showcaseKey,
+          _homeShowcaseData.closedHouseHold.showcaseKey,
 
       i18.home.manageAttendanceLabel:
-          homeShowcaseData.manageAttendance.showcaseKey,
+          _homeShowcaseData.manageAttendance.showcaseKey,
 
       i18.home.beneficiaryReferralLabel:
-          homeShowcaseData.hfBeneficiaryReferral.showcaseKey,
+          _homeShowcaseData.hfBeneficiaryReferral.showcaseKey,
 
       i18.home.beneficiaryLabel:
-          homeShowcaseData.distributorBeneficiaries.showcaseKey,
+          _homeShowcaseData.distributorBeneficiaries.showcaseKey,
 
       i18.home.manageStockLabel:
-          homeShowcaseData.warehouseManagerManageStock.showcaseKey,
+          _homeShowcaseData.warehouseManagerManageStock.showcaseKey,
       i18.home.stockReconciliationLabel:
-          homeShowcaseData.wareHouseManagerStockReconciliation.showcaseKey,
-      i18.home.viewReportsLabel: homeShowcaseData.inventoryReport.showcaseKey,
-      i18.home.syncDataLabel: homeShowcaseData.distributorSyncData.showcaseKey,
+          _homeShowcaseData.wareHouseManagerStockReconciliation.showcaseKey,
+      i18.home.viewReportsLabel: _homeShowcaseData.inventoryReport.showcaseKey,
+      i18.home.syncDataLabel:
+          _homeShowcaseData.distributorSyncData.showcaseKey,
       i18.home.fileComplaint:
-          homeShowcaseData.distributorFileComplaint.showcaseKey,
-      i18.home.db: homeShowcaseData.db.showcaseKey,
-      i18.home.dashboard: homeShowcaseData.dashBoard.showcaseKey,
-      i18.home.clfLabel: homeShowcaseData.clf.showcaseKey,
+          _homeShowcaseData.distributorFileComplaint.showcaseKey,
+      i18.home.db: _homeShowcaseData.db.showcaseKey,
+      i18.home.dashboard: _homeShowcaseData.dashBoard.showcaseKey,
+      i18.home.clfLabel: _homeShowcaseData.clf.showcaseKey,
       i18.home.mySurveyForm:
-          homeShowcaseData.supervisorMySurveyForm.showcaseKey,
-      i18.home.summaryLabel: homeShowcaseData.summaryReport.showcaseKey,
-      i18.home.editTasks: homeShowcaseData.editTasks.showcaseKey,
+          _homeShowcaseData.supervisorMySurveyForm.showcaseKey,
+      i18.home.summaryLabel: _homeShowcaseData.summaryReport.showcaseKey,
+      i18.home.editTasks: _homeShowcaseData.editTasks.showcaseKey,
     };
 
     final homeItemsLabel = <String>[
@@ -642,7 +646,7 @@ class _HomePageState extends LocalizedState<HomePage> {
 
     // if ((envConfig.variables.envType == EnvType.demo && kReleaseMode) ||
     //     envConfig.variables.envType == EnvType.uat) {
-    filteredLabels.remove(i18.home.db);
+    // filteredLabels.remove(i18.home.db);
     // }
 
     final List<Widget> widgetList =
