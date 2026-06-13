@@ -8,6 +8,58 @@ class CustomIndividualLocalRepository extends IndividualLocalRepository {
   const CustomIndividualLocalRepository(super.sql, super.opLogManager);
 
   @override
+  FutureOr<void> create(
+    IndividualModel entity, {
+    bool createOpLog = true,
+    DataOperation dataOperation = DataOperation.create,
+  }) async {
+    return retryLocalCallOperation(() async {
+      final addresses = entity.address;
+      final identifiers = entity.identifiers;
+      final individualCompanion = entity.companion;
+      final nameCompanion = entity.name?.companion;
+
+      await sql.batch((batch) async {
+        batch.insert(
+          sql.individual,
+          individualCompanion,
+          mode: InsertMode.insertOrReplace,
+        );
+        if (nameCompanion != null) {
+          batch.insert(
+            sql.name,
+            nameCompanion,
+            mode: InsertMode.insertOrReplace,
+          );
+        }
+
+        if (addresses != null) {
+          final addressCompanions = addresses.map((e) => e.companion).toList();
+          batch.insertAll(
+            sql.address,
+            addressCompanions,
+            mode: InsertMode.insertOrReplace,
+          );
+        }
+
+        if (identifiers != null) {
+          final identifierCompanions =
+              identifiers.map((e) => e.companion).toList();
+          batch.insertAll(
+            sql.identifier,
+            identifierCompanions,
+            mode: InsertMode.insertOrReplace,
+          );
+        }
+      });
+
+      if (createOpLog) {
+        await createOplogEntry(entity, dataOperation);
+      }
+    });
+  }
+
+  @override
   FutureOr<List<IndividualModel>> search(
     IndividualSearchModel query, [
     String? userId,

@@ -241,7 +241,7 @@ class CustomBeneficiaryRegistrationBloc
             final locality = code == null || name == null
                 ? null
                 : LocalityModel(code: code, name: name);
-            await householdRepository.create(
+            await _createHouseholdIfMissing(
               household.copyWith(
                 address: address?.copyWith(
                   relatedClientReferenceId: household.clientReferenceId,
@@ -265,7 +265,7 @@ class CustomBeneficiaryRegistrationBloc
               ),
             );
 
-            await projectBeneficiaryRepository.create(
+            await _createProjectBeneficiaryIfMissing(
               value.projectBeneficiaryModel!,
             );
 
@@ -338,7 +338,7 @@ class CustomBeneficiaryRegistrationBloc
           final locality = code == null || name == null
               ? null
               : LocalityModel(code: code, name: name);
-          await householdRepository.create(
+          await _createHouseholdIfMissing(
             household.copyWith(
               address: address.copyWith(
                 relatedClientReferenceId: household.clientReferenceId,
@@ -362,7 +362,7 @@ class CustomBeneficiaryRegistrationBloc
             ),
           );
 
-          await projectBeneficiaryRepository.create(
+          await _createProjectBeneficiaryIfMissing(
             value.projectBeneficiaryModel!,
           );
 
@@ -429,7 +429,7 @@ class CustomBeneficiaryRegistrationBloc
           final locality = code == null || name == null
               ? null
               : LocalityModel(code: code, name: name);
-          await householdRepository.create(
+          await _createHouseholdIfMissing(
             event.household.copyWith(
               address: address?.copyWith(
                 relatedClientReferenceId: event.household.clientReferenceId,
@@ -526,36 +526,33 @@ class CustomBeneficiaryRegistrationBloc
             // }
           } else {
             for (var element in value.individualModel) {
-              await projectBeneficiaryRepository.create(ProjectBeneficiaryModel(
-                  rowVersion: 1,
-                  clientReferenceId: IdGen.i.identifier,
-                  dateOfRegistration: DateTime.now().millisecondsSinceEpoch,
-                  projectId: RegistrationDeliverySingleton().projectId,
-                  tenantId: RegistrationDeliverySingleton().tenantId,
-                  beneficiaryClientReferenceId:
-                      beneficiaryType == BeneficiaryType.individual
-                          ? element.clientReferenceId
-                          : value.householdModel.clientReferenceId,
-                  clientAuditDetails: ClientAuditDetails(
-                    createdBy: RegistrationDeliverySingleton()
-                        .loggedInUserUuid
-                        .toString(),
-                    createdTime: DateTime.now().millisecondsSinceEpoch,
-                    lastModifiedTime: DateTime.now().millisecondsSinceEpoch,
-                    lastModifiedBy: RegistrationDeliverySingleton()
-                        .loggedInUserUuid
-                        .toString(),
-                  ),
-                  auditDetails: AuditDetails(
-                    createdBy: RegistrationDeliverySingleton()
-                        .loggedInUserUuid
-                        .toString(),
-                    createdTime: DateTime.now().millisecondsSinceEpoch,
-                    lastModifiedTime: DateTime.now().millisecondsSinceEpoch,
-                    lastModifiedBy: RegistrationDeliverySingleton()
-                        .loggedInUserUuid
-                        .toString(),
-                  )));
+              await _createProjectBeneficiaryIfMissing(ProjectBeneficiaryModel(
+                rowVersion: 1,
+                clientReferenceId: IdGen.i.identifier,
+                dateOfRegistration: DateTime.now().millisecondsSinceEpoch,
+                projectId: RegistrationDeliverySingleton().projectId,
+                tenantId: RegistrationDeliverySingleton().tenantId,
+                beneficiaryClientReferenceId:
+                    beneficiaryType == BeneficiaryType.individual
+                        ? element.clientReferenceId
+                        : value.householdModel.clientReferenceId,
+                clientAuditDetails: ClientAuditDetails(
+                  createdBy:
+                      RegistrationDeliverySingleton().loggedInUserUuid.toString(),
+                  createdTime: DateTime.now().millisecondsSinceEpoch,
+                  lastModifiedTime: DateTime.now().millisecondsSinceEpoch,
+                  lastModifiedBy:
+                      RegistrationDeliverySingleton().loggedInUserUuid.toString(),
+                ),
+                auditDetails: AuditDetails(
+                  createdBy:
+                      RegistrationDeliverySingleton().loggedInUserUuid.toString(),
+                  createdTime: DateTime.now().millisecondsSinceEpoch,
+                  lastModifiedTime: DateTime.now().millisecondsSinceEpoch,
+                  lastModifiedBy:
+                      RegistrationDeliverySingleton().loggedInUserUuid.toString(),
+                ),
+              ));
             }
           }
 
@@ -703,7 +700,7 @@ class CustomBeneficiaryRegistrationBloc
             ),
           );
           if (event.beneficiaryType == BeneficiaryType.individual) {
-            await projectBeneficiaryRepository.create(
+            await _createProjectBeneficiaryIfMissing(
               ProjectBeneficiaryModel(
                 tag: event.tag,
                 rowVersion: 1,
@@ -765,6 +762,28 @@ class CustomBeneficiaryRegistrationBloc
   getIndividualBeneficiaryClientReferenceId(
       List<IndividualModel> individualModel) {
     return individualModel.map((e) => e.clientReferenceId).toList();
+  }
+
+  Future<void> _createHouseholdIfMissing(HouseholdModel household) async {
+    final existing = await householdRepository.search(
+      HouseholdSearchModel(
+        clientReferenceId: [household.clientReferenceId],
+      ),
+    );
+    if (existing.isNotEmpty) return;
+    await householdRepository.create(household);
+  }
+
+  Future<void> _createProjectBeneficiaryIfMissing(
+    ProjectBeneficiaryModel model,
+  ) async {
+    final existing = await projectBeneficiaryRepository.search(
+      ProjectBeneficiarySearchModel(
+        clientReferenceId: [model.clientReferenceId],
+      ),
+    );
+    if (existing.isNotEmpty) return;
+    await projectBeneficiaryRepository.create(model);
   }
 }
 

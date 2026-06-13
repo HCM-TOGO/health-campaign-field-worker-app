@@ -40,6 +40,7 @@ class CustomSummaryPage extends LocalizedStatefulWidget {
 
 class CustomSummaryPageState extends LocalizedState<CustomSummaryPage> {
   final clickedStatus = ValueNotifier<bool>(false);
+  bool _skipCreateOnPop = false;
 
   String getLocalizedMessage(String code) {
     return localizations.translate(code);
@@ -52,6 +53,7 @@ class CustomSummaryPageState extends LocalizedState<CustomSummaryPage> {
 
     return PopScope(
       onPopInvoked: (val) {
+        if (_skipCreateOnPop) return;
         context.read<CustomBeneficiaryRegistrationBloc>().add(
               BeneficiaryRegistrationCreateEvent(
                 projectId: RegistrationDeliverySingleton().projectId!,
@@ -190,6 +192,7 @@ class CustomSummaryPageState extends LocalizedState<CustomSummaryPage> {
 
                                 if (submit ?? false) {
                                   if (context.mounted) {
+                                    _skipCreateOnPop = true;
                                     final CustomSearchHouseholdsBloc
                                         customSearchHouseholdsBloc = context
                                             .read<CustomSearchHouseholdsBloc>();
