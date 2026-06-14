@@ -296,7 +296,7 @@ class CustomIndividualDetailsPageState
                             }
                             if (form.control(_genderKey).value == null) {
                               setState(() {
-                                form.control(_genderKey).setErrors({'': true});
+                                form.control(_genderKey).setErrors({'required': true});
                               });
                             }
                             final userId = RegistrationDeliverySingleton()
@@ -1104,7 +1104,7 @@ class CustomIndividualDetailsPageState
                               form.control(_genderKey).value = value;
                             } else {
                               form.control(_genderKey).value = null;
-                              form.control(_genderKey).setErrors({'': true});
+                              form.control(_genderKey).setErrors({'required': true});
                             }
                           },
                         ),
