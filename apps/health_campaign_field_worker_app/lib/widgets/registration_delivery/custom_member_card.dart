@@ -1567,7 +1567,7 @@ class CustomMemberCard extends StatelessWidget {
                                     projectBeneficiaryClientReferenceId:
                                         projectBeneficiaryClientReferenceId,
                                     individual: individual,
-                                    task: zeroDoseTasks.first,
+                                    task: zeroDoseTasks.last,
                                   ),
                                 )
                                     .then((_) {

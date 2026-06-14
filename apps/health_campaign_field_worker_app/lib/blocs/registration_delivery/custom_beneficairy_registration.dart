@@ -537,20 +537,24 @@ class CustomBeneficiaryRegistrationBloc
                         ? element.clientReferenceId
                         : value.householdModel.clientReferenceId,
                 clientAuditDetails: ClientAuditDetails(
-                  createdBy:
-                      RegistrationDeliverySingleton().loggedInUserUuid.toString(),
+                  createdBy: RegistrationDeliverySingleton()
+                      .loggedInUserUuid
+                      .toString(),
                   createdTime: DateTime.now().millisecondsSinceEpoch,
                   lastModifiedTime: DateTime.now().millisecondsSinceEpoch,
-                  lastModifiedBy:
-                      RegistrationDeliverySingleton().loggedInUserUuid.toString(),
+                  lastModifiedBy: RegistrationDeliverySingleton()
+                      .loggedInUserUuid
+                      .toString(),
                 ),
                 auditDetails: AuditDetails(
-                  createdBy:
-                      RegistrationDeliverySingleton().loggedInUserUuid.toString(),
+                  createdBy: RegistrationDeliverySingleton()
+                      .loggedInUserUuid
+                      .toString(),
                   createdTime: DateTime.now().millisecondsSinceEpoch,
                   lastModifiedTime: DateTime.now().millisecondsSinceEpoch,
-                  lastModifiedBy:
-                      RegistrationDeliverySingleton().loggedInUserUuid.toString(),
+                  lastModifiedBy: RegistrationDeliverySingleton()
+                      .loggedInUserUuid
+                      .toString(),
                 ),
               ));
             }
