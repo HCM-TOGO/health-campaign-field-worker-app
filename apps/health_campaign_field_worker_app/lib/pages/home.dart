@@ -595,8 +595,7 @@ class _HomePageState extends LocalizedState<HomePage> {
       i18.home.stockReconciliationLabel:
           _homeShowcaseData.wareHouseManagerStockReconciliation.showcaseKey,
       i18.home.viewReportsLabel: _homeShowcaseData.inventoryReport.showcaseKey,
-      i18.home.syncDataLabel:
-          _homeShowcaseData.distributorSyncData.showcaseKey,
+      i18.home.syncDataLabel: _homeShowcaseData.distributorSyncData.showcaseKey,
       i18.home.fileComplaint:
           _homeShowcaseData.distributorFileComplaint.showcaseKey,
       i18.home.db: _homeShowcaseData.db.showcaseKey,
@@ -646,7 +645,7 @@ class _HomePageState extends LocalizedState<HomePage> {
 
     // if ((envConfig.variables.envType == EnvType.demo && kReleaseMode) ||
     //     envConfig.variables.envType == EnvType.uat) {
-    // filteredLabels.remove(i18.home.db);
+    filteredLabels.remove(i18.home.db);
     // }
 
     final List<Widget> widgetList =
