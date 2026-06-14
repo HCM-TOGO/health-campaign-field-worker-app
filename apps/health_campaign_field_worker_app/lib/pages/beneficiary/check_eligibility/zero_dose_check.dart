@@ -60,6 +60,7 @@ class ZeroDoseCheckPage extends LocalizedStatefulWidget {
   final bool? hasSideEffects;
   final SideEffectModel sideEffect;
   final bool isRefused;
+  final ReferralModel? referral;
 
   ZeroDoseCheckPage({
     super.key,
@@ -72,6 +73,7 @@ class ZeroDoseCheckPage extends LocalizedStatefulWidget {
     this.individual,
     this.hasSideEffects = false,
     this.isRefused = false,
+    this.referral,
     SideEffectModel? sideEffect,
     TaskModel? task,
   })  : task = task ?? TaskModel(clientReferenceId: ''),
@@ -114,9 +116,25 @@ class ZeroDoseCheckPageState extends LocalizedState<ZeroDoseCheckPage> {
           value: Random().nextInt(100).toString(),
           submitTriggered: true,
         ));
+    if (widget.isEditing) {
+      final fields = widget.task.additionalFields?.fields ?? [];
+      for (final field in fields) {
+        if (field.key ==
+            additional_fields_local.AdditionalFieldsType.hasImmunizationCard
+                .toValue()) {
+          hasImmunizationCard = field.value.toString();
+        } else if (field.key ==
+            additional_fields_local.AdditionalFieldsType.immunizationCardLost
+                .toValue()) {
+          immunizationCardLost = field.value.toString();
+        } else if (field.key ==
+            additional_fields_local.AdditionalFieldsType.receivedPenta1
+                .toValue()) {
+          receivedPenta1 = field.value.toString();
+        }
+      }
+    }
     super.initState();
-    // context.read<LocationBloc>().add(const LoadLocationEvent());
-    // super.initState();
   }
 
   @override
@@ -158,7 +176,8 @@ class ZeroDoseCheckPageState extends LocalizedState<ZeroDoseCheckPage> {
                 ?.additionalDetails
                 ?.additionalProjectType;
 
-    final productVariants = !widget.isChecklistAssessmentDone
+    final productVariants = (!widget.isChecklistAssessmentDone ||
+            widget.isEditing)
         ? projectTypeModel?.resources
             ?.map((r) =>
                 DeliveryProductVariant(productVariantId: r.productVariantId))
@@ -246,6 +265,24 @@ class ZeroDoseCheckPageState extends LocalizedState<ZeroDoseCheckPage> {
                             controller.add(TextEditingController());
                           });
 
+                          if (widget.isEditing) {
+                            final prefillMap = {
+                              'ZDAQ1': hasImmunizationCard,
+                              'ZDAQ1.NO.Q2A': immunizationCardLost,
+                              'ZDAQ1.NO.Q2A.YES.Q2AA': receivedPenta1,
+                            };
+                            for (int i = 0;
+                                i < (initialAttributes ?? []).length;
+                                i++) {
+                              final code = initialAttributes![i].code;
+                              if (code != null &&
+                                  prefillMap.containsKey(code) &&
+                                  prefillMap[code] != 'NOT_SELECTED') {
+                                controller[i].text = prefillMap[code]!;
+                              }
+                            }
+                          }
+
                           isControllersInitialized = true;
                         }
                       },
@@ -322,12 +359,15 @@ class ZeroDoseCheckPageState extends LocalizedState<ZeroDoseCheckPage> {
 
                                 for (final entry in responses.entries) {
                                   if (entry.key == 'ZDAQ1') {
-                                    hasImmunizationCard = entry.value;
+                                    hasImmunizationCard =
+                                        entry.value ?? 'NOT_SELECTED';
                                   } else if (entry.key == 'ZDAQ1.NO.Q2A') {
-                                    immunizationCardLost = entry.value;
+                                    immunizationCardLost =
+                                        entry.value ?? 'NOT_SELECTED';
                                   } else if (entry.key ==
                                       'ZDAQ1.NO.Q2A.YES.Q2AA') {
-                                    receivedPenta1 = entry.value;
+                                    receivedPenta1 =
+                                        entry.value ?? 'NOT_SELECTED';
                                   }
                                 }
 
@@ -466,6 +506,7 @@ class ZeroDoseCheckPageState extends LocalizedState<ZeroDoseCheckPage> {
                                     hasImmunizationCard: hasImmunizationCard,
                                     immunizationCardLost: immunizationCardLost,
                                     receivedPenta1: receivedPenta1,
+                                    referral: widget.referral,
                                   ));
                                 } else {
                                   final shouldSubmit = await DigitDialog.show(
@@ -622,6 +663,14 @@ class ZeroDoseCheckPageState extends LocalizedState<ZeroDoseCheckPage> {
                                   );
                                   if (shouldSubmit ?? false) {
                                     if (context.mounted) {
+                                      if (widget.referral != null) {
+                                        context.read<ReferralBloc>().add(
+                                              ReferralSubmitEvent(
+                                                widget.referral!,
+                                                false,
+                                              ),
+                                            );
+                                      }
                                       if (widget.isChecklistAssessmentDone ==
                                           true) {
                                         final householdMember = context
@@ -632,11 +681,42 @@ class ZeroDoseCheckPageState extends LocalizedState<ZeroDoseCheckPage> {
                                             .read<DeliverInterventionBloc>()
                                             .state;
 
-                                        final oldTask =
-                                            deliverState.oldTask ?? widget.task;
-                                        final oldFields =
-                                            oldTask.additionalFields?.fields ??
-                                                [];
+                                        final oldTask = widget.referral != null
+                                            ? widget.task
+                                            : deliverState.oldTask ??
+                                                widget.task;
+                                        final keysToRewrite = {
+                                          additional_fields_local
+                                              .AdditionalFieldsType
+                                              .zeroDoseStatus
+                                              .toValue(),
+                                          additional_fields_local
+                                              .AdditionalFieldsType
+                                              .hasImmunizationCard
+                                              .toValue(),
+                                          additional_fields_local
+                                              .AdditionalFieldsType
+                                              .immunizationCardLost
+                                              .toValue(),
+                                          additional_fields_local
+                                              .AdditionalFieldsType
+                                              .receivedPenta1
+                                              .toValue(),
+                                          additional_fields_local
+                                              .AdditionalFieldsType
+                                              .selectedVaccines
+                                              .toValue(),
+                                          additional_fields_local
+                                              .AdditionalFieldsType
+                                              .noSelectedVaccines
+                                              .toValue(),
+                                        };
+                                        final oldFields = (oldTask
+                                                    .additionalFields?.fields ??
+                                                [])
+                                            .where((f) =>
+                                                !keysToRewrite.contains(f.key))
+                                            .toList();
 
                                         final updatedFields = [
                                           ...oldFields,
@@ -689,14 +769,9 @@ class ZeroDoseCheckPageState extends LocalizedState<ZeroDoseCheckPage> {
                                             .add(
                                               DeliverInterventionSubmitEvent(
                                                 task: updatedTask,
-                                                isEditing: (deliverState
-                                                                .tasks ??
-                                                            [])
-                                                        .isNotEmpty &&
-                                                    RegistrationDeliverySingleton()
-                                                            .beneficiaryType ==
-                                                        BeneficiaryType
-                                                            .household,
+                                                // Referred: task not yet persisted → create.
+                                                // Administration / edit: update existing task.
+                                                isEditing: widget.referral == null,
                                                 boundaryModel:
                                                     RegistrationDeliverySingleton()
                                                         .boundary!,

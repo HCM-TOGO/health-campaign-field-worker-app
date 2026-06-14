@@ -47,8 +47,6 @@ class _BoundarySelectionPageState
   late StreamSubscription syncSubscription;
   var leastLevelBoundaries;
 
-  final String setLocale = "fr_TG";
-
   @override
   void initState() {
     context.syncRefresh();
@@ -62,7 +60,24 @@ class _BoundarySelectionPageState
     super.initState();
     listenToSyncCount();
     if (AppSharedPreferences().getSelectedLocale == null) {
-      AppSharedPreferences().setSelectedLocale(setLocale);
+      // Seed the selected locale from the app config's default (first) language
+      // so it matches the locale the localization strings were stored under.
+      // Using a hardcoded value here causes a locale mismatch on first launch,
+      // which makes the app show localization codes instead of their values.
+      final defaultLocale =
+          context.read<AppInitializationBloc>().state.maybeWhen(
+                orElse: () => null,
+                initialized: (appConfiguration, _, __) => (appConfiguration
+                            .languages
+                            ?.where((element) =>
+                                element.value.toLowerCase().startsWith('fr'))
+                            .firstOrNull ??
+                        appConfiguration.languages?.firstOrNull)
+                    ?.value,
+              );
+      if (defaultLocale != null) {
+        AppSharedPreferences().setSelectedLocale(defaultLocale);
+      }
     }
   }
 
@@ -501,7 +516,9 @@ class _BoundarySelectionPageState
 
                                                 if (context.mounted) {
                                                   if (isOnline &&
-                                                      isDistributor &&
+                                                      (isDistributor ||
+                                                          context
+                                                              .isHealthFacilitySupervisor) &&
                                                       Constants
                                                           .isDownSyncEnabled) {
                                                     context

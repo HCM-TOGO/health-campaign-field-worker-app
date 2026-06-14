@@ -3,9 +3,10 @@ import 'package:digit_data_model/data_model.dart';
 import 'package:digit_ui_components/digit_components.dart';
 import 'package:digit_ui_components/theme/digit_extended_theme.dart';
 import 'package:digit_ui_components/widgets/molecules/digit_card.dart';
+import 'package:digit_ui_components/widgets/atoms/dropdown_wrapper.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter/services.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import '../../utils/hf_referral_cdd_singleton.dart';
 import 'package:health_campaign_field_worker_app/widgets/custom_back_navigation.dart';
 import 'package:reactive_forms/reactive_forms.dart';
 import 'package:referral_reconciliation/models/entities/referral_recon_enums.dart';
@@ -45,6 +46,7 @@ class _CustomReferralFacilityPageState
   static const _referredByKey = 'referredBy';
   final clickedStatus = ValueNotifier<bool>(false);
   String? selectedProjectFacilityId;
+  List<CddUser> _cddUsers = [];
 
   @override
   void dispose() {
@@ -62,6 +64,13 @@ class _CustomReferralFacilityPageState
       );
     });
     super.initState();
+    _fetchCddUsers();
+  }
+
+  void _fetchCddUsers() {
+    setState(() {
+      _cddUsers = HFReferralCddSingleton().cddUsers;
+    });
   }
 
   @override
@@ -412,37 +421,51 @@ class _CustomReferralFacilityPageState
                                                   formControlName:
                                                       _referredByKey,
                                                   builder: (field) {
+                                                    final currentValue = form
+                                                        .control(_referredByKey)
+                                                        .value as String?;
+                                                    final items = _cddUsers
+                                                        .map(
+                                                          (u) => DropdownItem(
+                                                            name: u.name,
+                                                            code: u.username,
+                                                          ),
+                                                        )
+                                                        .toList();
+                                                    final selectedOption =
+                                                        items.firstWhere(
+                                                      (item) =>
+                                                          item.code ==
+                                                          currentValue,
+                                                      orElse: () =>
+                                                          const DropdownItem(
+                                                              name: '',
+                                                              code: ''),
+                                                    );
                                                     return LabeledField(
-                                                        label: localizations
-                                                            .translate(
-                                                          i18.referralReconciliation
-                                                              .referredByTeamCodeLabel,
-                                                        ),
-                                                        child:
-                                                            DigitTextFormInput(
-                                                          inputFormatters: [
-                                                            UpperCaseTextFormatter(),
-                                                            FilteringTextInputFormatter
-                                                                .allow(RegExp(
-                                                              r"[a-zA-Z0-9\s\-.,\/!@#\$%\^&\*\(\)]",
-                                                            )),
-                                                          ],
-                                                          onChange: (val) => {
-                                                            form
-                                                                .control(
-                                                                    _referredByKey)
-                                                                .markAsTouched(),
-                                                            form
-                                                                .control(
-                                                                    _referredByKey)
-                                                                .value = val,
-                                                          },
-                                                          readOnly: viewOnly,
-                                                          initialValue: form
+                                                      label: localizations
+                                                          .translate(
+                                                        i18.referralReconciliation
+                                                            .referredByTeamCodeLabel,
+                                                      ),
+                                                      child: DigitDropdown(
+                                                        readOnly: viewOnly,
+                                                        onSelect:
+                                                            (DropdownItem val) {
+                                                          form
                                                               .control(
                                                                   _referredByKey)
-                                                              .value,
-                                                        ));
+                                                              .markAsTouched();
+                                                          form
+                                                              .control(
+                                                                  _referredByKey)
+                                                              .value = val.code;
+                                                        },
+                                                        selectedOption:
+                                                            selectedOption,
+                                                        items: items,
+                                                      ),
+                                                    );
                                                   }),
                                             ]),
                                       ),

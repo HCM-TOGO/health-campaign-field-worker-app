@@ -28,6 +28,7 @@ import '../data/local_store/no_sql/schema/project_types.dart';
 import '../data/local_store/no_sql/schema/row_versions.dart';
 import '../data/local_store/no_sql/schema/service_registry.dart';
 import '../data/repositories/local/inventory_management/custom_stock.dart';
+import '../data/repositories/local/registration_delivery/custom_individual_local_repository.dart';
 import '../data/repositories/remote/downsync.dart';
 import '../data/sync_registry.dart';
 import '../data/sync_service_mapper.dart';
@@ -115,6 +116,11 @@ class Constants {
   static const String spaq1 = "SPAQ 1";
   static const String spaq2 = "SPAQ 2";
 
+  static const String spaq1VariantId = "PVAR-2025-05-28-000001";
+  static const String spaq2VariantId = "PVAR-2025-05-28-000002";
+  static const String spaq1VariantIdProd = "PVAR-2025-06-19-000001";
+  static const String spaq2VariantIdProd = "PVAR-2025-06-19-000002";
+
   static const String spaq1Name = "SPAQ1_NAME";
   static const String spaq2Name = "SPAQ2_NAME";
 
@@ -130,6 +136,8 @@ class Constants {
   static const String tablet_3_11 = "tablet_3_11";
   static const String tablet_12_59 = "tablet_12_59";
   static const String zeroDose = 'zeroDose';
+  static const String unprocessed = 'unprocessed';
+  static const String pendingEligible = 'pendingEligible';
 
   // todo enable before cycle2
   static const bool isDownSyncEnabled = true;
@@ -147,7 +155,7 @@ class Constants {
       FacilityLocalRepository(sql, FacilityOpLogManager(isar)),
       ProjectLocalRepository(sql, ProjectOpLogManager(isar)),
       ProjectStaffLocalRepository(sql, ProjectStaffOpLogManager(isar)),
-      IndividualLocalRepository(sql, IndividualOpLogManager(isar)),
+      CustomIndividualLocalRepository(sql, IndividualOpLogManager(isar)),
       ProjectFacilityLocalRepository(sql, ProjectFacilityOpLogManager(isar)),
       ProjectResourceLocalRepository(
         sql,

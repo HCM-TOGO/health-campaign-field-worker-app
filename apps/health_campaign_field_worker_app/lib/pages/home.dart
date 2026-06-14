@@ -28,12 +28,12 @@ import 'dart:async';
 
 import 'package:connectivity_plus/connectivity_plus.dart';
 import 'package:digit_data_model/data_model.dart';
-import 'package:digit_data_model/models/entities/user_action.dart';
 import 'package:digit_dss/data/local_store/no_sql/schema/dashboard_config_schema.dart';
 import 'package:digit_dss/models/entities/dashboard_response_model.dart';
 import 'package:digit_dss/router/dashboard_router.gm.dart';
 import 'package:digit_dss/utils/utils.dart';
 import 'package:digit_location_tracker/utils/utils.dart';
+import 'package:digit_components/widgets/digit_card.dart';
 import 'package:digit_ui_components/digit_components.dart';
 import 'package:digit_ui_components/utils/component_utils.dart';
 import 'package:drift_db_viewer/drift_db_viewer.dart';
@@ -60,13 +60,16 @@ import '../utils/debound.dart';
 import '../utils/environment_config.dart';
 import '../utils/i18_key_constants.dart' as i18;
 import '../utils/least_level_boundary_singleton.dart';
+import '../utils/hf_referral_cdd_singleton.dart';
 import '../utils/utils.dart';
 import '../widgets/header/back_navigation_help_header.dart';
 import '../widgets/home/home_item_card.dart';
 import '../widgets/localized.dart';
 import '../widgets/registration_delivery/custom_beneficiary_progress.dart';
+import '../widgets/stock_balance/stock_balance_card.dart';
 import '../widgets/showcase/config/showcase_constants.dart';
 import '../widgets/showcase/showcase_button.dart';
+import 'edit/task_list.dart';
 // import 'package:referral_reconciliation/blocs/search_referral_reconciliations.dart';
 // import 'package:referral_reconciliation/router/referral_reconciliation_router.gm.dart';
 // import 'package:referral_reconciliation/pages/search_referral_reconciliations.dart';
@@ -85,8 +88,10 @@ class HomePage extends LocalizedStatefulWidget {
 class _HomePageState extends LocalizedState<HomePage> {
   bool skipProgressBar = false;
   final storage = const FlutterSecureStorage();
+  final _homeShowcaseData = HomePageShowcaseData();
   late StreamSubscription<List<ConnectivityResult>> subscription;
   bool isTriggerLocalisation = true;
+  // Stock in hand UI is handled by StockBalanceCard.
 
   @override
   initState() {
@@ -123,6 +128,9 @@ class _HomePageState extends LocalizedState<HomePage> {
     final roles = state.userModel.roles.map((e) {
       return e.code;
     });
+    final isDistributorRole =
+        roles.contains(RolesType.communityDistributor.toValue()) ||
+            roles.contains(RolesType.communityDistributor.toValue());
 
     if (!(roles.contains(RolesType.distributor.toValue()) ||
         roles.contains(RolesType.communityDistributor.toValue()) ||
@@ -134,7 +142,8 @@ class _HomePageState extends LocalizedState<HomePage> {
 
     final homeItems = mappedItems?.homeItems ?? [];
     final showcaseKeys = <GlobalKey>[
-      if (!skipProgressBar) homeShowcaseData.distributorProgressBar.showcaseKey,
+      if (!skipProgressBar)
+        _homeShowcaseData.distributorProgressBar.showcaseKey,
       ...(mappedItems?.showcaseKeys ?? []),
     ];
 
@@ -165,7 +174,7 @@ class _HomePageState extends LocalizedState<HomePage> {
               ),
               skipProgressBar
                   ? const SizedBox.shrink()
-                  : homeShowcaseData.distributorProgressBar.buildWith(
+                  : _homeShowcaseData.distributorProgressBar.buildWith(
                       child: CustomBeneficiaryProgressBar(
                         label: localizations.translate(
                           i18.home.progressIndicatorTitle,
@@ -175,6 +184,14 @@ class _HomePageState extends LocalizedState<HomePage> {
                         ),
                       ),
                     ),
+              Visibility(
+                visible: isDistributorRole,
+                maintainState: true,
+                child: Padding(
+                  padding: const EdgeInsets.symmetric(horizontal: spacer2),
+                  child: const StockBalanceCard(),
+                ),
+              ),
             ],
           ),
           footer: Padding(
@@ -341,7 +358,7 @@ class _HomePageState extends LocalizedState<HomePage> {
     }
 
     final Map<String, Widget> homeItemsMap = {
-      i18.home.dashboard: homeShowcaseData.dashBoard.buildWith(
+      i18.home.dashboard: _homeShowcaseData.dashBoard.buildWith(
         child: HomeItemCard(
           icon: Icons.bar_chart_sharp,
           label: i18.home.dashboard,
@@ -355,7 +372,7 @@ class _HomePageState extends LocalizedState<HomePage> {
         ),
       ),
       i18.home.beneficiaryLabel:
-          homeShowcaseData.distributorBeneficiaries.buildWith(
+          _homeShowcaseData.distributorBeneficiaries.buildWith(
         child: HomeItemCard(
           icon: Icons.family_restroom_rounded,
           label: i18.home.beneficiaryLabel,
@@ -367,7 +384,7 @@ class _HomePageState extends LocalizedState<HomePage> {
         ),
       ),
       i18.home.beneficiaryReferralLabel:
-          homeShowcaseData.hfBeneficiaryReferral.buildWith(
+          _homeShowcaseData.hfBeneficiaryReferral.buildWith(
         child: HomeItemCard(
           icon: Icons.supervised_user_circle_rounded,
           label: i18.home.beneficiaryReferralLabel,
@@ -381,7 +398,7 @@ class _HomePageState extends LocalizedState<HomePage> {
         ),
       ),
       i18.home.manageStockLabel:
-          homeShowcaseData.warehouseManagerManageStock.buildWith(
+          _homeShowcaseData.warehouseManagerManageStock.buildWith(
         child: HomeItemCard(
           icon: Icons.store_mall_directory,
           label: i18.home.manageStockLabel,
@@ -399,7 +416,7 @@ class _HomePageState extends LocalizedState<HomePage> {
           },
         ),
       ),
-      i18.home.summaryLabel: homeShowcaseData.summaryReport.buildWith(
+      i18.home.summaryLabel: _homeShowcaseData.summaryReport.buildWith(
         child: HomeItemCard(
           icon: Icons.summarize,
           label: i18.home.summaryLabel,
@@ -409,7 +426,7 @@ class _HomePageState extends LocalizedState<HomePage> {
         ),
       ),
       i18.home.stockReconciliationLabel:
-          homeShowcaseData.wareHouseManagerStockReconciliation.buildWith(
+          _homeShowcaseData.wareHouseManagerStockReconciliation.buildWith(
         child: HomeItemCard(
           icon: Icons.menu_book,
           label: i18.home.stockReconciliationLabel,
@@ -418,7 +435,7 @@ class _HomePageState extends LocalizedState<HomePage> {
           },
         ),
       ),
-      i18.home.viewReportsLabel: homeShowcaseData.inventoryReport.buildWith(
+      i18.home.viewReportsLabel: _homeShowcaseData.inventoryReport.buildWith(
         child: HomeItemCard(
           icon: Icons.announcement,
           label: i18.home.viewReportsLabel,
@@ -434,7 +451,7 @@ class _HomePageState extends LocalizedState<HomePage> {
           await context.router.push(CustomSearchReferralReconciliationsRoute());
         },
       ),
-      i18.home.syncDataLabel: homeShowcaseData.distributorSyncData.buildWith(
+      i18.home.syncDataLabel: _homeShowcaseData.distributorSyncData.buildWith(
         child: StreamBuilder<Map<String, dynamic>?>(
           stream: FlutterBackgroundService().on('serviceRunning'),
           builder: (context, snapshot) {
@@ -460,7 +477,7 @@ class _HomePageState extends LocalizedState<HomePage> {
           },
         ),
       ),
-      i18.home.db: homeShowcaseData.db.buildWith(
+      i18.home.db: _homeShowcaseData.db.buildWith(
         child: HomeItemCard(
           icon: Icons.table_chart,
           label: i18.home.db,
@@ -475,7 +492,7 @@ class _HomePageState extends LocalizedState<HomePage> {
           },
         ),
       ),
-      i18.home.dashboard: homeShowcaseData.dashBoard.buildWith(
+      i18.home.dashboard: _homeShowcaseData.dashBoard.buildWith(
         child: HomeItemCard(
           icon: Icons.bar_chart_sharp,
           label: i18.home.dashboard,
@@ -490,7 +507,7 @@ class _HomePageState extends LocalizedState<HomePage> {
         ),
       ),
       i18.home.fileComplaint:
-          homeShowcaseData.distributorFileComplaint.buildWith(
+          _homeShowcaseData.distributorFileComplaint.buildWith(
         child: HomeItemCard(
           icon: Icons.announcement,
           label: i18.home.fileComplaint,
@@ -504,7 +521,7 @@ class _HomePageState extends LocalizedState<HomePage> {
         ),
       ),
       i18.home.manageAttendanceLabel:
-          homeShowcaseData.manageAttendance.buildWith(
+          _homeShowcaseData.manageAttendance.buildWith(
         child: HomeItemCard(
           icon: Icons.fingerprint_outlined,
           label: i18.home.manageAttendanceLabel,
@@ -518,7 +535,7 @@ class _HomePageState extends LocalizedState<HomePage> {
           },
         ),
       ),
-      i18.home.mySurveyForm: homeShowcaseData.supervisorMySurveyForm.buildWith(
+      i18.home.mySurveyForm: _homeShowcaseData.supervisorMySurveyForm.buildWith(
         child: HomeItemCard(
           enableCustomIcon: true,
           customIcon: mySurveyFormSvg,
@@ -535,7 +552,8 @@ class _HomePageState extends LocalizedState<HomePage> {
           },
         ),
       ),
-      i18.home.closedHouseHoldLabel: homeShowcaseData.closedHouseHold.buildWith(
+      i18.home.closedHouseHoldLabel:
+          _homeShowcaseData.closedHouseHold.buildWith(
         child: HomeItemCard(
           icon: Icons.home,
           enableCustomIcon: true,
@@ -546,37 +564,47 @@ class _HomePageState extends LocalizedState<HomePage> {
             context.router.push(const ClosedHouseholdWrapperRoute());
           },
         ),
-      )
+      ),
+      i18.home.editTasks: _homeShowcaseData.editTasks.buildWith(
+        child: HomeItemCard(
+          icon: Icons.edit_note,
+          label: i18.home.editTasks,
+          onPressed: () {
+            context.router.push(const TaskListRoute());
+          },
+        ),
+      ),
     };
 
     final Map<String, GlobalKey> homeItemsShowcaseMap = {
       // INFO : Need to add showcase keys of package Here
       i18.home.closedHouseHoldLabel:
-          homeShowcaseData.closedHouseHold.showcaseKey,
+          _homeShowcaseData.closedHouseHold.showcaseKey,
 
       i18.home.manageAttendanceLabel:
-          homeShowcaseData.manageAttendance.showcaseKey,
+          _homeShowcaseData.manageAttendance.showcaseKey,
 
       i18.home.beneficiaryReferralLabel:
-          homeShowcaseData.hfBeneficiaryReferral.showcaseKey,
+          _homeShowcaseData.hfBeneficiaryReferral.showcaseKey,
 
       i18.home.beneficiaryLabel:
-          homeShowcaseData.distributorBeneficiaries.showcaseKey,
+          _homeShowcaseData.distributorBeneficiaries.showcaseKey,
 
       i18.home.manageStockLabel:
-          homeShowcaseData.warehouseManagerManageStock.showcaseKey,
+          _homeShowcaseData.warehouseManagerManageStock.showcaseKey,
       i18.home.stockReconciliationLabel:
-          homeShowcaseData.wareHouseManagerStockReconciliation.showcaseKey,
-      i18.home.viewReportsLabel: homeShowcaseData.inventoryReport.showcaseKey,
-      i18.home.syncDataLabel: homeShowcaseData.distributorSyncData.showcaseKey,
+          _homeShowcaseData.wareHouseManagerStockReconciliation.showcaseKey,
+      i18.home.viewReportsLabel: _homeShowcaseData.inventoryReport.showcaseKey,
+      i18.home.syncDataLabel: _homeShowcaseData.distributorSyncData.showcaseKey,
       i18.home.fileComplaint:
-          homeShowcaseData.distributorFileComplaint.showcaseKey,
-      i18.home.db: homeShowcaseData.db.showcaseKey,
-      i18.home.dashboard: homeShowcaseData.dashBoard.showcaseKey,
-      i18.home.clfLabel: homeShowcaseData.clf.showcaseKey,
+          _homeShowcaseData.distributorFileComplaint.showcaseKey,
+      i18.home.db: _homeShowcaseData.db.showcaseKey,
+      i18.home.dashboard: _homeShowcaseData.dashBoard.showcaseKey,
+      i18.home.clfLabel: _homeShowcaseData.clf.showcaseKey,
       i18.home.mySurveyForm:
-          homeShowcaseData.supervisorMySurveyForm.showcaseKey,
-      i18.home.summaryLabel: homeShowcaseData.summaryReport.showcaseKey,
+          _homeShowcaseData.supervisorMySurveyForm.showcaseKey,
+      i18.home.summaryLabel: _homeShowcaseData.summaryReport.showcaseKey,
+      i18.home.editTasks: _homeShowcaseData.editTasks.showcaseKey,
     };
 
     final homeItemsLabel = <String>[
@@ -596,6 +624,7 @@ class _HomePageState extends LocalizedState<HomePage> {
       i18.home.db,
       i18.home.dashboard,
       i18.home.summaryLabel,
+      i18.home.editTasks,
     ];
 
     final List<String> filteredLabels = homeItemsLabel
@@ -611,6 +640,7 @@ class _HomePageState extends LocalizedState<HomePage> {
         .where((f) => f != i18.home.db)
         .map((label) => homeItemsShowcaseMap[label]!)
         .toList();
+    if (context.isCDD) filteredLabels.add(i18.home.editTasks);
     if (context.isCDD) filteredLabels.add(i18.home.summaryLabel);
 
     // if ((envConfig.variables.envType == EnvType.demo && kReleaseMode) ||
@@ -671,7 +701,7 @@ class _HomePageState extends LocalizedState<HomePage> {
                     LocalRepository<IndividualModel, IndividualSearchModel>>(),
                 // context.read<
                 //     LocalRepository<UserActionModel, UserActionSearchModel>>(),
-                context.read<LocalRepository<StockModel, StockSearchModel>>(),
+                // context.read<LocalRepository<StockModel, StockSearchModel>>(),
               ],
               remoteRepositories: [
                 // INFO : Need to add repo repo of package Here
@@ -789,6 +819,10 @@ void setPackagesSingleton(BuildContext context) {
               appConfiguration.checklistTypes?.map((e) => e.code).toList() ??
                   [],
         );
+
+        if (context.isHealthFacilitySupervisor) {
+          _fetchAndStoreCddUsers(context);
+        }
 
         RegistrationDeliverySingleton().setInitialData(
           loggedInUserUuid: context.loggedInUserUuid,
@@ -928,6 +962,86 @@ void setPackagesSingleton(BuildContext context) {
               }),
         );
       });
+}
+
+Future<void> _fetchAndStoreCddUsers(BuildContext context) async {
+  try {
+    // Read both repos before any await to avoid BuildContext across async gaps
+    final staffRepo = context
+        .read<RemoteRepository<ProjectStaffModel, ProjectStaffSearchModel>>();
+    final individualRepo = context
+        .read<RemoteRepository<IndividualModel, IndividualSearchModel>>();
+
+    // Step 1: get all project staff for this project → collect user UUIDs
+    final projectStaffList = await staffRepo.search(
+      ProjectStaffSearchModel(
+        projectId: [ReferralReconSingleton().projectId],
+      ),
+    );
+
+    if (projectStaffList.isEmpty) return;
+
+    final userUuids = projectStaffList
+        .where((s) => s.userId != null)
+        .map((s) => s.userId!)
+        .toList();
+
+    if (userUuids.isEmpty) return;
+
+    // Step 2: fetch individual details by userUuid; parse raw response to get
+    // userDetails.roles which is not part of IndividualModel
+    final response = await individualRepo.dio.post(
+      individualRepo.searchPath,
+      queryParameters: {
+        'offset': 0,
+        'limit': userUuids.length,
+        'tenantId': DigitDataModelSingleton().tenantId,
+      },
+      data: {
+        'Individual': {
+          'userUuid': userUuids,
+        },
+      },
+    );
+
+    final responseMap = response.data;
+    if (responseMap is! Map<String, dynamic> ||
+        !responseMap.containsKey('Individual')) return;
+
+    final individualList = responseMap['Individual'];
+    if (individualList is! List) return;
+
+    const cddRoles = {'COMMUNITY_DISTRIBUTOR', 'DISTRIBUTOR'};
+
+    final users = individualList
+        .whereType<Map<String, dynamic>>()
+        .where((ind) {
+          final userDetails = ind['userDetails'];
+          if (userDetails is! Map<String, dynamic>) return false;
+          final roles = userDetails['roles'];
+          if (roles is! List) return false;
+          return roles.any((role) =>
+              role is Map<String, dynamic> && cddRoles.contains(role['code']));
+        })
+        .map((ind) {
+          final nameMap = ind['name'];
+          final givenName = nameMap is Map<String, dynamic>
+              ? nameMap['givenName'] as String? ?? ''
+              : '';
+          final userDetails = ind['userDetails'] as Map<String, dynamic>?;
+          final username = userDetails?['username'] as String? ?? '';
+          return CddUser(
+            name: givenName.isNotEmpty ? givenName : username,
+            username: username,
+          );
+        })
+        .where((u) => u.username.isNotEmpty)
+        .toList();
+
+    HFReferralCddSingleton().setCddUsers(users);
+  } catch (_) {
+    // silently ignore — singleton retains empty list for this session
+  }
 }
 
 void loadLocalization(

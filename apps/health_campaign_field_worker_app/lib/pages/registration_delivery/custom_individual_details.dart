@@ -46,6 +46,9 @@ import '../../router/app_router.dart';
 import '../../utils/utils.dart' as local_utils;
 import '../../utils/registration_delivery/registration_delivery_utils.dart';
 import 'custom_beneficiary_acknowledgement.dart';
+import 'package:registration_delivery/models/entities/project_beneficiary.dart';
+import 'package:registration_delivery/models/entities/task.dart';
+import 'package:registration_delivery/models/entities/household_member.dart';
 
 @RoutePage()
 class CustomIndividualDetailsPage extends LocalizedStatefulWidget {
@@ -92,10 +95,21 @@ class CustomIndividualDetailsPageState
   Set<String>? beneficiaryId;
 
   late final CustomSearchHouseholdsBloc customSearchHouseholdsBloc;
+  final TextEditingController _deleteReasonController = TextEditingController();
 
   @override
   void initState() {
     customSearchHouseholdsBloc = context.read<CustomSearchHouseholdsBloc>();
+    final state = context.read<CustomBeneficiaryRegistrationBloc>().state;
+    final individual = state.mapOrNull<IndividualModel>(
+      editIndividual: (value) => value.individualModel,
+    );
+    final previousBenefId = individual?.additionalFields?.fields
+        .firstWhereOrNull((f) => f.key == 'previousBeneficiaryId')
+        ?.value;
+    if (previousBenefId != null && previousBenefId.toString().isNotEmpty) {
+      yesNoValue = yes;
+    }
     super.initState();
   }
 
@@ -139,6 +153,83 @@ class CustomIndividualDetailsPageState
       name: name,
       individualModel: individual,
     ));
+  }
+
+  Future<void> _deleteIndividualAndRelated(
+      BuildContext context, String reason) async {
+    final state = context.read<CustomBeneficiaryRegistrationBloc>().state;
+    final individual = state.mapOrNull<IndividualModel>(
+      editIndividual: (v) => v.individualModel,
+    );
+    final household = state.mapOrNull<HouseholdModel>(
+      editIndividual: (v) => v.householdModel,
+    );
+
+    if (individual == null || household == null) return;
+
+    final individualRepo = ContextUtilityExtensions(context)
+        .repository<IndividualModel, IndividualSearchModel>(context);
+    final projectBeneficiaryRepo = ContextUtilityExtensions(context)
+        .repository<ProjectBeneficiaryModel, ProjectBeneficiarySearchModel>(
+            context);
+    final householdMemberRepo = ContextUtilityExtensions(context)
+        .repository<HouseholdMemberModel, HouseholdMemberSearchModel>(context);
+    final taskRepo = ContextUtilityExtensions(context)
+        .repository<TaskModel, TaskSearchModel>(context);
+
+    // merge delete reason into individual's additional fields before delete
+    final existingAdditional = individual.additionalFields?.fields ?? [];
+    final updatedAdditional = [
+      ...existingAdditional,
+      AdditionalField('deleteReason', reason),
+    ];
+
+    // delete individual
+    final existing = (await individualRepo.search(IndividualSearchModel(
+      clientReferenceId: [individual.clientReferenceId],
+    )))
+        .firstOrNull;
+    await individualRepo.delete(individual.copyWith(
+      additionalFields:
+          IndividualAdditionalFields(version: 1, fields: updatedAdditional),
+      id: existing?.id,
+      rowVersion: existing?.rowVersion ?? 1,
+      nonRecoverableError: existing?.nonRecoverableError ?? false,
+    ));
+
+    // find project beneficiaries for this individual and delete them
+    final projectBeneficiaries = await projectBeneficiaryRepo.search(
+      ProjectBeneficiarySearchModel(
+        beneficiaryClientReferenceId: [individual.clientReferenceId],
+      ),
+    );
+
+    for (final pb in projectBeneficiaries) {
+      await projectBeneficiaryRepo
+          .delete(pb.copyWith(rowVersion: pb.rowVersion));
+    }
+
+    // delete household member mapping
+    final members = await householdMemberRepo.search(
+      HouseholdMemberSearchModel(
+        householdClientReferenceId: [household.clientReferenceId],
+        individualClientReferenceId: [individual.clientReferenceId],
+      ),
+    );
+    for (final m in members) {
+      await householdMemberRepo.delete(m.copyWith(rowVersion: m.rowVersion));
+    }
+
+    // fetch tasks linked to the individual's project beneficiaries and delete
+    if (projectBeneficiaries.isNotEmpty) {
+      final tasks = await taskRepo.search(TaskSearchModel(
+        projectBeneficiaryClientReferenceId:
+            projectBeneficiaries.map((e) => e.clientReferenceId).toList(),
+      ));
+      for (final t in tasks) {
+        await taskRepo.delete(t.copyWith(rowVersion: t.rowVersion));
+      }
+    }
   }
 
   @override
@@ -205,7 +296,7 @@ class CustomIndividualDetailsPageState
                             }
                             if (form.control(_genderKey).value == null) {
                               setState(() {
-                                form.control(_genderKey).setErrors({'': true});
+                                form.control(_genderKey).setErrors({'required': true});
                               });
                             }
                             final userId = RegistrationDeliverySingleton()
@@ -536,6 +627,163 @@ class CustomIndividualDetailsPageState
                         );
                       },
                     ),
+                    BlocBuilder<CustomBeneficiaryRegistrationBloc,
+                        BeneficiaryRegistrationState>(
+                      builder: (context, state) {
+                        final bool showDelete = state.maybeMap(
+                              editIndividual: (_) => true,
+                              orElse: () => false,
+                            ) &&
+                            !widget.isHeadOfHousehold;
+
+                        if (!showDelete) return const SizedBox.shrink();
+
+                        return Padding(
+                          padding: const EdgeInsets.only(top: spacer2),
+                          child: DigitButton(
+                            label: localizations.translate(
+                                i18.memberCard.deleteIndividualActionText),
+                            type: DigitButtonType.secondary,
+                            size: DigitButtonSize.large,
+                            mainAxisSize: MainAxisSize.max,
+                            onPressed: () async {
+                              final result = await showDialog<bool>(
+                                context: context,
+                                builder: (BuildContext ctx) {
+                                  return AlertDialog(
+                                    title: Text(localizations.translate(
+                                        i18.deliverIntervention.dialogTitle)),
+                                    content: Column(
+                                      mainAxisSize: MainAxisSize.min,
+                                      crossAxisAlignment:
+                                          CrossAxisAlignment.start,
+                                      children: [
+                                        Text(localizations.translate(i18
+                                            .deliverIntervention
+                                            .dialogContent)),
+                                        const SizedBox(height: 16),
+                                        TextField(
+                                          controller: _deleteReasonController,
+                                          decoration: InputDecoration(
+                                            labelText: localizations.translate(
+                                                i18_local.beneficiaryDetails
+                                                    .deleteIndividualLabelText),
+                                            hintText: localizations.translate(
+                                                i18_local.beneficiaryDetails
+                                                    .deleteIndividualHintText),
+                                            border: const OutlineInputBorder(),
+                                          ),
+                                          maxLines: 3,
+                                          maxLength: 200,
+                                          autofocus: true,
+                                        ),
+                                      ],
+                                    ),
+                                    actions: [
+                                      TextButton(
+                                        onPressed: () =>
+                                            Navigator.of(ctx).pop(false),
+                                        child: Text(localizations.translate(
+                                            i18.common.coreCommonCancel)),
+                                      ),
+                                      ElevatedButton(
+                                        onPressed: () {
+                                          final reason = _deleteReasonController
+                                              .text
+                                              .trim();
+                                          if (reason.isEmpty) {
+                                            ScaffoldMessenger.of(ctx)
+                                                .showSnackBar(
+                                              SnackBar(
+                                                content: Text(localizations
+                                                    .translate(i18_local
+                                                        .beneficiaryDetails
+                                                        .deleteIndividualRequiredErrorMsg)),
+                                                backgroundColor: Colors.red,
+                                              ),
+                                            );
+                                            return;
+                                          }
+                                          if (reason.length < 3) {
+                                            ScaffoldMessenger.of(ctx)
+                                                .showSnackBar(
+                                              SnackBar(
+                                                content: Text(localizations
+                                                    .translate(i18_local
+                                                        .beneficiaryDetails
+                                                        .deleteIndividualMinLengthErrorMsg)),
+                                                backgroundColor: Colors.red,
+                                              ),
+                                            );
+                                            return;
+                                          }
+                                          if (reason.length > 200) {
+                                            ScaffoldMessenger.of(ctx)
+                                                .showSnackBar(
+                                              SnackBar(
+                                                content: Text(localizations
+                                                    .translate(i18_local
+                                                        .beneficiaryDetails
+                                                        .deleteIndividualMaxLengthErrorMsg)),
+                                                backgroundColor: Colors.red,
+                                              ),
+                                            );
+                                            return;
+                                          }
+                                          Navigator.of(ctx).pop(true);
+                                        },
+                                        style: ElevatedButton.styleFrom(
+                                          backgroundColor: Colors.red,
+                                          foregroundColor: Colors.white,
+                                        ),
+                                        child: Text(localizations.translate(
+                                            i18_local.common.coreCommonDelete)),
+                                      ),
+                                    ],
+                                  );
+                                },
+                              );
+
+                              if (result != true) return;
+
+                              try {
+                                final reason =
+                                    _deleteReasonController.text.trim();
+                                await _deleteIndividualAndRelated(
+                                    context, reason);
+                                if (context.mounted) {
+                                  await DigitToast.show(
+                                    context,
+                                    options: DigitToastOptions(
+                                      localizations.translate(i18_local
+                                          .beneficiaryDetails
+                                          .deleteIndividualSuccessMsg),
+                                      true,
+                                      Theme.of(context),
+                                    ),
+                                  );
+                                  _deleteReasonController.clear();
+                                  context.router.maybePop();
+                                }
+                              } catch (e) {
+                                if (context.mounted) {
+                                  await DigitToast.show(
+                                    context,
+                                    options: DigitToastOptions(
+                                      localizations.translate(i18_local
+                                          .beneficiaryDetails
+                                          .deleteIndividualFailedMsg),
+                                      true,
+                                      Theme.of(context),
+                                    ),
+                                  );
+                                }
+                              }
+                            },
+                          ),
+                        );
+                      },
+                    ),
                   ]),
               slivers: [
                 SliverToBoxAdapter(
@@ -582,6 +830,7 @@ class CustomIndividualDetailsPageState
                                         : i18_local.individualDetails
                                             .nameLabelTextNewUpdate,
                                   ),
+                                  isRequired: true,
                                   child: DigitTextFormInput(
                                     inputFormatters: [
                                       UpperCaseTextFormatter(),
@@ -806,6 +1055,7 @@ class CustomIndividualDetailsPageState
                             requiredErrMsg: localizations.translate(
                               i18.common.corecommonRequired,
                             ),
+                            isRequired: true,
                             onChangeOfFormControl: (dob) {
                               final control = form.control(_dobKey);
                               if (dob == null) {
@@ -835,6 +1085,7 @@ class CustomIndividualDetailsPageState
                           label: localizations.translate(
                             i18.individualDetails.genderLabelText,
                           ),
+                          isRequired: true,
                           valueMapper: (value) =>
                               localizations.translate(value),
                           initialValue: form.control(_genderKey).value,
@@ -853,35 +1104,35 @@ class CustomIndividualDetailsPageState
                               form.control(_genderKey).value = value;
                             } else {
                               form.control(_genderKey).value = null;
-                              form.control(_genderKey).setErrors({'': true});
+                              form.control(_genderKey).setErrors({'required': true});
                             }
                           },
                         ),
-                        if (!widget.isHeadOfHousehold)
-                          DigitButton(
-                            capitalizeLetters: false,
-                            label: localizations.translate(
-                              i18_local.individualDetails
-                                  .linkQrCodeToBeneficiaryLabel,
-                            ),
-                            mainAxisSize: MainAxisSize.max,
-                            type: DigitButtonType.secondary,
-                            size: DigitButtonSize.large,
-                            isDisabled: false,
-                            onPressed: () {
-                              Navigator.of(context).push(
-                                MaterialPageRoute(
-                                  builder: (context) => const DigitScannerPage(
-                                    quantity: 5,
-                                    isGS1code: false,
-                                    singleValue: false,
-                                  ),
-                                  settings:
-                                      const RouteSettings(name: '/qr-scanner'),
-                                ),
-                              );
-                            },
-                          ),
+                        // if (!widget.isHeadOfHousehold)
+                        //   DigitButton(
+                        //     capitalizeLetters: false,
+                        //     label: localizations.translate(
+                        //       i18_local.individualDetails
+                        //           .linkQrCodeToBeneficiaryLabel,
+                        //     ),
+                        //     mainAxisSize: MainAxisSize.max,
+                        //     type: DigitButtonType.secondary,
+                        //     size: DigitButtonSize.large,
+                        //     isDisabled: false,
+                        //     onPressed: () {
+                        //       Navigator.of(context).push(
+                        //         MaterialPageRoute(
+                        //           builder: (context) => const DigitScannerPage(
+                        //             quantity: 5,
+                        //             isGS1code: false,
+                        //             singleValue: false,
+                        //           ),
+                        //           settings:
+                        //               const RouteSettings(name: '/qr-scanner'),
+                        //         ),
+                        //       );
+                        //     },
+                        //   ),
                         if (!widget.isHeadOfHousehold)
                           Text(
                               localizations.translate(i18_local
@@ -941,41 +1192,41 @@ class CustomIndividualDetailsPageState
                               },
                             ),
                           ),
-                        if (!widget.isHeadOfHousehold && isRelocated)
-                          DigitButton(
-                            capitalizeLetters: false,
-                            label: localizations.translate(i18_local
-                                .householdDetails.previousBeneficiaryQRCode),
-                            mainAxisSize: MainAxisSize.max,
-                            type: DigitButtonType.secondary,
-                            size: DigitButtonSize.large,
-                            isDisabled: false,
-                            onPressed: () {
-                              Navigator.of(context).push(
-                                MaterialPageRoute(
-                                  builder: (context) => const DigitScannerPage(
-                                    quantity: 5,
-                                    isGS1code: false,
-                                    singleValue: false,
-                                  ),
-                                  settings:
-                                      const RouteSettings(name: '/qr-scanner'),
-                                ),
-                              );
-                            },
-                          ),
-                        if (!widget.isHeadOfHousehold && isRelocated)
-                          Row(
-                            mainAxisAlignment: MainAxisAlignment.center,
-                            children: [
-                              Text(
-                                localizations.translate(
-                                  i18.individualDetails.separatorLabelText,
-                                ),
-                                style: theme.textTheme.bodyLarge,
-                              ),
-                            ],
-                          ),
+                        // if (!widget.isHeadOfHousehold && isRelocated)
+                        //   DigitButton(
+                        //     capitalizeLetters: false,
+                        //     label: localizations.translate(i18_local
+                        //         .householdDetails.previousBeneficiaryQRCode),
+                        //     mainAxisSize: MainAxisSize.max,
+                        //     type: DigitButtonType.secondary,
+                        //     size: DigitButtonSize.large,
+                        //     isDisabled: false,
+                        //     onPressed: () {
+                        //       Navigator.of(context).push(
+                        //         MaterialPageRoute(
+                        //           builder: (context) => const DigitScannerPage(
+                        //             quantity: 5,
+                        //             isGS1code: false,
+                        //             singleValue: false,
+                        //           ),
+                        //           settings:
+                        //               const RouteSettings(name: '/qr-scanner'),
+                        //         ),
+                        //       );
+                        //     },
+                        //   ),
+                        // if (!widget.isHeadOfHousehold && isRelocated)
+                        //   Row(
+                        //     mainAxisAlignment: MainAxisAlignment.center,
+                        //     children: [
+                        //       Text(
+                        //         localizations.translate(
+                        //           i18.individualDetails.separatorLabelText,
+                        //         ),
+                        //         style: theme.textTheme.bodyLarge,
+                        //       ),
+                        //     ],
+                        //   ),
                         if (!widget.isHeadOfHousehold && isRelocated)
                           ReactiveWrapperField(
                             formControlName: _previousBeneficiaryIdKey,
@@ -1136,15 +1387,37 @@ class CustomIndividualDetailsPageState
       ),
     );
 
-    List<IdentifierModel>? identifiers = individual.identifiers;
-    if (isEditIndividual == false) {
-      identifiers?.add(IdentifierModel(
-        clientReferenceId: individual.clientReferenceId,
-        identifierId: beneficiaryId,
-        identifierType: IdentifierTypes.uniqueBeneficiaryID.toValue(),
-        clientAuditDetails: individual.clientAuditDetails,
-        auditDetails: individual.auditDetails,
-      ));
+    final hasUniqueBeneficiaryId = individual.identifiers?.any(
+          (e) =>
+              e.identifierType == IdentifierTypes.uniqueBeneficiaryID.toValue(),
+        ) ??
+        false;
+
+    final List<IdentifierModel> resolvedIdentifiers;
+    if (isEditIndividual) {
+      resolvedIdentifiers = List<IdentifierModel>.from(
+        individual.identifiers ?? [],
+      );
+      if (!hasUniqueBeneficiaryId && beneficiaryId != null) {
+        resolvedIdentifiers.add(
+          IdentifierModel(
+            clientReferenceId: individual.clientReferenceId,
+            tenantId: RegistrationDeliverySingleton().tenantId,
+            rowVersion: 1,
+            identifierId: beneficiaryId,
+            identifierType: IdentifierTypes.uniqueBeneficiaryID.toValue(),
+            clientAuditDetails: individual.clientAuditDetails,
+            auditDetails: individual.auditDetails,
+          ),
+        );
+      }
+    } else {
+      resolvedIdentifiers = [
+        identifier.copyWith(
+          identifierId: beneficiaryId,
+          identifierType: IdentifierTypes.uniqueBeneficiaryID.toValue(),
+        ),
+      ];
     }
 
     String? individualName = form.control(_individualNameKey).value as String?;
@@ -1158,23 +1431,31 @@ class CustomIndividualDetailsPageState
               .byName(form.control(_genderKey).value.toString().toLowerCase()),
       mobileNumber: form.control(_mobileNumberKey).value,
       dateOfBirth: dobString,
-      identifiers: isEditIndividual && identifier.identifierId != null
-          ? identifiers
-          : [
-              identifier.copyWith(
-                identifierId: beneficiaryId,
-                identifierType: IdentifierTypes.uniqueBeneficiaryID.toValue(),
-              ),
-            ],
+      identifiers: resolvedIdentifiers,
       additionalFields: IndividualAdditionalFields(
         version: 1,
         fields: [
-          if (form.control(_previousBeneficiaryIdKey).value != null &&
+          if (isRelocated &&
+              form.control(_previousBeneficiaryIdKey).value != null &&
               // ignore: avoid_dynamic_calls
               form.control(_previousBeneficiaryIdKey).value!.isNotEmpty)
             AdditionalField(
               'previousBeneficiaryId',
               form.control(_previousBeneficiaryIdKey).value!,
+            ),
+          if (form.control(_idTypeKey).value != null &&
+              // ignore: avoid_dynamic_calls
+              form.control(_idTypeKey).value!.isNotEmpty)
+            AdditionalField(
+              'idType',
+              form.control(_idTypeKey).value!,
+            ),
+          if (form.control(_idNumberKey).value != null &&
+              // ignore: avoid_dynamic_calls
+              form.control(_idNumberKey).value!.isNotEmpty)
+            AdditionalField(
+              'idNumber',
+              form.control(_idNumberKey).value!,
             ),
         ],
       ),
@@ -1232,10 +1513,31 @@ class CustomIndividualDetailsPageState
             : null,
       ),
       _idTypeKey: FormControl<String>(
-        value: individual?.identifiers?.firstOrNull?.identifierType,
+        value: () {
+          final savedIdType = individual?.additionalFields?.fields
+              .firstWhereOrNull((f) => f.key == 'idType')
+              ?.value as String?;
+          if (savedIdType != null && savedIdType != 'DEFAULT') {
+            return savedIdType;
+          }
+          // For DEFAULT or missing, fall back to identifierType from identifiers
+          return individual?.identifiers?.firstOrNull?.identifierType ??
+              'DEFAULT';
+        }(),
       ),
       _idNumberKey: FormControl<String>(
-        value: individual?.identifiers?.firstOrNull?.identifierId,
+        value: () {
+          final savedIdType = individual?.additionalFields?.fields
+              .firstWhereOrNull((f) => f.key == 'idType')
+              ?.value as String?;
+          if (savedIdType != null && savedIdType != 'DEFAULT') {
+            return individual?.additionalFields?.fields
+                .firstWhereOrNull((f) => f.key == 'idNumber')
+                ?.value as String?;
+          }
+          // For DEFAULT, fall back to the UNIQUE_BENEFICIARY_ID from identifiers
+          return individual?.identifiers?.firstOrNull?.identifierId;
+        }(),
       ),
       _genderKey: FormControl<String>(value: getGenderOptions(individual)),
       _mobileNumberKey:

@@ -286,49 +286,55 @@ extension ContextUtilityExtensions on BuildContext {
   }
 
   int get spaq1 {
-    final authBloc = _get<AuthBloc>();
-    final spaq1 = authBloc.state.whenOrNull(
-      authenticated: (
-        accessToken,
-        refreshToken,
-        userModel,
-        actionsWrapper,
-        individualId,
-        spaq1,
-        spaq2,
-      ) {
-        return spaq1;
-      },
-    );
+    final balances = StockInHandCache.instance.currentBalances;
+    final computed = (balances[Constants.spaq1VariantId] ?? 0) +
+        (balances[Constants.spaq1VariantIdProd] ?? 0);
 
-    if (spaq1 == null) {
-      return 0;
+    if (computed > 0 || balances.isNotEmpty) {
+      return computed.toInt();
     }
 
-    return spaq1;
+    // Fallback to old stored value if cache isn't ready yet.
+    final authBloc = _get<AuthBloc>();
+    return authBloc.state.whenOrNull(
+          authenticated: (
+            accessToken,
+            refreshToken,
+            userModel,
+            actionsWrapper,
+            individualId,
+            spaq1,
+            spaq2,
+          ) =>
+              spaq1 ?? 0,
+        ) ??
+        0;
   }
 
   int get spaq2 {
-    final authBloc = _get<AuthBloc>();
-    final spaq2 = authBloc.state.whenOrNull(
-      authenticated: (
-        accessToken,
-        refreshToken,
-        userModel,
-        actionsWrapper,
-        individualId,
-        spaq1,
-        spaq2,
-      ) {
-        return spaq2;
-      },
-    );
+    final balances = StockInHandCache.instance.currentBalances;
+    final computed = (balances[Constants.spaq2VariantId] ?? 0) +
+        (balances[Constants.spaq2VariantIdProd] ?? 0);
 
-    if (spaq2 == null) {
-      return 0;
+    if (computed > 0 || balances.isNotEmpty) {
+      return computed.toInt();
     }
 
-    return spaq2;
+    // Fallback to old stored value if cache isn't ready yet.
+    final authBloc = _get<AuthBloc>();
+    return authBloc.state.whenOrNull(
+          authenticated: (
+            accessToken,
+            refreshToken,
+            userModel,
+            actionsWrapper,
+            individualId,
+            spaq1,
+            spaq2,
+          ) =>
+              spaq2 ?? 0,
+        ) ??
+        0;
   }
 
   bool get isWarehouseMgr {
@@ -410,5 +416,11 @@ extension ContextUtilityExtensions on BuildContext {
   Stream<SyncState> syncCount() {
     final syncBloc = _get<SyncBloc>();
     return syncBloc.stream;
+  }
+
+  /// Latest computed stock-in-hand (per productVariantId) for the currently
+  /// active ownerId (set by the home StockBalanceCard).
+  Map<String, double> get stockInHandByVariantId {
+    return StockInHandCache.instance.currentBalances;
   }
 }

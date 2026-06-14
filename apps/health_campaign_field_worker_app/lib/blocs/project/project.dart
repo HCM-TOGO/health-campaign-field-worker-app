@@ -17,6 +17,7 @@ import 'package:inventory_management/models/entities/stock.dart';
 import 'package:inventory_management/models/entities/transaction_type.dart';
 import 'package:isar/isar.dart';
 import 'package:recase/recase.dart';
+import 'package:registration_delivery/models/entities/task.dart';
 import 'package:survey_form/models/entities/service_definition.dart';
 
 import '../../../models/app_config/app_config_model.dart' as app_configuration;
@@ -31,9 +32,13 @@ import '../../models/auth/auth_model.dart';
 import '../../models/entities/roles_type.dart';
 import '../../models/data_model.dart';
 import '../../utils/background_service.dart';
+import '../../utils/constants.dart';
 import '../../utils/environment_config.dart';
 import '../../utils/least_level_boundary_singleton.dart';
+import '../../utils/stock_in_hand_cache.dart';
+import '../../utils/stock_in_hand_utils.dart';
 import '../../utils/utils.dart';
+import '../auth/auth.dart';
 
 part 'project.freezed.dart';
 
@@ -112,6 +117,8 @@ class ProjectBloc extends Bloc<ProjectEvent, ProjectState> {
   /// Stock Repositories
   final RemoteRepository<StockModel, StockSearchModel> stockRemoteRepository;
   final LocalRepository<StockModel, StockSearchModel> stockLocalRepository;
+  final RemoteRepository<TaskModel, TaskSearchModel> taskRemoteRepository;
+  final LocalRepository<TaskModel, TaskSearchModel> taskLocalRepository;
 
   final DashboardRemoteRepository dashboardRemoteRepository;
   BuildContext context;
@@ -146,6 +153,8 @@ class ProjectBloc extends Bloc<ProjectEvent, ProjectState> {
     required this.attendanceLogRemoteRepository,
     required this.stockLocalRepository,
     required this.stockRemoteRepository,
+    required this.taskRemoteRepository,
+    required this.taskLocalRepository,
     required this.context,
   })  : localSecureStore = localSecureStore ?? LocalSecureStore.instance,
         super(const ProjectState()) {
@@ -622,6 +631,7 @@ class ProjectBloc extends Bloc<ProjectEvent, ProjectState> {
           await facilityLocalRepository.search(FacilitySearchModel());
       await downloadStockDataBasedOnRole(
           projectFacilities, facilities, event.model.address?.boundaryType);
+      await downloadTaskDataForLoggedInUser();
     } catch (_) {
       emit(state.copyWith(
         loading: false,
@@ -719,7 +729,10 @@ class ProjectBloc extends Bloc<ProjectEvent, ProjectState> {
           .toList();
       final stockSearchModel = StockSearchModel(
         receiverId: receiverIds,
-        transactionType: [TransactionType.dispatched.toValue()],
+        transactionType: [
+          TransactionType.dispatched.toValue(),
+          TransactionType.received.toValue()
+        ],
       );
       final stockEntriesDownloaded =
           await downloadStockEntries(stockSearchModel);
@@ -735,18 +748,25 @@ class ProjectBloc extends Bloc<ProjectEvent, ProjectState> {
           .toList();
       final stockSearchModel = StockSearchModel(
         receiverId: receiverIds,
-        transactionType: [TransactionType.dispatched.toValue()],
+        transactionType: [
+          TransactionType.dispatched.toValue(),
+          TransactionType.received.toValue()
+        ],
       );
       final stockEntriesDownloaded =
           await downloadStockEntries(stockSearchModel);
 
       // info : create entries in the local repository
       await createStockDownloadedEntries(stockEntriesDownloaded);
-    } else if (userRoles.contains(RolesType.communityDistributor.toValue())) {
+    } else if (userRoles.contains(RolesType.communityDistributor.toValue()) ||
+        userRoles.contains(RolesType.distributor.toValue())) {
       final receiverIds = [context.loggedInUserUuid];
       final stockSearchModel = StockSearchModel(
         receiverId: receiverIds,
-        transactionType: [TransactionType.dispatched.toValue()],
+        transactionType: [
+          TransactionType.dispatched.toValue(),
+          TransactionType.received.toValue()
+        ],
       );
       final stockEntriesDownloaded =
           await downloadStockEntries(stockSearchModel);
@@ -761,6 +781,8 @@ class ProjectBloc extends Bloc<ProjectEvent, ProjectState> {
       List<StockModel> stockEntries) async {
     await (stockLocalRepository as CustomStockLocalRepository)
         .bulkStockCreate(stockEntries);
+
+    await _refreshSpaqCountsAfterDownsync();
   }
 
   // info:  downloads the stock data from remote repository
@@ -774,6 +796,197 @@ class ProjectBloc extends Bloc<ProjectEvent, ProjectState> {
         limit: initialLimit, offSet: offset);
 
     return stockEntries;
+  }
+
+  Future<void> _refreshSpaqCountsAfterDownsync() async {
+    final userObject = await localSecureStore.userRequestModel;
+    final userRoles = userObject?.roles.map((e) => e.code).toSet() ?? {};
+    final isDistributor = userRoles.contains(RolesType.distributor.toValue()) ||
+        userRoles.contains(RolesType.communityDistributor.toValue());
+
+    final stockRepo = stockLocalRepository as CustomStockLocalRepository;
+    final loggedInUserId = context.loggedInUserUuid;
+    if (loggedInUserId.isEmpty) return;
+
+    List<String> ownerIds = [];
+    if (isDistributor) {
+      ownerIds = [loggedInUserId];
+    } else {
+      final projectFacilities = await projectFacilityLocalRepository.search(
+        ProjectFacilitySearchModel(projectId: [context.projectId]),
+      );
+      final facilities = await facilityLocalRepository.search(
+        FacilitySearchModel(
+          id: projectFacilities.map((e) => e.facilityId).toList(),
+        ),
+      );
+
+      final selectedBoundaryType = context.selectedProject.address?.boundaryType;
+      var filteredFacilities = List<FacilityModel>.from(facilities);
+
+      if (userRoles.contains(RolesType.healthFacilitySupervisor.toValue())) {
+        filteredFacilities = filteredFacilities
+            .where((e) => e.usage == Constants.healthFacility)
+            .toList();
+      } else if (userRoles.contains(RolesType.warehouseManager.toValue()) &&
+          selectedBoundaryType == Constants.lgaBoundaryLevel) {
+        filteredFacilities = filteredFacilities
+            .where((e) => e.usage == Constants.lgaFacility)
+            .toList();
+      }
+
+      ownerIds = filteredFacilities
+          .map((e) => e.id)
+          .where((e) => e.isNotEmpty)
+          .toSet()
+          .toList();
+    }
+
+    if (ownerIds.isEmpty) return;
+
+    final receivedStocksRaw = await stockRepo.search(
+      StockSearchModel(receiverId: ownerIds),
+      isDistributor ? loggedInUserId : null,
+    );
+
+    final sentStocksRaw = <StockModel>[];
+    for (final senderId in ownerIds) {
+      final stocks = await stockRepo.search(
+        StockSearchModel(senderId: senderId),
+        isDistributor ? loggedInUserId : null,
+      );
+      sentStocksRaw.addAll(stocks);
+    }
+
+    final receivedStocks = isDistributor
+        ? receivedStocksRaw
+        : receivedStocksRaw
+            .where(
+              (s) => s.clientAuditDetails?.createdBy == loggedInUserId,
+            )
+            .toList();
+    final sentStocks = isDistributor
+        ? sentStocksRaw
+        : sentStocksRaw
+            .where(
+              (s) => s.clientAuditDetails?.createdBy == loggedInUserId,
+            )
+            .toList();
+
+    final allStocksMap = <String, StockModel>{};
+    for (final stock in receivedStocks) {
+      allStocksMap[stock.clientReferenceId] = stock;
+    }
+    for (final stock in sentStocks) {
+      allStocksMap[stock.clientReferenceId] = stock;
+    }
+
+    final allStocks = allStocksMap.values.toList();
+    final tasksCreatedByUser = await taskLocalRepository.search(
+      TaskSearchModel(createdBy: loggedInUserId),
+    );
+
+    for (final ownerId in ownerIds) {
+      final spaq1Result = calculateStockInHand(
+        stockEntries: allStocks,
+        tasksCreatedByUser: tasksCreatedByUser,
+        stockOwnerIds: [ownerId],
+        productVariantId: Constants.spaq1VariantId,
+        isDistributor: isDistributor,
+      );
+      final spaq1ProdResult = calculateStockInHand(
+        stockEntries: allStocks,
+        tasksCreatedByUser: tasksCreatedByUser,
+        stockOwnerIds: [ownerId],
+        productVariantId: Constants.spaq1VariantIdProd,
+        isDistributor: isDistributor,
+      );
+      final spaq2Result = calculateStockInHand(
+        stockEntries: allStocks,
+        tasksCreatedByUser: tasksCreatedByUser,
+        stockOwnerIds: [ownerId],
+        productVariantId: Constants.spaq2VariantId,
+        isDistributor: isDistributor,
+      );
+      final spaq2ProdResult = calculateStockInHand(
+        stockEntries: allStocks,
+        tasksCreatedByUser: tasksCreatedByUser,
+        stockOwnerIds: [ownerId],
+        productVariantId: Constants.spaq2VariantIdProd,
+        isDistributor: isDistributor,
+      );
+
+      StockInHandCache.instance.setBalances(
+        ownerId: ownerId,
+        balancesByVariantId: {
+          Constants.spaq1VariantId: max(spaq1Result.stockInHand, 0),
+          Constants.spaq1VariantIdProd: max(spaq1ProdResult.stockInHand, 0),
+          Constants.spaq2VariantId: max(spaq2Result.stockInHand, 0),
+          Constants.spaq2VariantIdProd: max(spaq2ProdResult.stockInHand, 0),
+        },
+      );
+    }
+
+    final currentOwnerId = StockInHandCache.instance.currentOwnerId;
+    if (currentOwnerId == null || !ownerIds.contains(currentOwnerId)) {
+      final sortedOwnerIds = [...ownerIds]..sort();
+      StockInHandCache.instance.setCurrentOwnerId(
+        isDistributor ? loggedInUserId : sortedOwnerIds.first,
+      );
+    }
+
+    if (!isDistributor) return;
+
+    final distributorBalances = StockInHandCache.instance.getBalances(
+      loggedInUserId,
+    );
+    final computedSpaq1 = max(
+      ((distributorBalances[Constants.spaq1VariantId] ?? 0) +
+              (distributorBalances[Constants.spaq1VariantIdProd] ?? 0))
+          .toInt(),
+      0,
+    );
+    final computedSpaq2 = max(
+      ((distributorBalances[Constants.spaq2VariantId] ?? 0) +
+              (distributorBalances[Constants.spaq2VariantIdProd] ?? 0))
+          .toInt(),
+      0,
+    );
+
+    final authBloc = context.read<AuthBloc>();
+    final currentSpaq = authBloc.state.whenOrNull(
+      authenticated: (
+        accessToken,
+        refreshToken,
+        userModel,
+        actionsWrapper,
+        individualId,
+        spaq1,
+        spaq2,
+      ) =>
+          (spaq1 ?? 0, spaq2 ?? 0),
+    );
+
+    final deltaSpaq1 = computedSpaq1 - (currentSpaq?.$1 ?? 0);
+    final deltaSpaq2 = computedSpaq2 - (currentSpaq?.$2 ?? 0);
+
+    if (deltaSpaq1 == 0 && deltaSpaq2 == 0) return;
+
+    authBloc.add(
+      AuthAddSpaqCountsEvent(
+        spaq1Count: deltaSpaq1,
+        spaq2Count: deltaSpaq2,
+      ),
+    );
+  }
+
+  FutureOr<void> downloadTaskDataForLoggedInUser() async {
+    final tasks = await taskRemoteRepository.search(
+      TaskSearchModel(createdBy: context.loggedInUserUuid),
+    );
+
+    if (tasks.isEmpty) return;
+    await taskLocalRepository.bulkCreate(tasks);
   }
 }
 

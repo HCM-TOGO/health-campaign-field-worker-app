@@ -4,7 +4,9 @@ import 'package:collection/collection.dart';
 import 'package:digit_data_model/data_model.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:freezed_annotation/freezed_annotation.dart';
+import 'package:intl/intl.dart';
 import 'package:registration_delivery/models/entities/household_member.dart';
+import 'package:registration_delivery/models/entities/project_beneficiary.dart';
 import 'package:registration_delivery/models/entities/task.dart';
 import 'package:registration_delivery/models/entities/task_resource.dart';
 import 'package:registration_delivery/utils/typedefs.dart';
@@ -15,6 +17,7 @@ import '../../../models/entities/additional_fields_type.dart'
 import '../../models/entities/assessment_checklist/status.dart';
 import '../../utils/constants.dart';
 import '../../utils/date_utils.dart';
+import '../../utils/typedefs.dart' show IndividualDataRepository;
 
 part 'custom_summary_report_bloc.freezed.dart';
 
@@ -24,11 +27,15 @@ class SummaryReportBloc extends Bloc<SummaryReportEvent, SummaryReportState> {
   final HouseholdMemberDataRepository householdMemberRepository;
   final TaskDataRepository taskDataRepository;
   final ProductVariantDataRepository productVariantDataRepository;
+  final IndividualDataRepository individualDataRepository;
+  final ProjectBeneficiaryDataRepository projectBeneficiaryDataRepository;
 
   SummaryReportBloc({
     required this.householdMemberRepository,
     required this.productVariantDataRepository,
     required this.taskDataRepository,
+    required this.individualDataRepository,
+    required this.projectBeneficiaryDataRepository,
   }) : super(const SummaryReportEmptyState()) {
     on<SummaryReportLoadDataEvent>(_handleLoadDataEvent);
     on<SummaryReportLoadingEvent>(_handleLoadingEvent);
@@ -49,8 +56,10 @@ class SummaryReportBloc extends Bloc<SummaryReportEvent, SummaryReportState> {
     List<TaskResourceModel> spaq2List = [];
     List<TaskModel> zeroDoseChildrenListData = [];
     List<TaskModel> zeroDoseChildrenList = [];
+    List<ProjectBeneficiaryModel> projectBeneficiaryListData = [];
+    List<IndividualModel> individualListData = [];
     final currentCycle =
-        RegistrationDeliverySingleton().projectType?.cycles?.firstWhere(
+        RegistrationDeliverySingleton().projectType?.cycles?.firstWhereOrNull(
               (e) =>
                   (e.startDate) < DateTime.now().millisecondsSinceEpoch &&
                   (e.endDate) > DateTime.now().millisecondsSinceEpoch,
@@ -62,6 +71,10 @@ class SummaryReportBloc extends Bloc<SummaryReportEvent, SummaryReportState> {
     taskListData = await (taskDataRepository).search(TaskSearchModel());
     productVariantList = await (productVariantDataRepository)
         .search(ProductVariantSearchModel());
+    projectBeneficiaryListData = await (projectBeneficiaryDataRepository)
+        .search(ProjectBeneficiarySearchModel());
+    individualListData =
+        await (individualDataRepository).search(IndividualSearchModel());
     final householdMemberList = currentCycle == null
         ? householdMemberListData
         : householdMemberListData.where((member) {
@@ -78,6 +91,17 @@ class SummaryReportBloc extends Bloc<SummaryReportEvent, SummaryReportState> {
         : taskListData.where((task) {
             final createdTime = task.auditDetails?.createdTime ?? 0;
             final createdBy = task.auditDetails?.createdBy;
+            if (createdBy == null) return false;
+            if (createdBy.isEmpty) return false;
+            return createdTime >= currentCycle.startDate &&
+                createdTime <= currentCycle.endDate &&
+                createdBy == currentUserUuId;
+          }).toList();
+    final individualList = currentCycle == null
+        ? individualListData
+        : individualListData.where((individual) {
+            final createdTime = individual.auditDetails?.createdTime ?? 0;
+            final createdBy = individual.auditDetails?.createdBy;
             if (createdBy == null) return false;
             if (createdBy.isEmpty) return false;
             return createdTime >= currentCycle.startDate &&
@@ -136,12 +160,67 @@ class SummaryReportBloc extends Bloc<SummaryReportEvent, SummaryReportState> {
       }
     }
 
+    // Build lookup: individualClientReferenceId -> IndividualModel
+    final individualMap = {
+      for (final ind in individualList) ind.clientReferenceId: ind,
+    };
+
+    // Build lookup: beneficiaryClientReferenceId -> ProjectBeneficiaryModel (current cycle)
+    final projectBeneficiaryList = currentCycle == null
+        ? projectBeneficiaryListData
+        : projectBeneficiaryListData.where((pb) {
+            final regMs = pb.dateOfRegistrationTime.millisecondsSinceEpoch;
+            return regMs >= currentCycle.startDate &&
+                regMs <= currentCycle.endDate;
+          }).toList();
+    final indIdToBeneficiary = {
+      for (final pb in projectBeneficiaryList)
+        if (pb.beneficiaryClientReferenceId != null)
+          pb.beneficiaryClientReferenceId!: pb,
+    };
+
+    // Set of project beneficiary client ref IDs that have at least one task
+    final beneficiaryIdsWithTask = taskList
+        .map((t) => t.projectBeneficiaryClientReferenceId)
+        .whereType<String>()
+        .toSet();
+
+    // Unprocessed: registered members with no task in the current cycle
+    final unprocessedList = householdMemberList.where((member) {
+      final indId = member.individualClientReferenceId;
+      if (indId == null) return false;
+      final pb = indIdToBeneficiary[indId];
+      if (pb == null) return false;
+      return !beneficiaryIdsWithTask.contains(pb.clientReferenceId);
+    }).toList();
+
+    // Pending eligible: unprocessed members whose age is within project eligibility range
+    final validMinAge =
+        RegistrationDeliverySingleton().projectType?.validMinAge;
+    final validMaxAge =
+        RegistrationDeliverySingleton().projectType?.validMaxAge;
+    final pendingEligibleList = unprocessedList.where((member) {
+      if (validMinAge == null || validMaxAge == null) return false;
+      final ind = individualMap[member.individualClientReferenceId];
+      if (ind == null) return false;
+      final dob = ind.dateOfBirth;
+      if (dob == null || dob.isEmpty) return false;
+      final dobDate = DateFormat('dd/MM/yyyy').tryParse(dob);
+      if (dobDate == null) return false;
+      final now = DateTime.now();
+      final totalMonths =
+          (now.year - dobDate.year) * 12 + (now.month - dobDate.month);
+      return totalMonths >= validMinAge && totalMonths <= validMaxAge;
+    }).toList();
+
     Map<String, List<HouseholdMemberModel>> dateVsHouseholdMembersList = {};
     Map<String, List<TaskModel>> dateVsAdministeredChilderenList = {};
     Map<String, List<TaskModel>> dateVsRefusalCasesList = {};
     Map<String, List<TaskResourceModel>> dateVsSpaq1List = {};
     Map<String, List<TaskResourceModel>> dateVsSpaq2List = {};
     Map<String, List<TaskModel>> dateVsZeroDoseChildrenList = {};
+    Map<String, List<HouseholdMemberModel>> dateVsUnprocessedList = {};
+    Map<String, List<HouseholdMemberModel>> dateVsPendingEligibleList = {};
     Set<String> uniqueDates = {};
     Map<String, int> dateVsHouseholdMembersCount = {};
     Map<String, int> dateVsAdministeredChilderenCount = {};
@@ -149,6 +228,8 @@ class SummaryReportBloc extends Bloc<SummaryReportEvent, SummaryReportState> {
     Map<String, int> dateVsZeroDoseChildrenCount = {};
     Map<String, int> dateVsSpaq1Count = {};
     Map<String, int> dateVsSpaq2Count = {};
+    Map<String, int> dateVsUnprocessedCount = {};
+    Map<String, int> dateVsPendingEligibleCount = {};
     Map<String, Map<String, int>> dateVsEntityVsCountMap = {};
 
     for (var element in householdMemberList) {
@@ -207,6 +288,24 @@ class SummaryReportBloc extends Bloc<SummaryReportEvent, SummaryReportState> {
         dateVsSpaq2List.putIfAbsent(dateKey, () => []).add(element);
       }
     }
+    for (var element in unprocessedList) {
+      var dateKey = DigitDateUtils.getDateFromTimestamp(
+          element.clientAuditDetails!.createdTime);
+      if (element.clientAuditDetails!.createdTime >= currentCycle!.startDate &&
+          element.clientAuditDetails!.createdTime <= currentCycle.endDate &&
+          element.clientAuditDetails?.createdBy == currentUserUuId) {
+        dateVsUnprocessedList.putIfAbsent(dateKey, () => []).add(element);
+      }
+    }
+    for (var element in pendingEligibleList) {
+      var dateKey = DigitDateUtils.getDateFromTimestamp(
+          element.clientAuditDetails!.createdTime);
+      if (element.clientAuditDetails!.createdTime >= currentCycle!.startDate &&
+          element.clientAuditDetails!.createdTime <= currentCycle.endDate &&
+          element.clientAuditDetails?.createdBy == currentUserUuId) {
+        dateVsPendingEligibleList.putIfAbsent(dateKey, () => []).add(element);
+      }
+    }
 
     // get a set of unique dates
     getUniqueSetOfDates(
@@ -216,6 +315,8 @@ class SummaryReportBloc extends Bloc<SummaryReportEvent, SummaryReportState> {
       dateVsZeroDoseChildrenList,
       dateVsSpaq1List,
       dateVsSpaq2List,
+      dateVsUnprocessedList,
+      dateVsPendingEligibleList,
       uniqueDates,
     );
 
@@ -229,6 +330,9 @@ class SummaryReportBloc extends Bloc<SummaryReportEvent, SummaryReportState> {
         dateVsZeroDoseChildrenList, dateVsZeroDoseChildrenCount);
     populateDateVsCountMap(dateVsSpaq1List, dateVsSpaq1Count);
     populateDateVsCountMap(dateVsSpaq2List, dateVsSpaq2Count);
+    populateDateVsCountMap(dateVsUnprocessedList, dateVsUnprocessedCount);
+    populateDateVsCountMap(
+        dateVsPendingEligibleList, dateVsPendingEligibleCount);
 
     popoulateDateVsEntityCountMap(
       dateVsEntityVsCountMap,
@@ -238,13 +342,32 @@ class SummaryReportBloc extends Bloc<SummaryReportEvent, SummaryReportState> {
       dateVsZeroDoseChildrenCount,
       dateVsSpaq1Count,
       dateVsSpaq2Count,
+      dateVsUnprocessedCount,
+      dateVsPendingEligibleCount,
       uniqueDates,
     );
     dateVsEntityVsCountMap =
         sortMapByDateKeyAndRenameDate(dateVsEntityVsCountMap);
     dateVsEntityVsCountMap = addTotalEntryToMap(dateVsEntityVsCountMap);
 
-    emit(SummaryReportDataState(data: dateVsEntityVsCountMap));
+    final Map<String, int> zeroDoseStatusCounts = {};
+    for (final task in zeroDoseChildrenList) {
+      final statusField = task.additionalFields?.fields.firstWhereOrNull(
+        (f) =>
+            f.key ==
+            additional_fields_local.AdditionalFieldsType.zeroDoseStatus
+                .toValue(),
+      );
+      if (statusField != null) {
+        final status = statusField.value.toString();
+        zeroDoseStatusCounts[status] = (zeroDoseStatusCounts[status] ?? 0) + 1;
+      }
+    }
+
+    emit(SummaryReportDataState(
+      data: dateVsEntityVsCountMap,
+      zeroDoseStatusCounts: zeroDoseStatusCounts,
+    ));
   }
 
   void getUniqueSetOfDates(
@@ -254,6 +377,8 @@ class SummaryReportBloc extends Bloc<SummaryReportEvent, SummaryReportState> {
     Map<String, List<TaskModel>> dateVsZeroDoseChildrenList,
     Map<String, List<TaskResourceModel>> dateVsSpaq1List,
     Map<String, List<TaskResourceModel>> dateVsSpaq2List,
+    Map<String, List<HouseholdMemberModel>> dateVsUnprocessedList,
+    Map<String, List<HouseholdMemberModel>> dateVsPendingEligibleList,
     Set<String> uniqueDates,
   ) {
     uniqueDates.addAll(dateVsHouseholdMembersList.keys.toSet());
@@ -262,6 +387,8 @@ class SummaryReportBloc extends Bloc<SummaryReportEvent, SummaryReportState> {
     uniqueDates.addAll(dateVsZeroDoseChildrenList.keys.toSet());
     uniqueDates.addAll(dateVsSpaq1List.keys.toSet());
     uniqueDates.addAll(dateVsSpaq2List.keys.toSet());
+    uniqueDates.addAll(dateVsUnprocessedList.keys.toSet());
+    uniqueDates.addAll(dateVsPendingEligibleList.keys.toSet());
   }
 
   void populateDateVsCountMap(
@@ -279,6 +406,8 @@ class SummaryReportBloc extends Bloc<SummaryReportEvent, SummaryReportState> {
     Map<String, int> dateVsZeroDoseChildrenCount,
     Map<String, int> dateVsSpaq1Count,
     Map<String, int> dateVsSpaq2Count,
+    Map<String, int> dateVsUnprocessedCount,
+    Map<String, int> dateVsPendingEligibleCount,
     Set<String> uniqueDates,
   ) {
     for (var date in uniqueDates) {
@@ -312,6 +441,16 @@ class SummaryReportBloc extends Bloc<SummaryReportEvent, SummaryReportState> {
           dateVsSpaq2Count[date] != null) {
         var count = dateVsSpaq2Count[date];
         elementVsCount[Constants.tablet_12_59] = count ?? 0;
+      }
+      if (dateVsUnprocessedCount.containsKey(date) &&
+          dateVsUnprocessedCount[date] != null) {
+        var count = dateVsUnprocessedCount[date];
+        elementVsCount[Constants.unprocessed] = count ?? 0;
+      }
+      if (dateVsPendingEligibleCount.containsKey(date) &&
+          dateVsPendingEligibleCount[date] != null) {
+        var count = dateVsPendingEligibleCount[date];
+        elementVsCount[Constants.pendingEligible] = count ?? 0;
       }
 
       dateVsEntityVsCountMap[date] = elementVsCount;
@@ -390,5 +529,6 @@ class SummaryReportState with _$SummaryReportState {
 
   const factory SummaryReportState.data({
     @Default({}) Map<String, Map<String, int>> data,
+    @Default({}) Map<String, int> zeroDoseStatusCounts,
   }) = SummaryReportDataState;
 }

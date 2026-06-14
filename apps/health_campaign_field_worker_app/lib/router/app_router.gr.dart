@@ -239,6 +239,8 @@ abstract class _$AppRouter extends RootStackRouter {
           viewOnly: args.viewOnly,
           referralReconciliation: args.referralReconciliation,
           cycles: args.cycles,
+          isSideEffect: args.isSideEffect,
+          individual: args.individual,
         ),
       );
     },
@@ -468,6 +470,11 @@ abstract class _$AppRouter extends RootStackRouter {
         child: CustomReferralReasonChecklistPage(
           key: args.key,
           referralClientRefId: args.referralClientRefId,
+          isSideEffect: args.isSideEffect,
+          projectBeneficiaryClientReferenceId:
+              args.projectBeneficiaryClientReferenceId,
+          taskClientReferenceId: args.taskClientReferenceId,
+          beneficiaryId: args.beneficiaryId,
           appLocalizations: args.appLocalizations,
         ),
       );
@@ -482,6 +489,21 @@ abstract class _$AppRouter extends RootStackRouter {
         child: CustomReferralReasonChecklistPreviewPage(
           key: args.key,
           appLocalizations: args.appLocalizations,
+        ),
+      );
+    },
+    CustomReferralReconAcknowedgmentRoute.name: (routeData) {
+      final args = routeData.argsAs<CustomReferralReconAcknowedgmentRouteArgs>(
+          orElse: () => const CustomReferralReconAcknowedgmentRouteArgs());
+      return AutoRoutePage<dynamic>(
+        routeData: routeData,
+        child: CustomReferralReconAcknowedgmentPage(
+          key: args.key,
+          appLocalizations: args.appLocalizations,
+          isDataRecordSuccess: args.isDataRecordSuccess,
+          label: args.label,
+          description: args.description,
+          descriptionTableData: args.descriptionTableData,
         ),
       );
     },
@@ -719,6 +741,17 @@ abstract class _$AppRouter extends RootStackRouter {
         ),
       );
     },
+    IndividualTaskListRoute.name: (routeData) {
+      final args = routeData.argsAs<IndividualTaskListRouteArgs>();
+      return AutoRoutePage<dynamic>(
+        routeData: routeData,
+        child: IndividualTaskListPage(
+          key: args.key,
+          individual: args.individual,
+          tasks: args.tasks,
+        ),
+      );
+    },
     LanguageSelectionRoute.name: (routeData) {
       return AutoRoutePage<dynamic>(
         routeData: routeData,
@@ -791,6 +824,23 @@ abstract class _$AppRouter extends RootStackRouter {
         ),
       );
     },
+    TaskDetailRoute.name: (routeData) {
+      final args = routeData.argsAs<TaskDetailRouteArgs>();
+      return AutoRoutePage<dynamic>(
+        routeData: routeData,
+        child: TaskDetailPage(
+          key: args.key,
+          taskModel: args.taskModel,
+          individualModel: args.individualModel,
+        ),
+      );
+    },
+    TaskListRoute.name: (routeData) {
+      return AutoRoutePage<dynamic>(
+        routeData: routeData,
+        child: const TaskListPage(),
+      );
+    },
     UnauthenticatedRouteWrapper.name: (routeData) {
       return AutoRoutePage<dynamic>(
         routeData: routeData,
@@ -828,6 +878,7 @@ abstract class _$AppRouter extends RootStackRouter {
           hasImmunizationCard: args.hasImmunizationCard,
           immunizationCardLost: args.immunizationCardLost,
           receivedPenta1: args.receivedPenta1,
+          referral: args.referral,
         ),
       );
     },
@@ -847,6 +898,7 @@ abstract class _$AppRouter extends RootStackRouter {
           individual: args.individual,
           hasSideEffects: args.hasSideEffects,
           isRefused: args.isRefused,
+          referral: args.referral,
           sideEffect: args.sideEffect,
           task: args.task,
         ),
@@ -1666,6 +1718,8 @@ class CustomHFCreateReferralWrapperRoute
     bool viewOnly = false,
     HFReferralModel? referralReconciliation,
     required List<String> cycles,
+    bool isSideEffect = false,
+    IndividualModel? individual,
     List<PageRouteInfo>? children,
   }) : super(
           CustomHFCreateReferralWrapperRoute.name,
@@ -1675,6 +1729,8 @@ class CustomHFCreateReferralWrapperRoute
             viewOnly: viewOnly,
             referralReconciliation: referralReconciliation,
             cycles: cycles,
+            isSideEffect: isSideEffect,
+            individual: individual,
           ),
           initialChildren: children,
         );
@@ -1692,6 +1748,8 @@ class CustomHFCreateReferralWrapperRouteArgs {
     this.viewOnly = false,
     this.referralReconciliation,
     required this.cycles,
+    this.isSideEffect = false,
+    this.individual,
   });
 
   final Key? key;
@@ -1704,9 +1762,13 @@ class CustomHFCreateReferralWrapperRouteArgs {
 
   final List<String> cycles;
 
+  final bool isSideEffect;
+
+  final IndividualModel? individual;
+
   @override
   String toString() {
-    return 'CustomHFCreateReferralWrapperRouteArgs{key: $key, projectId: $projectId, viewOnly: $viewOnly, referralReconciliation: $referralReconciliation, cycles: $cycles}';
+    return 'CustomHFCreateReferralWrapperRouteArgs{key: $key, projectId: $projectId, viewOnly: $viewOnly, referralReconciliation: $referralReconciliation, cycles: $cycles, isSideEffect: $isSideEffect, individual: $individual}';
   }
 }
 
@@ -2544,6 +2606,10 @@ class CustomReferralReasonChecklistRoute
   CustomReferralReasonChecklistRoute({
     Key? key,
     String? referralClientRefId,
+    bool isSideEffect = false,
+    String? projectBeneficiaryClientReferenceId,
+    String? taskClientReferenceId,
+    String? beneficiaryId,
     ReferralReconLocalization? appLocalizations,
     List<PageRouteInfo>? children,
   }) : super(
@@ -2551,6 +2617,11 @@ class CustomReferralReasonChecklistRoute
           args: CustomReferralReasonChecklistRouteArgs(
             key: key,
             referralClientRefId: referralClientRefId,
+            isSideEffect: isSideEffect,
+            projectBeneficiaryClientReferenceId:
+                projectBeneficiaryClientReferenceId,
+            taskClientReferenceId: taskClientReferenceId,
+            beneficiaryId: beneficiaryId,
             appLocalizations: appLocalizations,
           ),
           initialChildren: children,
@@ -2566,6 +2637,10 @@ class CustomReferralReasonChecklistRouteArgs {
   const CustomReferralReasonChecklistRouteArgs({
     this.key,
     this.referralClientRefId,
+    this.isSideEffect = false,
+    this.projectBeneficiaryClientReferenceId,
+    this.taskClientReferenceId,
+    this.beneficiaryId,
     this.appLocalizations,
   });
 
@@ -2573,11 +2648,19 @@ class CustomReferralReasonChecklistRouteArgs {
 
   final String? referralClientRefId;
 
+  final bool isSideEffect;
+
+  final String? projectBeneficiaryClientReferenceId;
+
+  final String? taskClientReferenceId;
+
+  final String? beneficiaryId;
+
   final ReferralReconLocalization? appLocalizations;
 
   @override
   String toString() {
-    return 'CustomReferralReasonChecklistRouteArgs{key: $key, referralClientRefId: $referralClientRefId, appLocalizations: $appLocalizations}';
+    return 'CustomReferralReasonChecklistRouteArgs{key: $key, referralClientRefId: $referralClientRefId, isSideEffect: $isSideEffect, projectBeneficiaryClientReferenceId: $projectBeneficiaryClientReferenceId, taskClientReferenceId: $taskClientReferenceId, beneficiaryId: $beneficiaryId, appLocalizations: $appLocalizations}';
   }
 }
 
@@ -2617,6 +2700,65 @@ class CustomReferralReasonChecklistPreviewRouteArgs {
   @override
   String toString() {
     return 'CustomReferralReasonChecklistPreviewRouteArgs{key: $key, appLocalizations: $appLocalizations}';
+  }
+}
+
+/// generated route for
+/// [CustomReferralReconAcknowedgmentPage]
+class CustomReferralReconAcknowedgmentRoute
+    extends PageRouteInfo<CustomReferralReconAcknowedgmentRouteArgs> {
+  CustomReferralReconAcknowedgmentRoute({
+    Key? key,
+    ReferralReconLocalization? appLocalizations,
+    bool isDataRecordSuccess = false,
+    String? label,
+    String? description,
+    Map<String, dynamic>? descriptionTableData,
+    List<PageRouteInfo>? children,
+  }) : super(
+          CustomReferralReconAcknowedgmentRoute.name,
+          args: CustomReferralReconAcknowedgmentRouteArgs(
+            key: key,
+            appLocalizations: appLocalizations,
+            isDataRecordSuccess: isDataRecordSuccess,
+            label: label,
+            description: description,
+            descriptionTableData: descriptionTableData,
+          ),
+          initialChildren: children,
+        );
+
+  static const String name = 'CustomReferralReconAcknowedgmentRoute';
+
+  static const PageInfo<CustomReferralReconAcknowedgmentRouteArgs> page =
+      PageInfo<CustomReferralReconAcknowedgmentRouteArgs>(name);
+}
+
+class CustomReferralReconAcknowedgmentRouteArgs {
+  const CustomReferralReconAcknowedgmentRouteArgs({
+    this.key,
+    this.appLocalizations,
+    this.isDataRecordSuccess = false,
+    this.label,
+    this.description,
+    this.descriptionTableData,
+  });
+
+  final Key? key;
+
+  final ReferralReconLocalization? appLocalizations;
+
+  final bool isDataRecordSuccess;
+
+  final String? label;
+
+  final String? description;
+
+  final Map<String, dynamic>? descriptionTableData;
+
+  @override
+  String toString() {
+    return 'CustomReferralReconAcknowedgmentRouteArgs{key: $key, appLocalizations: $appLocalizations, isDataRecordSuccess: $isDataRecordSuccess, label: $label, description: $description, descriptionTableData: $descriptionTableData}';
   }
 }
 
@@ -3477,6 +3619,50 @@ class HomeRouteArgs {
 }
 
 /// generated route for
+/// [IndividualTaskListPage]
+class IndividualTaskListRoute
+    extends PageRouteInfo<IndividualTaskListRouteArgs> {
+  IndividualTaskListRoute({
+    Key? key,
+    required IndividualModel individual,
+    required List<TaskModel> tasks,
+    List<PageRouteInfo>? children,
+  }) : super(
+          IndividualTaskListRoute.name,
+          args: IndividualTaskListRouteArgs(
+            key: key,
+            individual: individual,
+            tasks: tasks,
+          ),
+          initialChildren: children,
+        );
+
+  static const String name = 'IndividualTaskListRoute';
+
+  static const PageInfo<IndividualTaskListRouteArgs> page =
+      PageInfo<IndividualTaskListRouteArgs>(name);
+}
+
+class IndividualTaskListRouteArgs {
+  const IndividualTaskListRouteArgs({
+    this.key,
+    required this.individual,
+    required this.tasks,
+  });
+
+  final Key? key;
+
+  final IndividualModel individual;
+
+  final List<TaskModel> tasks;
+
+  @override
+  String toString() {
+    return 'IndividualTaskListRouteArgs{key: $key, individual: $individual, tasks: $tasks}';
+  }
+}
+
+/// generated route for
 /// [LanguageSelectionPage]
 class LanguageSelectionRoute extends PageRouteInfo<void> {
   const LanguageSelectionRoute({List<PageRouteInfo>? children})
@@ -3729,6 +3915,63 @@ class RecordRedoseRouteArgs {
 }
 
 /// generated route for
+/// [TaskDetailPage]
+class TaskDetailRoute extends PageRouteInfo<TaskDetailRouteArgs> {
+  TaskDetailRoute({
+    Key? key,
+    required TaskModel taskModel,
+    IndividualModel? individualModel,
+    List<PageRouteInfo>? children,
+  }) : super(
+          TaskDetailRoute.name,
+          args: TaskDetailRouteArgs(
+            key: key,
+            taskModel: taskModel,
+            individualModel: individualModel,
+          ),
+          initialChildren: children,
+        );
+
+  static const String name = 'TaskDetailRoute';
+
+  static const PageInfo<TaskDetailRouteArgs> page =
+      PageInfo<TaskDetailRouteArgs>(name);
+}
+
+class TaskDetailRouteArgs {
+  const TaskDetailRouteArgs({
+    this.key,
+    required this.taskModel,
+    this.individualModel,
+  });
+
+  final Key? key;
+
+  final TaskModel taskModel;
+
+  final IndividualModel? individualModel;
+
+  @override
+  String toString() {
+    return 'TaskDetailRouteArgs{key: $key, taskModel: $taskModel, individualModel: $individualModel}';
+  }
+}
+
+/// generated route for
+/// [TaskListPage]
+class TaskListRoute extends PageRouteInfo<void> {
+  const TaskListRoute({List<PageRouteInfo>? children})
+      : super(
+          TaskListRoute.name,
+          initialChildren: children,
+        );
+
+  static const String name = 'TaskListRoute';
+
+  static const PageInfo<void> page = PageInfo<void>(name);
+}
+
+/// generated route for
 /// [UnauthenticatedPageWrapper]
 class UnauthenticatedRouteWrapper extends PageRouteInfo<void> {
   const UnauthenticatedRouteWrapper({List<PageRouteInfo>? children})
@@ -3798,6 +4041,7 @@ class VaccineSelectionRoute extends PageRouteInfo<VaccineSelectionRouteArgs> {
     String? hasImmunizationCard,
     String? immunizationCardLost,
     String? receivedPenta1,
+    ReferralModel? referral,
     List<PageRouteInfo>? children,
   }) : super(
           VaccineSelectionRoute.name,
@@ -3817,6 +4061,7 @@ class VaccineSelectionRoute extends PageRouteInfo<VaccineSelectionRouteArgs> {
             hasImmunizationCard: hasImmunizationCard,
             immunizationCardLost: immunizationCardLost,
             receivedPenta1: receivedPenta1,
+            referral: referral,
           ),
           initialChildren: children,
         );
@@ -3843,6 +4088,7 @@ class VaccineSelectionRouteArgs {
     this.hasImmunizationCard,
     this.immunizationCardLost,
     this.receivedPenta1,
+    this.referral,
   });
 
   final Key? key;
@@ -3873,9 +4119,11 @@ class VaccineSelectionRouteArgs {
 
   final String? receivedPenta1;
 
+  final ReferralModel? referral;
+
   @override
   String toString() {
-    return 'VaccineSelectionRouteArgs{key: $key, appLocalizations: $appLocalizations, isAdministration: $isAdministration, eligibilityAssessmentType: $eligibilityAssessmentType, isChecklistAssessmentDone: $isChecklistAssessmentDone, projectBeneficiaryClientReferenceId: $projectBeneficiaryClientReferenceId, individual: $individual, task: $task, hasSideEffects: $hasSideEffects, sideEffect: $sideEffect, isZeroDoseAlreadyDone: $isZeroDoseAlreadyDone, hasImmunizationCard: $hasImmunizationCard, immunizationCardLost: $immunizationCardLost, receivedPenta1: $receivedPenta1}';
+    return 'VaccineSelectionRouteArgs{key: $key, appLocalizations: $appLocalizations, isAdministration: $isAdministration, eligibilityAssessmentType: $eligibilityAssessmentType, isChecklistAssessmentDone: $isChecklistAssessmentDone, projectBeneficiaryClientReferenceId: $projectBeneficiaryClientReferenceId, individual: $individual, task: $task, hasSideEffects: $hasSideEffects, sideEffect: $sideEffect, isZeroDoseAlreadyDone: $isZeroDoseAlreadyDone, hasImmunizationCard: $hasImmunizationCard, immunizationCardLost: $immunizationCardLost, receivedPenta1: $receivedPenta1, referral: $referral}';
   }
 }
 
@@ -3893,6 +4141,7 @@ class ZeroDoseCheckRoute extends PageRouteInfo<ZeroDoseCheckRouteArgs> {
     IndividualModel? individual,
     bool? hasSideEffects = false,
     bool isRefused = false,
+    ReferralModel? referral,
     SideEffectModel? sideEffect,
     TaskModel? task,
     List<PageRouteInfo>? children,
@@ -3910,6 +4159,7 @@ class ZeroDoseCheckRoute extends PageRouteInfo<ZeroDoseCheckRouteArgs> {
             individual: individual,
             hasSideEffects: hasSideEffects,
             isRefused: isRefused,
+            referral: referral,
             sideEffect: sideEffect,
             task: task,
           ),
@@ -3934,6 +4184,7 @@ class ZeroDoseCheckRouteArgs {
     this.individual,
     this.hasSideEffects = false,
     this.isRefused = false,
+    this.referral,
     this.sideEffect,
     this.task,
   });
@@ -3958,12 +4209,14 @@ class ZeroDoseCheckRouteArgs {
 
   final bool isRefused;
 
+  final ReferralModel? referral;
+
   final SideEffectModel? sideEffect;
 
   final TaskModel? task;
 
   @override
   String toString() {
-    return 'ZeroDoseCheckRouteArgs{key: $key, appLocalizations: $appLocalizations, eligibilityAssessmentType: $eligibilityAssessmentType, isAdministration: $isAdministration, isEditing: $isEditing, isChecklistAssessmentDone: $isChecklistAssessmentDone, projectBeneficiaryClientReferenceId: $projectBeneficiaryClientReferenceId, individual: $individual, hasSideEffects: $hasSideEffects, isRefused: $isRefused, sideEffect: $sideEffect, task: $task}';
+    return 'ZeroDoseCheckRouteArgs{key: $key, appLocalizations: $appLocalizations, eligibilityAssessmentType: $eligibilityAssessmentType, isAdministration: $isAdministration, isEditing: $isEditing, isChecklistAssessmentDone: $isChecklistAssessmentDone, projectBeneficiaryClientReferenceId: $projectBeneficiaryClientReferenceId, individual: $individual, hasSideEffects: $hasSideEffects, isRefused: $isRefused, referral: $referral, sideEffect: $sideEffect, task: $task}';
   }
 }

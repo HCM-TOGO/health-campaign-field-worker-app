@@ -42,6 +42,12 @@ class SyncServiceMapper extends SyncEntityMapperListener {
                   .map((e) => IndividualModelMapper.fromJson(jsonEncode(e)))
                   .toList();
               await local.bulkCreate(entity);
+            case "Stocks":
+            case "Stock":
+              final entity = entityList
+                  .map((e) => StockModelMapper.fromJson(jsonEncode(e)))
+                  .toList();
+              await local.bulkCreate(entity);
             case "Households":
               final entity = entityList
                   .map((e) => HouseholdModelMapper.fromJson(jsonEncode(e)))

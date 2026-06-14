@@ -11,6 +11,7 @@ import 'package:health_campaign_field_worker_app/widgets/custom_back_navigation.
 import 'package:registration_delivery/blocs/household_overview/household_overview.dart';
 import 'package:intl/intl.dart';
 import 'package:registration_delivery/models/entities/status.dart';
+import 'package:registration_delivery/utils/utils.dart';
 import 'package:survey_form/survey_form.dart';
 import 'package:registration_delivery/blocs/delivery_intervention/deliver_intervention.dart';
 import 'package:registration_delivery/blocs/search_households/search_households.dart';
@@ -72,6 +73,11 @@ class _EligibilityChecklistViewPage
   final String no = "NO";
   final String negative = "NEGATIVE";
   final String test_unavailable = "TEST_UNAVAILABLE";
+  static const String _kbea1Key = "KBEA1";
+  static const String _kbea2Key = "KBEA2";
+  static const String _kbea3Key = "KBEA3";
+  static const String _kbea4Key = "KBEA4";
+  static const String _rdtResultKey = "KBEA2.YES.KBEA2A";
   bool triggerLocalization = false;
 
   @override
@@ -101,6 +107,8 @@ class _EligibilityChecklistViewPage
 
     var projectBeneficiaryClientReferenceId =
         widget.projectBeneficiaryClientReferenceId;
+
+    var individual = widget.individual;
 
     return WillPopScope(
         onWillPop: context.isHealthFacilitySupervisor &&
@@ -350,6 +358,14 @@ class _EligibilityChecklistViewPage
                                                 'longitude',
                                                 longitude,
                                               ),
+                                              AdditionalField(
+                                                'projectBeneficiaryClientReferenceId',
+                                                projectBeneficiaryClientReferenceId,
+                                              ),
+                                              AdditionalField(
+                                                'individualClientReferenceId',
+                                                individual!.clientReferenceId,
+                                              ),
                                             ],
                                           ),
                                         ));
@@ -413,7 +429,17 @@ class _EligibilityChecklistViewPage
                                                           'lat', latitude),
                                                       AdditionalField(
                                                           'boundaryCode',
-                                                          context.boundary.code)
+                                                          context
+                                                              .boundary.code),
+                                                      AdditionalField(
+                                                        'projectBeneficiaryClientReferenceId',
+                                                        projectBeneficiaryClientReferenceId,
+                                                      ),
+                                                      AdditionalField(
+                                                        'individualClientReferenceId',
+                                                        individual!
+                                                            .clientReferenceId,
+                                                      ),
                                                     ],
                                                   )),
                                             ),
@@ -521,22 +547,31 @@ class _EligibilityChecklistViewPage
                                       ),
                                     );
 
-                                    // TODO: Currently, it's been shifted to the zero dose flow
-                                    // context.read<DeliverInterventionBloc>().add(
-                                    //       DeliverInterventionSubmitEvent(
-                                    //           task: task,
-                                    //           isEditing: false,
-                                    //           boundaryModel: context.boundary,
-                                    //           navigateToSummary: false,
-                                    //           householdMemberWrapper:
-                                    //               householdOverviewState
-                                    //                   .householdMemberWrapper),
-                                    //     );
-                                    // final searchBloc =
-                                    //     context.read<SearchHouseholdsBloc>();
-                                    // searchBloc.add(
-                                    //   const SearchHouseholdsClearEvent(),
-                                    // );
+                                    context.read<DeliverInterventionBloc>().add(
+                                          DeliverInterventionSubmitEvent(
+                                            task: task,
+                                            isEditing: false,
+                                            boundaryModel: context.boundary,
+                                          ),
+                                        );
+
+                                    final reloadState =
+                                        context.read<HouseholdOverviewBloc>();
+                                    Future.delayed(
+                                      const Duration(milliseconds: 500),
+                                      () {
+                                        reloadState.add(
+                                          HouseholdOverviewReloadEvent(
+                                            projectId:
+                                                RegistrationDeliverySingleton()
+                                                    .projectId!,
+                                            projectBeneficiaryType:
+                                                RegistrationDeliverySingleton()
+                                                    .beneficiaryType!,
+                                          ),
+                                        );
+                                      },
+                                    );
 
                                     router.push(ZeroDoseCheckRoute(
                                       eligibilityAssessmentType:
@@ -753,7 +788,9 @@ class _EligibilityChecklistViewPage
                                           ),
                                         ] else if (e.dataType ==
                                             'SingleValueList') ...[
-                                          if (!(e.code ?? '').contains('.'))
+                                          if (!(e.code ?? '').contains('.') &&
+                                              _shouldShowSpaqQuestionsForCode(
+                                                  e.code))
                                             DigitCard(
                                               child: _buildChecklist(
                                                 e,
@@ -799,7 +836,8 @@ class _EligibilityChecklistViewPage
 
       // Ensure the current index is added to visible indexes and not excluded
       if (!visibleChecklistIndexes.contains(index) &&
-          !excludedIndexes.contains(index)) {
+          !excludedIndexes.contains(index) &&
+          _shouldShowSpaqQuestionsForCode(item.code)) {
         visibleChecklistIndexes.add(index);
       }
 
@@ -849,7 +887,17 @@ class _EligibilityChecklistViewPage
                           ),
                         ).value;
 
-                        // Remove corresponding controllers based on the removed attributes
+                        if (item.code == _rdtResultKey) {
+                          _updateSpaqQuestionsVisibility(value);
+                        } else if (item.code == _kbea1Key) {
+                          if (value == yes) {
+                            _hideQuestionsForKbea1Yes();
+                          } else {
+                            _showQuestionsForKbea1No();
+                          }
+                        } else if (item.code == _kbea2Key && value != yes) {
+                          _showSpaqQuestions();
+                        }
                       });
                     },
                     items: item.values != null
@@ -1068,12 +1116,15 @@ class _EligibilityChecklistViewPage
     };
 
     if (responses.isNotEmpty) {
-      if (responses.containsKey(q3Key) && responses[q3Key]!.isNotEmpty) {
-        isIneligible = responses[q3Key] == yes ? true : false;
-      }
-      if (!isIneligible &&
-          (responses.containsKey(q5Key) && responses[q5Key]!.isNotEmpty)) {
-        isIneligible = responses[q5Key] == yes ? true : false;
+      final skipSpaqQuestions = _isRdtPositiveFromResponses(responses);
+      if (!skipSpaqQuestions) {
+        if (responses.containsKey(q3Key) && responses[q3Key]!.isNotEmpty) {
+          isIneligible = responses[q3Key] == yes ? true : false;
+        }
+        if (!isIneligible &&
+            (responses.containsKey(q5Key) && responses[q5Key]!.isNotEmpty)) {
+          isIneligible = responses[q5Key] == yes ? true : false;
+        }
       }
       if (responses.containsKey(q2Key) &&
           responses[q2Key]!.isNotEmpty &&
@@ -1084,7 +1135,7 @@ class _EligibilityChecklistViewPage
           isIneligible = responses[q6Key] == yes ? true : false;
         }
       }
-      if (isIneligible) {
+      if (isIneligible && !_isRdtPositiveFromResponses(responses)) {
         for (var entry in responses.entries) {
           if (entry.key == q3Key || entry.key == q5Key) {
             entry.value == yes
@@ -1123,9 +1174,7 @@ class _EligibilityChecklistViewPage
           responses[q2Key] == yes) {
         if (!isReferral &&
             (responses.containsKey(q3Key) && responses[q3Key]!.isNotEmpty)) {
-          isReferral = responses[q3Key] == test_unavailable
-              ? true
-              : false;
+          isReferral = responses[q3Key] == test_unavailable ? true : false;
         }
         if (!isReferral &&
             (responses.containsKey(q4Key) && responses[q4Key]!.isNotEmpty)) {
@@ -1265,6 +1314,85 @@ class _EligibilityChecklistViewPage
     }
 
     return dotCount;
+  }
+
+  int? _indexForAttributeCode(String code) {
+    final attributes = initialAttributes;
+    if (attributes == null) return null;
+    final index = attributes.indexWhere((a) => a.code == code);
+    return index >= 0 ? index : null;
+  }
+
+  bool _isRdtPositive() {
+    final kbea2Index = _indexForAttributeCode(_kbea2Key);
+    final rdtIndex = _indexForAttributeCode(_rdtResultKey);
+    if (kbea2Index == null || rdtIndex == null) return false;
+    return controller[kbea2Index].text.trim() == yes &&
+        controller[rdtIndex].text.trim() == positive;
+  }
+
+  bool _isRdtPositiveFromResponses(Map<String?, String> responses) {
+    return responses[_kbea2Key] == yes && responses[_rdtResultKey] == positive;
+  }
+
+  bool _isKbea1Yes() {
+    final kbea1Index = _indexForAttributeCode(_kbea1Key);
+    if (kbea1Index == null) return false;
+    return controller[kbea1Index].text.trim() == yes;
+  }
+
+  bool _shouldShowSpaqQuestionsForCode(String? code) {
+    if (_isKbea1Yes() && code != _kbea1Key) {
+      return false;
+    }
+    if (code == _kbea3Key || code == _kbea4Key) {
+      return !_isRdtPositive();
+    }
+    return true;
+  }
+
+  void _hideQuestionsForKbea1Yes() {
+    final kbea1Index = _indexForAttributeCode(_kbea1Key);
+    final attributes = initialAttributes;
+    if (attributes == null) return;
+    for (int i = 0; i < attributes.length; i++) {
+      if (i != kbea1Index) {
+        visibleChecklistIndexes.remove(i);
+        controller[i].clear();
+      }
+    }
+  }
+
+  void _showQuestionsForKbea1No() {
+    final kbea2Index = _indexForAttributeCode(_kbea2Key);
+    if (kbea2Index != null && !visibleChecklistIndexes.contains(kbea2Index)) {
+      visibleChecklistIndexes.add(kbea2Index);
+    }
+    _showSpaqQuestions();
+  }
+
+  void _updateSpaqQuestionsVisibility(String? rdtValue) {
+    final kbea3Index = _indexForAttributeCode(_kbea3Key);
+    final kbea4Index = _indexForAttributeCode(_kbea4Key);
+    if (rdtValue == positive) {
+      for (final index in [kbea3Index, kbea4Index]) {
+        if (index != null) {
+          visibleChecklistIndexes.remove(index);
+          controller[index].clear();
+        }
+      }
+    } else {
+      _showSpaqQuestions();
+    }
+  }
+
+  void _showSpaqQuestions() {
+    for (final code in [_kbea3Key, _kbea4Key]) {
+      final index = _indexForAttributeCode(code);
+      if (index != null && !visibleChecklistIndexes.contains(index)) {
+        visibleChecklistIndexes.add(index);
+      }
+    }
   }
 
   Future<bool> _onBackPressed(BuildContext context, bool isIneligible) async {

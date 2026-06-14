@@ -201,53 +201,57 @@ class CustomReferBeneficiarySMCPageState
                                     clickedStatus.value = true;
                                     final reason = reasons.first;
 
-                                    final event = context.read<ReferralBloc>();
-                                    event.add(ReferralSubmitEvent(
-                                      ReferralModel(
-                                        clientReferenceId: IdGen.i.identifier,
-                                        projectId: context.projectId,
-                                        projectBeneficiaryClientReferenceId:
-                                            widget
-                                                .projectBeneficiaryClientRefId,
-                                        referrerId: context.loggedInUserUuid,
-                                        recipientId: healthFacilities.first.id,
-                                        recipientType: "FACILITY",
-                                        reasons: [reason],
-                                        tenantId: envConfig.variables.tenantId,
-                                        rowVersion: 1,
-                                        auditDetails: AuditDetails(
-                                          createdBy: context.loggedInUserUuid,
-                                          createdTime:
-                                              context.millisecondsSinceEpoch(),
-                                          lastModifiedBy:
-                                              context.loggedInUserUuid,
-                                          lastModifiedTime:
-                                              context.millisecondsSinceEpoch(),
-                                        ),
-                                        clientAuditDetails: ClientAuditDetails(
-                                          createdBy: context.loggedInUserUuid,
-                                          createdTime:
-                                              context.millisecondsSinceEpoch(),
-                                          lastModifiedBy:
-                                              context.loggedInUserUuid,
-                                          lastModifiedTime:
-                                              context.millisecondsSinceEpoch(),
-                                        ),
-                                        additionalFields:
-                                            ReferralAdditionalFields(
-                                          version: 1,
-                                          fields: [
-                                            AdditionalField(
-                                              referralReasons,
-                                              reasons.join(","),
-                                            ),
-                                            const AdditionalField(
-                                                'referralType', 'smcReferred')
-                                          ],
-                                        ),
+                                    // final event = context.read<ReferralBloc>();
+
+                                    final referral =  ReferralModel(
+                                      clientReferenceId: IdGen.i.identifier,
+                                      projectId: context.projectId,
+                                      projectBeneficiaryClientReferenceId:
+                                      widget
+                                          .projectBeneficiaryClientRefId,
+                                      referrerId: context.loggedInUserUuid,
+                                      recipientId: healthFacilities.first.id,
+                                      recipientType: "FACILITY",
+                                      reasons: [reason],
+                                      tenantId: envConfig.variables.tenantId,
+                                      rowVersion: 1,
+                                      auditDetails: AuditDetails(
+                                        createdBy: context.loggedInUserUuid,
+                                        createdTime:
+                                        context.millisecondsSinceEpoch(),
+                                        lastModifiedBy:
+                                        context.loggedInUserUuid,
+                                        lastModifiedTime:
+                                        context.millisecondsSinceEpoch(),
                                       ),
-                                      false,
-                                    ));
+                                      clientAuditDetails: ClientAuditDetails(
+                                        createdBy: context.loggedInUserUuid,
+                                        createdTime:
+                                        context.millisecondsSinceEpoch(),
+                                        lastModifiedBy:
+                                        context.loggedInUserUuid,
+                                        lastModifiedTime:
+                                        context.millisecondsSinceEpoch(),
+                                      ),
+                                      additionalFields:
+                                      ReferralAdditionalFields(
+                                        version: 1,
+                                        fields: [
+                                          AdditionalField(
+                                            referralReasons,
+                                            reasons.join(","),
+                                          ),
+                                          const AdditionalField(
+                                              'referralType', 'smcReferred')
+                                        ],
+                                      ),
+                                    );
+
+                                    // event.add(ReferralSubmitEvent(
+                                    //   referral,
+                                    //   false,
+                                    // ));
+
 
                                     final clientReferenceId =
                                         IdGen.i.identifier;
@@ -329,8 +333,6 @@ class CustomReferBeneficiarySMCPageState
                                         id: null,
                                       ),
                                     );
-                                    // TODO: Currently, it's been shifted to the zero dose flow
-
                                     // context.read<DeliverInterventionBloc>().add(
                                     //       DeliverInterventionSubmitEvent(
                                     //         task: task,
@@ -338,11 +340,6 @@ class CustomReferBeneficiarySMCPageState
                                     //         boundaryModel: context.boundary,
                                     //       ),
                                     //     );
-                                    // final searchBloc =
-                                    //     context.read<SearchHouseholdsBloc>();
-                                    // searchBloc.add(
-                                    //   const SearchHouseholdsClearEvent(),
-                                    // );
 
                                     final reloadState =
                                         context.read<HouseholdOverviewBloc>();
@@ -367,6 +364,7 @@ class CustomReferBeneficiarySMCPageState
                                                   .projectBeneficiaryClientReferenceId ??
                                               widget
                                                   .projectBeneficiaryClientRefId,
+                                          referral: referral,
                                         ),
                                         // CustomHouseholdAcknowledgementRoute(
                                         //   enableViewHousehold: true,

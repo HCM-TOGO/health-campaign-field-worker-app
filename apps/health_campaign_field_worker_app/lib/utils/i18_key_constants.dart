@@ -44,6 +44,7 @@ const deliverIntervention = DeliverIntervention();
 const checklist = Checklist();
 const referBeneficiary = ReferBeneficiary();
 const householdDetails = HouseholdDetails();
+const editTasks = EditTasks();
 
 class Common {
   const Common();
@@ -121,6 +122,8 @@ class Common {
 
   String get coreCommonNo => 'CORE_COMMON_NO';
   String get coreCommonGoback => 'CORE_COMMON_GO_BACK';
+
+  String get coreCommonDelete => 'CORE_COMMON_DELETE';
 
   String get coreCommonRequiredItems => 'CORE_COMMON_REQUIRED_ITEMS';
 
@@ -206,6 +209,153 @@ class HouseholdOverView {
       'HOUSEHOLD_OVER_VIEW_INCOMPLETEMENT_VACCINE_LABEL';
   String get householdOverViewZeroDoseDeliveredIconLabel =>
       'HOUSEHOLD_OVER_VIEW_ZERO_DOSE_DELIVERED_ICON_LABEL';
+
+  String get editTaskDetails => 'MEMBER_CARD_EDIT_TASK_DETAILS';
+
+  String get noTasksAvailableTitle => 'MEMBER_CARD_NO_TASKS_AVAILABLE_TITLE';
+
+  String get noTasksAvailableContent =>
+      'MEMBER_CARD_NO_TASKS_AVAILABLE_CONTENT';
+
+  String get editVaccinationDetails => 'MEMBER_CARD_EDIT_VACCINE_DETAILS';
+
+  String get noVaccinationTasksAvailableTitle =>
+      'MEMBER_CARD_NO_VACCINATION_TASKS_AVAILABLE_TITLE';
+
+  String get noVaccinationTasksAvailableContent =>
+      'MEMBER_CARD_NO_VACCINATION_TASKS_AVAILABLE_CONTENT';
+}
+
+class EditTasks {
+  const EditTasks();
+
+  String get editTasksTitle => 'EDIT_TASKS_TITLE';
+
+  String get noTasksFound => 'NO_TASKS_FOUND';
+
+  String get taskLabel => 'TASK_LABEL';
+
+  String get nameLabel => 'NAME_LABEL';
+
+  String get beneficiaryIdLabel => 'BENEFICIARY_ID_LABEL';
+
+  String get idLabel => 'ID_LABEL';
+
+  String get clientRefIdLabel => 'CLIENT_REF_ID_LABEL';
+
+  String get projectIdLabel => 'PROJECT_ID_LABEL';
+
+  String get statusLabel => 'STATUS_LABEL';
+
+  String get createdByLabel => 'CREATED_BY_LABEL';
+
+  String get tenantIdLabel => 'TENANT_ID_LABEL';
+
+  String get tapToViewOrEdit => 'TAP_TO_VIEW_OR_EDIT';
+
+  String get tasksForLabel => 'TASKS_FOR_LABEL';
+
+  String get individualTasksTitle => 'INDIVIDUAL_TASKS_TITLE';
+
+  String get noTasksFoundForIndividual => 'NO_TASKS_FOUND_FOR_INDIVIDUAL';
+
+  String get updateDialogTitle => 'UPDATE_DIALOG_TITLE';
+
+  String get updateDialogMessage => 'UPDATE_DIALOG_MESSAGE';
+
+  String get reasonLabel => 'REASON_LABEL';
+
+  String get updateReasonHint => 'UPDATE_REASON_HINT';
+
+  String get updateReasonRequiredError => 'REASON_REQUIRED_ERROR';
+
+  String get reasonMinLengthError => 'REASON_MIN_LENGTH_ERROR';
+
+  String get reasonMaxLengthError => 'REASON_MAX_LENGTH_ERROR';
+
+  String get updateSuccessMessage => 'UPDATE_SUCCESS_MESSAGE';
+
+  String get updateErrorMessage => 'UPDATE_ERROR_MESSAGE';
+
+  String get deleteDialogTitle => 'DELETE_DIALOG_TITLE';
+
+  String get deleteDialogMessage => 'DELETE_DIALOG_MESSAGE';
+
+  String get deleteReasonHint => 'DELETE_REASON_HINT';
+
+  String get deleteReasonRequiredError => 'DELETE_REASON_REQUIRED_ERROR';
+
+  String get deleteSuccessMessage => 'DELETE_SUCCESS_MESSAGE';
+
+  String get deleteErrorMessage => 'DELETE_ERROR_MESSAGE';
+
+  String get beneficiaryDetailsSectionTitle =>
+      'BENEFICIARY_DETAILS_SECTION_TITLE';
+
+  String get ageLabel => 'AGE_LABEL';
+
+  String get yearsLabel => 'YEARS_LABEL';
+
+  String get andLabel => 'AND_LABEL';
+
+  String get monthsLabel => 'MONTHS_LABEL';
+
+  String get genderLabel => 'GENDER_LABEL';
+
+  String get resourcesSectionTitle => 'RESOURCES_SECTION_TITLE';
+
+  String get resourceLabel => 'RESOURCE_LABEL';
+
+  String get productVariantIdLabel => 'PRODUCT_VARIANT_ID_LABEL';
+
+  String get noProductVariantsFound => 'NO_PRODUCT_VARIANTS_FOUND';
+
+  String get taskIdLabel => 'TASK_ID_LABEL';
+
+  String get quantityLabel => 'QUANTITY_LABEL';
+
+  String get isDeliveredLabel => 'IS_DELIVERED_LABEL';
+
+  String get deliveryCommentLabel => 'DELIVERY_COMMENT_LABEL';
+
+  String get additionalDetailsSectionTitle =>
+      'ADDITIONAL_DETAILS_SECTION_TITLE';
+
+  String get editableFieldsHintTitle => 'EDIT_TASKS_EDITABLE_FIELDS_HINT_TITLE';
+
+  String get editableFieldBadge => 'EDIT_TASKS_EDITABLE_FIELD_BADGE';
+
+  String get schemaLabel => 'SCHEMA_LABEL';
+
+  String get versionLabel => 'VERSION_LABEL';
+
+  String get taskInfoSectionTitle => 'TASK_INFO_SECTION_TITLE';
+
+  String get selectStatusLabel => 'SELECT_STATUS_LABEL';
+
+  String get projectBeneficiaryIdLabel => 'PROJECT_BENEFICIARY_ID_LABEL';
+
+  String get rowVersionLabel => 'ROW_VERSION_LABEL';
+
+  String get projectBeneficiaryCLientRefIdLabel =>
+      'PROJECT_BENEFICIARY_CLIENT_REF_ID_LABEL';
+
+  String get isDeletedLabel => 'IS_DELETED_LABEL';
+
+  String get createdDateLabel => 'CREATED_DATE_LABEL';
+
+  String get systemFieldsSectionTitle => 'SYSTEM_FIELDS_SECTION_TITLE';
+
+  String get statusRequiredError => 'STATUS_REQUIRED_ERROR';
+
+  String get productVariantIdRequiredError =>
+      'PRODUCT_VARIANT_ID_REQUIRED_ERROR';
+
+  String get enableSearchLabel => 'ENABLE_SEARCH_LABEL';
+
+  String get searchByBeneficiaryIdLabel => 'SEARCH_BY_BENEFICIARY_ID_LABEL';
+
+  String get noMatchFound => 'NO_MATCH_FOUND';
 }
 
 class DeliverIntervention {
@@ -450,6 +600,26 @@ class HomeShowcase {
     return 'HOME_SHOWCASE_SUMMARY_REPORT_SPAQ2';
   }
 
+  String get summaryReportUnprocessedRecords {
+    return 'HOME_SHOWCASE_SUMMARY_REPORT_UNPROCESSED_RECORDS';
+  }
+
+  String get summaryReportPendingEligible {
+    return 'HOME_SHOWCASE_SUMMARY_REPORT_PENDING_ELIGIBLE';
+  }
+
+  String get zeroDoseBreakdownTitle {
+    return 'HOME_SHOWCASE_ZERO_DOSE_BREAKDOWN_TITLE';
+  }
+
+  String get zeroDoseBreakdownStatus {
+    return 'HOME_SHOWCASE_ZERO_DOSE_BREAKDOWN_STATUS';
+  }
+
+  String get zeroDoseBreakdownCount {
+    return 'HOME_SHOWCASE_ZERO_DOSE_BREAKDOWN_COUNT';
+  }
+
   String get distributorProgressBar {
     return 'DISTRIBUTOR_HOME_SHOWCASE_PROGRESS_BAR';
   }
@@ -600,6 +770,7 @@ class StockReconciliationDetails {
 
   String get commentRequiredError => 'RECONCILIATION_COMMENT_IS_REQUIRED';
   String get qrCodeInvalidFormat => 'QR_CODE_INVALID_FORMAT';
+  String get distributorInfoCardContent => 'DISTRIBUTOR_INFO_CARD_CONTENT';
 }
 
 class InventoryReportDetails {
@@ -1014,6 +1185,8 @@ class Home {
 
   String get clfLabel => "HOME_COMMUNAL_LIVING_FACILITIES_LABEL";
   String get summaryLabel => 'HOME_SUMMARY_LABEL';
+
+  String get editTasks => 'HOME_EDIT_TASKS_LABEL';
 }
 
 class AcknowledgementSuccess {
@@ -1370,7 +1543,7 @@ class SearchBeneficiary {
 
   String get noOfResourcesDelivered => 'NO_OF_RESOURCES_DELIVERED';
 
-  String get beneficiarySearchHintText => 'BENEFICIARY_SEARCH_HINT_TEXT';
+  String get beneficiarySearchHintText => 'BENEFICIARY_SEARCH_HINT_TEXT_SOME';
 
   String get beneficiarySearchByBeneficiaryIdHintText =>
       'BENEFICIARY_SEARCH_BY_BENEFICIARY_ID_HINT_TEXT';
@@ -1384,6 +1557,8 @@ class SearchBeneficiary {
   String get beneficiaryInfoDescription => 'BENEFICIARY_INFO_DESCRIPTION_TEXT';
 
   String get beneficiaryInfoTitle => 'BENEFICIARY_INFO_TITLE';
+
+  String get referralInfoTitle => 'REFERRAL_INFO_TITLE';
 
   String get beneficiaryAddActionLabel => 'BENEFICIARY_ADD_ACTION_LABEL';
 
@@ -1400,6 +1575,12 @@ class SearchBeneficiary {
   String get mobileNumberValidInfoDescription =>
       'MOBILE_NUMBER_VALID_INFO_DESCRIPTION';
   String get mobileNumberInfoTitle => 'MOBILE_NUMBER_VALID_INFO_TITLE';
+
+  String get sideEffectAlreadyRecorded => 'SIDE_EFFECT_ALREADY_RECORDED';
+
+  String get noTasksAssociated => 'NO_TASKS_ASSOCIATED_WITH_BENEFICIARY';
+
+  String get recordSideEffectActionLabel => 'RECORD_SIDE_EFFECT_ACTION_LABEL';
 }
 
 class IndividualDetails {
@@ -1613,6 +1794,17 @@ class BeneficiaryDetails {
   String get beneficiaryOnCotrimoxazoleTreatmentLabel =>
       'BENEFICIARY_ON_COTRIMOXAZOLE_TREATMENT_LABEL';
   String get beneficiaryHasAllergyLabel => 'BENEFICIARY_HAS_ALLERGY_LABEL';
+
+  String get deleteIndividualLabelText => 'DELETE_INDIVIDUAL_LABEL_TEXT';
+  String get deleteIndividualHintText => 'DELETE_INDIVIDUAL_HINT_TEXT';
+  String get deleteIndividualRequiredErrorMsg =>
+      'DELETE_INDIVIDUAL_REQUIRED_ERROR_MESSAGE';
+  String get deleteIndividualMinLengthErrorMsg =>
+      'DELETE_INDIVIDUAL_MIN_LENGTH_ERROR_MESSAGE';
+  String get deleteIndividualMaxLengthErrorMsg =>
+      'DELETE_INDIVIDUAL_MAX_LENGTH_ERROR_MESSAGE';
+  String get deleteIndividualSuccessMsg => 'DELETE_INDIVIDUAL_SUCCESS_MESSAGE';
+  String get deleteIndividualFailedMsg => 'DELETE_INDIVIDUAL_FAILED_MESSAGE';
 }
 
 class PrivacyPolicy {

@@ -1,4 +1,3 @@
-import 'package:auto_route/auto_route.dart';
 import 'package:collection/collection.dart';
 import 'package:digit_components/digit_components.dart';
 import 'package:digit_data_model/data_model.dart';
@@ -12,31 +11,26 @@ import 'package:intl/intl.dart';
 import 'package:registration_delivery/blocs/app_localization.dart';
 import 'package:registration_delivery/blocs/delivery_intervention/deliver_intervention.dart';
 import 'package:registration_delivery/blocs/household_overview/household_overview.dart';
-import 'package:registration_delivery/blocs/search_households/search_households.dart';
 import 'package:registration_delivery/models/entities/project_beneficiary.dart';
 import 'package:registration_delivery/models/entities/side_effect.dart';
 import 'package:registration_delivery/models/entities/status.dart';
 import 'package:registration_delivery/models/entities/task.dart';
-import 'package:registration_delivery/router/registration_delivery_router.gm.dart';
 import 'package:registration_delivery/utils/i18_key_constants.dart' as i18;
-import '../../blocs/localization/app_localization.dart';
-import '../../models/entities/additional_fields_type.dart';
-import '../../models/entities/identifier_types.dart';
-// import '../../utils/registration_delivery/utils_smc.dart';
 import 'package:registration_delivery/utils/utils.dart';
-import '../../router/app_router.dart';
-import '../../utils/app_enums.dart';
-import '../../utils/environment_config.dart';
-import '../../utils/registration_delivery/utils_smc.dart';
-import '../../utils/utils.dart';
-import '../action_card/action_card.dart';
 
-import '../../utils/i18_key_constants.dart' as i18_local;
 import '../../../models/entities/assessment_checklist/status.dart'
     as status_local;
 import '../../models/entities/additional_fields_type.dart'
     as additional_fields_local;
+import '../../models/entities/additional_fields_type.dart';
+import '../../models/entities/identifier_types.dart';
+import '../../router/app_router.dart';
+import '../../utils/app_enums.dart';
 import '../../utils/date_utils.dart' as digits;
+import '../../utils/i18_key_constants.dart' as i18_local;
+import '../../utils/registration_delivery/utils_smc.dart';
+import '../../utils/utils.dart';
+import '../action_card/action_card.dart';
 
 class CustomMemberCard extends StatelessWidget {
   final List<ProductVariantModel> variant;
@@ -119,8 +113,19 @@ class CustomMemberCard extends StatelessWidget {
     return tasks?.firstWhereOrNull((e) =>
             e.additionalFields?.fields.firstWhereOrNull((field) =>
                 field.key == AdditionalFieldsType.cycleIndex.toValue() &&
+                context.selectedCycle != null &&
                 int.tryParse(field.value)! > context.selectedCycle!.id) !=
             null) !=
+        null;
+  }
+
+  bool _checkIfAdministrationDone(List<TaskModel>? tasks) {
+    if (tasks == null || tasks.isEmpty) {
+      return false;
+    }
+
+    return tasks.firstWhereOrNull(
+            (e) => e.status == Status.administeredSuccess.toValue()) !=
         null;
   }
 
@@ -207,6 +212,7 @@ class CustomMemberCard extends StatelessWidget {
     bool isBeneficiaryOnCotrimoxazole =
         checkBeneficiaryOnCotrimoxazole(currentTasks);
     bool hasBeneficiaryAllergy = checkBeneficiaryHasAllergy(currentTasks);
+    bool isAdministrationDone = _checkIfAdministrationDone(smcTasks);
 
     final theme = Theme.of(context);
     if (isHead) {
@@ -239,7 +245,7 @@ class CustomMemberCard extends StatelessWidget {
         ),
       );
     }
-    if ((isSMCDelivered ||
+    if (((isSMCDelivered && isAdministrationDone) ||
             isBeneficiaryReferredSMC ||
             isBeneficiaryInEligibleSMC) &&
         !hasBeneficiaryRefused &&
@@ -705,16 +711,14 @@ class CustomMemberCard extends StatelessWidget {
                             ),
                           );
 
-                          // TODO: Currently it's been shifted to the zero dose flow
-
-                          // context.read<DeliverInterventionBloc>().add(
-                          //       DeliverInterventionSubmitEvent(
-                          //         task: refusalTask,
-                          //         isEditing: false,
-                          //         boundaryModel:
-                          //             RegistrationDeliverySingleton().boundary!,
-                          //       ),
-                          //     );
+                          context.read<DeliverInterventionBloc>().add(
+                                DeliverInterventionSubmitEvent(
+                                  task: refusalTask,
+                                  isEditing: false,
+                                  boundaryModel:
+                                      RegistrationDeliverySingleton().boundary!,
+                                ),
+                              );
 
                           final reloadState =
                               context.read<HouseholdOverviewBloc>();
@@ -796,16 +800,14 @@ class CustomMemberCard extends StatelessWidget {
                             ),
                           );
 
-                          // TODO: Currently it's been shifted to the zero dose flow
-
-                          // context.read<DeliverInterventionBloc>().add(
-                          //       DeliverInterventionSubmitEvent(
-                          //         task: refusalTask,
-                          //         isEditing: false,
-                          //         boundaryModel:
-                          //             RegistrationDeliverySingleton().boundary!,
-                          //       ),
-                          //     );
+                          context.read<DeliverInterventionBloc>().add(
+                                DeliverInterventionSubmitEvent(
+                                  task: absentTask,
+                                  isEditing: false,
+                                  boundaryModel:
+                                      RegistrationDeliverySingleton().boundary!,
+                                ),
+                              );
 
                           final reloadState =
                               context.read<HouseholdOverviewBloc>();
@@ -975,16 +977,14 @@ class CustomMemberCard extends StatelessWidget {
                             ),
                           );
 
-                          // TODO: Currently it's been shifted to the zero dose flow
-
-                          // context.read<DeliverInterventionBloc>().add(
-                          //       DeliverInterventionSubmitEvent(
-                          //         task: refusalTask,
-                          //         isEditing: false,
-                          //         boundaryModel:
-                          //             RegistrationDeliverySingleton().boundary!,
-                          //       ),
-                          //     );
+                          context.read<DeliverInterventionBloc>().add(
+                                DeliverInterventionSubmitEvent(
+                                  task: task,
+                                  isEditing: false,
+                                  boundaryModel:
+                                      RegistrationDeliverySingleton().boundary!,
+                                ),
+                              );
 
                           final reloadState =
                               context.read<HouseholdOverviewBloc>();
@@ -1067,16 +1067,14 @@ class CustomMemberCard extends StatelessWidget {
                             ),
                           );
 
-                          // TODO: Currently it's been shifted to the zero dose flow
-
-                          // context.read<DeliverInterventionBloc>().add(
-                          //       DeliverInterventionSubmitEvent(
-                          //         task: refusalTask,
-                          //         isEditing: false,
-                          //         boundaryModel:
-                          //             RegistrationDeliverySingleton().boundary!,
-                          //       ),
-                          //     );
+                          context.read<DeliverInterventionBloc>().add(
+                                DeliverInterventionSubmitEvent(
+                                  task: task,
+                                  isEditing: false,
+                                  boundaryModel:
+                                      RegistrationDeliverySingleton().boundary!,
+                                ),
+                              );
 
                           final reloadState =
                               context.read<HouseholdOverviewBloc>();
@@ -1159,16 +1157,14 @@ class CustomMemberCard extends StatelessWidget {
                             ),
                           );
 
-                          // TODO: Currently it's been shifted to the zero dose flow
-
-                          // context.read<DeliverInterventionBloc>().add(
-                          //       DeliverInterventionSubmitEvent(
-                          //         task: refusalTask,
-                          //         isEditing: false,
-                          //         boundaryModel:
-                          //             RegistrationDeliverySingleton().boundary!,
-                          //       ),
-                          //     );
+                          context.read<DeliverInterventionBloc>().add(
+                                DeliverInterventionSubmitEvent(
+                                  task: task,
+                                  isEditing: false,
+                                  boundaryModel:
+                                      RegistrationDeliverySingleton().boundary!,
+                                ),
+                              );
 
                           final reloadState =
                               context.read<HouseholdOverviewBloc>();
@@ -1468,14 +1464,6 @@ class CustomMemberCard extends StatelessWidget {
                   ),
                 ],
               ),
-              // ((tasks == null || tasks!.isEmpty) &&
-              //         !isSMCDelivered &&
-              //         !isVASDelivered &&
-              //         // !isNotEligibleSMC &&
-              //         // !isNotEligibleVAS &&
-              //         !isBeneficiaryIneligible &&
-              //         !isBeneficiaryReferred)
-              //     ?
               Positioned(
                 child: Align(
                   alignment: Alignment.topRight,
@@ -1491,6 +1479,133 @@ class CustomMemberCard extends StatelessWidget {
                             ),
                             action: editMemberAction,
                           ),
+                          ActionCardModel(
+                            icon: Icons.edit_sharp,
+                            label: localizations.translate(
+                              i18_local.householdOverView.editTaskDetails,
+                            ),
+                            action: () {
+                              Navigator.of(context, rootNavigator: true).pop();
+                              if (tasks != null && tasks!.isNotEmpty) {
+                                final bloc =
+                                    context.read<HouseholdOverviewBloc>();
+                                final projectId =
+                                    RegistrationDeliverySingleton().projectId!;
+                                final beneficiaryType =
+                                    RegistrationDeliverySingleton()
+                                        .beneficiaryType!;
+
+                                context.router
+                                    .push(
+                                  IndividualTaskListRoute(
+                                    individual: individual,
+                                    tasks: tasks!,
+                                  ),
+                                )
+                                    .then((_) {
+                                  bloc.add(
+                                    HouseholdOverviewReloadEvent(
+                                      projectId: projectId,
+                                      projectBeneficiaryType: beneficiaryType,
+                                    ),
+                                  );
+                                });
+                              } else {
+                                DigitDialog.show(
+                                  context,
+                                  options: DigitDialogOptions(
+                                    titleText: localizations.translate(
+                                      i18_local.householdOverView
+                                          .noTasksAvailableTitle,
+                                    ),
+                                    contentText: localizations.translate(
+                                      i18_local.householdOverView
+                                          .noTasksAvailableContent,
+                                    ),
+                                    primaryAction: DigitDialogActions(
+                                      label: localizations.translate(
+                                        i18.common.coreCommonOk,
+                                      ),
+                                      action: (ctx) {
+                                        Navigator.of(
+                                          ctx,
+                                          rootNavigator: true,
+                                        ).pop();
+                                      },
+                                    ),
+                                  ),
+                                );
+                              }
+                            },
+                          ),
+                          ActionCardModel(
+                            icon: Icons.edit_sharp,
+                            label: localizations.translate(
+                              i18_local
+                                  .householdOverView.editVaccinationDetails,
+                            ),
+                            action: () {
+                              Navigator.of(context, rootNavigator: true).pop();
+                              final zeroDoseTasks =
+                                  _getZeroDoseStatusData(context);
+                              if (zeroDoseTasks != null &&
+                                  zeroDoseTasks.isNotEmpty) {
+                                final bloc =
+                                    context.read<HouseholdOverviewBloc>();
+                                final projectId =
+                                    RegistrationDeliverySingleton().projectId!;
+                                final beneficiaryType =
+                                    RegistrationDeliverySingleton()
+                                        .beneficiaryType!;
+                                context.router
+                                    .push(
+                                  ZeroDoseCheckRoute(
+                                    eligibilityAssessmentType:
+                                        EligibilityAssessmentType.smc,
+                                    isAdministration: false,
+                                    isEditing: true,
+                                    projectBeneficiaryClientReferenceId:
+                                        projectBeneficiaryClientReferenceId,
+                                    individual: individual,
+                                    task: zeroDoseTasks.last,
+                                  ),
+                                )
+                                    .then((_) {
+                                  bloc.add(
+                                    HouseholdOverviewReloadEvent(
+                                      projectId: projectId,
+                                      projectBeneficiaryType: beneficiaryType,
+                                    ),
+                                  );
+                                });
+                              } else {
+                                DigitDialog.show(
+                                  context,
+                                  options: DigitDialogOptions(
+                                    titleText: localizations.translate(
+                                      i18_local.householdOverView
+                                          .noVaccinationTasksAvailableTitle,
+                                    ),
+                                    contentText: localizations.translate(
+                                      i18_local.householdOverView
+                                          .noVaccinationTasksAvailableContent,
+                                    ),
+                                    primaryAction: DigitDialogActions(
+                                      label: localizations.translate(
+                                        i18.common.coreCommonOk,
+                                      ),
+                                      action: (ctx) {
+                                        Navigator.of(
+                                          ctx,
+                                          rootNavigator: true,
+                                        ).pop();
+                                      },
+                                    ),
+                                  ),
+                                );
+                              }
+                            },
+                          ),
                         ],
                       ),
                     ),
@@ -1501,7 +1616,6 @@ class CustomMemberCard extends StatelessWidget {
                   ),
                 ),
               )
-              // : const Offstage(),
             ],
           ),
           SizedBox(

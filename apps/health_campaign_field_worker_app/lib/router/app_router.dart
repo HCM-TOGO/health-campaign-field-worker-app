@@ -9,6 +9,7 @@ import 'package:referral_reconciliation/pages/search_referral_reconciliations.da
 import 'package:referral_reconciliation/router/referral_reconciliation_router.gm.dart';
 import 'package:referral_reconciliation/router/referral_reconciliation_router.dart';
 import 'package:registration_delivery/blocs/app_localization.dart';
+import 'package:registration_delivery/models/entities/referral.dart';
 import 'package:registration_delivery/models/entities/task.dart';
 import 'package:registration_delivery/router/registration_delivery_router.dart';
 import 'package:registration_delivery/router/registration_delivery_router.gm.dart';
@@ -19,6 +20,9 @@ import 'package:inventory_management/blocs/app_localization.dart';
 import 'package:inventory_management/router/inventory_router.dart';
 import 'package:inventory_management/router/inventory_router.gm.dart';
 import 'package:inventory_management/blocs/record_stock.dart' as _i15;
+import '../pages/edit/individual_task_list.dart';
+import '../pages/edit/task_list.dart';
+import '../pages/edit/task_details.dart';
 import '../pages/registration_delivery/custom_complaints_inbox_search.dart';
 
 import '../blocs/inventory_management/custom_inventory_report.dart';
@@ -51,6 +55,7 @@ import '../pages/registration_delivery/custom_beneficiary_registration_wrapper.d
 import '../pages/registration_delivery/custom_household_details.dart';
 import '../pages/registration_delivery/custom_household_location.dart';
 import '../pages/registration_delivery/custom_household_overview.dart';
+import '../pages/edit/individual_task_list.dart';
 import '../pages/registration_delivery/custom_individual_details.dart';
 import '../pages/registration_delivery/custom_registration_delivery_wrapper.dart';
 import '../pages/registration_delivery/custom_search_beneficiary.dart';
@@ -110,6 +115,7 @@ import '../pages/attendance/custom_session_select.dart';
 import '../pages/attendance/custom_mark_attendance.dart';
 import 'package:attendance_management/models/entities/attendee.dart';
 import 'package:attendance_management/models/entities/attendance_register.dart';
+import '../pages/referral_reconcillation/custom_referral_recon_acknowedgment_page.dart';
 
 import 'package:complaints/blocs/localization/app_localization.dart';
 part 'app_router.gr.dart';
@@ -215,6 +221,16 @@ class AppRouter extends _$AppRouter {
                   path: 'closed-household-acknowledgement'),
             ]),
 
+        // Edit Task Route
+        AutoRoute(
+          page: TaskListRoute.page,
+          path: 'task-list',
+        ),
+        AutoRoute(
+          page: TaskDetailRoute.page,
+          path: 'task-details',
+        ),
+
         // Attendance Route
         AutoRoute(
           page: ManageAttendanceRoute.page,
@@ -314,11 +330,18 @@ class AppRouter extends _$AppRouter {
               RedirectRoute(
                   path: 'referral-checklist-view',
                   redirectTo: 'custom-referral-checklist-view'),
+              AutoRoute(
+                page: ReferralReconAcknowledgementRoute.page,
+                path: 'referral-acknowledgement',
+              ),
+              AutoRoute(
+                page: CustomReferralReconAcknowedgmentRoute.page,
+                path: 'custom-referral-acknowledgement',
+              ),
+              RedirectRoute(
+                  path: 'referral-acknowledgement',
+                  redirectTo: 'custom-referral-acknowledgement')
             ]),
-        AutoRoute(
-          page: ReferralReconAcknowledgementRoute.page,
-          path: 'referral-acknowledgement',
-        ),
         AutoRoute(
           page: ReferralReconProjectFacilitySelectionRoute.page,
           path: 'referral-project-facility',
@@ -416,6 +439,14 @@ class AppRouter extends _$AppRouter {
                     page: CustomHouseholdOverviewRoute.page,
                     path: 'custom-overview',
                     initial: true,
+                  ),
+                  AutoRoute(
+                    page: IndividualTaskListRoute.page,
+                    path: 'individual-task-list',
+                  ),
+                  AutoRoute(
+                    page: TaskDetailRoute.page,
+                    path: 'task-details',
                   ),
                   // AutoRoute(
                   //   page: BeneficiaryDetailsRoute.page,

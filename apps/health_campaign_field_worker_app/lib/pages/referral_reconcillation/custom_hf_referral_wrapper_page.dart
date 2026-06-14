@@ -3,6 +3,7 @@ import 'package:digit_data_model/data_model.dart';
 import 'package:survey_form/survey_form.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:provider/provider.dart';
 import 'package:referral_reconciliation/blocs/app_localization.dart';
 import 'package:referral_reconciliation/blocs/referral_recon_record.dart';
 import 'package:referral_reconciliation/models/entities/hf_referral.dart';
@@ -19,6 +20,8 @@ class CustomHFCreateReferralWrapperPage extends LocalizedStatefulWidget {
   final HFReferralModel? referralReconciliation;
   final List<String> cycles;
   final String projectId;
+  final bool isSideEffect;
+  final IndividualModel? individual;
 
   const CustomHFCreateReferralWrapperPage({
     super.key,
@@ -26,6 +29,8 @@ class CustomHFCreateReferralWrapperPage extends LocalizedStatefulWidget {
     this.viewOnly = false,
     this.referralReconciliation,
     required this.cycles,
+    this.isSideEffect = false,
+    this.individual,
   });
 
   @override
@@ -84,7 +89,10 @@ class _HFCreateReferralWrapperPageState
                     referralReconDataRepository: context.repository<
                         HFReferralModel, HFReferralSearchModel>(context),
                   ),
-                  child: const AutoRouter(),
+                  child: Provider<IndividualModel?>.value(
+                    value: widget.individual,
+                    child: const AutoRouter(),
+                  ),
                 ),
               ),
             ),

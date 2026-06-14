@@ -930,7 +930,7 @@ class CustomStockDetailsPageState
                                                       null &&
                                                   element.receiverId ==
                                                       (deliveryTeamSelected
-                                                          ? 'FAC_${selectedFacilityId}'
+                                                          ? deliveryTeamName
                                                           : selectedFacilityId) &&
                                                   element.auditDetails
                                                           ?.createdBy ==
@@ -968,9 +968,10 @@ class CustomStockDetailsPageState
                                                       //           .pipeSeparator)
                                                       //       .last
                                                       // ],
-                                                      senderId: deliveryTeamSelected
-                                                          ? 'FAC_${selectedFacilityId}'
-                                                          : selectedFacilityId,
+                                                      senderId:
+                                                          deliveryTeamSelected
+                                                              ? deliveryTeamName
+                                                              : selectedFacilityId,
                                                       transactionType: [
                                                         TransactionType.received
                                                             .toValue()
@@ -2016,6 +2017,10 @@ class CustomStockDetailsPageState
                                         i18.stockDetails.commentsLabel,
                                       ),
                                       onChange: (val) {
+                                        if (val == '') {
+                                          field.control.value = null;
+                                          return;
+                                        }
                                         field.control.value = val;
                                       },
                                     );

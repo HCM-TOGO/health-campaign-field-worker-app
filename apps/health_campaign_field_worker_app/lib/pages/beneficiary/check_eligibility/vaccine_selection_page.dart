@@ -66,6 +66,7 @@ class VaccineSelectionPage extends LocalizedStatefulWidget {
   final String? hasImmunizationCard;
   final String? immunizationCardLost;
   final String? receivedPenta1;
+  final ReferralModel? referral;
 
   const VaccineSelectionPage({
     super.key,
@@ -82,6 +83,7 @@ class VaccineSelectionPage extends LocalizedStatefulWidget {
     this.hasImmunizationCard,
     this.immunizationCardLost,
     this.receivedPenta1,
+    this.referral,
   });
 
   @override
@@ -342,6 +344,22 @@ class _VaccineSelectionPageState extends LocalizedState<VaccineSelectionPage> {
     return true;
   }
 
+  void _goToPreviousVaccineGroup() {
+    if (currentIndex > 0) {
+      setState(() {
+        currentIndex--;
+      });
+    }
+  }
+
+  Widget _buildBackHeader(BuildContext context) {
+    return CustomBackNavigationHelpHeaderWidget(
+      showHelp: false,
+      defaultPopRoute: currentIndex == 0,
+      handleback: currentIndex > 0 ? _goToPreviousVaccineGroup : null,
+    );
+  }
+
   String _numberToWords(int number) {
     // Simple mapping for numbers 0-6, extend as needed
     const words = [
@@ -499,13 +517,14 @@ class _VaccineSelectionPageState extends LocalizedState<VaccineSelectionPage> {
 
   @override
   Widget build(BuildContext context) {
-    final dob = context
-        .read<HouseholdOverviewBloc>()
-        .state
-        .selectedIndividual
-        ?.dateOfBirth;
+    final dob = widget.individual?.dateOfBirth ??
+        context
+            .read<HouseholdOverviewBloc>()
+            .state
+            .selectedIndividual
+            ?.dateOfBirth;
     final theme = Theme.of(context);
-    final ageInDays = calculateAgeInDaysFromDob(dob!);
+    final ageInDays = calculateAgeInDaysFromDob(dob ?? '');
 
     return BlocListener<ServiceBloc, ServiceState>(listener: (context, state) {
       state.maybeWhen(
@@ -593,67 +612,78 @@ class _VaccineSelectionPageState extends LocalizedState<VaccineSelectionPage> {
         }
 
         if (currentIndex < lastIndex) {
-          return ScrollableContent(
-            header: const Column(children: [
-              CustomBackNavigationHelpHeaderWidget(
-                showHelp: false,
-              )
-            ]),
-            enableFixedDigitButton: true,
-            footer: DigitCard(
-              margin: const EdgeInsets.fromLTRB(0, kPadding, 0, 0),
-              padding: const EdgeInsets.fromLTRB(kPadding, 0, kPadding, 0),
-              children: [
-                DigitElevatedButton(
-                  onPressed: () async {
-                    if (!isValid(
-                        responses: currentResponses,
-                        allVaccineCodes: allVaccineCodes,
-                        vaccineCodes: currentVaccineCodes)) {
-                      await DigitToast.show(
-                        context,
-                        options: DigitToastOptions(
-                          localizations.translate(
-                            i18.common.corecommonRequired,
+          return PopScope(
+            canPop: currentIndex == 0,
+            onPopInvoked: (didPop) {
+              if (!didPop && currentIndex > 0) {
+                _goToPreviousVaccineGroup();
+              }
+            },
+            child: ScrollableContent(
+              header: Column(children: [
+                _buildBackHeader(context),
+              ]),
+              enableFixedDigitButton: true,
+              footer: DigitCard(
+                margin: const EdgeInsets.fromLTRB(0, kPadding, 0, 0),
+                padding: const EdgeInsets.fromLTRB(kPadding, 0, kPadding, 0),
+                children: [
+                  DigitElevatedButton(
+                    onPressed: () async {
+                      if (!isValid(
+                          responses: currentResponses,
+                          allVaccineCodes: allVaccineCodes,
+                          vaccineCodes: currentVaccineCodes)) {
+                        await DigitToast.show(
+                          context,
+                          options: DigitToastOptions(
+                            localizations.translate(
+                              i18.common.corecommonRequired,
+                            ),
+                            true,
+                            theme,
                           ),
-                          true,
-                          theme,
-                        ),
-                      );
-                      return;
-                    }
-                    saveResponses(currentResponses);
-                    setState(() {
-                      currentIndex++;
-                    });
-                  },
-                  child: Text(
-                    localizations.translate(i18.common.coreCommonNext),
-                  ),
-                )
+                        );
+                        return;
+                      }
+                      saveResponses(currentResponses);
+                      setState(() {
+                        currentIndex++;
+                      });
+                    },
+                    child: Text(
+                      localizations.translate(i18.common.coreCommonNext),
+                    ),
+                  )
+                ],
+              ),
+              children: [
+                _buildVaccineRadioChecklist(
+                  context: context,
+                  index: currentIndex,
+                  vaccineCodeToName: vaccineCodeToName,
+                  vaccineResponses: currentResponses,
+                  vaccineCodes: currentVaccineCodes,
+                ),
               ],
             ),
-            children: [
-              _buildVaccineRadioChecklist(
-                context: context,
-                index: currentIndex,
-                vaccineCodeToName: vaccineCodeToName,
-                vaccineResponses: currentResponses,
-                vaccineCodes: currentVaccineCodes,
-              ),
-            ],
           );
         }
 
         return PopScope(
-            canPop: true,
+            canPop: currentIndex == 0,
+            onPopInvoked: (didPop) {
+              if (!didPop && currentIndex > 0) {
+                _goToPreviousVaccineGroup();
+              }
+            },
             child: Scaffold(body: BlocBuilder<LocationBloc, LocationState>(
                 builder: (context, locationState) {
               return BlocBuilder<HouseholdOverviewBloc, HouseholdOverviewState>(
                 builder: (context, householdOverviewState) {
                   double? latitude = locationState.latitude;
                   double? longitude = locationState.longitude;
-                  String vaccineSelection = "ZERO_DOSE_ASSESSMENT";
+                  String vaccineSelection = "UPDATED_ZERO_DOSE_ASSESSMENT";
                   return BlocBuilder<ServiceDefinitionBloc,
                       ServiceDefinitionState>(
                     builder: (context, state) {
@@ -689,10 +719,8 @@ class _VaccineSelectionPageState extends LocalizedState<VaccineSelectionPage> {
                         orElse: () => Text(state.runtimeType.toString()),
                         serviceDefinitionFetch: (value) {
                           return ScrollableContent(
-                            header: const Column(children: [
-                              CustomBackNavigationHelpHeaderWidget(
-                                showHelp: false,
-                              )
+                            header: Column(children: [
+                              _buildBackHeader(context),
                             ]),
                             enableFixedDigitButton: true,
                             footer: DigitCard(
@@ -974,6 +1002,15 @@ class _VaccineSelectionPageState extends LocalizedState<VaccineSelectionPage> {
                                             ),
                                           );
 
+                                      if (widget.referral != null) {
+                                        context.read<ReferralBloc>().add(
+                                              ReferralSubmitEvent(
+                                                widget.referral!,
+                                                false,
+                                              ),
+                                            );
+                                      }
+
                                       if (widget.isChecklistAssessmentDone ==
                                           true) {
                                         final householdMember = context
@@ -984,11 +1021,42 @@ class _VaccineSelectionPageState extends LocalizedState<VaccineSelectionPage> {
                                             .read<DeliverInterventionBloc>()
                                             .state;
 
-                                        final oldTask =
-                                            deliverState.oldTask ?? widget.task;
-                                        final oldFields =
-                                            oldTask.additionalFields?.fields ??
-                                                [];
+                                        final oldTask = widget.referral != null
+                                            ? widget.task
+                                            : deliverState.oldTask ??
+                                                widget.task;
+                                        final keysToRewrite = {
+                                          additional_fields_local
+                                              .AdditionalFieldsType
+                                              .zeroDoseStatus
+                                              .toValue(),
+                                          additional_fields_local
+                                              .AdditionalFieldsType
+                                              .hasImmunizationCard
+                                              .toValue(),
+                                          additional_fields_local
+                                              .AdditionalFieldsType
+                                              .immunizationCardLost
+                                              .toValue(),
+                                          additional_fields_local
+                                              .AdditionalFieldsType
+                                              .receivedPenta1
+                                              .toValue(),
+                                          additional_fields_local
+                                              .AdditionalFieldsType
+                                              .selectedVaccines
+                                              .toValue(),
+                                          additional_fields_local
+                                              .AdditionalFieldsType
+                                              .noSelectedVaccines
+                                              .toValue(),
+                                        };
+                                        final oldFields = (oldTask
+                                                    .additionalFields?.fields ??
+                                                [])
+                                            .where((f) =>
+                                                !keysToRewrite.contains(f.key))
+                                            .toList();
 
                                         final updatedFields = [
                                           ...oldFields,
@@ -1051,14 +1119,9 @@ class _VaccineSelectionPageState extends LocalizedState<VaccineSelectionPage> {
                                             .add(
                                               DeliverInterventionSubmitEvent(
                                                 task: updatedTask,
-                                                isEditing: (deliverState
-                                                                .tasks ??
-                                                            [])
-                                                        .isNotEmpty &&
-                                                    RegistrationDeliverySingleton()
-                                                            .beneficiaryType ==
-                                                        BeneficiaryType
-                                                            .household,
+                                                // Referred: task not yet persisted → create.
+                                                // Administration / edit: update existing task.
+                                                isEditing: widget.referral == null,
                                                 boundaryModel:
                                                     RegistrationDeliverySingleton()
                                                         .boundary!,

@@ -1,20 +1,16 @@
-import 'package:collection/collection.dart';
 import 'package:digit_components/digit_components.dart';
-import 'package:digit_components/utils/date_utils.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import '../../widgets/localized.dart';
-import '../../widgets/reports/readonly_pluto_grid.dart';
-import 'package:intl/intl.dart';
 import 'package:reactive_forms/reactive_forms.dart';
-import 'package:registration_delivery/models/entities/household.dart';
-import 'package:registration_delivery/registration_delivery.dart';
 import 'package:registration_delivery/widgets/back_navigation_help_header.dart';
 
 import '../../../router/app_router.dart';
-import '../../../utils/utils.dart';
+import '../../../utils/app_enums.dart';
 import '../../../utils/i18_key_constants.dart' as i18Local;
+import '../../../utils/utils.dart';
 import '../../blocs/inventory_management/custom_summary_report_bloc.dart';
+import '../../widgets/localized.dart';
+import '../../widgets/reports/readonly_pluto_grid.dart';
 
 @RoutePage()
 class CustomSummaryReportPage extends LocalizedStatefulWidget {
@@ -53,6 +49,25 @@ class _CustomSummaryReportState
   static const _usedTablet_3_11monthKey = 'usedTablet3_11month';
   static const _usedTablet_12_59monthKey = 'usedTablet12s_59month';
   static const _zeroDoseChildrenKey = 'zeroDoseChildren';
+  static const _unprocessedRecordsWithoutExplanationKey =
+      'unprocessedRecordsWithoutExplanation';
+  static const _pendingEligibleChildrenKey = 'pendingEligibleChildren';
+
+  String _zeroDoseStatusLabel(String status) {
+    switch (status) {
+      case 'zeroDose':
+        return localizations.translate(
+            i18Local.householdOverView.householdOverViewZeroDoseIconLabel);
+      case 'done':
+        return localizations.translate(i18Local
+            .householdOverView.householdOverViewZeroDoseDeliveredIconLabel);
+      case 'incompletementVaccine':
+        return localizations.translate(i18Local
+            .householdOverView.householdOverViewIncompletementVaccineLabel);
+      default:
+        return status;
+    }
+  }
 
   FormGroup _form() {
     return fb.group({});
@@ -94,7 +109,7 @@ class _CustomSummaryReportState
                   ),
                 ),
               ),
-              if (sumamryReportState is SummaryReportDataState)
+              if (sumamryReportState is SummaryReportDataState) ...[
                 ReactiveFormBuilder(
                   form: _form,
                   builder: (ctx, form, child) {
@@ -148,6 +163,19 @@ class _CustomSummaryReportState
                               key: _zeroDoseChildrenKey,
                               width: 180,
                             ),
+                            DigitGridColumn(
+                              label: localizations.translate(i18Local
+                                  .homeShowcase
+                                  .summaryReportUnprocessedRecords),
+                              key: _unprocessedRecordsWithoutExplanationKey,
+                              width: 180,
+                            ),
+                            DigitGridColumn(
+                              label: localizations.translate(i18Local
+                                  .homeShowcase.summaryReportPendingEligible),
+                              key: _pendingEligibleChildrenKey,
+                              width: 180,
+                            ),
                           ],
                           rows: [
                             for (final entry
@@ -197,6 +225,21 @@ class _CustomSummaryReportState
                                         (entry.value[Constants.zeroDose] ?? 0)
                                             .toString(),
                                   ),
+                                  DigitGridCell(
+                                    key:
+                                        _unprocessedRecordsWithoutExplanationKey,
+                                    value:
+                                        (entry.value[Constants.unprocessed] ??
+                                                0)
+                                            .toString(),
+                                  ),
+                                  DigitGridCell(
+                                    key: _pendingEligibleChildrenKey,
+                                    value: (entry.value[
+                                                Constants.pendingEligible] ??
+                                            0)
+                                        .toString(),
+                                  ),
                                 ],
                               ),
                             ],
@@ -206,6 +249,63 @@ class _CustomSummaryReportState
                     );
                   },
                 ),
+                Padding(
+                  padding: const EdgeInsets.fromLTRB(
+                      kPadding, kPadding * 2, kPadding, 0),
+                  child: Align(
+                    alignment: Alignment.centerLeft,
+                    child: Text(
+                      localizations.translate(
+                          i18Local.homeShowcase.zeroDoseBreakdownTitle),
+                      maxLines: 1,
+                      style: Theme.of(context).textTheme.displayMedium,
+                    ),
+                  ),
+                ),
+                ReactiveFormBuilder(
+                  form: _form,
+                  builder: (ctx, form, child) {
+                    final counts = sumamryReportState.zeroDoseStatusCounts;
+                    return SizedBox(
+                      height: 130,
+                      child: _ReportDetailsContent(
+                        title: localizations.translate(
+                            i18Local.homeShowcase.zeroDoseBreakdownTitle),
+                        data: DigitGridData(
+                          columns: [
+                            DigitGridColumn(
+                              label: localizations.translate(i18Local
+                                  .homeShowcase.zeroDoseBreakdownStatus),
+                              key: 'label',
+                              width: 180,
+                            ),
+                            for (final status in ZeroDoseStatus.values)
+                              DigitGridColumn(
+                                label: _zeroDoseStatusLabel(status.name),
+                                key: status.name,
+                                width: 180,
+                              ),
+                          ],
+                          rows: [
+                            DigitGridRow([
+                              DigitGridCell(
+                                key: 'label',
+                                value: localizations.translate(i18Local
+                                    .homeShowcase.zeroDoseBreakdownCount),
+                              ),
+                              for (final status in ZeroDoseStatus.values)
+                                DigitGridCell(
+                                  key: status.name,
+                                  value: (counts[status.name] ?? 0).toString(),
+                                ),
+                            ]),
+                          ],
+                        ),
+                      ),
+                    );
+                  },
+                ),
+              ]
             ],
           );
         },

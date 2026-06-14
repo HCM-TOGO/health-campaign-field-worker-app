@@ -213,7 +213,11 @@ class CustomSurveyFormPreviewPageState
                                                                     .toString()
                                                                     .toUpperCase(),
                                                               )
-                                                            : e.value ?? "",
+                                                            : isDateAttribute(
+                                                                    e.attributeCode)
+                                                                ? formatEpochDate(
+                                                                    e.value)
+                                                                : e.value ?? "",
                                                     isInline: false,
                                                   ),
                                                   if (e.additionalDetails !=
@@ -250,6 +254,26 @@ class CustomSurveyFormPreviewPageState
           }),
         ],
       ),
+    );
+  }
+
+  /// Matches the date attribute codes used while filling the checklist in
+  /// [CustomSurveyFormViewPage]. These attributes are persisted as epoch
+  /// milliseconds, so they need to be formatted back for display.
+  bool isDateAttribute(String? code) {
+    return (code == "UHFWA_Q7" || code == "CDD_UPA_Q5" || code == "UHFA_Q3");
+  }
+
+  /// Formats a stored date value (epoch milliseconds) into the same
+  /// `dd/MM/yyyy` format the user entered while filling the checklist.
+  /// Falls back to the raw value if it can't be parsed as an epoch.
+  String formatEpochDate(String? value) {
+    if (value == null || value.trim().isEmpty) return "";
+    final millis = int.tryParse(value.trim());
+    if (millis == null) return value;
+
+    return DateFormat('dd/MM/yyyy').format(
+      DateTime.fromMillisecondsSinceEpoch(millis),
     );
   }
 

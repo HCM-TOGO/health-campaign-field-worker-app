@@ -1,4 +1,3 @@
-import 'package:auto_route/auto_route.dart';
 import 'package:collection/collection.dart';
 import 'package:digit_data_model/models/entities/individual.dart';
 import 'package:digit_ui_components/digit_components.dart';
@@ -15,6 +14,7 @@ import 'package:registration_delivery/router/registration_delivery_router.gm.dar
 import '../../blocs/registration_delivery/custom_beneficairy_registration.dart';
 import '../../blocs/registration_delivery/custom_search_household.dart';
 import '../../models/entities/identifier_types.dart';
+import '../../router/app_router.dart';
 import '../../widgets/digit_ui_component/custom_panel_card.dart';
 import '../../utils/i18_key_constants.dart' as i18_local;
 
@@ -64,7 +64,7 @@ class CustomBeneficiaryAcknowledgementPageState
             };
     } else {
       String? beneficiaryId = widget.selectedIndividual != null
-          ? householdMember!.members
+          ? householdMember?.members
               ?.firstWhereOrNull((member) =>
                   member.clientReferenceId ==
                   widget.selectedIndividual?.clientReferenceId)
@@ -134,11 +134,34 @@ class CustomBeneficiaryAcknowledgementPageState
                             i18.householdDetails.viewHouseHoldDetailsAction,
                           ),
                           onPressed: () {
-                            context.router.popAndPush(
-                              BeneficiaryWrapperRoute(
-                                wrapper: householdMemberWrapper!,
-                              ),
-                            );
+                            final wrapper = householdMemberWrapper!;
+                            // The stale household overview / edit pages are
+                            // still sitting beneath this acknowledgement (see
+                            // the back-to-search handler below), so a plain
+                            // popAndPush would reveal them on back. Rebuild the
+                            // registration-delivery wrapper's stack as
+                            // [search, household overview] so backing out of
+                            // the overview lands on a fresh search page.
+                            context.read<CustomSearchHouseholdsBloc>().add(
+                                  const CustomSearchHouseholdsEvent.clear(),
+                                );
+                            RoutingController? wrapperRouter = context.router;
+                            while (wrapperRouter != null &&
+                                wrapperRouter.routeData.name !=
+                                    CustomRegistrationDeliveryWrapperRoute
+                                        .name) {
+                              wrapperRouter = wrapperRouter.parent();
+                            }
+                            if (wrapperRouter is StackRouter) {
+                              wrapperRouter.replaceAll([
+                                CustomSearchBeneficiaryRoute(),
+                                BeneficiaryWrapperRoute(wrapper: wrapper),
+                              ]);
+                            } else {
+                              context.router.popAndPush(
+                                BeneficiaryWrapperRoute(wrapper: wrapper),
+                              );
+                            }
                           },
                           type: DigitButtonType.primary,
                           size: DigitButtonSize.large),
@@ -147,7 +170,36 @@ class CustomBeneficiaryAcknowledgementPageState
                             .acknowledgementSuccess
                             .backToSearchActionLabelText),
                         onPressed: () {
-                          context.router.maybePop();
+                          if (widget.acknowledgementType == AcknowledgementType.addMember) {
+                            context.router.popUntilRouteWithName(BeneficiaryWrapperRoute.name);
+                          } else {
+                            final wrapper = householdMemberWrapper!;
+                            context.read<CustomSearchHouseholdsBloc>().add(
+                                  const CustomSearchHouseholdsEvent.clear(),
+                                );
+                            // By the time we reach this acknowledgement, the
+                            // add-member flow has already destroyed the original
+                            // CustomSearchBeneficiaryRoute, so there is nothing to
+                            // pop back to - the registration-delivery wrapper's
+                            // stack bottoms out at the (stale) household overview.
+                            // Walk up to that wrapper's router and replace its
+                            // whole stack with a fresh search page. The wrapper
+                            // then holds only [search], so backing out of search
+                            // bubbles up and pops the wrapper off, landing on Home.
+                            RoutingController? wrapperRouter = context.router;
+                            while (wrapperRouter != null &&
+                                wrapperRouter.routeData.name !=
+                                    CustomRegistrationDeliveryWrapperRoute.name) {
+                              wrapperRouter = wrapperRouter.parent();
+                            }
+                            if (wrapperRouter is StackRouter) {
+                              wrapperRouter
+                                  .replaceAll([CustomSearchBeneficiaryRoute()]);
+                            } else {
+                              context.router
+                                  .navigate(CustomSearchBeneficiaryRoute());
+                            }
+                          }
                         },
                         type: DigitButtonType.secondary,
                         size: DigitButtonSize.large),
