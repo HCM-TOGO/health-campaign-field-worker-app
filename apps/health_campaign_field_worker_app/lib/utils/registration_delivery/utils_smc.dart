@@ -147,66 +147,83 @@ bool checkBeneficiaryZeroDose(List<TaskModel>? tasks) {
   if ((tasks ?? []).isEmpty) {
     return false;
   }
-  var successfulTask = tasks!
-      .where(
-        (element) =>
-            element.additionalFields?.fields.firstWhereOrNull(
-              (e) =>
-                  e.key ==
-                      additional_fields_local
-                          .AdditionalFieldsType.zeroDoseStatus
-                          .toValue() &&
-                  e.value == ZeroDoseStatus.zeroDose.name,
-            ) !=
-            null,
-      )
-      .lastOrNull;
+  final latestTask = _getLatestZeroDoseStatusTask(tasks);
+  if (latestTask == null) return false;
 
-  return successfulTask != null;
+  final status = latestTask.additionalFields?.fields
+      .firstWhereOrNull(
+        (e) =>
+            e.key ==
+            additional_fields_local.AdditionalFieldsType.zeroDoseStatus.toValue(),
+      )
+      ?.value;
+  return status == ZeroDoseStatus.zeroDose.name;
 }
 
 bool checkBeneficiaryIncompletementVaccine(List<TaskModel>? tasks) {
   if ((tasks ?? []).isEmpty) {
     return false;
   }
-  var successfulTask = tasks!
-      .where(
-        (element) =>
-            element.additionalFields?.fields.firstWhereOrNull(
-              (e) =>
-                  e.key ==
-                      additional_fields_local
-                          .AdditionalFieldsType.zeroDoseStatus
-                          .toValue() &&
-                  e.value == ZeroDoseStatus.incompletementVaccine.name,
-            ) !=
-            null,
-      )
-      .lastOrNull;
+  final latestTask = _getLatestZeroDoseStatusTask(tasks);
+  if (latestTask == null) return false;
 
-  return successfulTask != null;
+  final status = latestTask.additionalFields?.fields
+      .firstWhereOrNull(
+        (e) =>
+            e.key ==
+            additional_fields_local.AdditionalFieldsType.zeroDoseStatus.toValue(),
+      )
+      ?.value;
+  return status == ZeroDoseStatus.incompletementVaccine.name;
 }
 
 bool checkBeneficiaryZeroDoseDelivered(List<TaskModel>? tasks) {
   if ((tasks ?? []).isEmpty) {
     return false;
   }
-  var successfulTask = tasks!
+  final latestTask = _getLatestZeroDoseStatusTask(tasks);
+  if (latestTask == null) return false;
+
+  final status = latestTask.additionalFields?.fields
+      .firstWhereOrNull(
+        (e) =>
+            e.key ==
+            additional_fields_local.AdditionalFieldsType.zeroDoseStatus.toValue(),
+      )
+      ?.value;
+  return status == ZeroDoseStatus.done.name;
+}
+
+TaskModel? _getLatestZeroDoseStatusTask(List<TaskModel>? tasks) {
+  if ((tasks ?? []).isEmpty) return null;
+
+  final candidates = tasks!
       .where(
-        (element) =>
-            element.additionalFields?.fields.firstWhereOrNull(
+        (task) => task.additionalFields?.fields.firstWhereOrNull(
               (e) =>
                   e.key ==
                       additional_fields_local
                           .AdditionalFieldsType.zeroDoseStatus
                           .toValue() &&
-                  e.value == ZeroDoseStatus.done.name,
+                  (e.value == ZeroDoseStatus.zeroDose.name ||
+                      e.value == ZeroDoseStatus.incompletementVaccine.name ||
+                      e.value == ZeroDoseStatus.done.name),
             ) !=
             null,
       )
-      .lastOrNull;
+      .toList();
 
-  return successfulTask != null;
+  if (candidates.isEmpty) return null;
+
+  int taskTimestamp(TaskModel task) {
+    return task.clientAuditDetails?.createdTime ??
+        task.createdDate ??
+        task.clientAuditDetails?.lastModifiedTime ??
+        0;
+  }
+
+  candidates.sort((a, b) => taskTimestamp(a).compareTo(taskTimestamp(b)));
+  return candidates.last;
 }
 
 bool checkBeneficiaryReferredSMC(List<TaskModel>? tasks) {
