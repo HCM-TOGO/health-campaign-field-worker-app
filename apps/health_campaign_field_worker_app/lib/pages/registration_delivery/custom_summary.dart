@@ -72,6 +72,17 @@ class CustomSummaryPageState extends LocalizedState<CustomSummaryPage> {
               if (value.navigateToRoot) {
                 (router.parent() as StackRouter).maybePop();
               } else {
+                final customSearchHouseholdsBloc =
+                    context.read<CustomSearchHouseholdsBloc>();
+                customSearchHouseholdsBloc
+                    .add(const CustomSearchHouseholdsEvent.clear());
+                customSearchHouseholdsBloc.add(
+                  CustomSearchHouseholdsEvent.searchByHousehold(
+                    householdModel: value.householdModel,
+                    projectId: RegistrationDeliverySingleton().projectId!,
+                    isProximityEnabled: false,
+                  ),
+                );
                 router.popUntil((route) =>
                     route.settings.name == SearchBeneficiaryRoute.name);
                 context.read<SearchBlocWrapper>().searchHouseholdsBloc.add(
@@ -193,9 +204,6 @@ class CustomSummaryPageState extends LocalizedState<CustomSummaryPage> {
                                 if (submit ?? false) {
                                   if (context.mounted) {
                                     _skipCreateOnPop = true;
-                                    final CustomSearchHouseholdsBloc
-                                        customSearchHouseholdsBloc = context
-                                            .read<CustomSearchHouseholdsBloc>();
                                     bloc.add(
                                       BeneficiaryRegistrationCreateEvent(
                                           projectId: projectId!,
@@ -206,32 +214,6 @@ class CustomSummaryPageState extends LocalizedState<CustomSummaryPage> {
                                           tag: projectBeneficiaryModel?.tag,
                                           navigateToSummary: false),
                                     );
-                                    customSearchHouseholdsBloc.add(
-                                        const CustomSearchHouseholdsEvent
-                                            .clear());
-                                    customSearchHouseholdsBloc.add(
-                                      CustomSearchHouseholdsEvent
-                                          .searchByHouseholdHead(
-                                        searchText: widget.name.trim(),
-                                        projectId: projectId!,
-                                        isProximityEnabled: false,
-                                        maxRadius:
-                                            RegistrationDeliverySingleton()
-                                                .maxRadius,
-                                        limit: customSearchHouseholdsBloc
-                                            .state.limit,
-                                        offset: 0,
-                                      ),
-                                    );
-                                    context.router.popUntil((route) =>
-                                        route.settings.name ==
-                                        SearchBeneficiaryRoute.name);
-                                    context.router.push(
-                                        CustomBeneficiaryAcknowledgementRoute(
-                                      enableViewHousehold: true,
-                                      acknowledgementType:
-                                          AcknowledgementType.addHousehold,
-                                    ));
                                   }
                                 }
                               },
