@@ -821,7 +821,8 @@ class ProjectBloc extends Bloc<ProjectEvent, ProjectState> {
         ),
       );
 
-      final selectedBoundaryType = context.selectedProject.address?.boundaryType;
+      final selectedBoundaryType =
+          context.selectedProject.address?.boundaryType;
       var filteredFacilities = List<FacilityModel>.from(facilities);
 
       if (userRoles.contains(RolesType.healthFacilitySupervisor.toValue())) {
@@ -953,25 +954,15 @@ class ProjectBloc extends Bloc<ProjectEvent, ProjectState> {
       0,
     );
 
-    final authBloc = context.read<AuthBloc>();
-    final currentSpaq = authBloc.state.whenOrNull(
-      authenticated: (
-        accessToken,
-        refreshToken,
-        userModel,
-        actionsWrapper,
-        individualId,
-        spaq1,
-        spaq2,
-      ) =>
-          (spaq1 ?? 0, spaq2 ?? 0),
-    );
+    final currentSpaq1 = await localSecureStore.spaq1;
+    final currentSpaq2 = await localSecureStore.spaq2;
 
-    final deltaSpaq1 = computedSpaq1 - (currentSpaq?.$1 ?? 0);
-    final deltaSpaq2 = computedSpaq2 - (currentSpaq?.$2 ?? 0);
+    final deltaSpaq1 = computedSpaq1 - currentSpaq1;
+    final deltaSpaq2 = computedSpaq2 - currentSpaq2;
 
     if (deltaSpaq1 == 0 && deltaSpaq2 == 0) return;
 
+    final authBloc = context.read<AuthBloc>();
     authBloc.add(
       AuthAddSpaqCountsEvent(
         spaq1Count: deltaSpaq1,
