@@ -356,6 +356,11 @@ class EditTasks {
   String get searchByBeneficiaryIdLabel => 'SEARCH_BY_BENEFICIARY_ID_LABEL';
 
   String get noMatchFound => 'NO_MATCH_FOUND';
+
+  String get dateOfDeliveryLabel => 'DATE_OF_DELIVERY_LABEL';
+
+  String get deliveryStrategyLabel => 'DELIVERY_STRATEGY_LABEL';
+  String get deliveryTypeLabel => 'DELIVERY_TYPE_LABEL';
 }
 
 class DeliverIntervention {
