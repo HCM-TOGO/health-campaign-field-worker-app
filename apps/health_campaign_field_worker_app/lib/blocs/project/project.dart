@@ -980,6 +980,10 @@ class ProjectBloc extends Bloc<ProjectEvent, ProjectState> {
     );
   }
 
+  Future<void> refreshSpaqCountsAfterBoundarySelection() async {
+    await _refreshSpaqCountsAfterDownsync();
+  }
+
   FutureOr<void> downloadTaskDataForLoggedInUser() async {
     final tasks = await taskRemoteRepository.search(
       TaskSearchModel(createdBy: context.loggedInUserUuid),
