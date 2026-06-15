@@ -361,13 +361,6 @@ class EditTasks {
 
   String get deliveryStrategyLabel => 'DELIVERY_STRATEGY_LABEL';
   String get deliveryTypeLabel => 'DELIVERY_TYPE_LABEL';
-
-  String get individualClientReferenceIdLabel =>
-      'INDIVIDUAL_CLIENT_REFERENCE_ID_LABEL';
-  String get zeroDoseStatusLabel => 'ZERO_DOSE_STATUS_LABEL';
-  String get hasImmunizationCardLabel => 'HAS_IMMUNIZATION_CARD_LABEL';
-  String get immunizationCardLostLabel => 'IMMUNIZATION_CARD_LOST_LABEL';
-  String get receivedPenta1Label => 'RECEIVED_PENTA1_LABEL';
 }
 
 class DeliverIntervention {
