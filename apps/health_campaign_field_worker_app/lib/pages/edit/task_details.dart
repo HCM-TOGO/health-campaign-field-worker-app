@@ -1508,6 +1508,13 @@ class _TaskDetailPageState extends LocalizedState<TaskDetailPage> {
       'dateOfDelivery' => i18.editTasks.dateOfDeliveryLabel,
       'deliveryStrategy' => i18.editTasks.deliveryStrategyLabel,
       'deliveryType' => i18.editTasks.deliveryTypeLabel,
+      'individualClientReferenceId' =>
+        i18.editTasks.individualClientReferenceIdLabel,
+      'UniqueBeneficiaryID' => i18.editTasks.beneficiaryIdLabel,
+      'ZeroDoseStatus' => i18.editTasks.zeroDoseStatusLabel,
+      'HasImmunizationCard' => i18.editTasks.hasImmunizationCardLabel,
+      'ImmunizationCardLost' => i18.editTasks.immunizationCardLostLabel,
+      'ReceivedPenta1' => i18.editTasks.receivedPenta1Label,
       _ => null,
     };
 
