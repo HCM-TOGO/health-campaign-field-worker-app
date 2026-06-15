@@ -153,6 +153,7 @@ class AuthBloc extends Bloc<AuthEvent, AuthState> {
     try {
       emit(const AuthLoadingState());
       StockInHandCache.instance.clear();
+      await localSecureStore.clearSpaqCounts();
       await localSecureStore.deleteAll();
       await localSecureStore.setBoundaryRefetch(true);
     } catch (error) {
