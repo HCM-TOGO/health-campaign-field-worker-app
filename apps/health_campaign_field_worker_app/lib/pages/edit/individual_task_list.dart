@@ -111,7 +111,8 @@ class _IndividualTaskListPageState
         children: [
           const BackNavigationHelpHeaderWidget(showHelp: false),
           Padding(
-            padding: const EdgeInsets.fromLTRB(spacer4, spacer2, spacer4, spacer2),
+            padding:
+                const EdgeInsets.fromLTRB(spacer4, spacer2, spacer4, spacer2),
             child: Text(
               titleText,
               style: textTheme.headingXl.copyWith(
@@ -141,7 +142,8 @@ class _IndividualTaskListPageState
                     padding:
                         const EdgeInsets.fromLTRB(spacer4, 0, spacer4, spacer4),
                     itemCount: _tasks.length,
-                    separatorBuilder: (_, __) => const SizedBox(height: spacer2),
+                    separatorBuilder: (_, __) =>
+                        const SizedBox(height: spacer2),
                     itemBuilder: (context, index) {
                       final task = _tasks[index];
                       return DigitCard(
@@ -155,8 +157,8 @@ class _IndividualTaskListPageState
                                   individualModel: individual,
                                 ),
                               )
-                              .then(
-                                  (_) => setState(() => _tasks = _filterTasks()));
+                              .then((_) =>
+                                  setState(() => _tasks = _filterTasks()));
                         },
                         children: [
                           Text(
@@ -167,13 +169,11 @@ class _IndividualTaskListPageState
                               String? doseIndex;
                               for (final f in fields) {
                                 if (f.key == 'cycleIndex' &&
-                                    (f.value?.toString().isNotEmpty ??
-                                        false)) {
+                                    (f.value?.toString().isNotEmpty ?? false)) {
                                   cycleIndex = f.value.toString();
                                 }
                                 if (f.key == 'doseIndex' &&
-                                    (f.value?.toString().isNotEmpty ??
-                                        false)) {
+                                    (f.value?.toString().isNotEmpty ?? false)) {
                                   doseIndex = f.value.toString();
                                 }
                               }
@@ -281,7 +281,8 @@ class _IndividualTaskListPageState
 
     return Container(
       margin: const EdgeInsets.only(right: spacer4),
-      padding: const EdgeInsets.symmetric(horizontal: spacer3, vertical: spacer2),
+      padding:
+          const EdgeInsets.symmetric(horizontal: spacer3, vertical: spacer2),
       decoration: BoxDecoration(
         color: theme.colorTheme.paper.secondary,
         borderRadius: BorderRadius.circular(spacer2),
@@ -299,7 +300,7 @@ class _IndividualTaskListPageState
           ),
           const SizedBox(height: spacer1),
           Text(
-            value,
+            localizations.translate(value),
             style: textTheme.bodyS.copyWith(
               color: theme.colorTheme.text.primary,
             ),
