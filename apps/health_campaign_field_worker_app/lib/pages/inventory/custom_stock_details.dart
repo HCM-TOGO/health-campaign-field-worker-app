@@ -399,7 +399,8 @@ class CustomStockDetailsPageState
                                         localizations.translate(
                                             i18.common.locationCapturing),
                                         DialogType.inProgress);
-                                    Future.delayed(const Duration(seconds: 2),
+                                    Future.delayed(
+                                        const Duration(milliseconds: 500),
                                         () async {
                                       DigitComponentsUtils.hideDialog(context);
                                       final bloc =
