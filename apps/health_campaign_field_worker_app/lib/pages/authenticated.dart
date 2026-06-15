@@ -310,8 +310,9 @@ class AuthenticatedPageWrapper extends StatelessWidget {
             ),
             sidebarItems: [
               SidebarItem(
-                title: AppLocalizations.of(context).translate(
+                title: AppLocalizations.of(context).translateWithDefault(
                   i18.common.coreCommonHome,
+                  fallback: 'Home',
                 ),
                 onPressed: () {
                   Navigator.of(context, rootNavigator: true).pop();
@@ -321,8 +322,9 @@ class AuthenticatedPageWrapper extends StatelessWidget {
               ),
               if (appInitializationBloc.state is AppInitialized) ...[
                 SidebarItem(
-                  title: AppLocalizations.of(context).translate(
+                  title: AppLocalizations.of(context).translateWithDefault(
                     i18.common.coreCommonlanguage,
+                    fallback: 'Language',
                   ),
                   isSearchEnabled: false,
                   icon: Icons.language,
