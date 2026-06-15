@@ -14,7 +14,6 @@ import 'package:sync_service/blocs/sync/sync.dart';
 
 import '../blocs/app_initialization/app_initialization.dart';
 import '../blocs/localization/localization.dart';
-import '../blocs/project/project.dart';
 import '../blocs/projects_beneficiary_downsync/project_beneficiaries_downsync.dart';
 import '../data/local_store/app_shared_preferences.dart';
 import '../data/local_store/no_sql/schema/app_configuration.dart';
@@ -512,9 +511,6 @@ class _BoundarySelectionPageState
                                                     .add(
                                                       const BoundarySubmitEvent(),
                                                     );
-                                                await context
-                                                    .read<ProjectBloc>()
-                                                    .refreshSpaqCountsAfterBoundarySelection();
                                                 bool isOnline =
                                                     await getIsConnected();
 
