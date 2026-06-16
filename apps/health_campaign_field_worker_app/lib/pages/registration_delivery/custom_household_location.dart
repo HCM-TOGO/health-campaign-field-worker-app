@@ -398,6 +398,11 @@ class CustomHouseholdLocationPageState
                               'maxLength': (object) => localizations
                                   .translate(i18.common.maxCharsRequired)
                                   .replaceAll('{}', maxLength.toString()),
+                              'onlyAlphabetsAndDigits': (_) =>
+                                  localizations.translate(
+                                    i18_local.individualDetails
+                                        .onlyAlphabetsNumbersSpacesValidationMessage,
+                                  ),
                             },
                             builder: (field) => LabeledField(
                               label: localizations.translate(

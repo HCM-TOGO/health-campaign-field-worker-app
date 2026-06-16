@@ -350,7 +350,8 @@ class AuthenticatedPageWrapper extends StatelessWidget {
               // ],
             ],
             logOutDigitButtonLabel: AppLocalizations.of(context)
-                .translate(i18.common.coreCommonLogout),
+                .translateWithDefault(i18.common.coreCommonLogout,
+                    fallback: 'Logout'),
             onLogOut: () async {
               final isConnected = await getIsConnected();
 

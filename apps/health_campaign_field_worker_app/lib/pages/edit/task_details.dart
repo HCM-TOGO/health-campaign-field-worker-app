@@ -1508,6 +1508,7 @@ class _TaskDetailPageState extends LocalizedState<TaskDetailPage> {
       'dateOfDelivery' => i18.editTasks.dateOfDeliveryLabel,
       'deliveryStrategy' => i18.editTasks.deliveryStrategyLabel,
       'deliveryType' => i18.editTasks.deliveryTypeLabel,
+      'TaskStatus' || 'taskStatus' => i18.editTasks.statusLabel,
       _ => null,
     };
 
@@ -1768,7 +1769,15 @@ class _TaskDetailPageState extends LocalizedState<TaskDetailPage> {
 
     Widget field;
 
-    if (_datePickerAdditionalFieldKeys.contains(key)) {
+    if (key == 'TaskStatus' || key == 'taskStatus') {
+      field = CustomDigitTextField(
+        label: label,
+        controller: TextEditingController(
+          text: localizations.translate(controller.text),
+        ),
+        readOnly: true,
+      );
+    } else if (_datePickerAdditionalFieldKeys.contains(key)) {
       field = _buildDatePickerField(
         label: label,
         controller: controller,
