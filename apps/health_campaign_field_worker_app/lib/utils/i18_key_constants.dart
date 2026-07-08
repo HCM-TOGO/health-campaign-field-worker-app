@@ -467,6 +467,9 @@ class Checklist {
   String get checklistBackDialogSecondaryAction =>
       'CHECKLIST_BACK_DIALOG_SECONDARY_ACTION';
 
+  String get zeroDoseCheckBackDialogDescription =>
+      'ZERO_DOSE_CHECK_BACK_DIALOG_DESCRIPTION';
+
   String get noChecklistFound => 'NO_CHECKLISTS_FOUND';
 }
 

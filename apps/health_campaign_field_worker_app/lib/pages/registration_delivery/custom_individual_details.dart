@@ -49,6 +49,7 @@ import 'custom_beneficiary_acknowledgement.dart';
 import 'package:registration_delivery/models/entities/project_beneficiary.dart';
 import 'package:registration_delivery/models/entities/task.dart';
 import 'package:registration_delivery/models/entities/household_member.dart';
+import 'package:registration_delivery/models/entities/additional_fields_type.dart';
 
 @RoutePage()
 class CustomIndividualDetailsPage extends LocalizedStatefulWidget {
@@ -229,6 +230,61 @@ class CustomIndividualDetailsPageState
       for (final t in tasks) {
         await taskRepo.delete(t.copyWith(rowVersion: t.rowVersion));
       }
+    }
+  }
+
+  /// Keeps the age snapshot stored on an individual's tasks (see
+  /// [local_utils.getIndividualAdditionalFields]) in sync whenever the
+  /// individual's date of birth is edited here, since task edit no longer
+  /// allows directly overwriting age.
+  Future<void> _syncTaskAgeForIndividual(
+    BuildContext context,
+    IndividualModel individual,
+  ) async {
+    if (individual.dateOfBirth == null) return;
+
+    final projectBeneficiaryRepo = ContextUtilityExtensions(context)
+        .repository<ProjectBeneficiaryModel, ProjectBeneficiarySearchModel>(
+            context);
+    final taskRepo = ContextUtilityExtensions(context)
+        .repository<TaskModel, TaskSearchModel>(context);
+
+    final projectBeneficiaries = await projectBeneficiaryRepo.search(
+      ProjectBeneficiarySearchModel(
+        beneficiaryClientReferenceId: [individual.clientReferenceId],
+      ),
+    );
+
+    if (projectBeneficiaries.isEmpty) return;
+
+    final tasks = await taskRepo.search(TaskSearchModel(
+      projectBeneficiaryClientReferenceId:
+          projectBeneficiaries.map((e) => e.clientReferenceId).toList(),
+    ));
+
+    if (tasks.isEmpty) return;
+
+    final newAge = local_utils.getIndividualAge(individual);
+    final ageKey = AdditionalFieldsType.age.toValue();
+
+    for (final task in tasks) {
+      if (task.isDeleted == true) continue;
+
+      final existingFields = task.additionalFields?.fields ?? [];
+      if (!existingFields.any((f) => f.key == ageKey)) continue;
+
+      final updatedFields = existingFields
+          .map((f) => f.key == ageKey ? AdditionalField(ageKey, newAge) : f)
+          .toList();
+
+      await taskRepo.update(task.copyWith(
+        additionalFields: TaskAdditionalFields(
+          schema: task.additionalFields?.schema ?? '',
+          version: task.additionalFields?.version ?? 1,
+          fields: updatedFields,
+        ),
+        rowVersion: task.rowVersion,
+      ));
     }
   }
 
@@ -534,6 +590,10 @@ class CustomIndividualDetailsPageState
                                             ? scannerBloc.state.qrCodes.first
                                             : null,
                                       ),
+                                    );
+                                    _syncTaskAgeForIndividual(
+                                      context,
+                                      individual,
                                     );
                                     onSubmit(individual, false);
                                   }

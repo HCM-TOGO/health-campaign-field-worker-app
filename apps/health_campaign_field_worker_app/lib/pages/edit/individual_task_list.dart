@@ -43,10 +43,6 @@ class _IndividualTaskListPageState
   List<TaskModel> _filterTasks() {
     return widget.tasks.where((task) {
       if (task.isDeleted == true) return false;
-      if (task.clientAuditDetails?.createdBy !=
-          RegistrationDeliverySingleton().loggedInUserUuid) {
-        return false;
-      }
 
       final doseIndexField = task.additionalFields?.fields.firstWhereOrNull(
         (field) => field.key == AdditionalFieldsType.doseIndex.toValue(),
@@ -68,16 +64,10 @@ class _IndividualTaskListPageState
         .toSet();
 
     taskDataRepository.listenToChanges(
-      query: TaskSearchModel(
-        createdBy: RegistrationDeliverySingleton().loggedInUserUuid,
-      ),
+      query: TaskSearchModel(),
       listener: (data) {
         final filtered = data.where((task) {
           if (task.isDeleted == true) return false;
-          if (task.clientAuditDetails?.createdBy !=
-              RegistrationDeliverySingleton().loggedInUserUuid) {
-            return false;
-          }
           if (task.projectBeneficiaryClientReferenceId == null) return false;
           if (!allowedBeneficiaryRefs
               .contains(task.projectBeneficiaryClientReferenceId)) {

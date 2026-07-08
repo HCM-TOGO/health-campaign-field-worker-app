@@ -63,7 +63,7 @@ class _TaskDetailPageState extends LocalizedState<TaskDetailPage> {
     'dateOfVerification',
   };
 
-  static const _editableAdditionalFieldKeys = {'name', 'age'};
+  static const _editableAdditionalFieldKeys = {'name'};
 
   static const _genderFieldKey = 'gender';
 
@@ -1533,7 +1533,6 @@ class _TaskDetailPageState extends LocalizedState<TaskDetailPage> {
       localizations.translate(i18.editTasks.statusLabel),
       localizations.translate(i18.editTasks.createdDateLabel),
       _getAdditionalFieldLabel('name'),
-      _getAdditionalFieldLabel('age'),
       _getAdditionalFieldLabel('gender'),
       _getAdditionalFieldLabel('dateOfDelivery'),
     ];
