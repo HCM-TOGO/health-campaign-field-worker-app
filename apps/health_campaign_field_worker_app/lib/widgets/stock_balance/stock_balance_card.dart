@@ -14,7 +14,6 @@ import 'package:registration_delivery/registration_delivery.dart';
 import '../../blocs/app_initialization/app_initialization.dart';
 import '../../data/repositories/local/inventory_management/custom_stock.dart';
 import '../../models/entities/roles_type.dart';
-import '../../utils/constants.dart';
 import '../../utils/i18_key_constants.dart' as i18;
 import '../../utils/stock_in_hand_cache.dart';
 import '../../utils/stock_in_hand_utils.dart';
@@ -43,24 +42,14 @@ class _StockBalanceCardState extends LocalizedState<StockBalanceCard> {
 
   List<FacilityModel> _filterFacilitiesByUsage(List<FacilityModel> facilities) {
     final boundaryType = context.selectedProject.address?.boundaryType;
-    List<FacilityModel> filteredFacilities;
+    final userRoles =
+        context.loggedInUserRoles.map((role) => role.code).toSet();
 
-    if (boundaryType == Constants.countryBoundaryLevel ||
-        boundaryType == Constants.stateBoundaryLevel) {
-      filteredFacilities = facilities
-          .where((element) => element.usage == Constants.stateFacility)
-          .toList();
-    } else if (boundaryType == Constants.lgaBoundaryLevel) {
-      filteredFacilities = facilities
-          .where((element) => element.usage == Constants.lgaFacility)
-          .toList();
-    } else {
-      filteredFacilities = facilities
-          .where((element) => element.usage == Constants.healthFacility)
-          .toList();
-    }
-
-    return filteredFacilities.isEmpty ? facilities : filteredFacilities;
+    return filterFacilitiesByRole(
+      facilities: facilities,
+      userRoles: userRoles,
+      boundaryType: boundaryType,
+    );
   }
 
   bool get _isDistributor => context.loggedInUserRoles.any(

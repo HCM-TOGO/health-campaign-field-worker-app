@@ -3,6 +3,9 @@ import 'package:collection/collection.dart';
 import 'package:inventory_management/models/entities/stock.dart';
 import 'package:registration_delivery/registration_delivery.dart';
 
+import '../models/entities/roles_type.dart';
+import 'constants.dart';
+
 class StockInHandResult {
   final double received;
   final double returned;
@@ -25,6 +28,42 @@ class StockInHandResult {
   double get stockInHand => isDistributor
       ? received - (returned + damaged + lost + dispatched) - administered
       : received + returned - (damaged + lost + dispatched) - administered;
+}
+
+/// Single source of truth for resolving which facilities a non-distributor
+/// user's stock/administration numbers should be scoped to. Both the stock
+/// balance widget and the post-downsync stock recalculation must use this
+/// so the two never disagree on the owned-facility set for the same user.
+List<FacilityModel> filterFacilitiesByRole({
+  required List<FacilityModel> facilities,
+  required Set<String> userRoles,
+  required String? boundaryType,
+}) {
+  // HEALTH_FACILITY_SUPERVISOR always operates at HF level, regardless of
+  // the boundary of the currently selected project.
+  final List<FacilityModel> matched;
+  if (userRoles.contains(RolesType.healthFacilitySupervisor.toValue())) {
+    matched =
+        facilities.where((f) => f.usage == Constants.healthFacility).toList();
+  } else if (boundaryType == Constants.countryBoundaryLevel ||
+      boundaryType == Constants.stateBoundaryLevel) {
+    // WAREHOUSE_MANAGER is reused across HF/District/Region tiers; the
+    // boundary of the assigned project is what disambiguates which tier
+    // this particular user's facilities belong to.
+    matched =
+        facilities.where((f) => f.usage == Constants.stateFacility).toList();
+  } else if (boundaryType == Constants.lgaBoundaryLevel) {
+    matched =
+        facilities.where((f) => f.usage == Constants.lgaFacility).toList();
+  } else {
+    matched =
+        facilities.where((f) => f.usage == Constants.healthFacility).toList();
+  }
+
+  // A role/usage tag mismatch shouldn't zero out a user's stock view
+  // entirely — fall back to the unfiltered (still current-project)
+  // facility set rather than dropping the user's facility altogether.
+  return matched.isEmpty ? facilities : matched;
 }
 
 String _additionalFieldValue(StockModel stock, String key) {

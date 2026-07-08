@@ -689,16 +689,21 @@ class CustomStockReconciliationPageState
                                         .toStringAsFixed(0),
                                     labelFlex: 5,
                                   ),
-                                  const DigitDivider(),
-                                  LabelValueItem(
-                                    label: localizations.translate(
-                                      i18.stockReconciliationDetails
-                                          .stockIssued,
+                                  if (!(InventorySingleton().isDistributor! &&
+                                      // ignore: avoid_dynamic_calls
+                                      !InventorySingleton()
+                                          .isWareHouseMgr!)) ...[
+                                    const DigitDivider(),
+                                    LabelValueItem(
+                                      label: localizations.translate(
+                                        i18.stockReconciliationDetails
+                                            .stockIssued,
+                                      ),
+                                      value: stockState.stockIssued
+                                          .toStringAsFixed(0),
+                                      labelFlex: 5,
                                     ),
-                                    value: stockState.stockIssued
-                                        .toStringAsFixed(0),
-                                    labelFlex: 5,
-                                  ),
+                                  ],
                                   const DigitDivider(),
                                   LabelValueItem(
                                     label: localizations.translate(

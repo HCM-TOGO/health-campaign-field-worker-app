@@ -625,8 +625,9 @@ class ProjectBloc extends Bloc<ProjectEvent, ProjectState> {
     }
 
     try {
-      final projectFacilities = await projectFacilityLocalRepository
-          .search(ProjectFacilitySearchModel());
+      final projectFacilities = await projectFacilityLocalRepository.search(
+        ProjectFacilitySearchModel(projectId: [event.model.id]),
+      );
       final facilities =
           await facilityLocalRepository.search(FacilitySearchModel());
       await downloadStockDataBasedOnRole(
@@ -740,11 +741,19 @@ class ProjectBloc extends Bloc<ProjectEvent, ProjectState> {
 
       await createStockDownloadedEntries(stockEntriesDownloaded);
     } else if (userRoles.contains(RolesType.warehouseManager.toValue()) &&
-        boundaryType == Constants.lgaBoundaryLevel) {
+        (boundaryType == Constants.lgaBoundaryLevel ||
+            boundaryType == Constants.stateBoundaryLevel ||
+            boundaryType == Constants.countryBoundaryLevel)) {
+      // WAREHOUSE_MANAGER is reused across District/Region/Country tiers;
+      // the boundary of the assigned project disambiguates which facility
+      // usage tier this user's stock should be downloaded for.
+      final targetUsage = boundaryType == Constants.lgaBoundaryLevel
+          ? Constants.lgaFacility
+          : Constants.stateFacility;
       List<String> receiverIds =
           projectFacilities.map((e) => e.facilityId).toList();
       receiverIds = receiverIds
-          .where((e) => facilityIdUsageMap[e] == Constants.lgaFacility)
+          .where((e) => facilityIdUsageMap[e] == targetUsage)
           .toList();
       final stockSearchModel = StockSearchModel(
         receiverId: receiverIds,
@@ -823,18 +832,11 @@ class ProjectBloc extends Bloc<ProjectEvent, ProjectState> {
 
       final selectedBoundaryType =
           context.selectedProject.address?.boundaryType;
-      var filteredFacilities = List<FacilityModel>.from(facilities);
-
-      if (userRoles.contains(RolesType.healthFacilitySupervisor.toValue())) {
-        filteredFacilities = filteredFacilities
-            .where((e) => e.usage == Constants.healthFacility)
-            .toList();
-      } else if (userRoles.contains(RolesType.warehouseManager.toValue()) &&
-          selectedBoundaryType == Constants.lgaBoundaryLevel) {
-        filteredFacilities = filteredFacilities
-            .where((e) => e.usage == Constants.lgaFacility)
-            .toList();
-      }
+      final filteredFacilities = filterFacilitiesByRole(
+        facilities: facilities,
+        userRoles: userRoles,
+        boundaryType: selectedBoundaryType,
+      );
 
       ownerIds = filteredFacilities
           .map((e) => e.id)
