@@ -52,7 +52,6 @@ class CustomBeneficiaryRegistrationBloc
     on(_handleUpdateIndividual);
     on(_handleAddMember);
     on(_handleSummary);
-    on(_handleResetToCreate);
   }
 
   //_handleSaveAddress event can be used for saving address details to the form
@@ -195,28 +194,6 @@ class CustomBeneficiaryRegistrationBloc
               ),
             ),
             isHeadOfHousehold: value.isHeadOfHousehold));
-      },
-    );
-  }
-
-  //Reverts a `summary` state back to `create`, carrying forward all the data
-  //collected so far, so household location/details and individual details
-  //pages remain functional if the user navigates back from the summary page.
-  FutureOr<void> _handleResetToCreate(
-    BeneficiaryRegistrationResetToCreateEvent event,
-    BeneficiaryRegistrationEmitter emit,
-  ) async {
-    state.maybeMap(
-      orElse: () {},
-      summary: (value) {
-        emit(BeneficiaryRegistrationCreateState(
-          addressModel: value.addressModel,
-          householdModel: value.householdModel,
-          individualModel: value.individualModel,
-          projectBeneficiaryModel: value.projectBeneficiaryModel,
-          registrationDate: value.registrationDate,
-          isHeadOfHousehold: value.isHeadOfHousehold,
-        ));
       },
     );
   }
@@ -882,11 +859,6 @@ class BeneficiaryRegistrationEvent with _$BeneficiaryRegistrationEvent {
   const factory BeneficiaryRegistrationEvent.validate({
     required String tag,
   }) = BeneficiaryRegistrationTagEvent;
-
-  //Reverts a `summary` state back to `create` so earlier steps in the
-  //registration flow remain usable after navigating back from the summary page.
-  const factory BeneficiaryRegistrationEvent.resetToCreate() =
-      BeneficiaryRegistrationResetToCreateEvent;
 }
 
 @freezed

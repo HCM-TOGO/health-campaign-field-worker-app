@@ -51,11 +51,7 @@ class CustomSummaryPageState extends LocalizedState<CustomSummaryPage> {
     final textTheme = theme.digitTextTheme(context);
 
     return PopScope(
-      onPopInvoked: (val) {
-        context.read<CustomBeneficiaryRegistrationBloc>().add(
-              const BeneficiaryRegistrationEvent.resetToCreate(),
-            );
-      },
+      onPopInvoked: (val) {},
       child: Scaffold(
           body: BlocConsumer<CustomBeneficiaryRegistrationBloc,
               BeneficiaryRegistrationState>(
