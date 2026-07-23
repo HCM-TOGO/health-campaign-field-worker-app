@@ -102,12 +102,26 @@ bool _doseIndexIs01(TaskModel task) {
   return doseIndex?.toString() == '01';
 }
 
+/// A task only counts toward the current cycle's administered doses if its
+/// `cycleIndex` additional field matches the currently active cycle's id.
+/// Without this, doses given in past cycles keep getting subtracted from
+/// stock received in the current cycle, driving the balance negative.
+bool _cycleIndexMatches(TaskModel task, int? currentCycleId) {
+  if (currentCycleId == null) return false;
+  final fields = task.additionalFields?.fields;
+  if (fields == null || fields.isEmpty) return false;
+  final cycleIndex =
+      fields.firstWhereOrNull((f) => f.key == 'cycleIndex')?.value;
+  return int.tryParse(cycleIndex?.toString() ?? '') == currentCycleId;
+}
+
 StockInHandResult calculateStockInHand({
   required List<StockModel> stockEntries,
   required List<TaskModel> tasksCreatedByUser,
   required List<String> stockOwnerIds,
   required String productVariantId,
   required bool isDistributor,
+  int? currentCycleId,
 }) {
   double received = 0;
   double returned = 0;
@@ -169,6 +183,7 @@ StockInHandResult calculateStockInHand({
   double administered = 0;
   for (final task in tasksCreatedByUser) {
     if (!_doseIndexIs01(task)) continue;
+    if (!_cycleIndexMatches(task, currentCycleId)) continue;
     final resources = task.resources;
     if (resources == null || resources.isEmpty) continue;
     for (final res in resources) {

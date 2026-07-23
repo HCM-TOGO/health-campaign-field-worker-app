@@ -215,14 +215,16 @@ class _StockBalanceCardState extends LocalizedState<StockBalanceCard> {
         ? receivedStocksRaw
         : receivedStocksRaw
             .where(
-              (s) => s.clientAuditDetails?.createdBy == context.loggedInUserUuid,
+              (s) =>
+                  s.clientAuditDetails?.createdBy == context.loggedInUserUuid,
             )
             .toList();
     final sentStocks = isDistributor
         ? sentStocksRaw
         : sentStocksRaw
             .where(
-              (s) => s.clientAuditDetails?.createdBy == context.loggedInUserUuid,
+              (s) =>
+                  s.clientAuditDetails?.createdBy == context.loggedInUserUuid,
             )
             .toList();
 
@@ -237,6 +239,7 @@ class _StockBalanceCardState extends LocalizedState<StockBalanceCard> {
     final tasksCreatedByUser = await taskRepo.search(
       TaskSearchModel(createdBy: context.loggedInUserUuid),
     );
+    final currentCycleId = context.selectedCycle?.id;
 
     final allStocks = allStocksMap.values.toList();
     final balances = <String, double>{};
@@ -248,6 +251,7 @@ class _StockBalanceCardState extends LocalizedState<StockBalanceCard> {
         stockOwnerIds: ownerIds,
         productVariantId: pv.id,
         isDistributor: isDistributor,
+        currentCycleId: currentCycleId,
       );
       balances[pv.id] = max(res.stockInHand, 0);
     }

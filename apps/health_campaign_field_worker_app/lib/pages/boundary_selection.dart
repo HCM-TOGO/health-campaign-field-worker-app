@@ -41,7 +41,12 @@ class _BoundarySelectionPageState
   int i = 0;
   int pendingSyncCount = 0;
   final clickedStatus = ValueNotifier<bool>(false);
-  StreamController<double> downloadProgress = StreamController<double>();
+  // Broadcast so the progress dialog can be listened to again on every
+  // subsequent boundary-change/downsync attempt within this page's
+  // lifetime — a single-subscription stream throws "Stream has already
+  // been listened to" the second time its StreamBuilder attaches.
+  StreamController<double> downloadProgress =
+      StreamController<double>.broadcast();
 
   Map<String, TextEditingController> dropdownControllers = {};
   late StreamSubscription syncSubscription;
@@ -94,6 +99,7 @@ class _BoundarySelectionPageState
     clickedStatus.value = true;
     clickedStatus.dispose();
     syncSubscription.cancel();
+    downloadProgress.close();
     super.dispose();
   }
 
