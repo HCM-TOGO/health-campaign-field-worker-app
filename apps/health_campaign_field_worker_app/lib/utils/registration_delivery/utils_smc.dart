@@ -5,6 +5,7 @@ import 'package:digit_data_model/models/project_type/project_type_model.dart';
 import 'package:digit_ui_components/utils/date_utils.dart';
 import 'package:health_campaign_field_worker_app/utils/constants.dart';
 import 'package:registration_delivery/models/entities/additional_fields_type.dart';
+import 'package:registration_delivery/models/entities/deliver_strategy_type.dart';
 import 'package:registration_delivery/models/entities/side_effect.dart';
 import 'package:registration_delivery/models/entities/status.dart';
 import 'package:registration_delivery/models/entities/task.dart';
@@ -14,6 +15,7 @@ import '../../models/entities/additional_fields_type.dart'
 import '../app_enums.dart';
 import '../../../models/entities/assessment_checklist/status.dart'
     as status_local;
+import '../../data/repositories/custom_task.dart';
 
 bool checkStatusSMC(List<TaskModel>? tasks, ProjectCycle? currentCycle) {
   if (currentCycle == null) {
@@ -623,4 +625,64 @@ bool allDosesDelivered(
       return false;
     }
   }
+}
+
+String? _additionalFieldValue(TaskModel task, String key) => task
+    .additionalFields?.fields
+    .firstWhereOrNull((f) => f.key == key)
+    ?.value
+    ?.toString();
+
+// The administeredSuccess-slot task is always created with deliveryStrategy
+// "direct" (the dose given right now); the delivered-slot tasks are always
+// created with deliveryStrategy "indirect" (future doses of the same cycle,
+// recorded in advance). This distinction is set once at task creation and
+// never recomputed, so it's a stable way to tell the two slots apart -
+// unlike doseIndex, which is only reliable once cycle/dose bookkeeping and
+// edit-cascade logic preserve it correctly.
+bool isDirectDeliveryTask(TaskModel task) =>
+    _additionalFieldValue(task, AdditionalFieldsType.deliveryStrategy.toValue()) ==
+    DeliverStrategyType.direct.toValue();
+
+// All sibling tasks for this beneficiary + cycle that were left
+// notAdministered/beneficiaryRefused (a prior failed delivery attempt), so a
+// retry updates those same tasks instead of creating new ones. Tasks already
+// administeredSuccess/delivered are excluded on purpose: resubmitting against
+// those is the Redose flow, which must keep creating a new task per dose.
+//
+// Results are sorted by doseIndex ascending, purely to give callers a stable
+// order among same-role tasks (e.g. the delivered-slot tasks relative to
+// each other); callers should still tell the administeredSuccess slot apart
+// from the delivered slots via [isDirectDeliveryTask], not doseIndex.
+Future<List<TaskModel>> getRetryableTasksForCycle({
+  required CustomTaskLocalRepository taskDataRepository,
+  required String? projectBeneficiaryClientReferenceId,
+  required int cycle,
+}) async {
+  if (projectBeneficiaryClientReferenceId == null) return [];
+
+  final tasks = await taskDataRepository.search(TaskSearchModel(
+    projectBeneficiaryClientReferenceId: [projectBeneficiaryClientReferenceId],
+  ));
+
+  final cycleTag = "0$cycle";
+
+  final candidates = tasks
+      .where((task) =>
+          task.isDeleted != true &&
+          (task.status == Status.notAdministered.toValue() ||
+              task.status == Status.beneficiaryRefused.toValue()) &&
+          _additionalFieldValue(
+                  task, AdditionalFieldsType.cycleIndex.toValue()) ==
+              cycleTag)
+      .toList();
+
+  int doseIndexOf(TaskModel task) =>
+      int.tryParse(_additionalFieldValue(
+              task, AdditionalFieldsType.doseIndex.toValue()) ??
+          '') ??
+      0;
+
+  candidates.sort((a, b) => doseIndexOf(a).compareTo(doseIndexOf(b)));
+  return candidates;
 }

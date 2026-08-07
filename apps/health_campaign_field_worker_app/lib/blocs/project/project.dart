@@ -17,6 +17,7 @@ import 'package:inventory_management/models/entities/stock.dart';
 import 'package:inventory_management/models/entities/transaction_type.dart';
 import 'package:isar/isar.dart';
 import 'package:recase/recase.dart';
+import 'package:registration_delivery/data/repositories/local/task.dart';
 import 'package:registration_delivery/models/entities/task.dart';
 import 'package:survey_form/models/entities/service_definition.dart';
 
@@ -885,8 +886,15 @@ class ProjectBloc extends Bloc<ProjectEvent, ProjectState> {
     }
 
     final allStocks = allStocksMap.values.toList();
-    final tasksCreatedByUser = await taskLocalRepository.search(
+    // The base TaskLocalRepository.search() ignores TaskSearchModel.createdBy
+    // entirely — it only filters by the second positional userId argument
+    // (matched against the audit-populated auditCreatedBy column), so that
+    // argument must be passed explicitly for this to actually scope to the
+    // logged-in user.
+    final tasksCreatedByUser =
+        await (taskLocalRepository as TaskLocalRepository).search(
       TaskSearchModel(createdBy: loggedInUserId),
+      loggedInUserId,
     );
     final currentCycleId = context.selectedCycle?.id;
 

@@ -434,8 +434,15 @@ class _TaskDetailPageState extends LocalizedState<TaskDetailPage> {
       }
     }
 
-    // Apply edits from additional field controllers
+    // Apply edits from additional field controllers. Only genuinely
+    // editable fields (name/gender/dateOfDelivery) may be overwritten here:
+    // this method also runs for sibling tasks during a cascaded status
+    // change (see _saveChanges), and _additionalFieldControllers is
+    // populated from the single task that was opened for editing. Without
+    // this guard, read-only fields like doseIndex/cycleIndex would get
+    // clobbered with that one task's values on every sibling.
     updatedFields = updatedFields.map((field) {
+      if (!_isAdditionalFieldEditable(field.key)) return field;
       final controller = _additionalFieldControllers[field.key];
       if (controller != null) {
         return AdditionalField(field.key, controller.text);

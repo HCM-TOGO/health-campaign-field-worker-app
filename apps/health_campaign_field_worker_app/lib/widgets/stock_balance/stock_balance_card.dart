@@ -193,8 +193,8 @@ class _StockBalanceCardState extends LocalizedState<StockBalanceCard> {
     final stockRepo =
         context.read<LocalRepository<StockModel, StockSearchModel>>()
             as CustomStockLocalRepository;
-    final taskRepo =
-        context.read<LocalRepository<TaskModel, TaskSearchModel>>();
+    final taskRepo = context.read<LocalRepository<TaskModel, TaskSearchModel>>()
+        as TaskLocalRepository;
     final ownerId = ownerIds.first;
 
     final receivedStocksRaw = await stockRepo.search(
@@ -236,8 +236,14 @@ class _StockBalanceCardState extends LocalizedState<StockBalanceCard> {
       allStocksMap[s.clientReferenceId] = s;
     }
 
+    // The base TaskLocalRepository.search() ignores TaskSearchModel.createdBy
+    // entirely — it only filters by the second positional userId argument
+    // (matched against the audit-populated auditCreatedBy column), so that
+    // argument must be passed explicitly for this to actually scope to the
+    // logged-in user.
     final tasksCreatedByUser = await taskRepo.search(
       TaskSearchModel(createdBy: context.loggedInUserUuid),
+      context.loggedInUserUuid,
     );
     final currentCycleId = context.selectedCycle?.id;
 

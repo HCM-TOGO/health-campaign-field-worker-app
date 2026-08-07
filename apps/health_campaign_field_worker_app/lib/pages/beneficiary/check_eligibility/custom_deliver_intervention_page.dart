@@ -39,7 +39,9 @@ import '../../../models/entities/additional_fields_type.dart'
     as additional_fields_local;
 import '../../../utils/upper_case.dart';
 import '../../../utils/utils.dart' as local_utils;
+import '../../../utils/registration_delivery/utils_smc.dart';
 import '../../../widgets/custom_back_navigation.dart';
+import '../../../data/repositories/custom_task.dart';
 
 @RoutePage()
 class CustomDeliverInterventionPage extends LocalizedStatefulWidget {
@@ -93,13 +95,30 @@ class CustomDeliverInterventionPageState
       IndividualModel? selectedIndividual) async {
     final lat = locationState.latitude;
     final long = locationState.longitude;
+
+    // Reuse a task left notAdministered/beneficiaryRefused for this cycle
+    // instead of creating a new one on retry. The administeredSuccess-slot
+    // task is the one created with deliveryStrategy "direct" (see
+    // isDirectDeliveryTask).
+    final taskDataRepository =
+        context.read<LocalRepository<TaskModel, TaskSearchModel>>()
+            as CustomTaskLocalRepository;
+    final retryableTasks = await getRetryableTasksForCycle(
+      taskDataRepository: taskDataRepository,
+      projectBeneficiaryClientReferenceId: projectBeneficiary.clientReferenceId,
+      cycle: deliverInterventionState.cycle,
+    );
+    final existingTask =
+        retryableTasks.firstWhereOrNull(isDirectDeliveryTask);
+
     TaskModel taskModel = _getTaskModel(
       context,
       form: form,
-      oldTask: RegistrationDeliverySingleton().beneficiaryType ==
-              BeneficiaryType.household
-          ? deliverInterventionState.tasks?.lastOrNull
-          : null,
+      oldTask: existingTask ??
+          (RegistrationDeliverySingleton().beneficiaryType ==
+                  BeneficiaryType.household
+              ? deliverInterventionState.tasks?.lastOrNull
+              : null),
       projectBeneficiaryClientReferenceId: projectBeneficiary.clientReferenceId,
       dose: deliverInterventionState.dose,
       cycle: deliverInterventionState.cycle,
@@ -112,11 +131,10 @@ class CustomDeliverInterventionPageState
     context.read<DeliverInterventionBloc>().add(
           DeliverInterventionSubmitEvent(
               task: taskModel,
-              isEditing: (deliverInterventionState.tasks ?? []).isNotEmpty &&
+              isEditing: existingTask != null ||
+                  ((deliverInterventionState.tasks ?? []).isNotEmpty &&
                       RegistrationDeliverySingleton().beneficiaryType ==
-                          BeneficiaryType.household
-                  ? true
-                  : false,
+                          BeneficiaryType.household),
               boundaryModel: RegistrationDeliverySingleton().boundary!,
               navigateToSummary: false,
               householdMemberWrapper: householdMember),
@@ -858,6 +876,19 @@ class CustomDeliverInterventionPageState
         id: null,
       ),
       status: Status.administeredSuccess.toValue(),
+      // Bump audit details on every submission so a reused task's
+      // lastModifiedBy/lastModifiedTime reflect this retry, not whichever
+      // earlier edit it carried over from.
+      auditDetails: task.auditDetails?.copyWith(
+        lastModifiedBy: RegistrationDeliverySingleton().loggedInUserUuid,
+        lastModifiedTime:
+            ContextUtilityExtensions(context).millisecondsSinceEpoch(),
+      ),
+      clientAuditDetails: task.clientAuditDetails?.copyWith(
+        lastModifiedBy: RegistrationDeliverySingleton().loggedInUserUuid,
+        lastModifiedTime:
+            ContextUtilityExtensions(context).millisecondsSinceEpoch(),
+      ),
       additionalFields: TaskAdditionalFields(
         version: task.additionalFields?.version ?? 1,
         fields: [
@@ -912,7 +943,24 @@ class CustomDeliverInterventionPageState
       ),
     );
 
-    if (oldTask != null &&
+    // Reuse the existing resource rows' identity too (matched by index) so
+    // updating the task in place doesn't leave duplicate resource rows.
+    if (oldTask?.resources != null) {
+      task = task.copyWith(
+        resources: task.resources
+            ?.mapIndexed((i, resource) => i < oldTask!.resources!.length
+                ? resource.copyWith(
+                    clientReferenceId: oldTask.resources![i].clientReferenceId,
+                    id: oldTask.resources![i].id,
+                  )
+                : resource)
+            .toList(),
+      );
+    }
+
+    if (RegistrationDeliverySingleton().beneficiaryType ==
+            BeneficiaryType.household &&
+        oldTask != null &&
         oldTask.status == Status.beneficiaryRefused.toValue()) {
       oldTask = oldTask.copyWith(
         additionalFields: oldTask.additionalFields != null
