@@ -329,15 +329,15 @@ class _TaskDetailPageState extends LocalizedState<TaskDetailPage> {
           context.read<LocalRepository<TaskModel, TaskSearchModel>>()
               as CustomTaskLocalRepository;
 
+      bool changeStatus = false;
+      if (_originalTask.status != _controllers['status']?.text) {
+        changeStatus = true;
+      }
+
       if (_originalTask.status == Status.administeredSuccess.toValue() ||
           _originalTask.status == Status.delivered.toValue()) {
         List<TaskModel> allAdministrationTasks =
             await _getAllCurrentCycleAdministrationTasks(taskDataRepository);
-
-        bool changeStatus = false;
-        if (_originalTask.status != _controllers['status']?.text) {
-          changeStatus = true;
-        }
 
         for (var task in allAdministrationTasks) {
           TaskModel updatedTask =
@@ -346,9 +346,20 @@ class _TaskDetailPageState extends LocalizedState<TaskDetailPage> {
           await taskDataRepository.update(updatedTask);
         }
       } else {
-        TaskModel updatedTask = _getUpdatedTask(_originalTask);
-        // Save using repository
-        await taskDataRepository.update(updatedTask);
+        // _originalTask isn't in the administered/delivered slot (e.g. it's
+        // notAdministered after a prior revert) - cascade to every sibling
+        // task in this cycle that shares its current status, same as
+        // _deleteTask does, so all three cycle tasks move together instead
+        // of only the one that was opened for editing.
+        List<TaskModel> allRelatedTasks = await _getAllCurrentCycleRelatedTasks(
+            taskDataRepository, _originalTask.status);
+
+        for (var task in allRelatedTasks) {
+          TaskModel updatedTask =
+              _getUpdatedTask(task, changeStatus: changeStatus);
+          // Save using repository
+          await taskDataRepository.update(updatedTask);
+        }
       }
 
       if (mounted) {
@@ -361,6 +372,23 @@ class _TaskDetailPageState extends LocalizedState<TaskDetailPage> {
             backgroundColor: Theme.of(context).colorTheme.alert.success,
           ),
         );
+
+        // Reload the household overview bloc directly instead of relying on
+        // the return-navigation .then() chain (household -> task list ->
+        // this page): that chain only fires once every intermediate route is
+        // popped, so the household page kept showing the pre-edit status
+        // until the user navigated away and back.
+        final projectId = RegistrationDeliverySingleton().projectId;
+        final beneficiaryType = RegistrationDeliverySingleton().beneficiaryType;
+        if (projectId != null && beneficiaryType != null) {
+          context.read<HouseholdOverviewBloc>().add(
+                HouseholdOverviewReloadEvent(
+                  projectId: projectId,
+                  projectBeneficiaryType: beneficiaryType,
+                ),
+              );
+        }
+
         Navigator.pop(context);
       }
     } catch (e) {
@@ -450,16 +478,32 @@ class _TaskDetailPageState extends LocalizedState<TaskDetailPage> {
       return field;
     }).toList();
 
-    // Remove any existing editCount and updateReason before adding updated ones
+    // Resolve the status this save will actually apply, so additionalFields
+    // can mirror it exactly like every task-creation flow does (refusal,
+    // referral, in-eligible tasks all set additionalFields.taskStatus to the
+    // same value as TaskModel.status).
+    final resolvedStatus = changeStatus
+        ? (_controllers['status']?.text.isNotEmpty == true
+            ? _controllers['status']!.text
+            : task.status)
+        : task.status;
+
+    // Remove any existing editCount, updateReason and taskStatus before
+    // adding updated ones - taskStatus must not be left stale when the
+    // status dropdown changes.
     updatedFields = updatedFields
-        .where((f) => f.key != 'editCount' && f.key != 'updateReason')
+        .where((f) =>
+            f.key != 'editCount' &&
+            f.key != 'updateReason' &&
+            f.key != 'taskStatus')
         .toList();
 
-    // Now safely append updated editCount and updateReason
+    // Now safely append updated editCount, updateReason and taskStatus
     final List<AdditionalField> finalUpdatedFields = [
       ...updatedFields,
       AdditionalField('editCount', newEditCount.toString()),
       AdditionalField('updateReason', combinedReason),
+      if (resolvedStatus != null) AdditionalField('taskStatus', resolvedStatus),
     ];
 
     // Build new TaskAdditionalFields
@@ -580,11 +624,7 @@ class _TaskDetailPageState extends LocalizedState<TaskDetailPage> {
 
     // Create updated task model
     final updatedTask = task.copyWith(
-      status: changeStatus
-          ? (_controllers['status']?.text.isNotEmpty == true
-              ? _controllers['status']!.text
-              : task.status)
-          : task.status,
+      status: resolvedStatus,
       createdDate: parsedCreatedDate ?? task.createdDate,
       additionalFields: newAdditionalFields,
       resources: updatedResources,
@@ -730,6 +770,20 @@ class _TaskDetailPageState extends LocalizedState<TaskDetailPage> {
             backgroundColor: Theme.of(context).colorTheme.alert.success,
           ),
         );
+
+        // See _saveChanges - reload directly rather than relying on the
+        // return-navigation .then() chain.
+        final projectId = RegistrationDeliverySingleton().projectId;
+        final beneficiaryType = RegistrationDeliverySingleton().beneficiaryType;
+        if (projectId != null && beneficiaryType != null) {
+          context.read<HouseholdOverviewBloc>().add(
+                HouseholdOverviewReloadEvent(
+                  projectId: projectId,
+                  projectBeneficiaryType: beneficiaryType,
+                ),
+              );
+        }
+
         Navigator.pop(context);
       }
     } catch (e) {
