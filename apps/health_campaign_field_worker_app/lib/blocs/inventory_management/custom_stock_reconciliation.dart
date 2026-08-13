@@ -1,6 +1,7 @@
 // GENERATED using mason_cli
 import 'dart:async';
 
+import 'package:collection/collection.dart';
 import 'package:digit_data_model/data_model.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:freezed_annotation/freezed_annotation.dart';
@@ -11,8 +12,12 @@ import 'package:inventory_management/models/entities/transaction_reason.dart';
 import 'package:inventory_management/models/entities/transaction_type.dart';
 import 'package:inventory_management/utils/typedefs.dart';
 import 'package:inventory_management/utils/utils.dart';
+import 'package:registration_delivery/models/entities/task.dart';
+import 'package:registration_delivery/utils/typedefs.dart';
+import 'package:registration_delivery/utils/utils.dart';
 
 import '../../utils/extensions/extensions.dart';
+import '../../utils/stock_in_hand_utils.dart';
 
 part 'custom_stock_reconciliation.freezed.dart';
 
@@ -23,11 +28,13 @@ class CustomStockReconciliationBloc
     extends Bloc<StockReconciliationEvent, StockReconciliationState> {
   final StockDataRepository stockRepository;
   final StockReconciliationDataRepository stockReconciliationRepository;
+  final TaskDataRepository taskRepository;
 
   CustomStockReconciliationBloc(
     super.initialState, {
     required this.stockReconciliationRepository,
     required this.stockRepository,
+    required this.taskRepository,
   }) {
     on(_handleSelectFacility);
     on(_handleSelectProduct);
@@ -95,10 +102,22 @@ class CustomStockReconciliationBloc
                 InventorySingleton().loggedInUserUuid)
         .toList();
 
+    // Stock used (administered doses, including redoses) only factors into
+    // the CDD/distributor formula, so it's only fetched for that role.
+    final tasksCreatedByUser = event.isDistributor
+        ? (await taskRepository.search(TaskSearchModel()))
+            .where((element) =>
+                element.auditDetails != null &&
+                element.auditDetails?.createdBy ==
+                    InventorySingleton().loggedInUserUuid)
+            .toList()
+        : <TaskModel>[];
+
     // Emitting the state with the fetched stock reconciliation details
     emit(state.copyWith(
       loading: false,
       stockModels: [...receivedStocks, ...sentStocks],
+      tasksCreatedByUser: tasksCreatedByUser,
     ));
   }
 
@@ -123,6 +142,7 @@ class CustomStockReconciliationBloc
             AdditionalField('returned', state.stockReturned),
             AdditionalField('lost', state.stockLost),
             AdditionalField('damaged', state.stockDamaged),
+            AdditionalField('used', state.stockUsed),
             AdditionalField('inHand', state.stockInHand),
           ],
         ),
@@ -179,6 +199,7 @@ class StockReconciliationState with _$StockReconciliationState {
     FacilityModel? facilityModel,
     String? productVariantId,
     @Default([]) List<StockModel> stockModels,
+    @Default([]) List<TaskModel> tasksCreatedByUser,
     StockReconciliationModel? stockReconciliationModel,
   }) = _StockReconciliationState;
 
@@ -222,6 +243,34 @@ class StockReconciliationState with _$StockReconciliationState {
                     TransactionReason.damagedInStorage.toValue())),
       );
 
+  // Getter for used stock: children who received the SPAQ plus children who
+  // vomited and received a redose. CDD/distributor only — reuses the same
+  // administered-dose calculation `StockBalanceCard` relies on, so this
+  // figure never disagrees with the stock-in-hand balance shown there.
+  num get stockUsed {
+    final variantId = productVariantId;
+    final ownerId = facilityModel?.id;
+    if (variantId == null || ownerId == null || ownerId.isEmpty) return 0;
+
+    final currentCycle = RegistrationDeliverySingleton()
+        .projectType
+        ?.cycles
+        ?.firstWhereOrNull(
+          (cycle) =>
+              cycle.startDate < DateTime.now().millisecondsSinceEpoch &&
+              cycle.endDate > DateTime.now().millisecondsSinceEpoch,
+        );
+
+    return calculateStockInHand(
+      stockEntries: stockModels,
+      tasksCreatedByUser: tasksCreatedByUser,
+      stockOwnerIds: [ownerId],
+      productVariantId: variantId,
+      isDistributor: true,
+      currentCycleId: currentCycle?.id,
+    ).administered;
+  }
+
   // Getter for in-hand stock
   num get stockInHand {
     final isDistributor = (InventorySingleton().isDistributor ?? false) &&
@@ -230,7 +279,11 @@ class StockReconciliationState with _$StockReconciliationState {
 
     return isDistributor
         ? stockReceived -
-            (stockIssued + stockReturned + stockLost + stockDamaged)
+            (stockIssued +
+                stockReturned +
+                stockLost +
+                stockDamaged +
+                stockUsed)
         : (stockReceived + stockReturned) -
             (stockIssued + stockDamaged + stockLost);
   }
