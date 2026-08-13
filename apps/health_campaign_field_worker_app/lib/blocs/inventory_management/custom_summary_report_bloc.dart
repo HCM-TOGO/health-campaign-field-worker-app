@@ -201,16 +201,20 @@ class SummaryReportBloc extends Bloc<SummaryReportEvent, SummaryReportState> {
         RegistrationDeliverySingleton().projectType?.validMaxAge;
     final pendingEligibleList = unprocessedList.where((member) {
       if (validMinAge == null || validMaxAge == null) return false;
-      final ind = individualMap[member.individualClientReferenceId];
-      if (ind == null) return false;
-      final dob = ind.dateOfBirth;
-      if (dob == null || dob.isEmpty) return false;
-      final dobDate = DateFormat('dd/MM/yyyy').tryParse(dob);
-      if (dobDate == null) return false;
-      final now = DateTime.now();
-      final totalMonths =
-          (now.year - dobDate.year) * 12 + (now.month - dobDate.month);
+      final totalMonths = _ageInMonths(
+        individualMap[member.individualClientReferenceId],
+      );
+      if (totalMonths == null) return false;
       return totalMonths >= validMinAge && totalMonths <= validMaxAge;
+    }).toList();
+
+    // Registered children under 3 months — too young for SPAQ dosing yet,
+    // tracked separately from the 3-11/12-59 month dosing brackets below.
+    final childrenUnder3MonthsList = householdMemberList.where((member) {
+      final totalMonths = _ageInMonths(
+        individualMap[member.individualClientReferenceId],
+      );
+      return totalMonths != null && totalMonths < 3;
     }).toList();
 
     Map<String, List<HouseholdMemberModel>> dateVsHouseholdMembersList = {};
@@ -221,6 +225,8 @@ class SummaryReportBloc extends Bloc<SummaryReportEvent, SummaryReportState> {
     Map<String, List<TaskModel>> dateVsZeroDoseChildrenList = {};
     Map<String, List<HouseholdMemberModel>> dateVsUnprocessedList = {};
     Map<String, List<HouseholdMemberModel>> dateVsPendingEligibleList = {};
+    Map<String, List<HouseholdMemberModel>> dateVsChildrenUnder3MonthsList =
+        {};
     Set<String> uniqueDates = {};
     Map<String, int> dateVsHouseholdMembersCount = {};
     Map<String, int> dateVsAdministeredChilderenCount = {};
@@ -230,6 +236,7 @@ class SummaryReportBloc extends Bloc<SummaryReportEvent, SummaryReportState> {
     Map<String, int> dateVsSpaq2Count = {};
     Map<String, int> dateVsUnprocessedCount = {};
     Map<String, int> dateVsPendingEligibleCount = {};
+    Map<String, int> dateVsChildrenUnder3MonthsCount = {};
     Map<String, Map<String, int>> dateVsEntityVsCountMap = {};
 
     for (var element in householdMemberList) {
@@ -306,6 +313,17 @@ class SummaryReportBloc extends Bloc<SummaryReportEvent, SummaryReportState> {
         dateVsPendingEligibleList.putIfAbsent(dateKey, () => []).add(element);
       }
     }
+    for (var element in childrenUnder3MonthsList) {
+      var dateKey = DigitDateUtils.getDateFromTimestamp(
+          element.clientAuditDetails!.createdTime);
+      if (element.clientAuditDetails!.createdTime >= currentCycle!.startDate &&
+          element.clientAuditDetails!.createdTime <= currentCycle.endDate &&
+          element.clientAuditDetails?.createdBy == currentUserUuId) {
+        dateVsChildrenUnder3MonthsList
+            .putIfAbsent(dateKey, () => [])
+            .add(element);
+      }
+    }
 
     // get a set of unique dates
     getUniqueSetOfDates(
@@ -317,6 +335,7 @@ class SummaryReportBloc extends Bloc<SummaryReportEvent, SummaryReportState> {
       dateVsSpaq2List,
       dateVsUnprocessedList,
       dateVsPendingEligibleList,
+      dateVsChildrenUnder3MonthsList,
       uniqueDates,
     );
 
@@ -333,6 +352,8 @@ class SummaryReportBloc extends Bloc<SummaryReportEvent, SummaryReportState> {
     populateDateVsCountMap(dateVsUnprocessedList, dateVsUnprocessedCount);
     populateDateVsCountMap(
         dateVsPendingEligibleList, dateVsPendingEligibleCount);
+    populateDateVsCountMap(
+        dateVsChildrenUnder3MonthsList, dateVsChildrenUnder3MonthsCount);
 
     popoulateDateVsEntityCountMap(
       dateVsEntityVsCountMap,
@@ -344,6 +365,7 @@ class SummaryReportBloc extends Bloc<SummaryReportEvent, SummaryReportState> {
       dateVsSpaq2Count,
       dateVsUnprocessedCount,
       dateVsPendingEligibleCount,
+      dateVsChildrenUnder3MonthsCount,
       uniqueDates,
     );
     dateVsEntityVsCountMap =
@@ -379,6 +401,7 @@ class SummaryReportBloc extends Bloc<SummaryReportEvent, SummaryReportState> {
     Map<String, List<TaskResourceModel>> dateVsSpaq2List,
     Map<String, List<HouseholdMemberModel>> dateVsUnprocessedList,
     Map<String, List<HouseholdMemberModel>> dateVsPendingEligibleList,
+    Map<String, List<HouseholdMemberModel>> dateVsChildrenUnder3MonthsList,
     Set<String> uniqueDates,
   ) {
     uniqueDates.addAll(dateVsHouseholdMembersList.keys.toSet());
@@ -389,6 +412,7 @@ class SummaryReportBloc extends Bloc<SummaryReportEvent, SummaryReportState> {
     uniqueDates.addAll(dateVsSpaq2List.keys.toSet());
     uniqueDates.addAll(dateVsUnprocessedList.keys.toSet());
     uniqueDates.addAll(dateVsPendingEligibleList.keys.toSet());
+    uniqueDates.addAll(dateVsChildrenUnder3MonthsList.keys.toSet());
   }
 
   void populateDateVsCountMap(
@@ -408,6 +432,7 @@ class SummaryReportBloc extends Bloc<SummaryReportEvent, SummaryReportState> {
     Map<String, int> dateVsSpaq2Count,
     Map<String, int> dateVsUnprocessedCount,
     Map<String, int> dateVsPendingEligibleCount,
+    Map<String, int> dateVsChildrenUnder3MonthsCount,
     Set<String> uniqueDates,
   ) {
     for (var date in uniqueDates) {
@@ -451,6 +476,11 @@ class SummaryReportBloc extends Bloc<SummaryReportEvent, SummaryReportState> {
           dateVsPendingEligibleCount[date] != null) {
         var count = dateVsPendingEligibleCount[date];
         elementVsCount[Constants.pendingEligible] = count ?? 0;
+      }
+      if (dateVsChildrenUnder3MonthsCount.containsKey(date) &&
+          dateVsChildrenUnder3MonthsCount[date] != null) {
+        var count = dateVsChildrenUnder3MonthsCount[date];
+        elementVsCount[Constants.registeredUnder3Months] = count ?? 0;
       }
 
       dateVsEntityVsCountMap[date] = elementVsCount;
@@ -503,6 +533,18 @@ class SummaryReportBloc extends Bloc<SummaryReportEvent, SummaryReportState> {
   String _toIsoFormat(String dateStr) {
     final parts = dateStr.split('/');
     return '${parts[2]}-${parts[1]}-${parts[0]}';
+  }
+
+  /// Age in months as of now, computed from [individual]'s `dd/MM/yyyy`
+  /// date of birth. Returns null when the individual or its date of birth
+  /// is missing/unparseable.
+  int? _ageInMonths(IndividualModel? individual) {
+    final dob = individual?.dateOfBirth;
+    if (dob == null || dob.isEmpty) return null;
+    final dobDate = DateFormat('dd/MM/yyyy').tryParse(dob);
+    if (dobDate == null) return null;
+    final now = DateTime.now();
+    return (now.year - dobDate.year) * 12 + (now.month - dobDate.month);
   }
 
   Future<void> _handleLoadingEvent(

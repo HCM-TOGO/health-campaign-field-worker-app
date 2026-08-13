@@ -46,6 +46,7 @@ class _CustomSummaryReportState
   static const _registeredChildrenKey = 'registeredChildren';
   static const _administeredChildrenKey = 'administeredChildren';
   static const _refusalsCasesKey = 'refusalsCases';
+  static const _registeredUnder3MonthsKey = 'registeredUnder3Months';
   static const _usedTablet_3_11monthKey = 'usedTablet3_11month';
   static const _usedTablet_12_59monthKey = 'usedTablet12s_59month';
   static const _zeroDoseChildrenKey = 'zeroDoseChildren';
@@ -146,6 +147,13 @@ class _CustomSummaryReportState
                               width: 180,
                             ),
                             DigitGridColumn(
+                              label: localizations.translate(i18Local
+                                  .homeShowcase
+                                  .summaryReportRegisteredUnder3Months),
+                              key: _registeredUnder3MonthsKey,
+                              width: 180,
+                            ),
+                            DigitGridColumn(
                               label: localizations.translate(
                                   i18Local.homeShowcase.summaryReportSPAQ1),
                               key: _usedTablet_3_11monthKey,
@@ -204,6 +212,14 @@ class _CustomSummaryReportState
                                     value:
                                         (entry.value[Constants.refusals] ?? 0)
                                             .toString(),
+                                  ),
+                                  DigitGridCell(
+                                    key: _registeredUnder3MonthsKey,
+                                    value: (entry.value[
+                                                Constants
+                                                    .registeredUnder3Months] ??
+                                            0)
+                                        .toString(),
                                   ),
                                   DigitGridCell(
                                     key: _usedTablet_3_11monthKey,
