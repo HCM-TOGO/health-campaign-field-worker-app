@@ -178,7 +178,7 @@ class CustomDoseAdministeredPageState
                                       address: address?.copyWith(
                                         relatedClientReferenceId:
                                             clientReferenceId,
-                                        id: null,
+                                        id: existingTask?.address?.id,
                                       ),
                                       status: Status.delivered.toValue(),
                                       clientReferenceId: clientReferenceId,

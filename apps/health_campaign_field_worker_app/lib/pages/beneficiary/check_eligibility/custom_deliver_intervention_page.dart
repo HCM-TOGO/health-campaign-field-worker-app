@@ -873,7 +873,7 @@ class CustomDeliverInterventionPageState
           .toList(),
       address: address?.copyWith(
         relatedClientReferenceId: clientReferenceId,
-        id: null,
+        id: oldTask?.address?.id,
       ),
       status: Status.administeredSuccess.toValue(),
       // Bump audit details on every submission so a reused task's
