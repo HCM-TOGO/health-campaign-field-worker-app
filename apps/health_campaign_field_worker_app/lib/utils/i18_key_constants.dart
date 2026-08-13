@@ -616,6 +616,10 @@ class HomeShowcase {
     return 'HOME_SHOWCASE_SUMMARY_REPORT_PENDING_ELIGIBLE';
   }
 
+  String get summaryReportRegisteredUnder3Months {
+    return 'HOME_SHOWCASE_SUMMARY_REPORT_REGISTERED_UNDER_3_MONTHS';
+  }
+
   String get zeroDoseBreakdownTitle {
     return 'HOME_SHOWCASE_ZERO_DOSE_BREAKDOWN_TITLE';
   }
@@ -779,6 +783,7 @@ class StockReconciliationDetails {
   String get commentRequiredError => 'RECONCILIATION_COMMENT_IS_REQUIRED';
   String get qrCodeInvalidFormat => 'QR_CODE_INVALID_FORMAT';
   String get distributorInfoCardContent => 'DISTRIBUTOR_INFO_CARD_CONTENT';
+  String get stockUsed => 'RECONCILIATION_STOCK_USED';
 }
 
 class InventoryReportDetails {
@@ -1178,6 +1183,14 @@ class Home {
   String get dataSyncInfoLabel => 'DATA_SYNC_INFO_LABEL';
 
   String get dataSyncInfoContent => 'DATA_SYNC_INFO_CONTENT';
+
+  String get cddSyncInfoChildrenRegistered =>
+      'CDD_SYNC_INFO_CHILDREN_REGISTERED';
+
+  String get cddSyncInfoTasksAdministered =>
+      'CDD_SYNC_INFO_TASKS_ADMINISTERED';
+
+  String get cddSyncInfoStockReceived => 'CDD_SYNC_INFO_STOCK_RECEIVED';
 
   String get mySurveyForm => 'MY_CHECK_LIST_LABEL';
 

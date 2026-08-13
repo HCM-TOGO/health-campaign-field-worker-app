@@ -42,6 +42,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_background_service/flutter_background_service.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
+import 'package:isar/isar.dart';
 import 'package:survey_form/models/entities/service.dart';
 import 'package:survey_form/router/survey_form_router.gm.dart';
 import 'package:survey_form/utils/utils.dart';
@@ -49,6 +50,7 @@ import 'package:sync_service/blocs/sync/sync.dart';
 
 import '../blocs/app_initialization/app_initialization.dart';
 import '../blocs/auth/auth.dart';
+import '../blocs/localization/app_localization.dart';
 import '../blocs/localization/localization.dart';
 import '../data/local_store/app_shared_preferences.dart';
 import '../data/local_store/no_sql/schema/app_configuration.dart';
@@ -56,6 +58,7 @@ import '../data/local_store/no_sql/schema/service_registry.dart';
 import '../data/local_store/secure_store/secure_store.dart';
 import '../models/entities/roles_type.dart';
 import '../router/app_router.dart';
+import '../utils/cdd_sync_summary.dart';
 import '../utils/debound.dart';
 import '../utils/environment_config.dart';
 import '../utils/i18_key_constants.dart' as i18;
@@ -92,6 +95,7 @@ class _HomePageState extends LocalizedState<HomePage> {
   late StreamSubscription<List<ConnectivityResult>> subscription;
   bool isTriggerLocalisation = true;
   // Stock in hand UI is handled by StockBalanceCard.
+  CddSyncSummary? _cddSyncSummary;
 
   @override
   initState() {
@@ -208,6 +212,16 @@ class _HomePageState extends LocalizedState<HomePage> {
                 state.maybeWhen(
                   orElse: () => null,
                   pendingSync: (count) {
+                    if (context.isCDD) {
+                      final summary = getCddSyncSummary(
+                        context.read<Isar>(),
+                        context.loggedInUserUuid,
+                      );
+                      if (mounted) {
+                        setState(() => _cddSyncSummary = summary);
+                      }
+                    }
+
                     final debouncer = Debouncer(seconds: 5);
                     debouncer.run(() async {
                       if (count != 0) {
@@ -296,22 +310,27 @@ class _HomePageState extends LocalizedState<HomePage> {
                 return state.maybeWhen(
                   orElse: () => const Offstage(),
                   pendingSync: (count) {
-                    return count == 0
-                        ? const Offstage()
-                        : Padding(
-                            padding: const EdgeInsets.symmetric(
-                              horizontal: spacer2,
-                            ),
-                            child: InfoCard(
-                              type: InfoType.info,
-                              description: localizations
-                                  .translate(i18.home.dataSyncInfoContent)
-                                  .replaceAll('{}', count.toString()),
-                              title: localizations.translate(
-                                i18.home.dataSyncInfoLabel,
-                              ),
-                            ),
-                          );
+                    if (count == 0) return const Offstage();
+
+                    final cddSyncSummary = _cddSyncSummary;
+                    final description = context.isCDD && cddSyncSummary != null
+                        ? _cddSyncInfoContent(cddSyncSummary)
+                        : localizations
+                            .translate(i18.home.dataSyncInfoContent)
+                            .replaceAll('{}', count.toString());
+
+                    return Padding(
+                      padding: const EdgeInsets.symmetric(
+                        horizontal: spacer2,
+                      ),
+                      child: InfoCard(
+                        type: InfoType.info,
+                        description: description,
+                        title: localizations.translate(
+                          i18.home.dataSyncInfoLabel,
+                        ),
+                      ),
+                    );
                   },
                 );
               },
@@ -349,6 +368,30 @@ class _HomePageState extends LocalizedState<HomePage> {
         action: (ctx) => Navigator.pop(ctx),
       ),
     );
+  }
+
+  String _cddSyncInfoContent(CddSyncSummary summary) {
+    return [
+      localizations
+          .translateWithDefault(
+            i18.home.cddSyncInfoChildrenRegistered,
+            fallback: '{} enfants enregistrés',
+          )
+          .replaceAll('{}', summary.childrenRegistered.toString()),
+      localizations
+          .translateWithDefault(
+            i18.home.cddSyncInfoTasksAdministered,
+            fallback: '{} tâches administrées',
+          )
+          .replaceAll('{}', summary.tasksAdministered.toString()),
+      localizations
+          .translateWithDefault(
+            i18.home.cddSyncInfoStockReceived,
+            fallback: '{spaq1} SPAQ1 + {spaq2} SPAQ2 reçus',
+          )
+          .replaceAll('{spaq1}', summary.spaq1Received.toString())
+          .replaceAll('{spaq2}', summary.spaq2Received.toString()),
+    ].join('\n');
   }
 
   _HomeItemDataModel? _getItems(BuildContext context) {
