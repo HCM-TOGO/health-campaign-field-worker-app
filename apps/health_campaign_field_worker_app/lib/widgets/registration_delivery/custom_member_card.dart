@@ -493,6 +493,22 @@ class CustomMemberCard extends StatelessWidget {
                   individualModel: individual,
                 ),
               );
+              // Zero dose tasks are empty here (guarded above), so there is
+              // no prior dose/cycle for this beneficiary yet. Resolve the
+              // real running cycle from the project's cycle date ranges
+              // instead of leaving DeliverInterventionBloc on its default
+              // cycle (1), which is what ZeroDoseCheckPage displays.
+              final projectType = RegistrationDeliverySingleton().projectType;
+              if (projectType != null) {
+                context.read<DeliverInterventionBloc>().add(
+                      DeliverInterventionEvent.setActiveCycleDose(
+                        lastDose: 0,
+                        lastCycle: 1,
+                        individualModel: individual,
+                        projectType: projectType,
+                      ),
+                    );
+              }
               // if ((smcTasks ?? []).isEmpty) {
               context.router.push(
                 ZeroDoseCheckRoute(

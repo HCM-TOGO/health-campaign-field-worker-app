@@ -254,6 +254,28 @@ class CustomDeliverInterventionPageState
     //     ),
     //   );
     // }
+    // Wait for the DeliverInterventionSubmitEvent handler above to actually
+    // finish taskRepository.create()/update() — it emits a state with
+    // oldTask matching this task right after that call completes — instead
+    // of a fixed sleep. A fixed delay either isn't long enough on a slow
+    // device (leaving the task uncreated/unsynced, the bug this replaced)
+    // or lingers longer than needed, giving custom_beneficiary_details_page's
+    // per-build setActiveCycleDose dispatch (see its own TODO about this)
+    // a chance to fire and bump the bloc's live cycle/dose before we
+    // navigate, which showed up as this task's dose being displayed as the
+    // next dose instead of the one just submitted.
+    final bloc = context.read<DeliverInterventionBloc>();
+    if (bloc.state.oldTask?.clientReferenceId != taskModel.clientReferenceId) {
+      await bloc.stream
+          .firstWhere(
+            (s) => s.oldTask?.clientReferenceId == taskModel.clientReferenceId,
+          )
+          .timeout(
+            const Duration(seconds: 3),
+            onTimeout: () => bloc.state,
+          );
+    }
+
     context.router.popAndPush(CustomDeliverySummaryRoute(
       eligibilityAssessmentType: widget.eligibilityAssessmentType,
       task: taskModel,
@@ -894,7 +916,7 @@ class CustomDeliverInterventionPageState
         fields: [
           AdditionalField(
             RegistrationDeliveryEnums.name.toValue(),
-            RegistrationDeliverySingleton().loggedInUser?.name,
+            selectedIndividual?.name?.givenName,
           ),
           AdditionalField(
             AdditionalFieldsType.dateOfDelivery.toValue(),
