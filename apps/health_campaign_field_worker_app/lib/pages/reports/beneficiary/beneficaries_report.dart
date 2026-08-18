@@ -154,7 +154,7 @@ class BeneficiariesReportState extends LocalizedState<BeneficiariesReportPage> {
                           primaryButtonLabel: localizations.translate(
                             i18.acknowledgementSuccess.goToHome,
                           ),
-                          boundaryName: selectedBoundary!.name.toString(),
+                          boundaryName: selectedBoundary!.code.toString(),
                         ),
                         dialogType: DigitProgressDialogType.pendingSync,
                         isPop: true,
@@ -189,7 +189,7 @@ class BeneficiariesReportState extends LocalizedState<BeneficiariesReportPage> {
                                     .proceedWithoutDownloading
                                 : i18.acknowledgementSuccess.goToHome,
                           ),
-                          boundaryName: selectedBoundary!.name.toString(),
+                          boundaryName: selectedBoundary!.code.toString(),
                         ),
                         dialogType: DigitProgressDialogType.dataFound,
                         isPop: true,
@@ -215,7 +215,7 @@ class BeneficiariesReportState extends LocalizedState<BeneficiariesReportPage> {
                               totalCount: totalCount,
                               prefixLabel: syncCount.toString(),
                               suffixLabel: totalCount.toString(),
-                              boundaryName: selectedBoundary!.name.toString(),
+                              boundaryName: selectedBoundary!.code.toString(),
                             ),
                             dialogType: DigitProgressDialogType.inProgress,
                             isPop: true,
@@ -232,7 +232,9 @@ class BeneficiariesReportState extends LocalizedState<BeneficiariesReportPage> {
                           i18.beneficiaryDetails.downloadreport,
                         )}\n\n\n${localizations.translate(
                           i18.beneficiaryDetails.boundary,
-                        )} ${result.boundaryName}\n${localizations.translate(
+                        )} ${localizations.translate(
+                          result.boundaryName ?? '',
+                        )}\n${localizations.translate(
                           i18.beneficiaryDetails.status,
                         )} ${localizations.translate(
                           i18.beneficiaryDetails.downloadcompleted,
@@ -248,7 +250,9 @@ class BeneficiariesReportState extends LocalizedState<BeneficiariesReportPage> {
                           descriptionTableData: {
                             localizations.translate(
                               i18.beneficiaryDetails.boundary,
-                            ): result.boundaryName!,
+                            ): localizations.translate(
+                              result.boundaryName ?? '',
+                            ),
                             localizations.translate(
                               i18.beneficiaryDetails.status,
                             ): localizations.translate(
@@ -285,7 +289,7 @@ class BeneficiariesReportState extends LocalizedState<BeneficiariesReportPage> {
                           secondaryButtonLabel: localizations.translate(
                             i18.beneficiaryDetails.proceedWithoutDownloading,
                           ),
-                          boundaryName: selectedBoundary!.name.toString(),
+                          boundaryName: selectedBoundary!.code.toString(),
                         ),
                         dialogType: DigitProgressDialogType.failed,
                         isPop: true,
@@ -306,7 +310,7 @@ class BeneficiariesReportState extends LocalizedState<BeneficiariesReportPage> {
                           secondaryButtonLabel: localizations.translate(
                             i18.beneficiaryDetails.proceedWithoutDownloading,
                           ),
-                          boundaryName: selectedBoundary!.name.toString(),
+                          boundaryName: selectedBoundary!.code.toString(),
                         ),
                         dialogType: DigitProgressDialogType.checkFailed,
                         isPop: true,
@@ -325,7 +329,7 @@ class BeneficiariesReportState extends LocalizedState<BeneficiariesReportPage> {
                           primaryButtonLabel: localizations.translate(
                             i18.common.coreCommonOk,
                           ),
-                          boundaryName: selectedBoundary!.name.toString(),
+                          boundaryName: selectedBoundary!.code.toString(),
                         ),
                         dialogType: DigitProgressDialogType.insufficientStorage,
                         isPop: true,
@@ -411,7 +415,7 @@ class BeneficiariesReportState extends LocalizedState<BeneficiariesReportPage> {
                                         projectId: context.projectId,
                                         boundaryCode: e.locality!,
                                         pendingSyncCount: pendingSyncCount,
-                                        boundaryName: e.boundaryName.toString(),
+                                        boundaryName: e.locality.toString(),
                                       ),
                                     );
                               },
