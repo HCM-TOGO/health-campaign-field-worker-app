@@ -212,7 +212,7 @@ class _BoundarySelectionPageState
                                                 pendingSyncCount:
                                                     pendingSyncCount,
                                                 boundaryName: selectedBoundary
-                                                    .value!.name
+                                                    .value!.code
                                                     .toString(),
                                                 batchSize: batchSize,
                                               ),
@@ -235,7 +235,7 @@ class _BoundarySelectionPageState
                                           i18.acknowledgementSuccess.goToHome,
                                         ),
                                         boundaryName: selectedBoundary
-                                            .value!.name
+                                            .value!.code
                                             .toString(),
                                       ),
                                       dialogType:
@@ -283,7 +283,7 @@ class _BoundarySelectionPageState
                                                     .goToHome,
                                           ),
                                           boundaryName: selectedBoundary
-                                              .value!.name
+                                              .value!.code
                                               .toString(),
                                         ),
                                         dialogType:
@@ -316,7 +316,7 @@ class _BoundarySelectionPageState
                                             prefixLabel: syncCount.toString(),
                                             suffixLabel: totalCount.toString(),
                                             boundaryName: selectedBoundary
-                                                .value!.name
+                                                .value!.code
                                                 .toString(),
                                           ),
                                           dialogType: DigitProgressDialogType
@@ -337,7 +337,9 @@ class _BoundarySelectionPageState
                                         i18.beneficiaryDetails.downloadreport,
                                       )}\n\n\n${localizations.translate(
                                         i18.beneficiaryDetails.boundary,
-                                      )} ${result.boundaryName}\n${localizations.translate(
+                                      )} ${localizations.translate(
+                                        result.boundaryName ?? '',
+                                      )}\n${localizations.translate(
                                         i18.beneficiaryDetails.status,
                                       )} ${localizations.translate(
                                         i18.beneficiaryDetails
@@ -363,7 +365,9 @@ class _BoundarySelectionPageState
                                         descriptionTableData: {
                                           localizations.translate(
                                             i18.beneficiaryDetails.boundary,
-                                          ): result.boundaryName!,
+                                          ): localizations.translate(
+                                            result.boundaryName ?? '',
+                                          ),
                                           localizations.translate(
                                             i18.beneficiaryDetails.status,
                                           ): localizations.translate(
@@ -405,7 +409,7 @@ class _BoundarySelectionPageState
                                               .proceedWithoutDownloading,
                                         ),
                                         boundaryName: selectedBoundary
-                                            .value!.name
+                                            .value!.code
                                             .toString(),
                                       ),
                                       dialogType:
@@ -435,7 +439,7 @@ class _BoundarySelectionPageState
                                               .proceedWithoutDownloading,
                                         ),
                                         boundaryName: selectedBoundary
-                                            .value!.name
+                                            .value!.code
                                             .toString(),
                                       ),
                                       dialogType:
@@ -464,7 +468,7 @@ class _BoundarySelectionPageState
                                             i18.common.coreCommonOk,
                                           ),
                                           boundaryName: selectedBoundary
-                                              .value!.name
+                                              .value!.code
                                               .toString(),
                                         ),
                                         dialogType: DigitProgressDialogType
@@ -545,7 +549,7 @@ class _BoundarySelectionPageState
                                                                 pendingSyncCount,
                                                             boundaryName:
                                                                 selectedBoundary
-                                                                    .value!.name
+                                                                    .value!.code
                                                                     .toString(),
                                                           ),
                                                         );
