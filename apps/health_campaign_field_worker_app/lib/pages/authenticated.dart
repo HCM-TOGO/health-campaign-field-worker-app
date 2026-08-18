@@ -6,7 +6,6 @@ import 'package:digit_ui_components/digit_components.dart';
 import 'package:digit_ui_components/services/location_bloc.dart';
 import 'package:digit_ui_components/theme/digit_extended_theme.dart';
 import 'package:digit_ui_components/widgets/atoms/pop_up_card.dart';
-import 'package:digit_ui_components/widgets/helper_widget/digit_profile.dart';
 import 'package:digit_ui_components/widgets/molecules/hamburger.dart';
 import 'package:digit_ui_components/widgets/molecules/show_pop_up.dart';
 import 'package:flutter/material.dart';
@@ -35,6 +34,7 @@ import '../router/authenticated_route_observer.dart';
 import '../utils/environment_config.dart';
 import '../utils/i18_key_constants.dart' as i18;
 import '../utils/utils.dart';
+import '../widgets/header/dual_description_profile_widget.dart';
 
 @RoutePage()
 class AuthenticatedPageWrapper extends StatelessWidget {
@@ -291,7 +291,7 @@ class AuthenticatedPageWrapper extends StatelessWidget {
           padding: const EdgeInsets.only(top: kToolbarHeight),
           child: SideBar(
             profile: state.maybeMap(
-              authenticated: (value) => ProfileWidget(
+              authenticated: (value) => DualDescriptionProfileWidget(
                 leading: GestureDetector(
                   onTap: () {
                     Navigator.of(context, rootNavigator: true).pop();
@@ -303,15 +303,17 @@ class AuthenticatedPageWrapper extends StatelessWidget {
                     size: 150.0,
                   ),
                 ),
-                title: value.userModel.name.toString(),
-                description: value.userModel.mobileNumber.toString(),
+                title: value.userModel.userName.toString(),
+                description: value.userModel.name.toString(),
+                description2: value.userModel.mobileNumber.toString(),
               ),
               orElse: () => null,
             ),
             sidebarItems: [
               SidebarItem(
-                title: AppLocalizations.of(context).translate(
+                title: AppLocalizations.of(context).translateWithDefault(
                   i18.common.coreCommonHome,
+                  fallback: 'Home',
                 ),
                 onPressed: () {
                   Navigator.of(context, rootNavigator: true).pop();
@@ -321,8 +323,9 @@ class AuthenticatedPageWrapper extends StatelessWidget {
               ),
               if (appInitializationBloc.state is AppInitialized) ...[
                 SidebarItem(
-                  title: AppLocalizations.of(context).translate(
+                  title: AppLocalizations.of(context).translateWithDefault(
                     i18.common.coreCommonlanguage,
+                    fallback: 'Language',
                   ),
                   isSearchEnabled: false,
                   icon: Icons.language,
@@ -348,7 +351,8 @@ class AuthenticatedPageWrapper extends StatelessWidget {
               // ],
             ],
             logOutDigitButtonLabel: AppLocalizations.of(context)
-                .translate(i18.common.coreCommonLogout),
+                .translateWithDefault(i18.common.coreCommonLogout,
+                    fallback: 'Logout'),
             onLogOut: () async {
               final isConnected = await getIsConnected();
 

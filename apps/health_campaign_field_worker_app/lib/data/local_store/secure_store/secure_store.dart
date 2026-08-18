@@ -227,6 +227,11 @@ class LocalSecureStore {
     }
   }
 
+  Future<void> clearSpaqCounts() async {
+    await storage.delete(key: spaq1Key);
+    await storage.delete(key: spaq2Key);
+  }
+
   Future<void> setSelectedProject(ProjectModel projectModel) async {
     await storage.write(
       key: selectedProjectKey,

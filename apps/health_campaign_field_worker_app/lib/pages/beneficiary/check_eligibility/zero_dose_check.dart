@@ -1688,7 +1688,7 @@ class ZeroDoseCheckPageState extends LocalizedState<ZeroDoseCheckPage> {
             i18_local.checklist.checklistBackDialogLabel,
           ),
           content: Text(localizations.translate(
-            i18_local.checklist.checklistBackDialogDescription,
+            i18_local.checklist.zeroDoseCheckBackDialogDescription,
           )),
           primaryAction: DigitDialogActions(
             label: localizations.translate(

@@ -229,7 +229,7 @@ class _RecordRedosePageState extends LocalizedState<RecordRedosePage> {
                                                       otherControl.setErrors({
                                                         'onlyAlphabets': true
                                                       });
-                                                      
+
                                                       return;
                                                     }
                                                   }
@@ -685,10 +685,10 @@ class _RecordRedosePageState extends LocalizedState<RecordRedosePage> {
                                                                       .selectReasonForRedoseLabel,
                                                                 ),
                                                           },
-                                                          valueMapper: (value) =>
-                                                              localizations
-                                                                  .translate(
-                                                                      value),
+                                                          valueMapper: (value) {
+                                                            final option = deliveryCommentOptions.where((e) => e.code == value).firstOrNull;
+                                                            return option?.name ?? localizations.translate(value);
+                                                          },
                                                           initialValue:
                                                               deliveryCommentOptions
                                                                   .firstOrNull

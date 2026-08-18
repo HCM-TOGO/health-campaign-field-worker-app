@@ -356,6 +356,11 @@ class EditTasks {
   String get searchByBeneficiaryIdLabel => 'SEARCH_BY_BENEFICIARY_ID_LABEL';
 
   String get noMatchFound => 'NO_MATCH_FOUND';
+
+  String get dateOfDeliveryLabel => 'DATE_OF_DELIVERY_LABEL';
+
+  String get deliveryStrategyLabel => 'DELIVERY_STRATEGY_LABEL';
+  String get deliveryTypeLabel => 'DELIVERY_TYPE_LABEL';
 }
 
 class DeliverIntervention {
@@ -461,6 +466,9 @@ class Checklist {
 
   String get checklistBackDialogSecondaryAction =>
       'CHECKLIST_BACK_DIALOG_SECONDARY_ACTION';
+
+  String get zeroDoseCheckBackDialogDescription =>
+      'ZERO_DOSE_CHECK_BACK_DIALOG_DESCRIPTION';
 
   String get noChecklistFound => 'NO_CHECKLISTS_FOUND';
 }
@@ -606,6 +614,10 @@ class HomeShowcase {
 
   String get summaryReportPendingEligible {
     return 'HOME_SHOWCASE_SUMMARY_REPORT_PENDING_ELIGIBLE';
+  }
+
+  String get summaryReportRegisteredUnder3Months {
+    return 'HOME_SHOWCASE_SUMMARY_REPORT_REGISTERED_UNDER_3_MONTHS';
   }
 
   String get zeroDoseBreakdownTitle {
@@ -771,6 +783,7 @@ class StockReconciliationDetails {
   String get commentRequiredError => 'RECONCILIATION_COMMENT_IS_REQUIRED';
   String get qrCodeInvalidFormat => 'QR_CODE_INVALID_FORMAT';
   String get distributorInfoCardContent => 'DISTRIBUTOR_INFO_CARD_CONTENT';
+  String get stockUsed => 'RECONCILIATION_STOCK_USED';
 }
 
 class InventoryReportDetails {
@@ -1170,6 +1183,14 @@ class Home {
   String get dataSyncInfoLabel => 'DATA_SYNC_INFO_LABEL';
 
   String get dataSyncInfoContent => 'DATA_SYNC_INFO_CONTENT';
+
+  String get cddSyncInfoChildrenRegistered =>
+      'CDD_SYNC_INFO_CHILDREN_REGISTERED';
+
+  String get cddSyncInfoTasksAdministered =>
+      'CDD_SYNC_INFO_TASKS_ADMINISTERED';
+
+  String get cddSyncInfoStockReceived => 'CDD_SYNC_INFO_STOCK_RECEIVED';
 
   String get mySurveyForm => 'MY_CHECK_LIST_LABEL';
 
