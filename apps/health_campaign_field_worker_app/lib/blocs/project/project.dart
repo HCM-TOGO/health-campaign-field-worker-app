@@ -896,7 +896,7 @@ class ProjectBloc extends Bloc<ProjectEvent, ProjectState> {
       TaskSearchModel(createdBy: loggedInUserId),
       loggedInUserId,
     );
-    final currentCycleId = context.selectedCycle?.id;
+    final currentCycle = context.selectedCycle;
 
     for (final ownerId in ownerIds) {
       final spaq1Result = calculateStockInHand(
@@ -905,7 +905,7 @@ class ProjectBloc extends Bloc<ProjectEvent, ProjectState> {
         stockOwnerIds: [ownerId],
         productVariantId: Constants.spaq1VariantId,
         isDistributor: isDistributor,
-        currentCycleId: currentCycleId,
+        currentCycle: currentCycle,
       );
       final spaq1ProdResult = calculateStockInHand(
         stockEntries: allStocks,
@@ -913,7 +913,7 @@ class ProjectBloc extends Bloc<ProjectEvent, ProjectState> {
         stockOwnerIds: [ownerId],
         productVariantId: Constants.spaq1VariantIdProd,
         isDistributor: isDistributor,
-        currentCycleId: currentCycleId,
+        currentCycle: currentCycle,
       );
       final spaq2Result = calculateStockInHand(
         stockEntries: allStocks,
@@ -921,7 +921,7 @@ class ProjectBloc extends Bloc<ProjectEvent, ProjectState> {
         stockOwnerIds: [ownerId],
         productVariantId: Constants.spaq2VariantId,
         isDistributor: isDistributor,
-        currentCycleId: currentCycleId,
+        currentCycle: currentCycle,
       );
       final spaq2ProdResult = calculateStockInHand(
         stockEntries: allStocks,
@@ -929,7 +929,7 @@ class ProjectBloc extends Bloc<ProjectEvent, ProjectState> {
         stockOwnerIds: [ownerId],
         productVariantId: Constants.spaq2VariantIdProd,
         isDistributor: isDistributor,
-        currentCycleId: currentCycleId,
+        currentCycle: currentCycle,
       );
 
       StockInHandCache.instance.setBalances(

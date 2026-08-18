@@ -245,7 +245,7 @@ class _StockBalanceCardState extends LocalizedState<StockBalanceCard> {
       TaskSearchModel(createdBy: context.loggedInUserUuid),
       context.loggedInUserUuid,
     );
-    final currentCycleId = context.selectedCycle?.id;
+    final currentCycle = context.selectedCycle;
 
     final allStocks = allStocksMap.values.toList();
     final balances = <String, double>{};
@@ -257,7 +257,7 @@ class _StockBalanceCardState extends LocalizedState<StockBalanceCard> {
         stockOwnerIds: ownerIds,
         productVariantId: pv.id,
         isDistributor: isDistributor,
-        currentCycleId: currentCycleId,
+        currentCycle: currentCycle,
       );
       balances[pv.id] = max(res.stockInHand, 0);
     }

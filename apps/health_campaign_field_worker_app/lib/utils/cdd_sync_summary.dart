@@ -26,7 +26,11 @@ class CddSyncSummary {
 /// generic sync count (`SyncBloc`/`SyncServiceMapper.getSyncCount`) is
 /// derived from: rows created by [createdBy] that are either not synced up
 /// yet, or synced up but not yet synced down.
-CddSyncSummary getCddSyncSummary(Isar isar, String createdBy) {
+CddSyncSummary getCddSyncSummary(
+  Isar isar,
+  String createdBy, {
+  ProjectCycle? currentCycle,
+}) {
   final pendingOpLogs = [
     ...isar.opLogs
         .filter()
@@ -65,7 +69,9 @@ CddSyncSummary getCddSyncSummary(Isar isar, String createdBy) {
         break;
       case DataModelType.stock:
         final stock = opLog.getEntity<StockModel>();
-        if (stock is StockModel && _isReceived(stock)) {
+        if (stock is StockModel &&
+            _isReceived(stock) &&
+            _isInCurrentCycle(stock, currentCycle)) {
           final qty = double.tryParse(stock.quantity ?? '') ?? 0;
           if (_isSpaq1(stock.productVariantId)) {
             spaq1ReceivedQty += qty;
@@ -124,4 +130,14 @@ bool _isReceived(StockModel stock) {
   return stock.transactionType?.toUpperCase() ==
           TransactionType.received.toValue() &&
       stock.transactionReason?.toUpperCase() != 'RETURNED';
+}
+
+/// Matches the cycle-window scoping [calculateStockInHand] applies to its
+/// `received` bucket, so a pending "received" count here never disagrees
+/// with the stock-in-hand balance once that stock finishes syncing.
+bool _isInCurrentCycle(StockModel stock, ProjectCycle? currentCycle) {
+  if (currentCycle == null) return true;
+  final createdTime = stock.clientAuditDetails?.createdTime ?? 0;
+  return createdTime >= currentCycle.startDate &&
+      createdTime <= currentCycle.endDate;
 }

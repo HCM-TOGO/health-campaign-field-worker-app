@@ -216,6 +216,7 @@ class _HomePageState extends LocalizedState<HomePage> {
                       final summary = getCddSyncSummary(
                         context.read<Isar>(),
                         context.loggedInUserUuid,
+                        currentCycle: context.selectedCycle,
                       );
                       if (mounted) {
                         setState(() => _cddSyncSummary = summary);

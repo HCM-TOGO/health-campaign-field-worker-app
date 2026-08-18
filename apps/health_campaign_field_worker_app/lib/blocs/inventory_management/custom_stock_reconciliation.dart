@@ -78,6 +78,25 @@ class CustomStockReconciliationBloc
     if ((productVariantId == null) ||
         (!event.isDistributor && facilityId == null)) return;
 
+    // Reconciliation figures must only reflect the active cycle's activity,
+    // so stock fetched here is additionally scoped to it (unlike the
+    // cumulative stock-in-hand balance, which intentionally spans cycles).
+    final currentCycle = RegistrationDeliverySingleton()
+        .projectType
+        ?.cycles
+        ?.firstWhereOrNull(
+          (cycle) =>
+              cycle.startDate < DateTime.now().millisecondsSinceEpoch &&
+              cycle.endDate > DateTime.now().millisecondsSinceEpoch,
+        );
+
+    bool isInCurrentCycle(StockModel stock) {
+      if (currentCycle == null) return true;
+      final createdTime = stock.clientAuditDetails?.createdTime ?? 0;
+      return createdTime >= currentCycle.startDate &&
+          createdTime <= currentCycle.endDate;
+    }
+
     // Fetching the stock reconciliation details
     final receivedStocks = (await stockRepository.search(
       StockSearchModel(
@@ -88,7 +107,8 @@ class CustomStockReconciliationBloc
         .where((element) =>
             element.auditDetails != null &&
             element.auditDetails?.createdBy ==
-                InventorySingleton().loggedInUserUuid)
+                InventorySingleton().loggedInUserUuid &&
+            isInCurrentCycle(element))
         .toList();
     final sentStocks = (await stockRepository.search(
       StockSearchModel(
@@ -99,7 +119,8 @@ class CustomStockReconciliationBloc
         .where((element) =>
             element.auditDetails != null &&
             element.auditDetails?.createdBy ==
-                InventorySingleton().loggedInUserUuid)
+                InventorySingleton().loggedInUserUuid &&
+            isInCurrentCycle(element))
         .toList();
 
     // Stock used (administered doses, including redoses) only factors into
@@ -267,7 +288,7 @@ class StockReconciliationState with _$StockReconciliationState {
       stockOwnerIds: [ownerId],
       productVariantId: variantId,
       isDistributor: true,
-      currentCycleId: currentCycle?.id,
+      currentCycle: currentCycle,
     ).administered;
   }
 

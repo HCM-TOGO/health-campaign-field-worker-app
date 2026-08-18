@@ -115,13 +115,23 @@ bool _cycleIndexMatches(TaskModel task, int? currentCycleId) {
   return int.tryParse(cycleIndex?.toString() ?? '') == currentCycleId;
 }
 
+/// A stock entry only counts toward the current cycle's stock-in-hand if it
+/// was recorded within that cycle's date window, mirroring the reconciliation
+/// screen's scoping so the two never disagree on the same facility/product.
+bool _isInCycleWindow(StockModel stock, ProjectCycle? currentCycle) {
+  if (currentCycle == null) return true;
+  final createdTime = stock.clientAuditDetails?.createdTime ?? 0;
+  return createdTime >= currentCycle.startDate &&
+      createdTime <= currentCycle.endDate;
+}
+
 StockInHandResult calculateStockInHand({
   required List<StockModel> stockEntries,
   required List<TaskModel> tasksCreatedByUser,
   required List<String> stockOwnerIds,
   required String productVariantId,
   required bool isDistributor,
-  int? currentCycleId,
+  ProjectCycle? currentCycle,
 }) {
   double received = 0;
   double returned = 0;
@@ -148,6 +158,8 @@ StockInHandResult calculateStockInHand({
     final isMine = ownerIds.contains(stock.receiverId) ||
         ownerIds.contains(stock.senderId);
     if (!isMine) continue;
+
+    if (!_isInCycleWindow(stock, currentCycle)) continue;
 
     final qty = _qty(stock.quantity);
     if (qty <= 0) continue;
@@ -183,7 +195,7 @@ StockInHandResult calculateStockInHand({
   double administered = 0;
   for (final task in tasksCreatedByUser) {
     if (!_doseIndexIs01(task)) continue;
-    if (!_cycleIndexMatches(task, currentCycleId)) continue;
+    if (!_cycleIndexMatches(task, currentCycle?.id)) continue;
     final resources = task.resources;
     if (resources == null || resources.isEmpty) continue;
     for (final res in resources) {
