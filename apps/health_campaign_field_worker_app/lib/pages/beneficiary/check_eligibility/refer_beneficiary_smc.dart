@@ -341,6 +341,31 @@ class CustomReferBeneficiarySMCPageState
                                     //       ),
                                     //     );
 
+                                    // Sync DeliverInterventionBloc's cycle
+                                    // with the real running cycle before
+                                    // navigating to ZeroDoseCheckPage —
+                                    // otherwise it displays its default
+                                    // (cycle 1) instead of the actual
+                                    // current cycle used just above for this
+                                    // referral task's own cycleIndex field.
+                                    final projectType =
+                                        RegistrationDeliverySingleton()
+                                            .projectType;
+                                    if (projectType != null) {
+                                      context.read<DeliverInterventionBloc>().add(
+                                            DeliverInterventionEvent
+                                                .setActiveCycleDose(
+                                              lastDose: 0,
+                                              lastCycle:
+                                                  context.selectedCycle?.id ??
+                                                      1,
+                                              individualModel:
+                                                  widget.individual,
+                                              projectType: projectType,
+                                            ),
+                                          );
+                                    }
+
                                     final reloadState =
                                         context.read<HouseholdOverviewBloc>();
                                     Future.delayed(
