@@ -317,9 +317,6 @@ class ZeroDoseCheckPageState extends LocalizedState<ZeroDoseCheckPage> {
                                 final itemsAttributes = initialAttributes;
 
                                 for (int i = 0; i < controller.length; i++) {
-                                  if (i == 0 && controller[i].text == 'YES') {
-                                    break;
-                                  }
                                   if (itemsAttributes?[i].required == true &&
                                       itemsAttributes?[i].dataType ==
                                           'SingleValueList' &&
@@ -1439,12 +1436,22 @@ class ZeroDoseCheckPageState extends LocalizedState<ZeroDoseCheckPage> {
                     groupValue: controller[index].text.trim(),
                     onChanged: (value) {
                       setState(() {
-                        for (final matchingChildItem in childItems) {
-                          final childIndex =
-                              initialAttributes?.indexOf(matchingChildItem);
-                          if (childIndex != null) {
-                            visibleChecklistIndexes
-                                .removeWhere((v) => v == childIndex);
+                        // Hide and reset every descendant question (not just
+                        // direct children), since a stale nested answer can
+                        // otherwise remain marked visible with an empty
+                        // controller value and be submitted as-is.
+                        final descendantPrefix = '${item.code}.';
+                        for (int i = 0;
+                            i < (initialAttributes ?? []).length;
+                            i++) {
+                          final descendantCode =
+                              initialAttributes?[i].code ?? '';
+                          if (descendantCode.startsWith(descendantPrefix)) {
+                            visibleChecklistIndexes.removeWhere((v) => v == i);
+                            controller[i].value =
+                                TextEditingController.fromValue(
+                              const TextEditingValue(text: ''),
+                            ).value;
                           }
                         }
 
@@ -1455,8 +1462,6 @@ class ZeroDoseCheckPageState extends LocalizedState<ZeroDoseCheckPage> {
                             text: value!,
                           ),
                         ).value;
-
-                        // Remove corresponding controllers based on the removed attributes
                       });
                     },
                     items: item.values != null
