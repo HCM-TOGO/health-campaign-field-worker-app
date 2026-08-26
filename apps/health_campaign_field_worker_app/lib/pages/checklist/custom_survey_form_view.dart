@@ -274,7 +274,12 @@ class CustomSurveyFormViewPageState
                                                                       .toString()
                                                                   : '0')
                                                       : visibleSurveyFormIndexes
-                                                              .contains(i)
+                                                                  .contains(
+                                                                      i) &&
+                                                              controller[i]
+                                                                  .text
+                                                                  .trim()
+                                                                  .isNotEmpty
                                                           ? controller[i]
                                                               .text
                                                               .toString()
