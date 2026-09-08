@@ -77,8 +77,16 @@ class _RecordRedosePageState extends LocalizedState<RecordRedosePage> {
   // Variable to track dose administration status
   bool doseAdministered = true;
 
+  final clickedStatus = ValueNotifier<bool>(false);
+
   // List of controllers for form elements
   final List _controllers = [];
+
+  @override
+  void dispose() {
+    clickedStatus.dispose();
+    super.dispose();
+  }
 
   // toggle doseAdministered
   void checkDoseAdministration(bool newValue) {
@@ -188,8 +196,14 @@ class _RecordRedosePageState extends LocalizedState<RecordRedosePage> {
                                             padding: const EdgeInsets.fromLTRB(
                                                 kPadding, 0, kPadding, 0),
                                             children: [
-                                              DigitElevatedButton(
-                                                onPressed: () async {
+                                              ValueListenableBuilder<bool>(
+                                                valueListenable: clickedStatus,
+                                                builder:
+                                                    (context, isClicked, _) {
+                                                  return DigitElevatedButton(
+                                                    onPressed: isClicked
+                                                        ? null
+                                                        : () async {
                                                   form.markAllAsTouched();
                                                   // Check for Others and invalid input
                                                   if (form
@@ -368,6 +382,8 @@ class _RecordRedosePageState extends LocalizedState<RecordRedosePage> {
 
                                                       if (true) {
                                                         if (context.mounted) {
+                                                          clickedStatus.value =
+                                                              true;
                                                           int spaq1 = 0;
                                                           int spaq2 = 0;
 
@@ -503,14 +519,16 @@ class _RecordRedosePageState extends LocalizedState<RecordRedosePage> {
                                                     }
                                                   }
                                                 },
-                                                child: Center(
-                                                  child: Text(
-                                                    localizations.translate(
-                                                      i18.common
-                                                          .coreCommonSubmit,
+                                                    child: Center(
+                                                      child: Text(
+                                                        localizations.translate(
+                                                          i18.common
+                                                              .coreCommonSubmit,
+                                                        ),
+                                                      ),
                                                     ),
-                                                  ),
-                                                ),
+                                                  );
+                                                },
                                               ),
                                             ]);
                                       },
