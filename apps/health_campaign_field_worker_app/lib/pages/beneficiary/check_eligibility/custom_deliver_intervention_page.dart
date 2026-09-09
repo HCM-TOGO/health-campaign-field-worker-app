@@ -484,6 +484,7 @@ class CustomDeliverInterventionPageState
                                                               type: ToastType
                                                                   .error);
                                                         } else {
+                                                          clickedStatus.value = true;
                                                           // final shouldSubmit =
                                                           //     await dialog
                                                           //             .DigitDialog

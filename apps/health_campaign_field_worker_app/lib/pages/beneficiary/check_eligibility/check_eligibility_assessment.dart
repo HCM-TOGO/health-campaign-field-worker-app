@@ -1160,9 +1160,9 @@ class _EligibilityChecklistViewPage
           isIneligible = responses[q6Key] == yes ? true : false;
         }
       }
-      if (isIneligible && !_isRdtPositiveFromResponses(responses)) {
+      if (isIneligible) {
         for (var entry in responses.entries) {
-          if (entry.key == q3Key || entry.key == q5Key) {
+          if (entry.key == q3Key || entry.key == q5Key || entry.key == q6Key) {
             entry.value == yes
                 ? ineligibilityReasons.add(keyVsReason[entry.key])
                 : null;
