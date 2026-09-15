@@ -277,6 +277,12 @@ class EditTasks {
 
   String get updateErrorMessage => 'UPDATE_ERROR_MESSAGE';
 
+  String get ineligibleToAdministeredWarningTitle =>
+      'EDIT_TASKS_INELIGIBLE_TO_ADMINISTERED_WARNING_TITLE';
+
+  String get ineligibleToAdministeredWarningMessage =>
+      'EDIT_TASKS_INELIGIBLE_TO_ADMINISTERED_WARNING_MESSAGE';
+
   String get deleteDialogTitle => 'DELETE_DIALOG_TITLE';
 
   String get deleteDialogMessage => 'DELETE_DIALOG_MESSAGE';

@@ -187,6 +187,61 @@ class _TaskDetailPageState extends LocalizedState<TaskDetailPage> {
     super.dispose();
   }
 
+  // This screen updates a task's status directly (taskDataRepository.update)
+  // without going through the eligibility/delivery wizard, so it doesn't
+  // create the future-dose tasks or populate the administration-specific
+  // fields (doseIndex, deliveryStrategy, dateOfAdministration, etc.) that the
+  // wizard would. Warn before letting a beneficiaryInEligible task be flipped
+  // straight to administered/delivered here, since the resulting record will
+  // be incomplete compared to one created through the normal flow.
+  Future<bool> _confirmIneligibleToAdministered() async {
+    final result = await showDialog<bool>(
+      context: context,
+      builder: (BuildContext dialogContext) {
+        final dialogTheme = Theme.of(dialogContext);
+        final dialogTextTheme = dialogTheme.digitTextTheme(dialogContext);
+        return AlertDialog(
+          backgroundColor: dialogTheme.colorTheme.paper.primary,
+          title: Text(
+            localizations.translateWithDefault(
+              i18.editTasks.ineligibleToAdministeredWarningTitle,
+              fallback: 'Administrer un enfant inéligible ?',
+            ),
+            style: dialogTextTheme.headingM.copyWith(
+              color: dialogTheme.colorTheme.text.primary,
+            ),
+          ),
+          content: Text(
+            localizations.translateWithDefault(
+              i18.editTasks.ineligibleToAdministeredWarningMessage,
+              fallback:
+                  'Cette tâche a été marquée comme inéligible. Voulez-vous vraiment l\'administrer ?',
+            ),
+            style: dialogTextTheme.bodyL.copyWith(
+              color: dialogTheme.colorTheme.text.primary,
+            ),
+          ),
+          actions: [
+            TextButton(
+              onPressed: () => Navigator.of(dialogContext).pop(false),
+              child: Text(localizations.translate(i18.common.coreCommonNo)),
+            ),
+            ElevatedButton(
+              onPressed: () => Navigator.of(dialogContext).pop(true),
+              style: ElevatedButton.styleFrom(
+                backgroundColor: dialogTheme.colorTheme.primary.primary2,
+                foregroundColor: dialogTheme.colorTheme.paper.primary,
+              ),
+              child: Text(localizations.translate(i18.common.coreCommonYes)),
+            ),
+          ],
+        );
+      },
+    );
+
+    return result ?? false;
+  }
+
   Future<void> _showSaveDialog() async {
     final theme = Theme.of(context);
 
@@ -1440,20 +1495,39 @@ class _TaskDetailPageState extends LocalizedState<TaskDetailPage> {
                             .translate(i18.editTasks.selectStatusLabel),
                   ),
                   items: statusOptions,
-                  onSelect: (selected) {
-                    if (selected != null) {
-                      _controllers['status']?.text = selected.code;
-                      if (selected.code ==
-                              Status.administeredSuccess.toValue() ||
-                          selected.code == Status.delivered.toValue()) {
-                        setState(() {
-                          showResources = true;
-                        });
-                      } else {
-                        setState(() {
-                          showResources = false;
-                        });
+                  onSelect: (selected) async {
+                    if (selected == null) return;
+
+                    final isIneligibleToAdministered =
+                        _originalTask.status ==
+                            Status.beneficiaryInEligible.toValue() &&
+                        (selected.code ==
+                                Status.administeredSuccess.toValue() ||
+                            selected.code == Status.delivered.toValue());
+
+                    if (isIneligibleToAdministered) {
+                      final confirmed =
+                          await _confirmIneligibleToAdministered();
+                      if (!confirmed) {
+                        // Force a rebuild so the dropdown's controlled
+                        // selectedOption reasserts the unchanged status
+                        // instead of visually sticking on the declined pick.
+                        setState(() {});
+                        return;
                       }
+                    }
+
+                    _controllers['status']?.text = selected.code;
+                    if (selected.code ==
+                            Status.administeredSuccess.toValue() ||
+                        selected.code == Status.delivered.toValue()) {
+                      setState(() {
+                        showResources = true;
+                      });
+                    } else {
+                      setState(() {
+                        showResources = false;
+                      });
                     }
                   },
                 ),

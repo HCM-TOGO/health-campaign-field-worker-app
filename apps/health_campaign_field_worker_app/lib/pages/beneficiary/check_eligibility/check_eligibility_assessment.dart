@@ -34,6 +34,7 @@ import '../../../models/entities/assessment_checklist/status.dart'
 import 'package:digit_ui_components/services/location_bloc.dart' as location;
 import '../../../models/entities/additional_fields_type.dart'
     as additional_fields_local;
+import 'package:registration_delivery/models/entities/registration_delivery_enums.dart';
 
 @RoutePage()
 class EligibilityChecklistViewPage extends LocalizedStatefulWidget {
@@ -68,6 +69,12 @@ class _EligibilityChecklistViewPage
   List<int> visibleChecklistIndexes = [];
   GlobalKey<FormState> checklistFormKey = GlobalKey<FormState>();
   Map<String?, String> responses = {};
+  // Tracks the ineligible TaskModel submitted earlier in this same page
+  // instance (e.g. the user went back after submitting ineligible and is
+  // resubmitting). Reused to update that same task instead of creating a
+  // duplicate, and to retract it if the user now submits as eligible or
+  // referred.
+  TaskModel? _submittedIneligibleTask;
   final String yes = "YES";
   final String positive = "POSITIVE";
   final String no = "NO";
@@ -476,27 +483,46 @@ class _EligibilityChecklistViewPage
                                         ifReferral)) {
                                   final router = context.router;
                                   if (ifIneligible) {
-                                    // added the deliversubmitevent here
+                                    // If the user already submitted an
+                                    // ineligible result earlier in this same
+                                    // page instance (came back and is
+                                    // resubmitting), reuse that task's
+                                    // identity and update it in place instead
+                                    // of creating a duplicate row.
+                                    final existingIneligibleTask =
+                                        _submittedIneligibleTask;
                                     final clientReferenceId =
-                                        IdGen.i.identifier;
+                                        existingIneligibleTask
+                                                ?.clientReferenceId ??
+                                            IdGen.i.identifier;
                                     final task = TaskModel(
+                                      id: existingIneligibleTask?.id,
                                       projectBeneficiaryClientReferenceId:
                                           projectBeneficiaryClientReferenceId,
                                       clientReferenceId: clientReferenceId,
                                       tenantId: envConfig.variables.tenantId,
-                                      rowVersion: 1,
-                                      auditDetails: AuditDetails(
-                                        createdBy: context.loggedInUserUuid,
-                                        createdTime:
-                                            context.millisecondsSinceEpoch(),
-                                      ),
+                                      rowVersion:
+                                          existingIneligibleTask?.rowVersion ??
+                                              1,
+                                      auditDetails: existingIneligibleTask
+                                              ?.auditDetails ??
+                                          AuditDetails(
+                                            createdBy: context.loggedInUserUuid,
+                                            createdTime: context
+                                                .millisecondsSinceEpoch(),
+                                          ),
                                       projectId: context.projectId,
                                       status: status_local
                                           .Status.beneficiaryInEligible
                                           .toValue(),
                                       clientAuditDetails: ClientAuditDetails(
-                                        createdBy: context.loggedInUserUuid,
-                                        createdTime:
+                                        createdBy: existingIneligibleTask
+                                                ?.clientAuditDetails
+                                                ?.createdBy ??
+                                            context.loggedInUserUuid,
+                                        createdTime: existingIneligibleTask
+                                                ?.clientAuditDetails
+                                                ?.createdTime ??
                                             context.millisecondsSinceEpoch(),
                                         lastModifiedBy:
                                             context.loggedInUserUuid,
@@ -521,6 +547,23 @@ class _EligibilityChecklistViewPage
                                             'ineligibleReasons',
                                             ineligibilityReasons.join(","),
                                           ),
+                                          AdditionalField(
+                                            RegistrationDeliveryEnums.name
+                                                .toValue(),
+                                            widget.individual?.name?.givenName,
+                                          ),
+                                          if (latitude != null)
+                                            AdditionalField(
+                                              AdditionalFieldsType.latitude
+                                                  .toValue(),
+                                              latitude,
+                                            ),
+                                          if (longitude != null)
+                                            AdditionalField(
+                                              AdditionalFieldsType.longitude
+                                                  .toValue(),
+                                              longitude,
+                                            ),
                                           AdditionalField(
                                             additional_fields_local
                                                 .AdditionalFieldsType
@@ -550,10 +593,12 @@ class _EligibilityChecklistViewPage
                                     context.read<DeliverInterventionBloc>().add(
                                           DeliverInterventionSubmitEvent(
                                             task: task,
-                                            isEditing: false,
+                                            isEditing:
+                                                existingIneligibleTask != null,
                                             boundaryModel: context.boundary,
                                           ),
                                         );
+                                    _submittedIneligibleTask = task;
 
                                     final reloadState =
                                         context.read<HouseholdOverviewBloc>();
@@ -584,7 +629,9 @@ class _EligibilityChecklistViewPage
                                         RegistrationDeliverySingleton()
                                             .projectType;
                                     if (projectType != null) {
-                                      context.read<DeliverInterventionBloc>().add(
+                                      context
+                                          .read<DeliverInterventionBloc>()
+                                          .add(
                                             DeliverInterventionEvent
                                                 .setActiveCycleDose(
                                               lastDose: 0,
@@ -614,6 +661,14 @@ class _EligibilityChecklistViewPage
                                     //           widget.eligibilityAssessmentType),
                                     // );
                                   } else if (ifReferral) {
+                                    // Note: unlike the eligible/administer
+                                    // path, the referral flow does not yet
+                                    // reuse a prior ineligible task for this
+                                    // cycle (see refer_beneficiary_smc.dart) -
+                                    // it always creates its own task. A
+                                    // beneficiaryInEligible task left behind
+                                    // by an earlier submission in this same
+                                    // session is not touched here.
                                     if (widget.eligibilityAssessmentType ==
                                         EligibilityAssessmentType.smc) {
                                       router

@@ -42,6 +42,8 @@ import '../../../utils/utils.dart' as local_utils;
 import '../../../utils/registration_delivery/utils_smc.dart';
 import '../../../widgets/custom_back_navigation.dart';
 import '../../../data/repositories/custom_task.dart';
+import '../../../models/entities/assessment_checklist/status.dart'
+    as status_local;
 
 @RoutePage()
 class CustomDeliverInterventionPage extends LocalizedStatefulWidget {
@@ -99,7 +101,12 @@ class CustomDeliverInterventionPageState
     // Reuse a task left notAdministered/beneficiaryRefused for this cycle
     // instead of creating a new one on retry. The administeredSuccess-slot
     // task is the one created with deliveryStrategy "direct" (see
-    // isDirectDeliveryTask).
+    // isDirectDeliveryTask). A beneficiaryInEligible task never carries a
+    // deliveryStrategy field (it's set before that concept applies), but it
+    // is still the direct-slot attempt for this cycle - if the user came
+    // back and changed the answers to eligible, fall back to it so
+    // administering the dose updates that same task instead of leaving it
+    // behind as a stale ineligible record.
     final taskDataRepository =
         context.read<LocalRepository<TaskModel, TaskSearchModel>>()
             as CustomTaskLocalRepository;
@@ -108,8 +115,9 @@ class CustomDeliverInterventionPageState
       projectBeneficiaryClientReferenceId: projectBeneficiary.clientReferenceId,
       cycle: deliverInterventionState.cycle,
     );
-    final existingTask =
-        retryableTasks.firstWhereOrNull(isDirectDeliveryTask);
+    final existingTask = retryableTasks.firstWhereOrNull(isDirectDeliveryTask) ??
+        retryableTasks.firstWhereOrNull((t) =>
+            t.status == status_local.Status.beneficiaryInEligible.toValue());
 
     TaskModel taskModel = _getTaskModel(
       context,

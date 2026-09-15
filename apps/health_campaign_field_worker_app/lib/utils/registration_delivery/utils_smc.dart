@@ -645,10 +645,12 @@ bool isDirectDeliveryTask(TaskModel task) =>
     DeliverStrategyType.direct.toValue();
 
 // All sibling tasks for this beneficiary + cycle that were left
-// notAdministered/beneficiaryRefused (a prior failed delivery attempt), so a
-// retry updates those same tasks instead of creating new ones. Tasks already
-// administeredSuccess/delivered are excluded on purpose: resubmitting against
-// those is the Redose flow, which must keep creating a new task per dose.
+// notAdministered/beneficiaryRefused (a prior failed delivery attempt) or
+// beneficiaryInEligible (the user later came back and changed the answers
+// to eligible), so a retry/administration updates those same tasks instead
+// of creating new ones. Tasks already administeredSuccess/delivered are
+// excluded on purpose: resubmitting against those is the Redose flow, which
+// must keep creating a new task per dose.
 //
 // Results are sorted by doseIndex ascending, purely to give callers a stable
 // order among same-role tasks (e.g. the delivered-slot tasks relative to
@@ -671,7 +673,9 @@ Future<List<TaskModel>> getRetryableTasksForCycle({
       .where((task) =>
           task.isDeleted != true &&
           (task.status == Status.notAdministered.toValue() ||
-              task.status == Status.beneficiaryRefused.toValue()) &&
+              task.status == Status.beneficiaryRefused.toValue() ||
+              task.status ==
+                  status_local.Status.beneficiaryInEligible.toValue()) &&
           _additionalFieldValue(
                   task, AdditionalFieldsType.cycleIndex.toValue()) ==
               cycleTag)
