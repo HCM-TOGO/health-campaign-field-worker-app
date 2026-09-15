@@ -908,10 +908,15 @@ class CustomDeliverInterventionPageState
             ContextUtilityExtensions(context).millisecondsSinceEpoch(),
       ),
       clientAuditDetails: task.clientAuditDetails?.copyWith(
-        lastModifiedBy: RegistrationDeliverySingleton().loggedInUserUuid,
-        lastModifiedTime:
-            ContextUtilityExtensions(context).millisecondsSinceEpoch(),
-      ),
+            lastModifiedBy: RegistrationDeliverySingleton().loggedInUserUuid,
+            lastModifiedTime:
+                ContextUtilityExtensions(context).millisecondsSinceEpoch(),
+          ) ??
+          ClientAuditDetails(
+            createdBy: RegistrationDeliverySingleton().loggedInUserUuid!,
+            createdTime:
+                ContextUtilityExtensions(context).millisecondsSinceEpoch(),
+          ),
       additionalFields: TaskAdditionalFields(
         version: task.additionalFields?.version ?? 1,
         fields: [
