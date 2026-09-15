@@ -3,6 +3,7 @@ import 'package:digit_components/digit_components.dart';
 import 'package:digit_components/widgets/atoms/digit_radio_button_list.dart';
 import 'package:digit_components/widgets/atoms/digit_toaster.dart';
 import 'package:digit_ui_components/enum/app_enums.dart';
+import 'package:digit_ui_components/services/location_bloc.dart' as location;
 import 'package:digit_ui_components/theme/spacers.dart';
 import 'package:digit_ui_components/widgets/atoms/digit_button.dart';
 import 'package:digit_ui_components/widgets/atoms/pop_up_card.dart';
@@ -12,6 +13,7 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:reactive_forms/reactive_forms.dart';
 import 'package:referral_reconciliation/referral_reconciliation.dart';
 import 'package:registration_delivery/models/entities/referral.dart';
+import 'package:registration_delivery/models/entities/registration_delivery_enums.dart';
 import 'package:registration_delivery/models/entities/status.dart';
 import 'package:registration_delivery/models/entities/task.dart';
 import 'package:registration_delivery/pages/beneficiary/facility_selection.dart';
@@ -73,6 +75,14 @@ class CustomReferBeneficiarySMCPageState
   static const sideEffectFromCurrentCycle = "DRUG_SE_CC";
 
   @override
+  void initState() {
+    context
+        .read<location.LocationBloc>()
+        .add(const location.LocationEvent.load());
+    super.initState();
+  }
+
+  @override
   void dispose() {
     clickedStatus.dispose();
     super.dispose();
@@ -82,414 +92,440 @@ class CustomReferBeneficiarySMCPageState
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
 
-    return BlocConsumer<FacilityBloc, FacilityState>(
-      listener: (context, state) {
-        state.whenOrNull(
-          empty: () => NoFacilitiesAssignedDialog.show(context),
-        );
-      },
-      builder: (ctx, facilityState) {
-        List<FacilityModel> facilities = [];
-        final healthFacilities = facilityState.whenOrNull(
-              fetched: (
-                facilities,
-                allFacilities,
-              ) {
-                final projectFacilities = facilities
-                    .where((e) => e.usage == Constants.healthFacility)
-                    .toList();
+    return BlocBuilder<location.LocationBloc, location.LocationState>(
+        builder: (context, locationState) {
+      return BlocConsumer<FacilityBloc, FacilityState>(
+        listener: (context, state) {
+          state.whenOrNull(
+            empty: () => NoFacilitiesAssignedDialog.show(context),
+          );
+        },
+        builder: (ctx, facilityState) {
+          List<FacilityModel> facilities = [];
+          final healthFacilities = facilityState.whenOrNull(
+                fetched: (
+                  facilities,
+                  allFacilities,
+                ) {
+                  final projectFacilities = facilities
+                      .where((e) => e.usage == Constants.healthFacility)
+                      .toList();
 
-                return projectFacilities.isEmpty
-                    ? allFacilities
-                    : projectFacilities;
-              },
-            ) ??
-            [];
-        if (healthFacilities.isEmpty) {
-          return const Center(child: CircularProgressIndicator());
-        }
+                  return projectFacilities.isEmpty
+                      ? allFacilities
+                      : projectFacilities;
+                },
+              ) ??
+              [];
+          if (healthFacilities.isEmpty) {
+            return const Center(child: CircularProgressIndicator());
+          }
 
-        facilities.addAll(healthFacilities);
+          facilities.addAll(healthFacilities);
 
-        final reasons = widget.isReadministrationUnSuccessful
-            ? [sideEffectFromCurrentCycle]
-            : (widget.referralReasons ?? []);
+          final reasons = widget.isReadministrationUnSuccessful
+              ? [sideEffectFromCurrentCycle]
+              : (widget.referralReasons ?? []);
 
-        return WillPopScope(
-          onWillPop: () =>
-              _onBackPressed(context, widget.isReadministrationUnSuccessful),
-          child: Scaffold(
-            body: Scaffold(
-              body: ReactiveFormBuilder(
-                form: () => buildForm(healthFacilities),
-                builder: (context, form, child) => ScrollableContent(
-                  enableFixedButton: true,
-                  header: Column(children: [
-                    widget.isReadministrationUnSuccessful
-                        ? const CustomBackNavigationHelpHeaderWidget(
-                            showBackNavigation: false,
-                            showHelp: false,
-                            showcaseButton: null,
-                          )
-                        : const CustomBackNavigationHelpHeaderWidget(
-                            showHelp: false,
-                            showcaseButton: null,
-                          ),
-                  ]),
-                  footer: DigitCard(
-                    margin: const EdgeInsets.fromLTRB(0, kPadding, 0, 0),
-                    padding:
-                        const EdgeInsets.fromLTRB(kPadding, 0, kPadding, 0),
-                    child: ValueListenableBuilder(
-                      valueListenable: clickedStatus,
-                      builder: (context, bool isClicked, _) {
-                        return DigitElevatedButton(
-                          onPressed: isClicked
-                              ? null
-                              : () async {
-                                  form.markAllAsTouched();
+          return WillPopScope(
+            onWillPop: () =>
+                _onBackPressed(context, widget.isReadministrationUnSuccessful),
+            child: Scaffold(
+              body: Scaffold(
+                body: ReactiveFormBuilder(
+                  form: () => buildForm(healthFacilities),
+                  builder: (context, form, child) => ScrollableContent(
+                    enableFixedButton: true,
+                    header: Column(children: [
+                      widget.isReadministrationUnSuccessful
+                          ? const CustomBackNavigationHelpHeaderWidget(
+                              showBackNavigation: false,
+                              showHelp: false,
+                              showcaseButton: null,
+                            )
+                          : const CustomBackNavigationHelpHeaderWidget(
+                              showHelp: false,
+                              showcaseButton: null,
+                            ),
+                    ]),
+                    footer: DigitCard(
+                      margin: const EdgeInsets.fromLTRB(0, kPadding, 0, 0),
+                      padding:
+                          const EdgeInsets.fromLTRB(kPadding, 0, kPadding, 0),
+                      child: ValueListenableBuilder(
+                        valueListenable: clickedStatus,
+                        builder: (context, bool isClicked, _) {
+                          return DigitElevatedButton(
+                            onPressed: isClicked
+                                ? null
+                                : () async {
+                                    form.markAllAsTouched();
 
-                                  if (reasons.isEmpty) {
-                                    return;
-                                  }
+                                    if (reasons.isEmpty) {
+                                      return;
+                                    }
 
-                                  if (!form.valid) {
-                                    return;
-                                  } else {
-                                    final submit = await showDialog(
-                                      context: context,
-                                      builder: (ctx) => Popup(
-                                        title: localizations.translate(
-                                          i18.deliverIntervention.dialogTitle,
-                                        ),
-                                        description: localizations.translate(
-                                          i18.deliverIntervention.dialogContent,
-                                        ),
-                                        actions: [
-                                          DigitButton(
-                                              label: localizations.translate(
-                                                i18.common.coreCommonSubmit,
-                                              ),
-                                              onPressed: () {
-                                                clickedStatus.value = true;
-                                                Navigator.of(
-                                                  context,
-                                                  rootNavigator: true,
-                                                ).pop(true);
-                                              },
-                                              type: DigitButtonType.primary,
-                                              size: DigitButtonSize.large),
-                                          DigitButton(
-                                              label: localizations.translate(
-                                                i18.common.coreCommonCancel,
-                                              ),
-                                              onPressed: () => Navigator.of(
+                                    if (!form.valid) {
+                                      return;
+                                    } else {
+                                      final submit = await showDialog(
+                                        context: context,
+                                        builder: (ctx) => Popup(
+                                          title: localizations.translate(
+                                            i18.deliverIntervention.dialogTitle,
+                                          ),
+                                          description: localizations.translate(
+                                            i18.deliverIntervention
+                                                .dialogContent,
+                                          ),
+                                          actions: [
+                                            DigitButton(
+                                                label: localizations.translate(
+                                                  i18.common.coreCommonSubmit,
+                                                ),
+                                                onPressed: () {
+                                                  clickedStatus.value = true;
+                                                  Navigator.of(
                                                     context,
                                                     rootNavigator: true,
-                                                  ).pop(false),
-                                              type: DigitButtonType.secondary,
-                                              size: DigitButtonSize.large)
-                                        ],
-                                      ),
-                                    );
-                                    if (submit == null || !submit) {
-                                      return;
-                                    }
-                                    if (healthFacilities.isEmpty) {
-                                      return;
-                                    }
-                                    clickedStatus.value = true;
-                                    final reason = reasons.first;
-
-                                    // final event = context.read<ReferralBloc>();
-
-                                    final referral =  ReferralModel(
-                                      clientReferenceId: IdGen.i.identifier,
-                                      projectId: context.projectId,
-                                      projectBeneficiaryClientReferenceId:
-                                      widget
-                                          .projectBeneficiaryClientRefId,
-                                      referrerId: context.loggedInUserUuid,
-                                      recipientId: healthFacilities.first.id,
-                                      recipientType: "FACILITY",
-                                      reasons: [reason],
-                                      tenantId: envConfig.variables.tenantId,
-                                      rowVersion: 1,
-                                      auditDetails: AuditDetails(
-                                        createdBy: context.loggedInUserUuid,
-                                        createdTime:
-                                        context.millisecondsSinceEpoch(),
-                                        lastModifiedBy:
-                                        context.loggedInUserUuid,
-                                        lastModifiedTime:
-                                        context.millisecondsSinceEpoch(),
-                                      ),
-                                      clientAuditDetails: ClientAuditDetails(
-                                        createdBy: context.loggedInUserUuid,
-                                        createdTime:
-                                        context.millisecondsSinceEpoch(),
-                                        lastModifiedBy:
-                                        context.loggedInUserUuid,
-                                        lastModifiedTime:
-                                        context.millisecondsSinceEpoch(),
-                                      ),
-                                      additionalFields:
-                                      ReferralAdditionalFields(
-                                        version: 1,
-                                        fields: [
-                                          AdditionalField(
-                                            referralReasons,
-                                            reasons.join(","),
-                                          ),
-                                          const AdditionalField(
-                                              'referralType', 'smcReferred')
-                                        ],
-                                      ),
-                                    );
-
-                                    // event.add(ReferralSubmitEvent(
-                                    //   referral,
-                                    //   false,
-                                    // ));
-
-
-                                    final clientReferenceId =
-                                        IdGen.i.identifier;
-                                    final task = TaskModel(
-                                      projectBeneficiaryClientReferenceId:
-                                          widget.projectBeneficiaryClientRefId,
-                                      clientReferenceId: clientReferenceId,
-                                      tenantId: envConfig.variables.tenantId,
-                                      rowVersion: 1,
-                                      auditDetails: AuditDetails(
-                                        createdBy: context.loggedInUserUuid,
-                                        createdTime:
-                                            context.millisecondsSinceEpoch(),
-                                      ),
-                                      projectId: context.projectId,
-                                      status:
-                                          Status.beneficiaryReferred.toValue(),
-                                      clientAuditDetails: ClientAuditDetails(
-                                        createdBy: context.loggedInUserUuid,
-                                        createdTime:
-                                            context.millisecondsSinceEpoch(),
-                                        lastModifiedBy:
-                                            context.loggedInUserUuid,
-                                        lastModifiedTime:
-                                            context.millisecondsSinceEpoch(),
-                                      ),
-                                      additionalFields: TaskAdditionalFields(
-                                        version: 1,
-                                        fields: [
-                                          AdditionalField(
-                                            AdditionalFieldsType.cycleIndex
-                                                .toValue(),
-                                            "0${context.selectedCycle?.id}",
-                                          ),
-                                          AdditionalField(
-                                            'taskStatus',
-                                            Status.beneficiaryReferred
-                                                .toValue(),
-                                          ),
-                                          if (widget
-                                              .isReadministrationUnSuccessful)
-                                            AdditionalField(
-                                              'quantityWasted',
-                                              widget.quantityWasted
-                                                          .toString()
-                                                          .length ==
-                                                      1
-                                                  ? "0${widget.quantityWasted}"
-                                                  : widget.quantityWasted
-                                                      .toString(),
-                                            ),
-                                          if (widget
-                                              .isReadministrationUnSuccessful)
-                                            const AdditionalField(
-                                              'unsuccessfullDelivery',
-                                              'true',
-                                            ),
-                                          if (widget.productVariantId != null)
-                                            AdditionalField(
-                                              'productVariantId',
-                                              widget.productVariantId,
-                                            ),
-                                          AdditionalField(
-                                            additional_fields_local
-                                                .AdditionalFieldsType
-                                                .deliveryType
-                                                .toValue(),
-                                            EligibilityAssessmentStatus
-                                                .smcDone.name,
-                                          ),
-                                          ...getIndividualAdditionalFields(
-                                              widget.individual)
-                                        ],
-                                      ),
-                                      address: widget.individual.address?.first
-                                          .copyWith(
-                                        relatedClientReferenceId:
-                                            clientReferenceId,
-                                        id: null,
-                                      ),
-                                    );
-                                    // context.read<DeliverInterventionBloc>().add(
-                                    //       DeliverInterventionSubmitEvent(
-                                    //         task: task,
-                                    //         isEditing: false,
-                                    //         boundaryModel: context.boundary,
-                                    //       ),
-                                    //     );
-
-                                    // Sync DeliverInterventionBloc's cycle
-                                    // with the real running cycle before
-                                    // navigating to ZeroDoseCheckPage —
-                                    // otherwise it displays its default
-                                    // (cycle 1) instead of the actual
-                                    // current cycle used just above for this
-                                    // referral task's own cycleIndex field.
-                                    final projectType =
-                                        RegistrationDeliverySingleton()
-                                            .projectType;
-                                    if (projectType != null) {
-                                      context.read<DeliverInterventionBloc>().add(
-                                            DeliverInterventionEvent
-                                                .setActiveCycleDose(
-                                              lastDose: 0,
-                                              lastCycle:
-                                                  context.selectedCycle?.id ??
-                                                      1,
-                                              individualModel:
-                                                  widget.individual,
-                                              projectType: projectType,
-                                            ),
-                                          );
-                                    }
-
-                                    final reloadState =
-                                        context.read<HouseholdOverviewBloc>();
-                                    Future.delayed(
-                                      const Duration(milliseconds: 500),
-                                      () {
-                                        reloadState
-                                            .add(HouseholdOverviewReloadEvent(
-                                          projectId: context.projectId,
-                                          projectBeneficiaryType:
-                                              context.beneficiaryType,
-                                        ));
-                                      },
-                                    ).then(
-                                      (value) => context.router.popAndPush(
-                                        ZeroDoseCheckRoute(
-                                          eligibilityAssessmentType:
-                                              EligibilityAssessmentType.smc,
-                                          isAdministration: false,
-                                          task: task,
-                                          projectBeneficiaryClientReferenceId: task
-                                                  .projectBeneficiaryClientReferenceId ??
-                                              widget
-                                                  .projectBeneficiaryClientRefId,
-                                          referral: referral,
+                                                  ).pop(true);
+                                                },
+                                                type: DigitButtonType.primary,
+                                                size: DigitButtonSize.large),
+                                            DigitButton(
+                                                label: localizations.translate(
+                                                  i18.common.coreCommonCancel,
+                                                ),
+                                                onPressed: () => Navigator.of(
+                                                      context,
+                                                      rootNavigator: true,
+                                                    ).pop(false),
+                                                type: DigitButtonType.secondary,
+                                                size: DigitButtonSize.large)
+                                          ],
                                         ),
-                                        // CustomHouseholdAcknowledgementRoute(
-                                        //   enableViewHousehold: true,
-                                        //   eligibilityAssessmentType:
-                                        //       EligibilityAssessmentType.vas,
-                                        // ),
-                                      ),
-                                    );
-                                  }
-                                },
-                          child: Center(
-                            child: Text(
-                              localizations
-                                  .translate(i18_local.common.coreCommonSubmit),
-                            ),
-                          ),
-                        );
-                      },
-                    ),
-                  ),
-                  children: [
-                    DigitCard(
-                      child: Column(
-                        children: [
-                          Row(
-                            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                            children: [
-                              Expanded(
-                                child: Text(
-                                  localizations.translate(
-                                    i18_local.referBeneficiary.referralDetails,
-                                  ),
-                                  style: theme.textTheme.displayMedium,
-                                ),
+                                      );
+                                      if (submit == null || !submit) {
+                                        return;
+                                      }
+                                      if (healthFacilities.isEmpty) {
+                                        return;
+                                      }
+                                      clickedStatus.value = true;
+                                      final reason = reasons.first;
+
+                                      // final event = context.read<ReferralBloc>();
+
+                                      final referral = ReferralModel(
+                                        clientReferenceId: IdGen.i.identifier,
+                                        projectId: context.projectId,
+                                        projectBeneficiaryClientReferenceId:
+                                            widget
+                                                .projectBeneficiaryClientRefId,
+                                        referrerId: context.loggedInUserUuid,
+                                        recipientId: healthFacilities.first.id,
+                                        recipientType: "FACILITY",
+                                        reasons: [reason],
+                                        tenantId: envConfig.variables.tenantId,
+                                        rowVersion: 1,
+                                        auditDetails: AuditDetails(
+                                          createdBy: context.loggedInUserUuid,
+                                          createdTime:
+                                              context.millisecondsSinceEpoch(),
+                                          lastModifiedBy:
+                                              context.loggedInUserUuid,
+                                          lastModifiedTime:
+                                              context.millisecondsSinceEpoch(),
+                                        ),
+                                        clientAuditDetails: ClientAuditDetails(
+                                          createdBy: context.loggedInUserUuid,
+                                          createdTime:
+                                              context.millisecondsSinceEpoch(),
+                                          lastModifiedBy:
+                                              context.loggedInUserUuid,
+                                          lastModifiedTime:
+                                              context.millisecondsSinceEpoch(),
+                                        ),
+                                        additionalFields:
+                                            ReferralAdditionalFields(
+                                          version: 1,
+                                          fields: [
+                                            AdditionalField(
+                                              referralReasons,
+                                              reasons.join(","),
+                                            ),
+                                            const AdditionalField(
+                                                'referralType', 'smcReferred')
+                                          ],
+                                        ),
+                                      );
+
+                                      // event.add(ReferralSubmitEvent(
+                                      //   referral,
+                                      //   false,
+                                      // ));
+
+                                      final clientReferenceId =
+                                          IdGen.i.identifier;
+                                      final task = TaskModel(
+                                        projectBeneficiaryClientReferenceId:
+                                            widget
+                                                .projectBeneficiaryClientRefId,
+                                        clientReferenceId: clientReferenceId,
+                                        tenantId: envConfig.variables.tenantId,
+                                        rowVersion: 1,
+                                        auditDetails: AuditDetails(
+                                          createdBy: context.loggedInUserUuid,
+                                          createdTime:
+                                              context.millisecondsSinceEpoch(),
+                                        ),
+                                        projectId: context.projectId,
+                                        status: Status.beneficiaryReferred
+                                            .toValue(),
+                                        clientAuditDetails: ClientAuditDetails(
+                                          createdBy: context.loggedInUserUuid,
+                                          createdTime:
+                                              context.millisecondsSinceEpoch(),
+                                          lastModifiedBy:
+                                              context.loggedInUserUuid,
+                                          lastModifiedTime:
+                                              context.millisecondsSinceEpoch(),
+                                        ),
+                                        additionalFields: TaskAdditionalFields(
+                                          version: 1,
+                                          fields: [
+                                            AdditionalField(
+                                              AdditionalFieldsType.cycleIndex
+                                                  .toValue(),
+                                              "0${context.selectedCycle?.id}",
+                                            ),
+                                            AdditionalField(
+                                              'taskStatus',
+                                              Status.beneficiaryReferred
+                                                  .toValue(),
+                                            ),
+                                            if (widget
+                                                .isReadministrationUnSuccessful)
+                                              AdditionalField(
+                                                'quantityWasted',
+                                                widget.quantityWasted
+                                                            .toString()
+                                                            .length ==
+                                                        1
+                                                    ? "0${widget.quantityWasted}"
+                                                    : widget.quantityWasted
+                                                        .toString(),
+                                              ),
+                                            if (widget
+                                                .isReadministrationUnSuccessful)
+                                              const AdditionalField(
+                                                'unsuccessfullDelivery',
+                                                'true',
+                                              ),
+                                            if (widget.productVariantId != null)
+                                              AdditionalField(
+                                                'productVariantId',
+                                                widget.productVariantId,
+                                              ),
+                                            AdditionalField(
+                                              RegistrationDeliveryEnums.name
+                                                  .toValue(),
+                                              widget.individual.name?.givenName,
+                                            ),
+                                            if (locationState.latitude != null)
+                                              AdditionalField(
+                                                AdditionalFieldsType.latitude
+                                                    .toValue(),
+                                                locationState.latitude,
+                                              ),
+                                            if (locationState.longitude != null)
+                                              AdditionalField(
+                                                AdditionalFieldsType.longitude
+                                                    .toValue(),
+                                                locationState.longitude,
+                                              ),
+                                            AdditionalField(
+                                              additional_fields_local
+                                                  .AdditionalFieldsType
+                                                  .deliveryType
+                                                  .toValue(),
+                                              EligibilityAssessmentStatus
+                                                  .smcDone.name,
+                                            ),
+                                            ...getIndividualAdditionalFields(
+                                                widget.individual)
+                                          ],
+                                        ),
+                                        address: widget
+                                            .individual.address?.first
+                                            .copyWith(
+                                          relatedClientReferenceId:
+                                              clientReferenceId,
+                                          id: null,
+                                        ),
+                                      );
+                                      // context.read<DeliverInterventionBloc>().add(
+                                      //       DeliverInterventionSubmitEvent(
+                                      //         task: task,
+                                      //         isEditing: false,
+                                      //         boundaryModel: context.boundary,
+                                      //       ),
+                                      //     );
+
+                                      // Sync DeliverInterventionBloc's cycle
+                                      // with the real running cycle before
+                                      // navigating to ZeroDoseCheckPage —
+                                      // otherwise it displays its default
+                                      // (cycle 1) instead of the actual
+                                      // current cycle used just above for this
+                                      // referral task's own cycleIndex field.
+                                      final projectType =
+                                          RegistrationDeliverySingleton()
+                                              .projectType;
+                                      if (projectType != null) {
+                                        context
+                                            .read<DeliverInterventionBloc>()
+                                            .add(
+                                              DeliverInterventionEvent
+                                                  .setActiveCycleDose(
+                                                lastDose: 0,
+                                                lastCycle:
+                                                    context.selectedCycle?.id ??
+                                                        1,
+                                                individualModel:
+                                                    widget.individual,
+                                                projectType: projectType,
+                                              ),
+                                            );
+                                      }
+
+                                      final reloadState =
+                                          context.read<HouseholdOverviewBloc>();
+                                      Future.delayed(
+                                        const Duration(milliseconds: 500),
+                                        () {
+                                          reloadState
+                                              .add(HouseholdOverviewReloadEvent(
+                                            projectId: context.projectId,
+                                            projectBeneficiaryType:
+                                                context.beneficiaryType,
+                                          ));
+                                        },
+                                      ).then(
+                                        (value) => context.router.popAndPush(
+                                          ZeroDoseCheckRoute(
+                                            eligibilityAssessmentType:
+                                                EligibilityAssessmentType.smc,
+                                            isAdministration: false,
+                                            task: task,
+                                            projectBeneficiaryClientReferenceId:
+                                                task.projectBeneficiaryClientReferenceId ??
+                                                    widget
+                                                        .projectBeneficiaryClientRefId,
+                                            referral: referral,
+                                          ),
+                                          // CustomHouseholdAcknowledgementRoute(
+                                          //   enableViewHousehold: true,
+                                          //   eligibilityAssessmentType:
+                                          //       EligibilityAssessmentType.vas,
+                                          // ),
+                                        ),
+                                      );
+                                    }
+                                  },
+                            child: Center(
+                              child: Text(
+                                localizations.translate(
+                                    i18_local.common.coreCommonSubmit),
                               ),
-                            ],
-                          ),
-                          Column(children: [
-                            DigitDateFormPicker(
-                              margin:
-                                  const EdgeInsets.symmetric(vertical: spacer2),
-                              isEnabled: false,
-                              formControlName: _dateOfReferralKey,
-                              label: localizations.translate(
-                                i18_local.referBeneficiary.dateOfReferralLabel,
-                              ),
-                              isRequired: false,
-                              initialDate: DateTime.now(),
-                              cancelText: localizations
-                                  .translate(i18_local.common.coreCommonCancel),
-                              confirmText: localizations
-                                  .translate(i18_local.common.coreCommonOk),
                             ),
-                            DigitTextFormField(
-                              formControlName: _administrativeUnitKey,
-                              label: localizations.translate(
-                                i18_local
-                                    .referBeneficiary.organizationUnitFormLabel,
-                              ),
-                              isRequired: true,
-                              readOnly: true,
-                            ),
-                            DigitTextFormField(
-                              formControlName: _referredByKey,
-                              readOnly: true,
-                              label: localizations.translate(
-                                i18_local.referBeneficiary.referredToLabel,
-                              ),
-                              validationMessages: {
-                                'required': (_) => localizations.translate(
-                                      i18_local.common.corecommonRequired,
-                                    ),
-                              },
-                              isRequired: true,
-                            ),
-                            DigitTextFormField(
-                              formControlName: _referredToKey,
-                              readOnly: true,
-                              label: localizations.translate(
-                                i18_local.referBeneficiary.referredByLabel,
-                              ),
-                              validationMessages: {
-                                'required': (_) => localizations.translate(
-                                      i18_local.common.corecommonRequired,
-                                    ),
-                              },
-                              isRequired: true,
-                            ),
-                          ]),
-                        ],
+                          );
+                        },
                       ),
                     ),
-                  ],
+                    children: [
+                      DigitCard(
+                        child: Column(
+                          children: [
+                            Row(
+                              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                              children: [
+                                Expanded(
+                                  child: Text(
+                                    localizations.translate(
+                                      i18_local
+                                          .referBeneficiary.referralDetails,
+                                    ),
+                                    style: theme.textTheme.displayMedium,
+                                  ),
+                                ),
+                              ],
+                            ),
+                            Column(children: [
+                              DigitDateFormPicker(
+                                margin: const EdgeInsets.symmetric(
+                                    vertical: spacer2),
+                                isEnabled: false,
+                                formControlName: _dateOfReferralKey,
+                                label: localizations.translate(
+                                  i18_local
+                                      .referBeneficiary.dateOfReferralLabel,
+                                ),
+                                isRequired: false,
+                                initialDate: DateTime.now(),
+                                cancelText: localizations.translate(
+                                    i18_local.common.coreCommonCancel),
+                                confirmText: localizations
+                                    .translate(i18_local.common.coreCommonOk),
+                              ),
+                              DigitTextFormField(
+                                formControlName: _administrativeUnitKey,
+                                label: localizations.translate(
+                                  i18_local.referBeneficiary
+                                      .organizationUnitFormLabel,
+                                ),
+                                isRequired: true,
+                                readOnly: true,
+                              ),
+                              DigitTextFormField(
+                                formControlName: _referredByKey,
+                                readOnly: true,
+                                label: localizations.translate(
+                                  i18_local.referBeneficiary.referredToLabel,
+                                ),
+                                validationMessages: {
+                                  'required': (_) => localizations.translate(
+                                        i18_local.common.corecommonRequired,
+                                      ),
+                                },
+                                isRequired: true,
+                              ),
+                              DigitTextFormField(
+                                formControlName: _referredToKey,
+                                readOnly: true,
+                                label: localizations.translate(
+                                  i18_local.referBeneficiary.referredByLabel,
+                                ),
+                                validationMessages: {
+                                  'required': (_) => localizations.translate(
+                                        i18_local.common.corecommonRequired,
+                                      ),
+                                },
+                                isRequired: true,
+                              ),
+                            ]),
+                          ],
+                        ),
+                      ),
+                    ],
+                  ),
                 ),
               ),
             ),
-          ),
-        );
-      },
-    );
+          );
+        },
+      );
+    });
   }
 
   FormGroup buildForm(List<FacilityModel> healthFacilities) {
@@ -554,7 +590,6 @@ class CustomReferBeneficiarySMCPageState
     return shouldNavigateBack ?? false;
   }
 }
-
 
 // class CustomFacilityValueAccessor extends ControlValueAccessor<FacilityModel, String> {
 //   final FacilityModel facility;
