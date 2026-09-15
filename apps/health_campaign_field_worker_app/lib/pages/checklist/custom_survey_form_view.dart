@@ -445,7 +445,7 @@ class CustomSurveyFormViewPageState
                                           i18.common.corecommonRequired);
                                     }
                                     if (e.required == true &&
-                                        Validators.minLength(3)(
+                                        Validators.minLength(2)(
                                               FormControl<String>(
                                                   value: controller[index]
                                                       .text
@@ -455,7 +455,7 @@ class CustomSurveyFormViewPageState
                                       return localizations
                                           .translate(
                                               i18.common.min2CharsRequired)
-                                          .replaceAll('{}', '3');
+                                          .replaceAll('{}', '2');
                                     }
                                     if (e.regex != null) {
                                       return (RegExp(e.regex!).hasMatch(
@@ -1050,13 +1050,13 @@ class CustomSurveyFormViewPageState
               return localizations.translate(i18.common.corecommonRequired);
             }
             if (item.required == true &&
-                Validators.minLength(3)(
+                Validators.minLength(2)(
                       FormControl<String>(value: controller[index].text.trim()),
                     ) !=
                     null) {
               return localizations
                   .translate(i18.common.min2CharsRequired)
-                  .replaceAll('{}', '3');
+                  .replaceAll('{}', '2');
             }
             if (item.regex != null) {
               return (RegExp(item.regex!).hasMatch(controller[index].text!))
