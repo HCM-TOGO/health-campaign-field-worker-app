@@ -71,7 +71,7 @@ class CustomSurveyFormViewPageState
   }
 
   bool isDateAttribute(String? code) {
-    return (code == "UHFWA_Q7" || code == "CDD_UPA_Q5" || code == "UHFA_Q3");
+    return (code == "UHFWA_Q6" || code == "CDD_UPA_Q10" || code == "UHFA_Q4");
   }
 
   /// Parses a survey date string regardless of whether it came from the
