@@ -508,7 +508,10 @@ class CustomViewBeneficiaryCardState
       }
       if (tasks.isNotEmpty &&
           tasks.last.status == Status.closeHousehold.toValue()) {
-        if (projectBeneficiaries.length == 1) {
+        // A closed household is created with a member count of 1, so a higher
+        // count means it was reopened and member details were entered.
+        if (projectBeneficiaries.length == 1 &&
+            (widget.householdMember.household?.memberCount ?? 1) <= 1) {
           return Status.closeHousehold.toValue();
         }
         return Status.registered.toValue();
