@@ -79,13 +79,10 @@ class CustomSummaryBeneficiaryPageState
               customSearchHouseholdsBloc
                   .add(const CustomSearchHouseholdsEvent.clear());
               customSearchHouseholdsBloc.add(
-                CustomSearchHouseholdsEvent.searchByHouseholdHead(
-                  searchText: widget.name.trim(),
+                CustomSearchHouseholdsEvent.searchByHousehold(
+                  householdModel: value.householdModel,
                   projectId: RegistrationDeliverySingleton().projectId!,
                   isProximityEnabled: false,
-                  maxRadius: RegistrationDeliverySingleton().maxRadius,
-                  limit: customSearchHouseholdsBloc.state.limit,
-                  offset: 0,
                 ),
               );
               router.popUntil((route) =>

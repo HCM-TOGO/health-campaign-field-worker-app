@@ -14,7 +14,6 @@ import 'package:registration_delivery/registration_delivery.dart';
 import '../../blocs/app_initialization/app_initialization.dart';
 import '../../data/repositories/local/inventory_management/custom_stock.dart';
 import '../../models/entities/roles_type.dart';
-import '../../utils/constants.dart';
 import '../../utils/i18_key_constants.dart' as i18;
 import '../../utils/stock_in_hand_cache.dart';
 import '../../utils/stock_in_hand_utils.dart';
@@ -43,24 +42,14 @@ class _StockBalanceCardState extends LocalizedState<StockBalanceCard> {
 
   List<FacilityModel> _filterFacilitiesByUsage(List<FacilityModel> facilities) {
     final boundaryType = context.selectedProject.address?.boundaryType;
-    List<FacilityModel> filteredFacilities;
+    final userRoles =
+        context.loggedInUserRoles.map((role) => role.code).toSet();
 
-    if (boundaryType == Constants.countryBoundaryLevel ||
-        boundaryType == Constants.stateBoundaryLevel) {
-      filteredFacilities = facilities
-          .where((element) => element.usage == Constants.stateFacility)
-          .toList();
-    } else if (boundaryType == Constants.lgaBoundaryLevel) {
-      filteredFacilities = facilities
-          .where((element) => element.usage == Constants.lgaFacility)
-          .toList();
-    } else {
-      filteredFacilities = facilities
-          .where((element) => element.usage == Constants.healthFacility)
-          .toList();
-    }
-
-    return filteredFacilities.isEmpty ? facilities : filteredFacilities;
+    return filterFacilitiesByRole(
+      facilities: facilities,
+      userRoles: userRoles,
+      boundaryType: boundaryType,
+    );
   }
 
   bool get _isDistributor => context.loggedInUserRoles.any(
@@ -204,8 +193,8 @@ class _StockBalanceCardState extends LocalizedState<StockBalanceCard> {
     final stockRepo =
         context.read<LocalRepository<StockModel, StockSearchModel>>()
             as CustomStockLocalRepository;
-    final taskRepo =
-        context.read<LocalRepository<TaskModel, TaskSearchModel>>();
+    final taskRepo = context.read<LocalRepository<TaskModel, TaskSearchModel>>()
+        as TaskLocalRepository;
     final ownerId = ownerIds.first;
 
     final receivedStocksRaw = await stockRepo.search(
@@ -226,14 +215,16 @@ class _StockBalanceCardState extends LocalizedState<StockBalanceCard> {
         ? receivedStocksRaw
         : receivedStocksRaw
             .where(
-              (s) => s.clientAuditDetails?.createdBy == context.loggedInUserUuid,
+              (s) =>
+                  s.clientAuditDetails?.createdBy == context.loggedInUserUuid,
             )
             .toList();
     final sentStocks = isDistributor
         ? sentStocksRaw
         : sentStocksRaw
             .where(
-              (s) => s.clientAuditDetails?.createdBy == context.loggedInUserUuid,
+              (s) =>
+                  s.clientAuditDetails?.createdBy == context.loggedInUserUuid,
             )
             .toList();
 
@@ -245,9 +236,16 @@ class _StockBalanceCardState extends LocalizedState<StockBalanceCard> {
       allStocksMap[s.clientReferenceId] = s;
     }
 
+    // The base TaskLocalRepository.search() ignores TaskSearchModel.createdBy
+    // entirely — it only filters by the second positional userId argument
+    // (matched against the audit-populated auditCreatedBy column), so that
+    // argument must be passed explicitly for this to actually scope to the
+    // logged-in user.
     final tasksCreatedByUser = await taskRepo.search(
       TaskSearchModel(createdBy: context.loggedInUserUuid),
+      context.loggedInUserUuid,
     );
+    final currentCycle = context.selectedCycle;
 
     final allStocks = allStocksMap.values.toList();
     final balances = <String, double>{};
@@ -259,6 +257,7 @@ class _StockBalanceCardState extends LocalizedState<StockBalanceCard> {
         stockOwnerIds: ownerIds,
         productVariantId: pv.id,
         isDistributor: isDistributor,
+        currentCycle: currentCycle,
       );
       balances[pv.id] = max(res.stockInHand, 0);
     }

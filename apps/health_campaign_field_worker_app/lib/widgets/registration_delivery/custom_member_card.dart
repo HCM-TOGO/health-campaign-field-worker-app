@@ -493,6 +493,22 @@ class CustomMemberCard extends StatelessWidget {
                   individualModel: individual,
                 ),
               );
+              // Zero dose tasks are empty here (guarded above), so there is
+              // no prior dose/cycle for this beneficiary yet. Resolve the
+              // real running cycle from the project's cycle date ranges
+              // instead of leaving DeliverInterventionBloc on its default
+              // cycle (1), which is what ZeroDoseCheckPage displays.
+              final projectType = RegistrationDeliverySingleton().projectType;
+              if (projectType != null) {
+                context.read<DeliverInterventionBloc>().add(
+                      DeliverInterventionEvent.setActiveCycleDose(
+                        lastDose: 0,
+                        lastCycle: 1,
+                        individualModel: individual,
+                        projectType: projectType,
+                      ),
+                    );
+              }
               // if ((smcTasks ?? []).isEmpty) {
               context.router.push(
                 ZeroDoseCheckRoute(
@@ -720,6 +736,25 @@ class CustomMemberCard extends StatelessWidget {
                                 ),
                               );
 
+                          // Sync DeliverInterventionBloc's cycle with the
+                          // real running cycle before navigating to
+                          // ZeroDoseCheckPage - otherwise it displays its
+                          // default (cycle 1) instead of the actual current
+                          // cycle used just above for this refusal task's
+                          // own cycleIndex field.
+                          final refusalProjectType =
+                              RegistrationDeliverySingleton().projectType;
+                          if (refusalProjectType != null) {
+                            context.read<DeliverInterventionBloc>().add(
+                                  DeliverInterventionEvent.setActiveCycleDose(
+                                    lastDose: 0,
+                                    lastCycle: context.selectedCycle?.id ?? 1,
+                                    individualModel: individual,
+                                    projectType: refusalProjectType,
+                                  ),
+                                );
+                          }
+
                           final reloadState =
                               context.read<HouseholdOverviewBloc>();
                           Future.delayed(
@@ -808,6 +843,25 @@ class CustomMemberCard extends StatelessWidget {
                                       RegistrationDeliverySingleton().boundary!,
                                 ),
                               );
+
+                          // Sync DeliverInterventionBloc's cycle with the
+                          // real running cycle before navigating to
+                          // ZeroDoseCheckPage - otherwise it displays its
+                          // default (cycle 1) instead of the actual current
+                          // cycle used just above for this absent task's
+                          // own cycleIndex field.
+                          final absentProjectType =
+                              RegistrationDeliverySingleton().projectType;
+                          if (absentProjectType != null) {
+                            context.read<DeliverInterventionBloc>().add(
+                                  DeliverInterventionEvent.setActiveCycleDose(
+                                    lastDose: 0,
+                                    lastCycle: context.selectedCycle?.id ?? 1,
+                                    individualModel: individual,
+                                    projectType: absentProjectType,
+                                  ),
+                                );
+                          }
 
                           final reloadState =
                               context.read<HouseholdOverviewBloc>();
@@ -986,6 +1040,25 @@ class CustomMemberCard extends StatelessWidget {
                                 ),
                               );
 
+                          // Sync DeliverInterventionBloc's cycle with the
+                          // real running cycle before navigating to
+                          // ZeroDoseCheckPage - otherwise it displays its
+                          // default (cycle 1) instead of the actual current
+                          // cycle used just above for this task's own
+                          // cycleIndex field.
+                          final antimalarialProjectType =
+                              RegistrationDeliverySingleton().projectType;
+                          if (antimalarialProjectType != null) {
+                            context.read<DeliverInterventionBloc>().add(
+                                  DeliverInterventionEvent.setActiveCycleDose(
+                                    lastDose: 0,
+                                    lastCycle: context.selectedCycle?.id ?? 1,
+                                    individualModel: individual,
+                                    projectType: antimalarialProjectType,
+                                  ),
+                                );
+                          }
+
                           final reloadState =
                               context.read<HouseholdOverviewBloc>();
                           Future.delayed(
@@ -1076,6 +1149,25 @@ class CustomMemberCard extends StatelessWidget {
                                 ),
                               );
 
+                          // Sync DeliverInterventionBloc's cycle with the
+                          // real running cycle before navigating to
+                          // ZeroDoseCheckPage - otherwise it displays its
+                          // default (cycle 1) instead of the actual current
+                          // cycle used just above for this task's own
+                          // cycleIndex field.
+                          final cotrimoxazoleProjectType =
+                              RegistrationDeliverySingleton().projectType;
+                          if (cotrimoxazoleProjectType != null) {
+                            context.read<DeliverInterventionBloc>().add(
+                                  DeliverInterventionEvent.setActiveCycleDose(
+                                    lastDose: 0,
+                                    lastCycle: context.selectedCycle?.id ?? 1,
+                                    individualModel: individual,
+                                    projectType: cotrimoxazoleProjectType,
+                                  ),
+                                );
+                          }
+
                           final reloadState =
                               context.read<HouseholdOverviewBloc>();
                           Future.delayed(
@@ -1165,6 +1257,25 @@ class CustomMemberCard extends StatelessWidget {
                                       RegistrationDeliverySingleton().boundary!,
                                 ),
                               );
+
+                          // Sync DeliverInterventionBloc's cycle with the
+                          // real running cycle before navigating to
+                          // ZeroDoseCheckPage - otherwise it displays its
+                          // default (cycle 1) instead of the actual current
+                          // cycle used just above for this task's own
+                          // cycleIndex field.
+                          final allergyProjectType =
+                              RegistrationDeliverySingleton().projectType;
+                          if (allergyProjectType != null) {
+                            context.read<DeliverInterventionBloc>().add(
+                                  DeliverInterventionEvent.setActiveCycleDose(
+                                    lastDose: 0,
+                                    lastCycle: context.selectedCycle?.id ?? 1,
+                                    individualModel: individual,
+                                    projectType: allergyProjectType,
+                                  ),
+                                );
+                          }
 
                           final reloadState =
                               context.read<HouseholdOverviewBloc>();

@@ -43,10 +43,6 @@ class _IndividualTaskListPageState
   List<TaskModel> _filterTasks() {
     return widget.tasks.where((task) {
       if (task.isDeleted == true) return false;
-      if (task.clientAuditDetails?.createdBy !=
-          RegistrationDeliverySingleton().loggedInUserUuid) {
-        return false;
-      }
 
       final doseIndexField = task.additionalFields?.fields.firstWhereOrNull(
         (field) => field.key == AdditionalFieldsType.doseIndex.toValue(),
@@ -68,16 +64,10 @@ class _IndividualTaskListPageState
         .toSet();
 
     taskDataRepository.listenToChanges(
-      query: TaskSearchModel(
-        createdBy: RegistrationDeliverySingleton().loggedInUserUuid,
-      ),
+      query: TaskSearchModel(),
       listener: (data) {
         final filtered = data.where((task) {
           if (task.isDeleted == true) return false;
-          if (task.clientAuditDetails?.createdBy !=
-              RegistrationDeliverySingleton().loggedInUserUuid) {
-            return false;
-          }
           if (task.projectBeneficiaryClientReferenceId == null) return false;
           if (!allowedBeneficiaryRefs
               .contains(task.projectBeneficiaryClientReferenceId)) {
@@ -111,7 +101,8 @@ class _IndividualTaskListPageState
         children: [
           const BackNavigationHelpHeaderWidget(showHelp: false),
           Padding(
-            padding: const EdgeInsets.fromLTRB(spacer4, spacer2, spacer4, spacer2),
+            padding:
+                const EdgeInsets.fromLTRB(spacer4, spacer2, spacer4, spacer2),
             child: Text(
               titleText,
               style: textTheme.headingXl.copyWith(
@@ -141,7 +132,8 @@ class _IndividualTaskListPageState
                     padding:
                         const EdgeInsets.fromLTRB(spacer4, 0, spacer4, spacer4),
                     itemCount: _tasks.length,
-                    separatorBuilder: (_, __) => const SizedBox(height: spacer2),
+                    separatorBuilder: (_, __) =>
+                        const SizedBox(height: spacer2),
                     itemBuilder: (context, index) {
                       final task = _tasks[index];
                       return DigitCard(
@@ -155,8 +147,8 @@ class _IndividualTaskListPageState
                                   individualModel: individual,
                                 ),
                               )
-                              .then(
-                                  (_) => setState(() => _tasks = _filterTasks()));
+                              .then((_) =>
+                                  setState(() => _tasks = _filterTasks()));
                         },
                         children: [
                           Text(
@@ -167,13 +159,11 @@ class _IndividualTaskListPageState
                               String? doseIndex;
                               for (final f in fields) {
                                 if (f.key == 'cycleIndex' &&
-                                    (f.value?.toString().isNotEmpty ??
-                                        false)) {
+                                    (f.value?.toString().isNotEmpty ?? false)) {
                                   cycleIndex = f.value.toString();
                                 }
                                 if (f.key == 'doseIndex' &&
-                                    (f.value?.toString().isNotEmpty ??
-                                        false)) {
+                                    (f.value?.toString().isNotEmpty ?? false)) {
                                   doseIndex = f.value.toString();
                                 }
                               }
@@ -281,7 +271,8 @@ class _IndividualTaskListPageState
 
     return Container(
       margin: const EdgeInsets.only(right: spacer4),
-      padding: const EdgeInsets.symmetric(horizontal: spacer3, vertical: spacer2),
+      padding:
+          const EdgeInsets.symmetric(horizontal: spacer3, vertical: spacer2),
       decoration: BoxDecoration(
         color: theme.colorTheme.paper.secondary,
         borderRadius: BorderRadius.circular(spacer2),
@@ -299,7 +290,7 @@ class _IndividualTaskListPageState
           ),
           const SizedBox(height: spacer1),
           Text(
-            value,
+            localizations.translate(value),
             style: textTheme.bodyS.copyWith(
               color: theme.colorTheme.text.primary,
             ),

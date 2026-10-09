@@ -17,6 +17,7 @@ import 'package:inventory_management/models/entities/stock.dart';
 import 'package:inventory_management/models/entities/transaction_type.dart';
 import 'package:isar/isar.dart';
 import 'package:recase/recase.dart';
+import 'package:registration_delivery/data/repositories/local/task.dart';
 import 'package:registration_delivery/models/entities/task.dart';
 import 'package:survey_form/models/entities/service_definition.dart';
 
@@ -625,8 +626,9 @@ class ProjectBloc extends Bloc<ProjectEvent, ProjectState> {
     }
 
     try {
-      final projectFacilities = await projectFacilityLocalRepository
-          .search(ProjectFacilitySearchModel());
+      final projectFacilities = await projectFacilityLocalRepository.search(
+        ProjectFacilitySearchModel(projectId: [event.model.id]),
+      );
       final facilities =
           await facilityLocalRepository.search(FacilitySearchModel());
       await downloadStockDataBasedOnRole(
@@ -740,11 +742,19 @@ class ProjectBloc extends Bloc<ProjectEvent, ProjectState> {
 
       await createStockDownloadedEntries(stockEntriesDownloaded);
     } else if (userRoles.contains(RolesType.warehouseManager.toValue()) &&
-        boundaryType == Constants.lgaBoundaryLevel) {
+        (boundaryType == Constants.lgaBoundaryLevel ||
+            boundaryType == Constants.stateBoundaryLevel ||
+            boundaryType == Constants.countryBoundaryLevel)) {
+      // WAREHOUSE_MANAGER is reused across District/Region/Country tiers;
+      // the boundary of the assigned project disambiguates which facility
+      // usage tier this user's stock should be downloaded for.
+      final targetUsage = boundaryType == Constants.lgaBoundaryLevel
+          ? Constants.lgaFacility
+          : Constants.stateFacility;
       List<String> receiverIds =
           projectFacilities.map((e) => e.facilityId).toList();
       receiverIds = receiverIds
-          .where((e) => facilityIdUsageMap[e] == Constants.lgaFacility)
+          .where((e) => facilityIdUsageMap[e] == targetUsage)
           .toList();
       final stockSearchModel = StockSearchModel(
         receiverId: receiverIds,
@@ -821,19 +831,13 @@ class ProjectBloc extends Bloc<ProjectEvent, ProjectState> {
         ),
       );
 
-      final selectedBoundaryType = context.selectedProject.address?.boundaryType;
-      var filteredFacilities = List<FacilityModel>.from(facilities);
-
-      if (userRoles.contains(RolesType.healthFacilitySupervisor.toValue())) {
-        filteredFacilities = filteredFacilities
-            .where((e) => e.usage == Constants.healthFacility)
-            .toList();
-      } else if (userRoles.contains(RolesType.warehouseManager.toValue()) &&
-          selectedBoundaryType == Constants.lgaBoundaryLevel) {
-        filteredFacilities = filteredFacilities
-            .where((e) => e.usage == Constants.lgaFacility)
-            .toList();
-      }
+      final selectedBoundaryType =
+          context.selectedProject.address?.boundaryType;
+      final filteredFacilities = filterFacilitiesByRole(
+        facilities: facilities,
+        userRoles: userRoles,
+        boundaryType: selectedBoundaryType,
+      );
 
       ownerIds = filteredFacilities
           .map((e) => e.id)
@@ -882,9 +886,17 @@ class ProjectBloc extends Bloc<ProjectEvent, ProjectState> {
     }
 
     final allStocks = allStocksMap.values.toList();
-    final tasksCreatedByUser = await taskLocalRepository.search(
+    // The base TaskLocalRepository.search() ignores TaskSearchModel.createdBy
+    // entirely — it only filters by the second positional userId argument
+    // (matched against the audit-populated auditCreatedBy column), so that
+    // argument must be passed explicitly for this to actually scope to the
+    // logged-in user.
+    final tasksCreatedByUser =
+        await (taskLocalRepository as TaskLocalRepository).search(
       TaskSearchModel(createdBy: loggedInUserId),
+      loggedInUserId,
     );
+    final currentCycle = context.selectedCycle;
 
     for (final ownerId in ownerIds) {
       final spaq1Result = calculateStockInHand(
@@ -893,6 +905,7 @@ class ProjectBloc extends Bloc<ProjectEvent, ProjectState> {
         stockOwnerIds: [ownerId],
         productVariantId: Constants.spaq1VariantId,
         isDistributor: isDistributor,
+        currentCycle: currentCycle,
       );
       final spaq1ProdResult = calculateStockInHand(
         stockEntries: allStocks,
@@ -900,6 +913,7 @@ class ProjectBloc extends Bloc<ProjectEvent, ProjectState> {
         stockOwnerIds: [ownerId],
         productVariantId: Constants.spaq1VariantIdProd,
         isDistributor: isDistributor,
+        currentCycle: currentCycle,
       );
       final spaq2Result = calculateStockInHand(
         stockEntries: allStocks,
@@ -907,6 +921,7 @@ class ProjectBloc extends Bloc<ProjectEvent, ProjectState> {
         stockOwnerIds: [ownerId],
         productVariantId: Constants.spaq2VariantId,
         isDistributor: isDistributor,
+        currentCycle: currentCycle,
       );
       final spaq2ProdResult = calculateStockInHand(
         stockEntries: allStocks,
@@ -914,6 +929,7 @@ class ProjectBloc extends Bloc<ProjectEvent, ProjectState> {
         stockOwnerIds: [ownerId],
         productVariantId: Constants.spaq2VariantIdProd,
         isDistributor: isDistributor,
+        currentCycle: currentCycle,
       );
 
       StockInHandCache.instance.setBalances(
@@ -953,31 +969,25 @@ class ProjectBloc extends Bloc<ProjectEvent, ProjectState> {
       0,
     );
 
-    final authBloc = context.read<AuthBloc>();
-    final currentSpaq = authBloc.state.whenOrNull(
-      authenticated: (
-        accessToken,
-        refreshToken,
-        userModel,
-        actionsWrapper,
-        individualId,
-        spaq1,
-        spaq2,
-      ) =>
-          (spaq1 ?? 0, spaq2 ?? 0),
-    );
+    final currentSpaq1 = await localSecureStore.spaq1;
+    final currentSpaq2 = await localSecureStore.spaq2;
 
-    final deltaSpaq1 = computedSpaq1 - (currentSpaq?.$1 ?? 0);
-    final deltaSpaq2 = computedSpaq2 - (currentSpaq?.$2 ?? 0);
+    final deltaSpaq1 = computedSpaq1 - currentSpaq1;
+    final deltaSpaq2 = computedSpaq2 - currentSpaq2;
 
     if (deltaSpaq1 == 0 && deltaSpaq2 == 0) return;
 
+    final authBloc = context.read<AuthBloc>();
     authBloc.add(
       AuthAddSpaqCountsEvent(
         spaq1Count: deltaSpaq1,
         spaq2Count: deltaSpaq2,
       ),
     );
+  }
+
+  Future<void> refreshSpaqCountsAfterBoundarySelection() async {
+    await _refreshSpaqCountsAfterDownsync();
   }
 
   FutureOr<void> downloadTaskDataForLoggedInUser() async {

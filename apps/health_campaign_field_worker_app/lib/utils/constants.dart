@@ -138,6 +138,7 @@ class Constants {
   static const String zeroDose = 'zeroDose';
   static const String unprocessed = 'unprocessed';
   static const String pendingEligible = 'pendingEligible';
+  static const String registeredUnder3Months = 'registeredUnder3Months';
 
   // todo enable before cycle2
   static const bool isDownSyncEnabled = true;

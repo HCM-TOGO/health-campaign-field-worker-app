@@ -14,6 +14,7 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:intl/intl.dart';
 import 'package:inventory_management/inventory_management.dart';
 import 'package:inventory_management/router/inventory_router.gm.dart';
+import 'package:registration_delivery/models/entities/task.dart';
 import 'package:inventory_management/utils/extensions/extensions.dart';
 import 'package:reactive_forms/reactive_forms.dart';
 
@@ -102,6 +103,8 @@ class CustomStockReconciliationPageState
                       ContextUtilityExtensions(context).repository<
                           StockReconciliationModel,
                           StockReconciliationSearchModel>(context),
+                  taskRepository: ContextUtilityExtensions(context)
+                      .repository<TaskModel, TaskSearchModel>(context),
                 ),
                 child: BlocConsumer<CustomStockReconciliationBloc,
                     StockReconciliationState>(
@@ -689,16 +692,21 @@ class CustomStockReconciliationPageState
                                         .toStringAsFixed(0),
                                     labelFlex: 5,
                                   ),
-                                  const DigitDivider(),
-                                  LabelValueItem(
-                                    label: localizations.translate(
-                                      i18.stockReconciliationDetails
-                                          .stockIssued,
+                                  if (!(InventorySingleton().isDistributor! &&
+                                      // ignore: avoid_dynamic_calls
+                                      !InventorySingleton()
+                                          .isWareHouseMgr!)) ...[
+                                    const DigitDivider(),
+                                    LabelValueItem(
+                                      label: localizations.translate(
+                                        i18.stockReconciliationDetails
+                                            .stockIssued,
+                                      ),
+                                      value: stockState.stockIssued
+                                          .toStringAsFixed(0),
+                                      labelFlex: 5,
                                     ),
-                                    value: stockState.stockIssued
-                                        .toStringAsFixed(0),
-                                    labelFlex: 5,
-                                  ),
+                                  ],
                                   const DigitDivider(),
                                   LabelValueItem(
                                     label: localizations.translate(
@@ -728,6 +736,21 @@ class CustomStockReconciliationPageState
                                         .toStringAsFixed(0),
                                     labelFlex: 5,
                                   ),
+                                  if (InventorySingleton().isDistributor! &&
+                                      // ignore: avoid_dynamic_calls
+                                      !InventorySingleton()
+                                          .isWareHouseMgr!) ...[
+                                    const DigitDivider(),
+                                    LabelValueItem(
+                                      label: localizations.translate(
+                                        i18_local.stockReconciliationDetails
+                                            .stockUsed,
+                                      ),
+                                      value: stockState.stockUsed
+                                          .toStringAsFixed(0),
+                                      labelFlex: 5,
+                                    ),
+                                  ],
                                   const DigitDivider(),
                                   LabelValueItem(
                                     label: localizations.translate(i18

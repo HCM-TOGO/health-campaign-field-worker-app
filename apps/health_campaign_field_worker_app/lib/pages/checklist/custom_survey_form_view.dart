@@ -30,6 +30,7 @@ import 'package:survey_form/widgets/localized.dart';
 
 import '../../router/app_router.dart';
 import '../../utils/upper_case.dart';
+import 'package:reactive_forms/reactive_forms.dart';
 
 @RoutePage()
 class CustomSurveyFormViewPage extends LocalizedStatefulWidget {
@@ -70,7 +71,7 @@ class CustomSurveyFormViewPageState
   }
 
   bool isDateAttribute(String? code) {
-    return (code == "UHFWA_Q7" || code == "CDD_UPA_Q5" || code == "UHFA_Q3");
+    return (code == "UHFWA_Q6" || code == "CDD_UPA_Q10" || code == "UHFA_Q4");
   }
 
   /// Parses a survey date string regardless of whether it came from the
@@ -151,7 +152,7 @@ class CustomSurveyFormViewPageState
                             for (int i = 0; i < controller.length; i++) {
                               if (itemsAttributes?[i].required == true &&
                                   visibleSurveyFormIndexes.any((e) => e == i) &&
-                                  controller[i].text == '') {
+                                  controller[i].text.trim().isEmpty) {
                                 return;
                               }
                             }
@@ -273,11 +274,12 @@ class CustomSurveyFormViewPageState
                                                                       .millisecondsSinceEpoch
                                                                       .toString()
                                                                   : '0')
-                                                      : visibleSurveyFormIndexes
-                                                              .contains(i)
-                                                          ? controller[i]
-                                                              .text
-                                                              .toString()
+                                                      : visibleSurveyFormIndexes.contains(i) &&
+                                                              controller[i]
+                                                                  .text
+                                                                  .trim()
+                                                                  .isNotEmpty
+                                                          ? controller[i].text.toString()
                                                           : i18.surveyForm.notSelectedKey,
                                               rowVersion: 1,
                                               additionalDetails:
@@ -416,7 +418,9 @@ class CustomSurveyFormViewPageState
                           ),
                         ),
                         ...initialAttributes!
-                            .where((att) => att.isActive == true && !(att.code ?? '').contains('.'))
+                            .where((att) =>
+                                att.isActive == true &&
+                                !(att.code ?? '').contains('.'))
                             .map((
                           e,
                         ) {
@@ -432,11 +436,26 @@ class CustomSurveyFormViewPageState
                                   autovalidateMode:
                                       AutovalidateMode.onUserInteraction,
                                   validator: (value) {
-                                    if (((controller[index].text == null ||
-                                            controller[index].text == '') &&
+                                    if ((controller[index]
+                                            .text
+                                            .trim()
+                                            .isEmpty &&
                                         e.required == true)) {
                                       return localizations.translate(
                                           i18.common.corecommonRequired);
+                                    }
+                                    if (e.required == true &&
+                                        Validators.minLength(2)(
+                                              FormControl<String>(
+                                                  value: controller[index]
+                                                      .text
+                                                      .trim()),
+                                            ) !=
+                                            null) {
+                                      return localizations
+                                          .translate(
+                                              i18.common.min2CharsRequired)
+                                          .replaceAll('{}', '2');
                                     }
                                     if (e.regex != null) {
                                       return (RegExp(e.regex!).hasMatch(
@@ -1026,10 +1045,18 @@ class CustomSurveyFormViewPageState
       return FormField<String>(
           autovalidateMode: AutovalidateMode.onUserInteraction,
           validator: (value) {
-            if (((controller[index].text == null ||
-                    controller[index].text == '') &&
+            if ((controller[index].text.trim().isEmpty &&
                 item.required == true)) {
               return localizations.translate(i18.common.corecommonRequired);
+            }
+            if (item.required == true &&
+                Validators.minLength(2)(
+                      FormControl<String>(value: controller[index].text.trim()),
+                    ) !=
+                    null) {
+              return localizations
+                  .translate(i18.common.min2CharsRequired)
+                  .replaceAll('{}', '2');
             }
             if (item.regex != null) {
               return (RegExp(item.regex!).hasMatch(controller[index].text!))

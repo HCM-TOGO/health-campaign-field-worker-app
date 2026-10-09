@@ -88,11 +88,12 @@ class CustomStockDetailsPageState
         Validators.number(),
         Validators.required,
         Validators.min(1),
-        Validators.max(100000000),
+        Validators.max(maxQuantity),
       ]),
       _transactionReasonKey: FormControl<String>(),
       _waybillNumberKey: FormControl<String>(
-        validators: [Validators.minLength(0), Validators.maxLength(200)],
+        // Backend Stock.wayBillNumber is @Size(min = 2, max = 200)
+        validators: [Validators.minLength(2), Validators.maxLength(200)],
       ),
       _waybillQuantityKey: FormControl<String>(),
       _batchNumberKey: FormControl<String>(),
@@ -399,7 +400,8 @@ class CustomStockDetailsPageState
                                         localizations.translate(
                                             i18.common.locationCapturing),
                                         DialogType.inProgress);
-                                    Future.delayed(const Duration(seconds: 2),
+                                    Future.delayed(
+                                        const Duration(milliseconds: 500),
                                         () async {
                                       DigitComponentsUtils.hideDialog(context);
                                       final bloc =
@@ -445,7 +447,7 @@ class CustomStockDetailsPageState
                                           .value as String?;
 
                                       final batchNumber = form
-                                          .control(_waybillQuantityKey)
+                                          .control(_batchNumberKey)
                                           .value as String?;
 
                                       final vehicleNumber = form
@@ -1756,14 +1758,13 @@ class CustomStockDetailsPageState
                                           if (val.isEmpty || val.trim() == '') {
                                             field.control.value = null;
                                           } else {
-                                            if (int.parse(val) > 10000000000) {
-                                              field.control.value = 10000;
-                                              field.control.markAsTouched();
-                                            } else {
-                                              field.control.value =
-                                                  int.parse(val);
-                                              field.control.markAsTouched();
-                                            }
+                                            // Keep out-of-range values so the max validator
+                                            // rejects them; digits too long to fit in an int
+                                            // are mapped just above the max for the same reason.
+                                            field.control.value =
+                                                int.tryParse(val) ??
+                                                    maxQuantity + 1;
+                                            field.control.markAsTouched();
                                           }
                                         },
                                       ),
@@ -1856,8 +1857,17 @@ class CustomStockDetailsPageState
                               if (isWareHouseMgr)
                                 ReactiveWrapperField(
                                     formControlName: _waybillNumberKey,
+                                    validationMessages: {
+                                      'minLength': (object) =>
+                                          localizations.translate(
+                                            i18_local.common.min2CharsRequired,
+                                          ),
+                                    },
+                                    showErrors: (control) =>
+                                        control.invalid && control.touched,
                                     builder: (field) {
                                       return InputField(
+                                        errorMessage: field.errorText,
                                         inputFormatters: [
                                           UpperCaseTextFormatter(),
                                           FilteringTextInputFormatter.allow(
@@ -1874,7 +1884,10 @@ class CustomStockDetailsPageState
                                           i18.stockDetails.waybillNumberLabel,
                                         ),
                                         onChange: (val) {
-                                          field.control.value = val;
+                                          final trimmed = val.trim();
+                                          field.control.value =
+                                              trimmed.isEmpty ? null : trimmed;
+                                          field.control.markAsTouched();
                                         },
                                       );
                                     }),

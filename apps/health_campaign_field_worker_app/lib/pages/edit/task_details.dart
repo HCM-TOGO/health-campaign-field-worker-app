@@ -19,6 +19,7 @@ import '../../../models/entities/additional_fields_type.dart'
     as additional_fields_local;
 import '../../../models/entities/assessment_checklist/status.dart';
 import '../../../utils/utils.dart' as local_utils;
+import '../../blocs/localization/app_localization.dart';
 import '../../data/repositories/custom_task.dart';
 import '../../models/entities/additional_fields_type.dart';
 import '../../models/entities/identifier_types.dart';
@@ -62,7 +63,7 @@ class _TaskDetailPageState extends LocalizedState<TaskDetailPage> {
     'dateOfVerification',
   };
 
-  static const _editableAdditionalFieldKeys = {'name', 'age'};
+  static const _editableAdditionalFieldKeys = {'name'};
 
   static const _genderFieldKey = 'gender';
 
@@ -161,8 +162,7 @@ class _TaskDetailPageState extends LocalizedState<TaskDetailPage> {
     _additionalFieldControllers = {
       for (final field in fieldsList)
         if (!_hiddenAdditionalFieldKeys.contains(field.key))
-          field.key:
-              TextEditingController(text: field.value?.toString() ?? '')
+          field.key: TextEditingController(text: field.value?.toString() ?? '')
     };
   }
 
@@ -185,6 +185,61 @@ class _TaskDetailPageState extends LocalizedState<TaskDetailPage> {
     _schemaController.dispose();
     _versionController.dispose();
     super.dispose();
+  }
+
+  // This screen updates a task's status directly (taskDataRepository.update)
+  // without going through the eligibility/delivery wizard, so it doesn't
+  // create the future-dose tasks or populate the administration-specific
+  // fields (doseIndex, deliveryStrategy, dateOfAdministration, etc.) that the
+  // wizard would. Warn before letting a beneficiaryInEligible task be flipped
+  // straight to administered/delivered here, since the resulting record will
+  // be incomplete compared to one created through the normal flow.
+  Future<bool> _confirmIneligibleToAdministered() async {
+    final result = await showDialog<bool>(
+      context: context,
+      builder: (BuildContext dialogContext) {
+        final dialogTheme = Theme.of(dialogContext);
+        final dialogTextTheme = dialogTheme.digitTextTheme(dialogContext);
+        return AlertDialog(
+          backgroundColor: dialogTheme.colorTheme.paper.primary,
+          title: Text(
+            localizations.translateWithDefault(
+              i18.editTasks.ineligibleToAdministeredWarningTitle,
+              fallback: 'Administrer un enfant inéligible ?',
+            ),
+            style: dialogTextTheme.headingM.copyWith(
+              color: dialogTheme.colorTheme.text.primary,
+            ),
+          ),
+          content: Text(
+            localizations.translateWithDefault(
+              i18.editTasks.ineligibleToAdministeredWarningMessage,
+              fallback:
+                  'Cette tâche a été marquée comme inéligible. Voulez-vous vraiment l\'administrer ?',
+            ),
+            style: dialogTextTheme.bodyL.copyWith(
+              color: dialogTheme.colorTheme.text.primary,
+            ),
+          ),
+          actions: [
+            TextButton(
+              onPressed: () => Navigator.of(dialogContext).pop(false),
+              child: Text(localizations.translate(i18.common.coreCommonNo)),
+            ),
+            ElevatedButton(
+              onPressed: () => Navigator.of(dialogContext).pop(true),
+              style: ElevatedButton.styleFrom(
+                backgroundColor: dialogTheme.colorTheme.primary.primary2,
+                foregroundColor: dialogTheme.colorTheme.paper.primary,
+              ),
+              child: Text(localizations.translate(i18.common.coreCommonYes)),
+            ),
+          ],
+        );
+      },
+    );
+
+    return result ?? false;
   }
 
   Future<void> _showSaveDialog() async {
@@ -329,15 +384,15 @@ class _TaskDetailPageState extends LocalizedState<TaskDetailPage> {
           context.read<LocalRepository<TaskModel, TaskSearchModel>>()
               as CustomTaskLocalRepository;
 
+      bool changeStatus = false;
+      if (_originalTask.status != _controllers['status']?.text) {
+        changeStatus = true;
+      }
+
       if (_originalTask.status == Status.administeredSuccess.toValue() ||
           _originalTask.status == Status.delivered.toValue()) {
         List<TaskModel> allAdministrationTasks =
             await _getAllCurrentCycleAdministrationTasks(taskDataRepository);
-
-        bool changeStatus = false;
-        if (_originalTask.status != _controllers['status']?.text) {
-          changeStatus = true;
-        }
 
         for (var task in allAdministrationTasks) {
           TaskModel updatedTask =
@@ -346,9 +401,20 @@ class _TaskDetailPageState extends LocalizedState<TaskDetailPage> {
           await taskDataRepository.update(updatedTask);
         }
       } else {
-        TaskModel updatedTask = _getUpdatedTask(_originalTask);
-        // Save using repository
-        await taskDataRepository.update(updatedTask);
+        // _originalTask isn't in the administered/delivered slot (e.g. it's
+        // notAdministered after a prior revert) - cascade to every sibling
+        // task in this cycle that shares its current status, same as
+        // _deleteTask does, so all three cycle tasks move together instead
+        // of only the one that was opened for editing.
+        List<TaskModel> allRelatedTasks = await _getAllCurrentCycleRelatedTasks(
+            taskDataRepository, _originalTask.status);
+
+        for (var task in allRelatedTasks) {
+          TaskModel updatedTask =
+              _getUpdatedTask(task, changeStatus: changeStatus);
+          // Save using repository
+          await taskDataRepository.update(updatedTask);
+        }
       }
 
       if (mounted) {
@@ -361,6 +427,23 @@ class _TaskDetailPageState extends LocalizedState<TaskDetailPage> {
             backgroundColor: Theme.of(context).colorTheme.alert.success,
           ),
         );
+
+        // Reload the household overview bloc directly instead of relying on
+        // the return-navigation .then() chain (household -> task list ->
+        // this page): that chain only fires once every intermediate route is
+        // popped, so the household page kept showing the pre-edit status
+        // until the user navigated away and back.
+        final projectId = RegistrationDeliverySingleton().projectId;
+        final beneficiaryType = RegistrationDeliverySingleton().beneficiaryType;
+        if (projectId != null && beneficiaryType != null) {
+          context.read<HouseholdOverviewBloc>().add(
+                HouseholdOverviewReloadEvent(
+                  projectId: projectId,
+                  projectBeneficiaryType: beneficiaryType,
+                ),
+              );
+        }
+
         Navigator.pop(context);
       }
     } catch (e) {
@@ -434,8 +517,15 @@ class _TaskDetailPageState extends LocalizedState<TaskDetailPage> {
       }
     }
 
-    // Apply edits from additional field controllers
+    // Apply edits from additional field controllers. Only genuinely
+    // editable fields (name/gender/dateOfDelivery) may be overwritten here:
+    // this method also runs for sibling tasks during a cascaded status
+    // change (see _saveChanges), and _additionalFieldControllers is
+    // populated from the single task that was opened for editing. Without
+    // this guard, read-only fields like doseIndex/cycleIndex would get
+    // clobbered with that one task's values on every sibling.
     updatedFields = updatedFields.map((field) {
+      if (!_isAdditionalFieldEditable(field.key)) return field;
       final controller = _additionalFieldControllers[field.key];
       if (controller != null) {
         return AdditionalField(field.key, controller.text);
@@ -443,16 +533,32 @@ class _TaskDetailPageState extends LocalizedState<TaskDetailPage> {
       return field;
     }).toList();
 
-    // Remove any existing editCount and updateReason before adding updated ones
+    // Resolve the status this save will actually apply, so additionalFields
+    // can mirror it exactly like every task-creation flow does (refusal,
+    // referral, in-eligible tasks all set additionalFields.taskStatus to the
+    // same value as TaskModel.status).
+    final resolvedStatus = changeStatus
+        ? (_controllers['status']?.text.isNotEmpty == true
+            ? _controllers['status']!.text
+            : task.status)
+        : task.status;
+
+    // Remove any existing editCount, updateReason and taskStatus before
+    // adding updated ones - taskStatus must not be left stale when the
+    // status dropdown changes.
     updatedFields = updatedFields
-        .where((f) => f.key != 'editCount' && f.key != 'updateReason')
+        .where((f) =>
+            f.key != 'editCount' &&
+            f.key != 'updateReason' &&
+            f.key != 'taskStatus')
         .toList();
 
-    // Now safely append updated editCount and updateReason
+    // Now safely append updated editCount, updateReason and taskStatus
     final List<AdditionalField> finalUpdatedFields = [
       ...updatedFields,
       AdditionalField('editCount', newEditCount.toString()),
       AdditionalField('updateReason', combinedReason),
+      if (resolvedStatus != null) AdditionalField('taskStatus', resolvedStatus),
     ];
 
     // Build new TaskAdditionalFields
@@ -573,11 +679,7 @@ class _TaskDetailPageState extends LocalizedState<TaskDetailPage> {
 
     // Create updated task model
     final updatedTask = task.copyWith(
-      status: changeStatus
-          ? (_controllers['status']?.text.isNotEmpty == true
-              ? _controllers['status']!.text
-              : task.status)
-          : task.status,
+      status: resolvedStatus,
       createdDate: parsedCreatedDate ?? task.createdDate,
       additionalFields: newAdditionalFields,
       resources: updatedResources,
@@ -723,6 +825,20 @@ class _TaskDetailPageState extends LocalizedState<TaskDetailPage> {
             backgroundColor: Theme.of(context).colorTheme.alert.success,
           ),
         );
+
+        // See _saveChanges - reload directly rather than relying on the
+        // return-navigation .then() chain.
+        final projectId = RegistrationDeliverySingleton().projectId;
+        final beneficiaryType = RegistrationDeliverySingleton().beneficiaryType;
+        if (projectId != null && beneficiaryType != null) {
+          context.read<HouseholdOverviewBloc>().add(
+                HouseholdOverviewReloadEvent(
+                  projectId: projectId,
+                  projectBeneficiaryType: beneficiaryType,
+                ),
+              );
+        }
+
         Navigator.pop(context);
       }
     } catch (e) {
@@ -1179,37 +1295,37 @@ class _TaskDetailPageState extends LocalizedState<TaskDetailPage> {
           if (productVariants != null && productVariants!.isNotEmpty)
             _wrapEditableField(
               child: LabeledField(
-              label:
-                  localizations.translate(i18.editTasks.productVariantIdLabel),
-              labelStyle: TextStyle(
-                color: theme.colorTheme.text.secondary,
-                fontSize: 16,
-              ),
-              child: digit_ui.DigitDropdown(
-                isDisabled: false,
-                readOnly: false,
-                selectedOption: DropdownItem(
-                  code: selectedVariantId,
-                  name: getFormattedSku(getSku(selectedVariantId) ?? ''),
+                label: localizations
+                    .translate(i18.editTasks.productVariantIdLabel),
+                labelStyle: TextStyle(
+                  color: theme.colorTheme.text.secondary,
+                  fontSize: 16,
                 ),
-                items: productVariants!
-                    .map(
-                      (variant) => DropdownItem(
-                        code: variant.productVariantId,
-                        name: getFormattedSku(
-                            getSku(variant.productVariantId) ?? ''),
-                      ),
-                    )
-                    .toList(),
-                onSelect: (selected) {
-                  if (selected != null) {
-                    selectedVariantId = selected.code;
-                    _resourceControllers['resource_${index}_productVariantId']
-                        ?.text = selected.code;
-                  }
-                },
+                child: digit_ui.DigitDropdown(
+                  isDisabled: false,
+                  readOnly: false,
+                  selectedOption: DropdownItem(
+                    code: selectedVariantId,
+                    name: getFormattedSku(getSku(selectedVariantId) ?? ''),
+                  ),
+                  items: productVariants!
+                      .map(
+                        (variant) => DropdownItem(
+                          code: variant.productVariantId,
+                          name: getFormattedSku(
+                              getSku(variant.productVariantId) ?? ''),
+                        ),
+                      )
+                      .toList(),
+                  onSelect: (selected) {
+                    if (selected != null) {
+                      selectedVariantId = selected.code;
+                      _resourceControllers['resource_${index}_productVariantId']
+                          ?.text = selected.code;
+                    }
+                  },
+                ),
               ),
-            ),
             )
           else
             Text(
@@ -1326,7 +1442,12 @@ class _TaskDetailPageState extends LocalizedState<TaskDetailPage> {
     // Generate dropdown items dynamically from Status enum
     final statusOptions = Status.values
         .where((s) => allowedStatuses.contains(s.toValue()))
-        .map((s) => DropdownItem(code: s.toValue(), name: s.toValue()))
+        .map(
+          (s) => DropdownItem(
+            code: s.toValue(),
+            name: localizations.translate(s.toValue()),
+          ),
+        )
         .toList();
 
     // Get current status value from controller
@@ -1358,26 +1479,47 @@ class _TaskDetailPageState extends LocalizedState<TaskDetailPage> {
             const SizedBox(height: 8),
             _wrapEditableField(
               child: LabeledField(
-              label: localizations.translate(i18.editTasks.statusLabel),
-              labelStyle: TextStyle(
-                color: theme.colorTheme.text.secondary,
-                fontSize: 16,
-              ),
-              child: digit_ui.DigitDropdown(
-                isDisabled: false,
-                readOnly: false,
-                selectedOption: DropdownItem(
-                  code: selectedStatus,
-                  name: selectedStatus.isNotEmpty
-                      ? selectedStatus
-                      : localizations
-                          .translate(i18.editTasks.selectStatusLabel),
+                label: localizations.translate(i18.editTasks.statusLabel),
+                labelStyle: TextStyle(
+                  color: theme.colorTheme.text.secondary,
+                  fontSize: 16,
                 ),
-                items: statusOptions,
-                onSelect: (selected) {
-                  if (selected != null) {
+                child: digit_ui.DigitDropdown(
+                  isDisabled: false,
+                  readOnly: false,
+                  selectedOption: DropdownItem(
+                    code: selectedStatus,
+                    name: selectedStatus.isNotEmpty
+                        ? localizations.translate(selectedStatus)
+                        : localizations
+                            .translate(i18.editTasks.selectStatusLabel),
+                  ),
+                  items: statusOptions,
+                  onSelect: (selected) async {
+                    if (selected == null) return;
+
+                    final isIneligibleToAdministered =
+                        _originalTask.status ==
+                            Status.beneficiaryInEligible.toValue() &&
+                        (selected.code ==
+                                Status.administeredSuccess.toValue() ||
+                            selected.code == Status.delivered.toValue());
+
+                    if (isIneligibleToAdministered) {
+                      final confirmed =
+                          await _confirmIneligibleToAdministered();
+                      if (!confirmed) {
+                        // Force a rebuild so the dropdown's controlled
+                        // selectedOption reasserts the unchanged status
+                        // instead of visually sticking on the declined pick.
+                        setState(() {});
+                        return;
+                      }
+                    }
+
                     _controllers['status']?.text = selected.code;
-                    if (selected.code == Status.administeredSuccess.toValue() ||
+                    if (selected.code ==
+                            Status.administeredSuccess.toValue() ||
                         selected.code == Status.delivered.toValue()) {
                       setState(() {
                         showResources = true;
@@ -1387,10 +1529,9 @@ class _TaskDetailPageState extends LocalizedState<TaskDetailPage> {
                         showResources = false;
                       });
                     }
-                  }
-                },
+                  },
+                ),
               ),
-            ),
             ),
             // const SizedBox(height: 12),
             // Row(
@@ -1419,8 +1560,8 @@ class _TaskDetailPageState extends LocalizedState<TaskDetailPage> {
                 // const SizedBox(width: 8),
                 Expanded(
                   child: _buildDatePickerField(
-                    label: localizations
-                        .translate(i18.editTasks.createdDateLabel),
+                    label:
+                        localizations.translate(i18.editTasks.createdDateLabel),
                     controller: _controllers['createdDate']!,
                     showEditableBadge: true,
                   ),
@@ -1487,6 +1628,35 @@ class _TaskDetailPageState extends LocalizedState<TaskDetailPage> {
         .join(' ');
   }
 
+  String _getAdditionalFieldLabel(String key) {
+    final String? i18Key = switch (key) {
+      'name' => i18.editTasks.nameLabel,
+      'age' => i18.editTasks.ageLabel,
+      'gender' => i18.editTasks.genderLabel,
+      'cycleIndex' || 'cycle' => i18.beneficiaryDetails.recordCycle,
+      'doseIndex' => i18.deliverIntervention.dose,
+      'dateOfAdministration' => i18.householdDetails.dateOfAdministrationLabel,
+      'dateOfEvaluation' => i18.referBeneficiary.dateOfEvaluationLabel,
+      'referralComments' => i18.referBeneficiary.referralComments,
+      'referredBy' => i18.referBeneficiary.referredByLabel,
+      'deliveryComment' => i18.editTasks.deliveryCommentLabel,
+      'dateOfDelivery' => i18.editTasks.dateOfDeliveryLabel,
+      'deliveryStrategy' => i18.editTasks.deliveryStrategyLabel,
+      'deliveryType' => i18.editTasks.deliveryTypeLabel,
+      'TaskStatus' || 'taskStatus' => i18.editTasks.statusLabel,
+      _ => null,
+    };
+
+    if (i18Key != null) {
+      return localizations.translate(i18Key);
+    }
+
+    return localizations.translateWithDefault(
+      key,
+      fallback: _formatFieldLabel(key),
+    );
+  }
+
   bool _isAdditionalFieldEditable(String key) {
     return _editableAdditionalFieldKeys.contains(key) ||
         key == _genderFieldKey ||
@@ -1497,10 +1667,9 @@ class _TaskDetailPageState extends LocalizedState<TaskDetailPage> {
     final labels = <String>[
       localizations.translate(i18.editTasks.statusLabel),
       localizations.translate(i18.editTasks.createdDateLabel),
-      _formatFieldLabel('name'),
-      _formatFieldLabel('age'),
-      localizations.translate(i18.editTasks.genderLabel),
-      _formatFieldLabel('dateOfDelivery'),
+      _getAdditionalFieldLabel('name'),
+      _getAdditionalFieldLabel('gender'),
+      _getAdditionalFieldLabel('dateOfDelivery'),
     ];
     if (showResources) {
       labels.insert(
@@ -1725,7 +1894,7 @@ class _TaskDetailPageState extends LocalizedState<TaskDetailPage> {
     String key,
     TextEditingController controller,
   ) {
-    final label = _formatFieldLabel(key);
+    final label = _getAdditionalFieldLabel(key);
     final isEditable = _isAdditionalFieldEditable(key);
 
     if (key == _genderFieldKey) {
@@ -1734,7 +1903,15 @@ class _TaskDetailPageState extends LocalizedState<TaskDetailPage> {
 
     Widget field;
 
-    if (_datePickerAdditionalFieldKeys.contains(key)) {
+    if (key == 'TaskStatus' || key == 'taskStatus') {
+      field = CustomDigitTextField(
+        label: label,
+        controller: TextEditingController(
+          text: localizations.translate(controller.text),
+        ),
+        readOnly: true,
+      );
+    } else if (_datePickerAdditionalFieldKeys.contains(key)) {
       field = _buildDatePickerField(
         label: label,
         controller: controller,

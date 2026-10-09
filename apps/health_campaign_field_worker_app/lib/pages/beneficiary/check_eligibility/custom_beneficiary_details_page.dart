@@ -117,11 +117,18 @@ class CustomBeneficiaryDetailsPageState
                   checkDeliveryType(element))
               .toList();
           final bloc = context.read<DeliverInterventionBloc>();
-          List<TaskModel>? pastTasks = taskData;
-          if (taskData?.lastOrNull?.status ==
-              Status.beneficiaryRefused.toValue().toString()) {
-            pastTasks?.removeLast();
-          }
+          // Only tasks that actually resulted in a delivered dose should
+          // count toward the next dose/cycle number. Non-delivery outcomes
+          // (ineligible, refused, referred, absent, etc.) carry the same
+          // deliveryType marker as a real dose but have no doseIndex, so
+          // including them here made the missing-doseIndex fallback
+          // ('1') look like a dose was already given, bumping the next
+          // real administration to dose 2 instead of dose 1.
+          List<TaskModel>? pastTasks = taskData
+              ?.where((element) =>
+                  element.status == Status.delivered.toValue() ||
+                  element.status == Status.administeredSuccess.toValue())
+              .toList();
           final lastDose = pastTasks != null && pastTasks.isNotEmpty
               ? pastTasks.last.additionalFields?.fields
                       .firstWhereOrNull(

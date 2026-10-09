@@ -3,6 +3,9 @@ import 'package:collection/collection.dart';
 import 'package:inventory_management/models/entities/stock.dart';
 import 'package:registration_delivery/registration_delivery.dart';
 
+import '../models/entities/roles_type.dart';
+import 'constants.dart';
+
 class StockInHandResult {
   final double received;
   final double returned;
@@ -25,6 +28,42 @@ class StockInHandResult {
   double get stockInHand => isDistributor
       ? received - (returned + damaged + lost + dispatched) - administered
       : received + returned - (damaged + lost + dispatched) - administered;
+}
+
+/// Single source of truth for resolving which facilities a non-distributor
+/// user's stock/administration numbers should be scoped to. Both the stock
+/// balance widget and the post-downsync stock recalculation must use this
+/// so the two never disagree on the owned-facility set for the same user.
+List<FacilityModel> filterFacilitiesByRole({
+  required List<FacilityModel> facilities,
+  required Set<String> userRoles,
+  required String? boundaryType,
+}) {
+  // HEALTH_FACILITY_SUPERVISOR always operates at HF level, regardless of
+  // the boundary of the currently selected project.
+  final List<FacilityModel> matched;
+  if (userRoles.contains(RolesType.healthFacilitySupervisor.toValue())) {
+    matched =
+        facilities.where((f) => f.usage == Constants.healthFacility).toList();
+  } else if (boundaryType == Constants.countryBoundaryLevel ||
+      boundaryType == Constants.stateBoundaryLevel) {
+    // WAREHOUSE_MANAGER is reused across HF/District/Region tiers; the
+    // boundary of the assigned project is what disambiguates which tier
+    // this particular user's facilities belong to.
+    matched =
+        facilities.where((f) => f.usage == Constants.stateFacility).toList();
+  } else if (boundaryType == Constants.lgaBoundaryLevel) {
+    matched =
+        facilities.where((f) => f.usage == Constants.lgaFacility).toList();
+  } else {
+    matched =
+        facilities.where((f) => f.usage == Constants.healthFacility).toList();
+  }
+
+  // A role/usage tag mismatch shouldn't zero out a user's stock view
+  // entirely — fall back to the unfiltered (still current-project)
+  // facility set rather than dropping the user's facility altogether.
+  return matched.isEmpty ? facilities : matched;
 }
 
 String _additionalFieldValue(StockModel stock, String key) {
@@ -63,12 +102,36 @@ bool _doseIndexIs01(TaskModel task) {
   return doseIndex?.toString() == '01';
 }
 
+/// A task only counts toward the current cycle's administered doses if its
+/// `cycleIndex` additional field matches the currently active cycle's id.
+/// Without this, doses given in past cycles keep getting subtracted from
+/// stock received in the current cycle, driving the balance negative.
+bool _cycleIndexMatches(TaskModel task, int? currentCycleId) {
+  if (currentCycleId == null) return false;
+  final fields = task.additionalFields?.fields;
+  if (fields == null || fields.isEmpty) return false;
+  final cycleIndex =
+      fields.firstWhereOrNull((f) => f.key == 'cycleIndex')?.value;
+  return int.tryParse(cycleIndex?.toString() ?? '') == currentCycleId;
+}
+
+/// A stock entry only counts toward the current cycle's stock-in-hand if it
+/// was recorded within that cycle's date window, mirroring the reconciliation
+/// screen's scoping so the two never disagree on the same facility/product.
+bool _isInCycleWindow(StockModel stock, ProjectCycle? currentCycle) {
+  if (currentCycle == null) return true;
+  final createdTime = stock.clientAuditDetails?.createdTime ?? 0;
+  return createdTime >= currentCycle.startDate &&
+      createdTime <= currentCycle.endDate;
+}
+
 StockInHandResult calculateStockInHand({
   required List<StockModel> stockEntries,
   required List<TaskModel> tasksCreatedByUser,
   required List<String> stockOwnerIds,
   required String productVariantId,
   required bool isDistributor,
+  ProjectCycle? currentCycle,
 }) {
   double received = 0;
   double returned = 0;
@@ -95,6 +158,8 @@ StockInHandResult calculateStockInHand({
     final isMine = ownerIds.contains(stock.receiverId) ||
         ownerIds.contains(stock.senderId);
     if (!isMine) continue;
+
+    if (!_isInCycleWindow(stock, currentCycle)) continue;
 
     final qty = _qty(stock.quantity);
     if (qty <= 0) continue;
@@ -130,6 +195,7 @@ StockInHandResult calculateStockInHand({
   double administered = 0;
   for (final task in tasksCreatedByUser) {
     if (!_doseIndexIs01(task)) continue;
+    if (!_cycleIndexMatches(task, currentCycle?.id)) continue;
     final resources = task.resources;
     if (resources == null || resources.isEmpty) continue;
     for (final res in resources) {

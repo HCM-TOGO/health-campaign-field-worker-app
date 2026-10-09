@@ -37,6 +37,8 @@ import '../../../models/entities/identifier_types.dart';
 import '../../../router/app_router.dart';
 import '../../../utils/app_enums.dart';
 import '../../../utils/utils.dart' show getIndividualAdditionalFields;
+import '../../../utils/registration_delivery/utils_smc.dart';
+import '../../../data/repositories/custom_task.dart';
 
 @RoutePage()
 class CustomDoseAdministeredPage extends LocalizedStatefulWidget {
@@ -117,7 +119,7 @@ class CustomDoseAdministeredPageState
                             size: DigitButtonSize.large,
                             mainAxisSize: MainAxisSize.max,
                             isDisabled: isClicked,
-                            onPressed: () {
+                            onPressed: () async {
                               final doseAdministered = true;
                               final lat = locationState.latitude;
                               final long = locationState.longitude;
@@ -128,21 +130,55 @@ class CustomDoseAdministeredPageState
                                   context.read<DeliverInterventionBloc>();
 
                               if (doseAdministered == true && context.mounted) {
-                                // Iterate through future deliveries
+                                final taskDataRepository = context.read<
+                                        LocalRepository<TaskModel,
+                                            TaskSearchModel>>()
+                                    as CustomTaskLocalRepository;
 
-                                for (var e in bloc.futureDeliveries!) {
+                                // Reuse tasks left notAdministered/
+                                // beneficiaryRefused for this cycle (a prior
+                                // failed attempt) instead of creating new
+                                // ones on retry. The administeredSuccess-slot
+                                // task (deliveryStrategy "direct") is handled
+                                // by the previous screen; only the
+                                // delivered-slot tasks (deliveryStrategy
+                                // "indirect") are consumed here, in order.
+                                final retryableTasks =
+                                    await getRetryableTasksForCycle(
+                                  taskDataRepository: taskDataRepository,
+                                  projectBeneficiaryClientReferenceId: bloc
+                                      .oldTask
+                                      ?.projectBeneficiaryClientReferenceId,
+                                  cycle: bloc.cycle,
+                                );
+                                final deliveredRetryTasks = retryableTasks
+                                    .whereNot(isDirectDeliveryTask)
+                                    .toList();
+
+                                // Iterate through future deliveries
+                                for (var i = 0;
+                                    i < bloc.futureDeliveries!.length;
+                                    i++) {
+                                  var e = bloc.futureDeliveries![i];
                                   int doseIndex = e.id;
-                                  final clientReferenceId = IdGen.i.identifier;
+                                  final existingTask =
+                                      i < deliveredRetryTasks.length
+                                          ? deliveredRetryTasks[i]
+                                          : null;
+                                  final clientReferenceId =
+                                      existingTask?.clientReferenceId ??
+                                          IdGen.i.identifier;
                                   final address = bloc.oldTask?.address;
-                                  // Create and dispatch a DeliverInterventionSubmitEvent with a new TaskModel
+                                  // Create and dispatch a DeliverInterventionSubmitEvent with a new (or reused) TaskModel
                                   event.add(DeliverInterventionSubmitEvent(
                                     task: TaskModel(
+                                      id: existingTask?.id,
                                       projectId: RegistrationDeliverySingleton()
                                           .projectId,
                                       address: address?.copyWith(
                                         relatedClientReferenceId:
                                             clientReferenceId,
-                                        id: null,
+                                        id: existingTask?.address?.id,
                                       ),
                                       status: Status.delivered.toValue(),
                                       clientReferenceId: clientReferenceId,
@@ -151,21 +187,38 @@ class CustomDoseAdministeredPageState
                                           ?.projectBeneficiaryClientReferenceId,
                                       tenantId: RegistrationDeliverySingleton()
                                           .tenantId,
-                                      rowVersion: 1,
-                                      auditDetails: AuditDetails(
-                                        createdBy:
-                                            RegistrationDeliverySingleton()
-                                                .loggedInUserUuid!,
-                                        createdTime:
-                                            context.millisecondsSinceEpoch(),
-                                      ),
-                                      clientAuditDetails: ClientAuditDetails(
-                                        createdBy:
-                                            RegistrationDeliverySingleton()
-                                                .loggedInUserUuid!,
-                                        createdTime:
-                                            context.millisecondsSinceEpoch(),
-                                      ),
+                                      rowVersion: existingTask?.rowVersion ?? 1,
+                                      auditDetails: existingTask?.auditDetails
+                                              ?.copyWith(
+                                            lastModifiedBy:
+                                                RegistrationDeliverySingleton()
+                                                    .loggedInUserUuid,
+                                            lastModifiedTime:
+                                                context.millisecondsSinceEpoch(),
+                                          ) ??
+                                          AuditDetails(
+                                            createdBy:
+                                                RegistrationDeliverySingleton()
+                                                    .loggedInUserUuid!,
+                                            createdTime:
+                                                context.millisecondsSinceEpoch(),
+                                          ),
+                                      clientAuditDetails: existingTask
+                                              ?.clientAuditDetails
+                                              ?.copyWith(
+                                            lastModifiedBy:
+                                                RegistrationDeliverySingleton()
+                                                    .loggedInUserUuid,
+                                            lastModifiedTime:
+                                                context.millisecondsSinceEpoch(),
+                                          ) ??
+                                          ClientAuditDetails(
+                                            createdBy:
+                                                RegistrationDeliverySingleton()
+                                                    .loggedInUserUuid!,
+                                            createdTime:
+                                                context.millisecondsSinceEpoch(),
+                                          ),
                                       resources: fetchProductVariant(
                                               e,
                                               overViewBloc.selectedIndividual,
@@ -173,36 +226,52 @@ class CustomDoseAdministeredPageState
                                                   .householdMemberWrapper
                                                   .household)
                                           ?.productVariants
-                                          ?.map((variant) => TaskResourceModel(
-                                                clientReferenceId:
-                                                    IdGen.i.identifier,
-                                                tenantId:
+                                          ?.mapIndexed((index, variant) {
+                                        // Reuse the matching existing
+                                        // resource row's identity too, so an
+                                        // update doesn't duplicate it.
+                                        final existingResource =
+                                            (existingTask?.resources != null &&
+                                                    index <
+                                                        existingTask!
+                                                            .resources!.length)
+                                                ? existingTask.resources![index]
+                                                : null;
+                                        return TaskResourceModel(
+                                          clientReferenceId: existingResource
+                                                  ?.clientReferenceId ??
+                                              IdGen.i.identifier,
+                                          id: existingResource?.id,
+                                          tenantId:
+                                              RegistrationDeliverySingleton()
+                                                  .tenantId,
+                                          taskclientReferenceId:
+                                              clientReferenceId,
+                                          quantity:
+                                              variant.quantity.toString(),
+                                          productVariantId:
+                                              variant.productVariantId,
+                                          isDelivered: true,
+                                          auditDetails: existingResource
+                                                  ?.auditDetails ??
+                                              AuditDetails(
+                                                createdBy:
                                                     RegistrationDeliverySingleton()
-                                                        .tenantId,
-                                                taskclientReferenceId:
-                                                    clientReferenceId,
-                                                quantity:
-                                                    variant.quantity.toString(),
-                                                productVariantId:
-                                                    variant.productVariantId,
-                                                isDelivered: true,
-                                                auditDetails: AuditDetails(
-                                                  createdBy:
-                                                      RegistrationDeliverySingleton()
-                                                          .loggedInUserUuid!,
-                                                  createdTime: context
-                                                      .millisecondsSinceEpoch(),
-                                                ),
-                                                clientAuditDetails:
-                                                    ClientAuditDetails(
-                                                  createdBy:
-                                                      RegistrationDeliverySingleton()
-                                                          .loggedInUserUuid!,
-                                                  createdTime: context
-                                                      .millisecondsSinceEpoch(),
-                                                ),
-                                              ))
-                                          .toList(),
+                                                        .loggedInUserUuid!,
+                                                createdTime: context
+                                                    .millisecondsSinceEpoch(),
+                                              ),
+                                          clientAuditDetails: existingResource
+                                                  ?.clientAuditDetails ??
+                                              ClientAuditDetails(
+                                                createdBy:
+                                                    RegistrationDeliverySingleton()
+                                                        .loggedInUserUuid!,
+                                                createdTime: context
+                                                    .millisecondsSinceEpoch(),
+                                              ),
+                                        );
+                                      }).toList(),
                                       additionalFields: TaskAdditionalFields(
                                         version: 1,
                                         fields: [
@@ -276,7 +345,7 @@ class CustomDoseAdministeredPageState
                                         ],
                                       ),
                                     ),
-                                    isEditing: false,
+                                    isEditing: existingTask != null,
                                     boundaryModel:
                                         RegistrationDeliverySingleton()
                                             .boundary!,

@@ -261,7 +261,7 @@ class CustomSurveyFormPreviewPageState
   /// [CustomSurveyFormViewPage]. These attributes are persisted as epoch
   /// milliseconds, so they need to be formatted back for display.
   bool isDateAttribute(String? code) {
-    return (code == "UHFWA_Q7" || code == "CDD_UPA_Q5" || code == "UHFA_Q3");
+    return (code == "UHFWA_Q6" || code == "CDD_UPA_Q10" || code == "UHFA_Q4");
   }
 
   /// Formats a stored date value (epoch milliseconds) into the same

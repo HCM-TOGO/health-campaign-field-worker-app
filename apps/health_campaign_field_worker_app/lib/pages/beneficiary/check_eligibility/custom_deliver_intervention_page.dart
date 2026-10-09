@@ -39,7 +39,11 @@ import '../../../models/entities/additional_fields_type.dart'
     as additional_fields_local;
 import '../../../utils/upper_case.dart';
 import '../../../utils/utils.dart' as local_utils;
+import '../../../utils/registration_delivery/utils_smc.dart';
 import '../../../widgets/custom_back_navigation.dart';
+import '../../../data/repositories/custom_task.dart';
+import '../../../models/entities/assessment_checklist/status.dart'
+    as status_local;
 
 @RoutePage()
 class CustomDeliverInterventionPage extends LocalizedStatefulWidget {
@@ -93,13 +97,36 @@ class CustomDeliverInterventionPageState
       IndividualModel? selectedIndividual) async {
     final lat = locationState.latitude;
     final long = locationState.longitude;
+
+    // Reuse a task left notAdministered/beneficiaryRefused for this cycle
+    // instead of creating a new one on retry. The administeredSuccess-slot
+    // task is the one created with deliveryStrategy "direct" (see
+    // isDirectDeliveryTask). A beneficiaryInEligible task never carries a
+    // deliveryStrategy field (it's set before that concept applies), but it
+    // is still the direct-slot attempt for this cycle - if the user came
+    // back and changed the answers to eligible, fall back to it so
+    // administering the dose updates that same task instead of leaving it
+    // behind as a stale ineligible record.
+    final taskDataRepository =
+        context.read<LocalRepository<TaskModel, TaskSearchModel>>()
+            as CustomTaskLocalRepository;
+    final retryableTasks = await getRetryableTasksForCycle(
+      taskDataRepository: taskDataRepository,
+      projectBeneficiaryClientReferenceId: projectBeneficiary.clientReferenceId,
+      cycle: deliverInterventionState.cycle,
+    );
+    final existingTask = retryableTasks.firstWhereOrNull(isDirectDeliveryTask) ??
+        retryableTasks.firstWhereOrNull((t) =>
+            t.status == status_local.Status.beneficiaryInEligible.toValue());
+
     TaskModel taskModel = _getTaskModel(
       context,
       form: form,
-      oldTask: RegistrationDeliverySingleton().beneficiaryType ==
-              BeneficiaryType.household
-          ? deliverInterventionState.tasks?.lastOrNull
-          : null,
+      oldTask: existingTask ??
+          (RegistrationDeliverySingleton().beneficiaryType ==
+                  BeneficiaryType.household
+              ? deliverInterventionState.tasks?.lastOrNull
+              : null),
       projectBeneficiaryClientReferenceId: projectBeneficiary.clientReferenceId,
       dose: deliverInterventionState.dose,
       cycle: deliverInterventionState.cycle,
@@ -112,11 +139,10 @@ class CustomDeliverInterventionPageState
     context.read<DeliverInterventionBloc>().add(
           DeliverInterventionSubmitEvent(
               task: taskModel,
-              isEditing: (deliverInterventionState.tasks ?? []).isNotEmpty &&
+              isEditing: existingTask != null ||
+                  ((deliverInterventionState.tasks ?? []).isNotEmpty &&
                       RegistrationDeliverySingleton().beneficiaryType ==
-                          BeneficiaryType.household
-                  ? true
-                  : false,
+                          BeneficiaryType.household),
               boundaryModel: RegistrationDeliverySingleton().boundary!,
               navigateToSummary: false,
               householdMemberWrapper: householdMember),
@@ -236,6 +262,28 @@ class CustomDeliverInterventionPageState
     //     ),
     //   );
     // }
+    // Wait for the DeliverInterventionSubmitEvent handler above to actually
+    // finish taskRepository.create()/update() — it emits a state with
+    // oldTask matching this task right after that call completes — instead
+    // of a fixed sleep. A fixed delay either isn't long enough on a slow
+    // device (leaving the task uncreated/unsynced, the bug this replaced)
+    // or lingers longer than needed, giving custom_beneficiary_details_page's
+    // per-build setActiveCycleDose dispatch (see its own TODO about this)
+    // a chance to fire and bump the bloc's live cycle/dose before we
+    // navigate, which showed up as this task's dose being displayed as the
+    // next dose instead of the one just submitted.
+    final bloc = context.read<DeliverInterventionBloc>();
+    if (bloc.state.oldTask?.clientReferenceId != taskModel.clientReferenceId) {
+      await bloc.stream
+          .firstWhere(
+            (s) => s.oldTask?.clientReferenceId == taskModel.clientReferenceId,
+          )
+          .timeout(
+            const Duration(seconds: 3),
+            onTimeout: () => bloc.state,
+          );
+    }
+
     context.router.popAndPush(CustomDeliverySummaryRoute(
       eligibilityAssessmentType: widget.eligibilityAssessmentType,
       task: taskModel,
@@ -444,6 +492,7 @@ class CustomDeliverInterventionPageState
                                                               type: ToastType
                                                                   .error);
                                                         } else {
+                                                          clickedStatus.value = true;
                                                           // final shouldSubmit =
                                                           //     await dialog
                                                           //             .DigitDialog
@@ -855,15 +904,33 @@ class CustomDeliverInterventionPageState
           .toList(),
       address: address?.copyWith(
         relatedClientReferenceId: clientReferenceId,
-        id: null,
+        id: oldTask?.address?.id,
       ),
       status: Status.administeredSuccess.toValue(),
+      // Bump audit details on every submission so a reused task's
+      // lastModifiedBy/lastModifiedTime reflect this retry, not whichever
+      // earlier edit it carried over from.
+      auditDetails: task.auditDetails?.copyWith(
+        lastModifiedBy: RegistrationDeliverySingleton().loggedInUserUuid,
+        lastModifiedTime:
+            ContextUtilityExtensions(context).millisecondsSinceEpoch(),
+      ),
+      clientAuditDetails: task.clientAuditDetails?.copyWith(
+            lastModifiedBy: RegistrationDeliverySingleton().loggedInUserUuid,
+            lastModifiedTime:
+                ContextUtilityExtensions(context).millisecondsSinceEpoch(),
+          ) ??
+          ClientAuditDetails(
+            createdBy: RegistrationDeliverySingleton().loggedInUserUuid!,
+            createdTime:
+                ContextUtilityExtensions(context).millisecondsSinceEpoch(),
+          ),
       additionalFields: TaskAdditionalFields(
         version: task.additionalFields?.version ?? 1,
         fields: [
           AdditionalField(
             RegistrationDeliveryEnums.name.toValue(),
-            RegistrationDeliverySingleton().loggedInUser?.name,
+            selectedIndividual?.name?.givenName,
           ),
           AdditionalField(
             AdditionalFieldsType.dateOfDelivery.toValue(),
@@ -912,7 +979,24 @@ class CustomDeliverInterventionPageState
       ),
     );
 
-    if (oldTask != null &&
+    // Reuse the existing resource rows' identity too (matched by index) so
+    // updating the task in place doesn't leave duplicate resource rows.
+    if (oldTask?.resources != null) {
+      task = task.copyWith(
+        resources: task.resources
+            ?.mapIndexed((i, resource) => i < oldTask!.resources!.length
+                ? resource.copyWith(
+                    clientReferenceId: oldTask.resources![i].clientReferenceId,
+                    id: oldTask.resources![i].id,
+                  )
+                : resource)
+            .toList(),
+      );
+    }
+
+    if (RegistrationDeliverySingleton().beneficiaryType ==
+            BeneficiaryType.household &&
+        oldTask != null &&
         oldTask.status == Status.beneficiaryRefused.toValue()) {
       oldTask = oldTask.copyWith(
         additionalFields: oldTask.additionalFields != null

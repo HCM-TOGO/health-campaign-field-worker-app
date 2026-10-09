@@ -822,6 +822,7 @@ mixin _$StockReconciliationState {
   FacilityModel? get facilityModel => throw _privateConstructorUsedError;
   String? get productVariantId => throw _privateConstructorUsedError;
   List<StockModel> get stockModels => throw _privateConstructorUsedError;
+  List<TaskModel> get tasksCreatedByUser => throw _privateConstructorUsedError;
   StockReconciliationModel? get stockReconciliationModel =>
       throw _privateConstructorUsedError;
 
@@ -844,6 +845,7 @@ abstract class $StockReconciliationStateCopyWith<$Res> {
       FacilityModel? facilityModel,
       String? productVariantId,
       List<StockModel> stockModels,
+      List<TaskModel> tasksCreatedByUser,
       StockReconciliationModel? stockReconciliationModel});
 }
 
@@ -868,6 +870,7 @@ class _$StockReconciliationStateCopyWithImpl<$Res,
     Object? facilityModel = freezed,
     Object? productVariantId = freezed,
     Object? stockModels = null,
+    Object? tasksCreatedByUser = null,
     Object? stockReconciliationModel = freezed,
   }) {
     return _then(_value.copyWith(
@@ -899,6 +902,10 @@ class _$StockReconciliationStateCopyWithImpl<$Res,
           ? _value.stockModels
           : stockModels // ignore: cast_nullable_to_non_nullable
               as List<StockModel>,
+      tasksCreatedByUser: null == tasksCreatedByUser
+          ? _value.tasksCreatedByUser
+          : tasksCreatedByUser // ignore: cast_nullable_to_non_nullable
+              as List<TaskModel>,
       stockReconciliationModel: freezed == stockReconciliationModel
           ? _value.stockReconciliationModel
           : stockReconciliationModel // ignore: cast_nullable_to_non_nullable
@@ -924,6 +931,7 @@ abstract class _$$StockReconciliationStateImplCopyWith<$Res>
       FacilityModel? facilityModel,
       String? productVariantId,
       List<StockModel> stockModels,
+      List<TaskModel> tasksCreatedByUser,
       StockReconciliationModel? stockReconciliationModel});
 }
 
@@ -947,6 +955,7 @@ class __$$StockReconciliationStateImplCopyWithImpl<$Res>
     Object? facilityModel = freezed,
     Object? productVariantId = freezed,
     Object? stockModels = null,
+    Object? tasksCreatedByUser = null,
     Object? stockReconciliationModel = freezed,
   }) {
     return _then(_$StockReconciliationStateImpl(
@@ -978,6 +987,10 @@ class __$$StockReconciliationStateImplCopyWithImpl<$Res>
           ? _value._stockModels
           : stockModels // ignore: cast_nullable_to_non_nullable
               as List<StockModel>,
+      tasksCreatedByUser: null == tasksCreatedByUser
+          ? _value._tasksCreatedByUser
+          : tasksCreatedByUser // ignore: cast_nullable_to_non_nullable
+              as List<TaskModel>,
       stockReconciliationModel: freezed == stockReconciliationModel
           ? _value.stockReconciliationModel
           : stockReconciliationModel // ignore: cast_nullable_to_non_nullable
@@ -997,8 +1010,10 @@ class _$StockReconciliationStateImpl extends _StockReconciliationState {
       this.facilityModel,
       this.productVariantId,
       final List<StockModel> stockModels = const [],
+      final List<TaskModel> tasksCreatedByUser = const [],
       this.stockReconciliationModel})
       : _stockModels = stockModels,
+        _tasksCreatedByUser = tasksCreatedByUser,
         super._();
 
   @override
@@ -1024,12 +1039,22 @@ class _$StockReconciliationStateImpl extends _StockReconciliationState {
     return EqualUnmodifiableListView(_stockModels);
   }
 
+  final List<TaskModel> _tasksCreatedByUser;
+  @override
+  @JsonKey()
+  List<TaskModel> get tasksCreatedByUser {
+    if (_tasksCreatedByUser is EqualUnmodifiableListView)
+      return _tasksCreatedByUser;
+    // ignore: implicit_dynamic_type
+    return EqualUnmodifiableListView(_tasksCreatedByUser);
+  }
+
   @override
   final StockReconciliationModel? stockReconciliationModel;
 
   @override
   String toString() {
-    return 'StockReconciliationState(loading: $loading, persisted: $persisted, projectId: $projectId, dateOfReconciliation: $dateOfReconciliation, facilityModel: $facilityModel, productVariantId: $productVariantId, stockModels: $stockModels, stockReconciliationModel: $stockReconciliationModel)';
+    return 'StockReconciliationState(loading: $loading, persisted: $persisted, projectId: $projectId, dateOfReconciliation: $dateOfReconciliation, facilityModel: $facilityModel, productVariantId: $productVariantId, stockModels: $stockModels, tasksCreatedByUser: $tasksCreatedByUser, stockReconciliationModel: $stockReconciliationModel)';
   }
 
   @override
@@ -1050,6 +1075,8 @@ class _$StockReconciliationStateImpl extends _StockReconciliationState {
                 other.productVariantId == productVariantId) &&
             const DeepCollectionEquality()
                 .equals(other._stockModels, _stockModels) &&
+            const DeepCollectionEquality()
+                .equals(other._tasksCreatedByUser, _tasksCreatedByUser) &&
             (identical(
                     other.stockReconciliationModel, stockReconciliationModel) ||
                 other.stockReconciliationModel == stockReconciliationModel));
@@ -1065,6 +1092,7 @@ class _$StockReconciliationStateImpl extends _StockReconciliationState {
       facilityModel,
       productVariantId,
       const DeepCollectionEquality().hash(_stockModels),
+      const DeepCollectionEquality().hash(_tasksCreatedByUser),
       stockReconciliationModel);
 
   @JsonKey(ignore: true)
@@ -1084,6 +1112,7 @@ abstract class _StockReconciliationState extends StockReconciliationState {
           final FacilityModel? facilityModel,
           final String? productVariantId,
           final List<StockModel> stockModels,
+          final List<TaskModel> tasksCreatedByUser,
           final StockReconciliationModel? stockReconciliationModel}) =
       _$StockReconciliationStateImpl;
   _StockReconciliationState._() : super._();
@@ -1102,6 +1131,8 @@ abstract class _StockReconciliationState extends StockReconciliationState {
   String? get productVariantId;
   @override
   List<StockModel> get stockModels;
+  @override
+  List<TaskModel> get tasksCreatedByUser;
   @override
   StockReconciliationModel? get stockReconciliationModel;
   @override
