@@ -88,7 +88,7 @@ class CustomStockDetailsPageState
         Validators.number(),
         Validators.required,
         Validators.min(1),
-        Validators.max(100000000),
+        Validators.max(maxQuantity),
       ]),
       _transactionReasonKey: FormControl<String>(),
       _waybillNumberKey: FormControl<String>(
@@ -1758,14 +1758,13 @@ class CustomStockDetailsPageState
                                           if (val.isEmpty || val.trim() == '') {
                                             field.control.value = null;
                                           } else {
-                                            if (int.parse(val) > 10000000000) {
-                                              field.control.value = 10000;
-                                              field.control.markAsTouched();
-                                            } else {
-                                              field.control.value =
-                                                  int.parse(val);
-                                              field.control.markAsTouched();
-                                            }
+                                            // Keep out-of-range values so the max validator
+                                            // rejects them; digits too long to fit in an int
+                                            // are mapped just above the max for the same reason.
+                                            field.control.value =
+                                                int.tryParse(val) ??
+                                                    maxQuantity + 1;
+                                            field.control.markAsTouched();
                                           }
                                         },
                                       ),
